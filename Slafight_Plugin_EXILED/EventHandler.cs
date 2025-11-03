@@ -262,7 +262,7 @@ namespace Slafight_Plugin_EXILED
                 speaker.Position = position;
             }
     
-            AudioClipStorage.LoadClip(Path.Combine("C:\\Users\\zeros\\AppData\\Roaming\\EXILED\\ServerContents\\", fileName), fileName);
+            AudioClipStorage.LoadClip(Path.Combine(Slafight_Plugin_EXILED.Plugin.Singleton.Config.AudioReferences, fileName), fileName);
 
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
         }
@@ -407,23 +407,26 @@ namespace Slafight_Plugin_EXILED
 
         public void AlphaWarheadLock(StartingEventArgs ev)
         {
-            Log.Debug("AlphaWarheadLock Successfully Started.");
-            if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && !SpecialWarhead /*&& Warhead.IsInProgress*/)
+            if (cfg.WarheadLockAllowed)
             {
-                float debugLocktime = Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultipler;
-                Log.Debug("Alpha Warhead Lock Timer:" + debugLocktime);
-                Timing.CallDelayed(Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultipler, () =>
+                Log.Debug("AlphaWarheadLock Successfully Started.");
+                if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && !SpecialWarhead /*&& Warhead.IsInProgress*/)
                 {
-                    if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
+                    float debugLocktime = Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultiplier;
+                    Log.Debug("Alpha Warhead Lock Timer:" + debugLocktime);
+                    Timing.CallDelayed(Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultiplier, () =>
                     {
-                        WarheadLocked = true;
-                        Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true,true,true);
-                    }
-                });
-            }
-            else
-            {
+                        if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
+                        {
+                            WarheadLocked = true;
+                            Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true,true,true);
+                        }
+                    });
+                }
+                else
+                {
                     Log.Debug("Alpha Warhead Lock Not Working.\nStatus:\nWarheadLocked?: "+WarheadLocked+"\nIsDeadman?: "+DeadmanSwitch.IsSequenceActive/*+"\nIsProgress?: "+Warhead.IsInProgress*/);
+                }
             }
         }
 
@@ -518,7 +521,7 @@ namespace Slafight_Plugin_EXILED
                         Cassie.MessageTranslated("By Order of O5 Command . Omega Warhead Sequence Activated .","O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを2分40秒後に爆破します。",true);
                         Cassie.MessageTranslated("Goodbye .","さようなら",false);
                         CreateAndPlayAudio("omega.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
-                        Timing.CallDelayed(160, () =>
+                        Timing.CallDelayed(cfg.OW_BoomTime, () =>
                         {
                             if (eventPID != EventPID) return;
                             foreach (Player player in Player.List)
@@ -561,7 +564,7 @@ namespace Slafight_Plugin_EXILED
                         }
                     }
                     CreateAndPlayAudio("delta.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
-                    Timing.CallDelayed(100, () =>
+                    Timing.CallDelayed(cfg.DW_BoomTime, () =>
                     {
                         if (eventPID != EventPID) return;
                         Log.Debug("Delta Passed EventPID Checker");
