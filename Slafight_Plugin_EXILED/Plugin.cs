@@ -16,7 +16,7 @@ namespace Slafight_Plugin_EXILED
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
         public override Version Version => new Version(1,0,0);
-        public override Version RequiredExiledVersion { get; } = new Version(9, 10, 0);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 10, 1);
 
         public EventHandler EventHandler { get; set; }
         public CustomMap CustomMap { get; set; }
