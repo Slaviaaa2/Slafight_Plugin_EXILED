@@ -10,10 +10,9 @@ SCP: Secret LaboratoryのEXILEDフレームワークで動作するプラグイ�
 ## 前提条件
 [ポート番号]/
 - RueI
-- ASS
-<br>
+- ASS<br>
 [dependencies]/
-- AudioPlayerApi
+- AudioPlayerApi<br>
 ## BGMについて
 Omega WarheadやDelta Warheadイベントの際、BGMが何もしていないと流れません。その為、Configにて音楽ファイルのフォルダパスを指定し、`omega.ogg`,`delta.ogg`というファイル名でBGMをフォルダ内に入れる必要があります。<br>
 また、BGM再生時から何秒後に爆発するかもConfigにてご自身の使用するBGMに合わせてfloat形式で設定してください。<br>
