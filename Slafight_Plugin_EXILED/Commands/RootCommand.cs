@@ -16,6 +16,8 @@ public class RootCommand : ParentCommand
     public override void LoadGeneratedCommands()
     {
         RegisterCommand(new ReRollSpecial());
+        RegisterCommand(new Spawn3005());
+        RegisterCommand(new SpawnFifthist());
     }
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

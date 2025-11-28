@@ -73,18 +73,15 @@ namespace Slafight_Plugin_EXILED
             PlayerHandler.Verified += OnVerified;
             ServerHandler.RestartingRound += OnRoundRestarted;
             ServerHandler.RoundStarted += OnRoundStarted;
-            ServerHandler.RoundStarted += SpEventHandler;
             ServerHandler.ReloadedPlugins += OnPluginLoad;
 
             MapHandler.Decontaminating += DeconCancell;
             
             PlayerHandler.ChangingRole += OnChangingRole;
-            PlayerHandler.ChangingRole += SkeletonSpawn;
-            PlayerHandler.ChangingRole += CryFuckSpawn;
+            PlayerHandler.ChangingRole += SpecificSCiPSpawn;
             PlayerHandler.ChangingRole += StatusManager;
             PlayerHandler.Hurting += OnTouchedEnemy;
             PlayerHandler.FlippingCoin += PositionGet;
-            PlayerHandler.Dying += CustomRoleRemover;
             PlayerHandler.InteractingDoor += DoorGet;
             PlayerHandler.Shot += CreateRagdoll;
 
@@ -93,27 +90,21 @@ namespace Slafight_Plugin_EXILED
             WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
             WarheadHandler.Stopping += LockedStopSystem;
             WarheadHandler.Starting += LockedStartSystem;
-            
-            Scp096Handler.CalmingDown += EndlessAnger;
-            Scp096Handler.Enraging += CleanShyDummy;
         }
         ~EventHandler()
         {
             PlayerHandler.Verified -= OnVerified;
             ServerHandler.RoundStarted -= OnRoundRestarted;
             ServerHandler.RoundStarted -= OnRoundStarted;
-            ServerHandler.RoundStarted -= SpEventHandler;
             ServerHandler.ReloadedPlugins -= OnPluginLoad;
             
             MapHandler.Decontaminating -= DeconCancell;
             
             PlayerHandler.ChangingRole -= OnChangingRole;
-            PlayerHandler.ChangingRole -= SkeletonSpawn;
+            PlayerHandler.ChangingRole -= SpecificSCiPSpawn;
             PlayerHandler.ChangingRole -= StatusManager;
-            PlayerHandler.ChangingRole -= CryFuckSpawn;
             PlayerHandler.Hurting -= OnTouchedEnemy;
             PlayerHandler.FlippingCoin -= PositionGet;
-            PlayerHandler.Dying -= CustomRoleRemover;
             PlayerHandler.InteractingDoor -= DoorGet;
             PlayerHandler.Shot -= CreateRagdoll;
             
@@ -122,9 +113,6 @@ namespace Slafight_Plugin_EXILED
             WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
             WarheadHandler.Stopping -= LockedStopSystem;
             WarheadHandler.Starting -= LockedStartSystem;
-            
-            Scp096Handler.CalmingDown -= EndlessAnger;
-            Scp096Handler.Enraging -= CleanShyDummy;
         }
         // Other File Access
         private readonly Config cfg = Plugin.Singleton.Config;
@@ -160,7 +148,11 @@ namespace Slafight_Plugin_EXILED
         
         public void OnVerified(VerifiedEventArgs ev)
         {
-            ev.Player.Broadcast(6,"[WARN]THIS IS EXILED TEST SERVER.\nWelcome to Slafight Plugin Server!",Broadcast.BroadcastFlags.Normal,true);
+            ev.Player.Broadcast(6,"\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>",Broadcast.BroadcastFlags.Normal,true);
+            Timing.CallDelayed(0.05f, () =>
+            {
+                ev.Player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"),55555f);
+            });
         }
 
         public void OnRoundRestarted()
@@ -186,11 +178,18 @@ namespace Slafight_Plugin_EXILED
         {
             Funny = 0;
             Funny = UnityEngine.Random.Range(0, 1f);
-            
+            foreach (Player player in Player.List)
+            {
+                player.ShowHint("");
+            }
         }
 
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
+            foreach (Player player in Player.List)
+            {
+                player.ShowHint("");
+            }
             ev.Player.UniqueRole = String.Empty;
             SpawnRoll = 1;
             SpawnRoll = UnityEngine.Random.Range(0, 1f);
@@ -230,9 +229,6 @@ namespace Slafight_Plugin_EXILED
                 
             CryFuckEnabled = false;
             CryFuckSpawned = false;
-            
-            EventPID = EventPID + 1;
-            SpEventHandler();
         }
         
         public IEnumerator<float> Coroutine(float delay)
@@ -267,16 +263,37 @@ namespace Slafight_Plugin_EXILED
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
         }
         
-        public void SkeletonSpawn(ChangingRoleEventArgs ev)
+        public void SpecificSCiPSpawn(ChangingRoleEventArgs ev)
         {
             var GetPlayerTeam = RoleExtensions.GetTeam(ev.NewRole);
-            if (cfg.SkeletonSpawnAllowed && !SkeletonSpawned && SpawnRoll <= cfg.SkeletonSpawnChance && GetPlayerTeam == Team.SCPs && ev.Reason == SpawnReason.RoundStart)
+            if (ev.Reason == SpawnReason.RoundStart && GetPlayerTeam == Team.SCPs)
             {
-                ev.IsAllowed = false;
-                SkeletonSpawned = true;
-                ev.Player.Role.Set(RoleTypeId.Scp3114);
-                Log.Debug("Scp3114 was Spawned!");
-                SkeletonRagdoll();
+                if (UnityEngine.Random.Range(1,3) == 1)
+                {
+                    List<string> SpecificSCiPs = new List<string>() { "Scp3114","Scp3005" };
+                    string SCiP = String.Empty;
+                    int getRandomValue = UnityEngine.Random.Range(0, SpecificSCiPs.Count);
+                    SCiP = SpecificSCiPs[getRandomValue];
+                    if (SCiP == "Scp3114") // SCP 3114
+                    {
+                        ev.IsAllowed = false;
+                        Timing.CallDelayed(1f, () =>
+                        {
+                            ev.Player.Role.Set(RoleTypeId.Scp3114);
+                            Log.Debug("Scp3114 was Spawned!");
+                            SkeletonRagdoll();
+                        });
+                    }
+                    else if (SCiP == "Scp3005")
+                    {
+                        ev.IsAllowed = false;
+                        Timing.CallDelayed(1f, () =>
+                        {
+                            Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(ev.Player);
+                            Log.Debug("Scp3005 was Spawned!");
+                        });
+                    }
+                }
             }
         }
 
@@ -447,274 +464,10 @@ namespace Slafight_Plugin_EXILED
             }
         }
 
-        public string NowEvent = String.Empty;
-        public void SpEventHandler()
-        {
-            if (cfg.EventAllowed)
-            {
-                Timing.CallDelayed(1, () =>
-                {
-                    Log.Debug("Funny:" + Funny);
-                    if (Funny <= 0.15) // Omega Warhead
-                    {
-                        if (cfg.OW_Allowed)
-                        {
-                            NowEvent = "Omega Warhead";
-                            SpecialWarhead = true;
-                            WarheadID = 1;
-                            DeadmanDisable = true;
-                            OmegaWarheadEvent();
-                        }
-                    }
-                    else if (Funny <= 0.25) // Delta Warhead
-                    {
-                        if (cfg.DW_Allowed)
-                        {
-                            NowEvent = "Delta Warhead";
-                            SpecialWarhead = true;
-                            WarheadID = 2;
-                            DeadmanDisable = true;
-                            DeltaWarheadEvent();
-                        }
-                    }
-                    else if (Funny <= 0.35) // SCP-096's Cry Fuck
-                    {
-                        if (cfg.CF_Allowed)
-                        {
-                            NowEvent = "SCP-096's Cry Fuck";
-                            CryFuckEnabled = true;
-                            Scp096CryFuckEvent();
-                        }
-                    }
-                });
-            }
-            Slafight_Plugin_EXILED.Plugin.Singleton.CustomMap.LoadMap("normal",String.Empty);
-        }
-
-        public void OmegaWarheadEvent()
-        {
-            int eventPID = EventPID;
-            Log.Debug("OmegaWarheadEvent called. PID:"+eventPID);
-            
-            if (eventPID != EventPID) return;
-            WarheadLocked = true;
-            
-            //DeadmanSwitch.IsDeadmanSwitchEnabled = false;
-            //DeadmanSwitch.IsSequenceActive = false;
-            if (eventPID != EventPID) return;
-            Cassie.MessageTranslated("Warning. By order of O5 Command , Starting Alpha Warhead System for Stop Containment Breach.","警告。O5評議会の決定により収容違反収束の為<color=red>ALPHA WARHEAD</color>の使用が決定されました。システムを準備しています・・・", true);
-            Timing.CallDelayed(30, () =>
-            {
-                if (eventPID != EventPID) return;
-                Cassie.MessageTranslated("Alpha Warhead System is now Locked . Warhead Starting . . .","<color=red>ALPHA WARHEAD</color>がロックされました。爆破システムを起動しています・・・");
-                Timing.CallDelayed(35, () =>
-                {
-                    if (eventPID != EventPID) return;
-                    Cassie.MessageTranslated("Alpha Warhead System Not Found . Reporting to O5 Command . . .","<color=red>ALPHA WARHEAD</color>起爆システムが見つかりませんでした。O5に報告しています・・・");
-                    Timing.CallDelayed(350, () =>
-                    {
-                        if (eventPID != EventPID) return;
-                        foreach (Room rooms in Room.List)
-                        {
-                            rooms.Color = Color.blue;
-                        }
-                        Cassie.MessageTranslated("By Order of O5 Command . Omega Warhead Sequence Activated .","O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを2分40秒後に爆破します。",true);
-                        Cassie.MessageTranslated("Goodbye .","さようなら",false);
-                        CreateAndPlayAudio("omega.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
-                        Timing.CallDelayed(cfg.OW_BoomTime, () =>
-                        {
-                            if (eventPID != EventPID) return;
-                            foreach (Player player in Player.List)
-                            {
-                                if (player == null) continue;
-                                player.ExplodeEffect(ProjectileType.FragGrenade);
-                                player.Kill("OMEGA WARHEADに爆破された");
-                            }
-                        });
-                    });
-                });
-            });
-        }
-        
-        public void DeltaWarheadEvent()
-        { 
-            int eventPID = EventPID;
-            Log.Debug("DeltaWarheadEvent called. PID:"+eventPID);
-            
-            if (eventPID != EventPID) return;
-            DeconCancellFlag = true;
-            WarheadLocked = true;
-            
-            if (eventPID != EventPID) return;
-            Timing.CallDelayed(60, () =>
-            {
-                if (eventPID != EventPID) return;
-                DecontaminationController.Singleton.TimeOffset = int.MinValue;
-                DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
-                Cassie.MessageTranslated("Light Containment Zone Decontamination Process now Stopped . Waiting new Process or Sequence Order .","軽度収容区画の除染プロセスが停止されました。代替となる指令を待機しています・・・");
-                Timing.CallDelayed(180, () =>
-                {
-                    if (eventPID != EventPID) return;
-                    Cassie.MessageTranslated("By order of O5 Command . Delta Warhead Sequence Activated . Entrance Zone and Heavy Containment Zone personnels . Please go to Light Containment Zone .","O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。中層及びエントランス区画は1分40秒後に爆破します。中層及びエントランス区画職員は下層か地上へ非難してください。", true);
-                    foreach (Room rooms in Room.List)
-                    {
-                        if (rooms.Zone == ZoneType.Entrance || rooms.Zone == ZoneType.HeavyContainment)
-                        {
-                            rooms.Color = Color.green;
-                        }
-                    }
-                    CreateAndPlayAudio("delta.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
-                    Timing.CallDelayed(cfg.DW_BoomTime, () =>
-                    {
-                        if (eventPID != EventPID) return;
-                        Log.Debug("Delta Passed EventPID Checker");
-                        List<ElevatorType> lockEvTypes = new List<ElevatorType>() { ElevatorType.GateA,ElevatorType.GateB,ElevatorType.LczA,ElevatorType.LczB };
-                        foreach (Lift lift in Lift.List){
-                            Log.Debug("sendforeach:"+lift.Type);
-                            if (lockEvTypes.Contains(lift.Type))
-                            {
-                                Log.Debug("foreach catched: "+lift.Type);
-                                lift.TryStart(0,true);
-                            }
-                        }
-                        Log.Debug("Delta Passed TryStart Elevator Foreach.");
-                        List<DoorType> lockEvDoorTypes = new List<DoorType>() { DoorType.ElevatorGateA,DoorType.ElevatorGateB,DoorType.ElevatorLczA,DoorType.ElevatorLczB };
-                        foreach (Door door in Door.List)
-                        {
-                            Log.Debug("lockforeach:"+door.Type);
-                            if (lockEvDoorTypes.Contains(door.Type))
-                            {
-                                Log.Debug("foreach catched: "+door.Type);
-                                door.Lock(DoorLockType.Warhead);
-                            }
-                        }
-                        Log.Debug("Delta Passed Lock Elevator Foreach.");
-                        foreach (Player player in Player.List)
-                        {
-                            Log.Debug("playerforeach:"+player.Zone);
-                            if (player.Zone == ZoneType.Entrance || player.Zone == ZoneType.HeavyContainment)
-                            {
-                                player.ExplodeEffect(ProjectileType.FragGrenade);
-                                player.Kill("DELTA WARHEADに爆破された");
-                            }
-                        }
-                        Log.Debug("Delta Passed Kill Player Foreach");
-                    });
-                });
-            });
-        }
-
-        public void Scp096CryFuckEvent()
-        {
-            int eventPID = EventPID;
-            Log.Debug("Scp096's CryFuckEvent called. PID:"+eventPID);
-            if (eventPID != EventPID) return;
-
-            CryFuckEnabled = true;
-            foreach (Player player in Player.List)
-            {
-                if (player.Role.Team == Team.SCPs || player.Role.Type == RoleTypeId.Tutorial)
-                {
-                    player.Role.Set(RoleTypeId.Scp096);
-                    break;
-                }
-            }
-        }
-
-        private Vector3 ShyguyPosition = Vector3.zero;
-        public void CryFuckSpawn(ChangingRoleEventArgs ev)
-        {
-            var GetPlayerTeam = RoleExtensions.GetTeam(ev.NewRole);
-            if (CryFuckEnabled && !CryFuckSpawned && GetPlayerTeam == Team.SCPs && (ev.Reason == SpawnReason.RoundStart || ev.Reason == SpawnReason.ForceClass))
-            {
-                ev.IsAllowed = false;
-                CryFuckSpawned = true;
-                ev.Player.Role.Set(RoleTypeId.Scp096);
-                ev.Player.CustomInfo = "SCP-096: ANGER";
-                ev.Player.UniqueRole = "Scp096_Anger";
-                ev.Player.MaxArtificialHealth = 1000;
-                ev.Player.MaxHealth = 5000;
-                ev.Player.Health = 5000;
-                StatusEffectBase? movement = ev.Player.GetEffect(EffectType.MovementBoost);
-                movement.Intensity = 50;
-                ev.Player.ShowHint("あなたは<color=red>SCP-096: ANGER!</color>\nSCP-096の怒りと悲しみが頂点に達し、その化身へと変貌して大いなる力を手に入れた。\n<color=red>とにかく破壊しまくれ！！！！！</color>",10);
-                /*Vector3 shyroom = Vector3.zero;
-                foreach (Room rooms in Room.List)
-                {
-                    if (rooms.Type == RoomType.Hcz096)
-                    {
-                        shyroom = rooms.Position;
-                    }
-                }
-                Log.Debug("Position Get from Hcz096: "+"X:" + shyroom.x + " Y:" + shyroom.y + " Z:" + shyroom.z);
-                */
-                //ev.Player.Position = new Vector3(shyroom.x,shyroom.y + 3f,shyroom.z);
-                //ev.Player.Position = new Vector3(31.8f,-97.04092f,105.0388f);
-                //ev.Player.Transform.localEulerAngles = new Vector3(0, -90, 0);
-                ev.Player.Transform.eulerAngles = new Vector3(0, -90, 0);
-                ShyguyPosition = ev.Player.Position;
-                Log.Debug("Scp096: Anger was Spawned!");
-                StartAnger();
-            }
-        }
-
-        public void StartAnger()
-        {
-            /*Vector3 shyroom = Room.Get(RoomType.Hcz096).Position;
-            foreach (Room rooms in Room.List)
-            {
-                if (rooms.Type == RoomType.Hcz096)
-                {
-                    shyroom = rooms.Position;
-                    Log.Debug("Position Get from for096 Npc_shyroom_get vector3: "+"X:" + shyroom.x + " Y:" + shyroom.y + " Z:" + shyroom.z);
-                }
-            }*/
-
-            foreach (Door door in Door.List)
-            {
-                if (door.Type == DoorType.HeavyContainmentDoor && door.Room.Type == RoomType.Hcz096)
-                {
-                    door.Lock(DoorLockType.AdminCommand);
-                }
-            }
-            
-            Vector3 spawnPoint = new Vector3(ShyguyPosition.x + 1f, ShyguyPosition.y + 0f, ShyguyPosition.z);
-            Npc term_npc = Npc.Spawn("for096",RoleTypeId.ClassD,false,position:spawnPoint);
-            term_npc.Transform.localEulerAngles = new Vector3(0,-90,0);
-        }
-        
-        public void EndlessAnger(Exiled.Events.EventArgs.Scp096.CalmingDownEventArgs ev)
-        {
-            if (ev.Player.UniqueRole == "Scp096_Anger")
-            {
-                ev.IsAllowed = false;
-                ev.ShouldClearEnragedTimeLeft = true;
-            }
-        }
-
-        public void CleanShyDummy(EnragingEventArgs ev)
-        {
-            if (ev.Player.UniqueRole == "Scp096_Anger")
-            {
-                foreach (Npc npc in Npc.List)
-                {
-                    if (npc.CustomName == "for096")
-                    {
-                        npc.Destroy();
-                    }
-                }
-            }
-        }
-
-        public void CustomRoleRemover(DyingEventArgs ev)
-        {
-            ev.Player.UniqueRole = String.Empty;
-        }
-
         public void PositionGet(FlippingCoinEventArgs ev)
         {
             Vector3 playerPosition = ev.Player.Position;
-            if (ev.Player.Role == RoleTypeId.Tutorial)
+            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.Group.BadgeText == "SERVER OWNER")
             {
                 if (ev.Player.CurrentRoom != null)
                 {
@@ -739,7 +492,7 @@ namespace Slafight_Plugin_EXILED
 
         public void DoorGet(InteractingDoorEventArgs ev)
         {
-            if (ev.Player.Role == RoleTypeId.Tutorial)
+            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.Group.BadgeText == "SERVER OWNER")
             {
                 ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + ev.Door.Room.Type,5);
                 Log.Debug("Door Get: " + ev.Door.Type);
@@ -749,13 +502,7 @@ namespace Slafight_Plugin_EXILED
 
         public void CreateRagdoll(ShotEventArgs ev)
         {
-            if (ev.Player.Role == RoleTypeId.Tutorial)
-            {
-                if (ev.Firearm.Type == ItemType.GunCOM15)
-                {
-                    Ragdoll testrag = Ragdoll.CreateAndSpawn(RoleTypeId.ClassD,"test","aaa",new Vector3(ev.Player.Position.x,ev.Player.Position.y + 1f,ev.Player.Position.z));
-                }
-            }
+            
         }
 
         public void LockedStopSystem(StoppingEventArgs ev)
@@ -777,10 +524,10 @@ namespace Slafight_Plugin_EXILED
         
         public void OnTouchedEnemy(Exiled.Events.EventArgs.Player.HurtingEventArgs ev)
         {
-            if (ev.Attacker.UniqueRole == "Scp096_Anger")
+            if (ev.Attacker != null && ev.Attacker.UniqueRole == "Scp096_Anger")
             {
                 ev.Amount = 999999;
-                ev.Attacker.ArtificialHealth = ev.Attacker.ArtificialHealth + 25;
+                ev.Attacker.ArtificialHealth += 25;
             }
         }
 

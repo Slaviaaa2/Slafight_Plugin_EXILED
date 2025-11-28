@@ -17,10 +17,6 @@ using MapHandler = Exiled.Events.Handlers.Map;
 using PlayerHandler = Exiled.Events.Handlers.Player;
 using CassieHandler = Exiled.Events.Handlers.Cassie;
 
-using MERFeatures = MapEditorReborn.API.Features;
-using MERHandler = MapEditorReborn.Events.Handlers;
-using MERArgs = MapEditorReborn.Events.EventArgs;
-
 namespace Slafight_Plugin_EXILED
 {
     public class CustomMap

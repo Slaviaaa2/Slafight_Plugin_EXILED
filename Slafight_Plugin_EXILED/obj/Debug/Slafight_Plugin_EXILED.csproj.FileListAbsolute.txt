@@ -102,10 +102,7 @@ D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Mem
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Buffers.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.ValueTuple.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Numerics.Vectors.dll
-D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\MapEditorReborn.dll
-D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Newtonsoft.Json.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Slafight_Plugin_EXILED.dll.config
-D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Assembly-CSharp.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.TextMeshPro.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\UnityEngine.UI.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.RenderPipelines.Core.Runtime.dll
@@ -122,3 +119,8 @@ D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.Rend
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.RenderPipelines.HighDefinition.Config.Runtime.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.Collections.LowLevel.ILSupport.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Unity.Burst.Unsafe.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\ProjectMER.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\AdvancedMERTools.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Newtonsoft.Json.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Assembly-CSharp-Publicized.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\ASS-Exiled.dll
