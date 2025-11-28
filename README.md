@@ -11,6 +11,7 @@ SCP: Secret LaboratoryのEXILEDフレームワークで動作するプラグイ�
 [ポート番号]/
 - RueI
 - ASS
+<br>
 [dependencies]/
 - AudioPlayerApi
 ## BGMについて
