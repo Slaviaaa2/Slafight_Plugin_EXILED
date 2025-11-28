@@ -7,6 +7,12 @@ SCP: Secret LaboratoryのEXILEDフレームワークで動作するプラグイ�
 作者はC#をいまだ良く分かっていないですし、問題だらけな部分が多いですが少しでもあなたの助けになれば幸いです<br>
 （このプラグインにはOmega WarheadやDelta Warheadなどのファンメイド要素が含まれています！なのでconfigをいじったりして利用してみてもいいかもしれません！）<br>
 # 利用時の注意点
+## 前提条件
+[ポート番号]/
+- RueI
+- ASS
+[dependencies]/
+- AudioPlayerApi
 ## BGMについて
 Omega WarheadやDelta Warheadイベントの際、BGMが何もしていないと流れません。その為、Configにて音楽ファイルのフォルダパスを指定し、`omega.ogg`,`delta.ogg`というファイル名でBGMをフォルダ内に入れる必要があります。<br>
 また、BGM再生時から何秒後に爆発するかもConfigにてご自身の使用するBGMに合わせてfloat形式で設定してください。<br>
