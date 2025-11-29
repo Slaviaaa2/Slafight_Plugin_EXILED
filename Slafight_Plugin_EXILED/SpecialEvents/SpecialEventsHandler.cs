@@ -143,6 +143,12 @@ public class SpecialEventsHandler
             FifthistsRaid FifthistsRaid = new FifthistsRaid();
             FifthistsRaid.FifthistsRaidEvent();
         }
+        else if (nowEvent == SpecialEventType.NuclearAttack)
+        {
+            // TODO: Create NuclearAttack Handler and Write Events.
+            //FifthistsRaid FifthistsRaid = new FifthistsRaid();
+            //FifthistsRaid.FifthistsRaidEvent();
+        }
         else
         {
             
@@ -180,6 +186,10 @@ public class SpecialEventsHandler
             if (Player.List.Count >= 4)
             {
                 allowedEvents.Add(SpecialEventType.FifthistsRaid);
+            }
+            if (Player.List.Count >= 4)
+            {
+                allowedEvents.Add(SpecialEventType.NuclearAttack);
             }
         }
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
@@ -232,6 +242,11 @@ public class SpecialEventsHandler
         else if (nowEvent == SpecialEventType.FifthistsRaid)
         {
             localizedEventName = "FifthistsRaid";
+            eventNeedTriggers = "4人以上のプレイヤー";
+        }
+        else if (nowEvent == SpecialEventType.NuclearAttack)
+        {
+            localizedEventName = "NuclearAttack";
             eventNeedTriggers = "4人以上のプレイヤー";
         }
         else
