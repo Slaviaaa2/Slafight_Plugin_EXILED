@@ -48,5 +48,7 @@ public class FifthistsRaid
                 break;
             }
         }
+        // TODO
+        //Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces .","新ステータス：承認",false,false);
     }
 }
