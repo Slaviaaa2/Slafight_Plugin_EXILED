@@ -118,6 +118,37 @@ public class CustomRolesHandler
         });
     }
 
+    public void SpawnChaosCommando(Player player)
+    {
+        player.Role.Set(RoleTypeId.ChaosMarauder);
+        Vector3 offset;
+        int MaxHealth = 120;
+        
+        OverrideRoleName(player,"",player.DisplayNickname,"カオス コマンドー","TODO: GREEN HEX");
+        
+        Timing.CallDelayed(1.5f, () =>
+        {
+            player.UniqueRole = "CI_Commando";
+
+            player.MaxHealth = MaxHealth;
+            player.Health = MaxHealth;
+            
+            //player.ShowHint(
+                "<color=#ff00fa>第五教会 救出師</color>\n非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない",
+                10);
+            Room SpawnRoom = Room.Get(RoomType.Surface);
+            Log.Debug(SpawnRoom.Position);
+            offset = new Vector3(0f,0f,0f);
+            // TODO: Set Chaos Commando Position or Remove it.
+            player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
+            //player.Rotation = SpawnRoom.Rotation;
+            
+            player.ClearInventory();
+            // TODO: Chaos Commando Inventory Set
+            //player.AddItem();
+        });
+    }
+
     public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
     {
         if (ev.Attacker == null || ev.Player == null)
