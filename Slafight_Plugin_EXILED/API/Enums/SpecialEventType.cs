@@ -17,5 +17,7 @@ public enum SpecialEventType
     /// <summary>BattleField 4</summary>
     Scp1509BattleField = 4,
     /// <summary>THE FIFTHIST'S RAID</summary>
-    FifthistsRaid = 5
+    FifthistsRaid = 5,
+    /// <summary>Nuclear Attack</summary>
+    NuclearAttack = 6
 }
