@@ -4,6 +4,7 @@ using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.DamageHandlers;
+using Exiled.API.Features.Roles;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem;
@@ -120,11 +121,11 @@ public class CustomRolesHandler
 
     public void SpawnChaosCommando(Player player)
     {
-        player.Role.Set(RoleTypeId.ChaosMarauder);
+        player.Role.Set(RoleTypeId.ChaosRepressor);
         Vector3 offset;
-        int MaxHealth = 120;
+        int MaxHealth = 200;
         
-        OverrideRoleName(player,"",player.DisplayNickname,"カオス コマンドー","TODO: GREEN HEX");
+        OverrideRoleName(player,"",player.DisplayNickname,"カオス コマンドー","#228b22");
         
         Timing.CallDelayed(1.5f, () =>
         {
@@ -132,20 +133,32 @@ public class CustomRolesHandler
 
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
+            if (player.Role is IHumeShieldRole)
+            {
+                player.MaxHumeShield = 500;
+                player.HumeShield = 500;
+                player.HumeShieldRegenerationMultiplier = 1.05f;
+            }
             
-            //player.ShowHint(
-                "<color=#ff00fa>第五教会 救出師</color>\n非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない",
+            player.ShowHint(
+                "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
                 10);
             Room SpawnRoom = Room.Get(RoomType.Surface);
             Log.Debug(SpawnRoom.Position);
             offset = new Vector3(0f,0f,0f);
-            // TODO: Set Chaos Commando Position or Remove it.
-            player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
+            //player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
             //player.Rotation = SpawnRoom.Rotation;
             
             player.ClearInventory();
-            // TODO: Chaos Commando Inventory Set
-            //player.AddItem();
+            player.AddItem(ItemType.GunLogicer);
+            player.AddItem(ItemType.ArmorHeavy);
+            player.AddItem(ItemType.KeycardChaosInsurgency);
+            player.AddItem(ItemType.Medkit);
+            player.AddItem(ItemType.Medkit);
+            player.AddItem(ItemType.Adrenaline);
+            player.AddItem(ItemType.GrenadeHE);
+            
+            player.AddAmmo(AmmoType.Nato762,800);
         });
     }
 

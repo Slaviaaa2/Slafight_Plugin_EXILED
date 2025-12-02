@@ -145,9 +145,8 @@ public class SpecialEventsHandler
         }
         else if (nowEvent == SpecialEventType.NuclearAttack)
         {
-            // TODO: Create NuclearAttack Handler and Write Events.
-            //FifthistsRaid FifthistsRaid = new FifthistsRaid();
-            //FifthistsRaid.FifthistsRaidEvent();
+            ChaosInsurgencyRaid ChaosInsurgencyRaid = new ChaosInsurgencyRaid();
+            ChaosInsurgencyRaid.CIREvent();
         }
         else
         {
@@ -187,7 +186,7 @@ public class SpecialEventsHandler
             {
                 allowedEvents.Add(SpecialEventType.FifthistsRaid);
             }
-            if (Player.List.Count >= 4)
+            if (Player.List.Count >= 6)
             {
                 allowedEvents.Add(SpecialEventType.NuclearAttack);
             }
@@ -246,8 +245,8 @@ public class SpecialEventsHandler
         }
         else if (nowEvent == SpecialEventType.NuclearAttack)
         {
-            localizedEventName = "NuclearAttack";
-            eventNeedTriggers = "4人以上のプレイヤー";
+            localizedEventName = "Chaos Insurgency Raid";
+            eventNeedTriggers = "6人以上のプレイヤー";
         }
         else
         {

@@ -18,14 +18,14 @@ namespace ASS.Example.PlayerMenuExamples
     {
         public SS_Handler()
         {
-            PlayerEvents.Joined += OnJoined;
-            PlayerEvents.Left += OnLeft;
+            //PlayerEvents.Joined += OnJoined;
+            //PlayerEvents.Left += OnLeft;
         }
 
         ~SS_Handler()
         {
-            PlayerEvents.Joined -= OnJoined;
-            PlayerEvents.Left -= OnLeft;
+            //PlayerEvents.Joined -= OnJoined;
+            //PlayerEvents.Left -= OnLeft;
         }
         private static readonly Dictionary<Player, PlayerMenu> Menus = new();
 

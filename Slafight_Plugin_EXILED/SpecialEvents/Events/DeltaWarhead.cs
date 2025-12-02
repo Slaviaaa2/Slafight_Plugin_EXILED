@@ -37,7 +37,7 @@ public class DeltaWarhead
             Timing.CallDelayed(180, () =>
             {
                 if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-                Cassie.MessageTranslated($"By Order of O5 Command . Delta Warhead Sequence Activated . Heavy Containment Zone Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime} Seconds.",$"O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime}秒後に爆破します。",true);
+                Cassie.MessageTranslated($"By Order of O5 Command . Delta Warhead Sequence Activated . Heavy Containment Zone Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime} Seconds.",$"O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。重度収容区画を{Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime}秒後に爆破します。",true);
                 foreach (Room rooms in Room.List)
                 {
                     if (rooms.Zone == ZoneType.HeavyContainment)
@@ -64,6 +64,8 @@ public class DeltaWarhead
                     foreach (Door door in Door.List)
                     {
                         Log.Debug("lockforeach:"+door.Type);
+                        if (door.Type == DoorType.CheckpointGateA || door.Type == DoorType.CheckpointGateB)
+                            door.IsOpen = false;
                         if (lockEvDoorTypes.Contains(door.Type))
                         {
                             Log.Debug("foreach catched: "+door.Type);

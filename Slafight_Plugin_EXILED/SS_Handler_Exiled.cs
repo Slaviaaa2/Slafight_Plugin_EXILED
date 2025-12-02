@@ -17,20 +17,24 @@ public class SS_Handler_Exiled
 {
     public SS_Handler_Exiled()
     {
+        /*
         SettingEvents.KeybindPressed += Speak;
         Exiled.Events.Handlers.Player.VoiceChatting += SpeakBySCiP;
         Exiled.Events.Handlers.Server.RestartingRound += initSpeakingPlayers;
         Exiled.Events.Handlers.Player.Left += leftSpeakingPlayers;
         Exiled.Events.Handlers.Player.Dying += dyingSpeakingPlayers;
+        */
     }
 
     ~SS_Handler_Exiled()
     {
+        /*
         SettingEvents.KeybindPressed -= Speak;
         Exiled.Events.Handlers.Player.VoiceChatting -= SpeakBySCiP;
         Exiled.Events.Handlers.Server.RestartingRound -= initSpeakingPlayers;
         Exiled.Events.Handlers.Player.Left -= leftSpeakingPlayers;
         Exiled.Events.Handlers.Player.Dying -= dyingSpeakingPlayers;
+        */
     }
 
     private List<Player> speakingPlayers = new List<Player>() { };
