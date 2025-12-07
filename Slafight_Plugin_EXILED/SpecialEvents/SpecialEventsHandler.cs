@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
+using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp096;
 using Exiled.Events.EventArgs.Server;
@@ -69,14 +70,15 @@ public class SpecialEventsHandler
 
     public void SkipEvent(int EventQueueId = 0)
     {
-        if (EventQueueId < 0)
+        if (EventQueueId < 0 || EventQueueId >= EventQueue.Count)
         {
-            Log.Error("SEH: SkipEvent失敗(0未満の値の指定)");
+            Log.Warn($"SEH: SkipEventスキップ(無効なインデックス: {EventQueueId}, Count: {EventQueue.Count})");
             return;
         }
         EventQueue.RemoveAt(EventQueueId);
         EventPID += 1;
     }
+
 
     public void RunEvent(SpecialEventType eventType)
     {
@@ -97,6 +99,20 @@ public class SpecialEventsHandler
         Log.Debug(SelectedEvent);
         RunEvent(SelectedEvent);
         Log.Debug(EventQueue[0]);
+    }
+    
+    public void SetQueueRandomEvent()
+    {
+        SelectRandom();
+        Log.Debug(SelectedEvent);
+        if (!Enum.IsDefined(typeof(SpecialEventType), SelectedEvent))
+        {
+            Log.Error("SEH: RunEvent失敗(存在しないSpecialEventType)");
+            return;
+        }
+        EventQueue.Insert(1, SelectedEvent);
+        SkipEvent();
+        eventLocSet();
     }
 
     public void InitStats()
@@ -148,6 +164,11 @@ public class SpecialEventsHandler
             ChaosInsurgencyRaid ChaosInsurgencyRaid = new ChaosInsurgencyRaid();
             ChaosInsurgencyRaid.CIREvent();
         }
+        else if (nowEvent == SpecialEventType.ClassicEvent)
+        {
+            ClassicEvent ClassicEvent = new ClassicEvent();
+            ClassicEvent.ClassicEvent_();
+        }
         else
         {
             
@@ -163,6 +184,7 @@ public class SpecialEventsHandler
     public SpecialEventType SelectedEvent = SpecialEventType.None; // 初期値
     public void SelectRandom()
     {
+        Vector3 ToiletPosition = Room.Get(RoomType.HczStraightC).Position;
         List<SpecialEventType> allowedEvents = new List<SpecialEventType>();
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
         {
@@ -186,21 +208,27 @@ public class SpecialEventsHandler
             {
                 allowedEvents.Add(SpecialEventType.FifthistsRaid);
             }
-            if (Player.List.Count >= 6)
+            if (Player.List.Count >= 5)
             {
                 allowedEvents.Add(SpecialEventType.NuclearAttack);
+            }
+            if (Player.List.Count >= 0)
+            {
+                // SCRAPPED. IT'S VERY FUCKIN ISSUES HAVE.
+                //allowedEvents.Add(SpecialEventType.ClassicEvent);
             }
         }
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
         {
-            if (Random.Range(1,5) == 1)
+            SelectedEvent = SpecialEventType.None;
+            if (Random.Range(1,3) == 1)
             {
                 // SpecialEventTypeの1番はNoneの為除外
                 var EventTypes = Enum.GetValues(typeof(SpecialEventType));
-                SpecialEventType selectedEvent;
+                SpecialEventType selectedEvent = SpecialEventType.None;
                 do
                 {
-                    int getRandomValue = Random.Range(1, EventTypes.Length+1);
+                    int getRandomValue = Random.Range(1, EventTypes.Length);
                     selectedEvent = (SpecialEventType)getRandomValue;
                 }
                 while (!allowedEvents.Contains(selectedEvent)); // allowedEventsに含まれなければ再抽選
@@ -212,6 +240,14 @@ public class SpecialEventsHandler
 
     public void eventLocSet()
     {
+        if (EventQueue.Count == 0)
+        {
+            localizedEventName = "無し";
+            eventNeedTriggers = "無し";
+            Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SyncSpecialEvent();
+            return;
+        }
+
         SpecialEventType nowEvent = EventQueue[0];
         if (nowEvent == SpecialEventType.None)
         {
@@ -248,11 +284,17 @@ public class SpecialEventsHandler
             localizedEventName = "Chaos Insurgency Raid";
             eventNeedTriggers = "6人以上のプレイヤー";
         }
+        else if (nowEvent == SpecialEventType.ClassicEvent)
+        {
+            localizedEventName = "MEGAPATCH II";
+            eventNeedTriggers = "無し";
+        }
         else
         {
             localizedEventName = "[エラー：存在しないイベント]";
             eventNeedTriggers = "What The Fuck";
         }
+        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SyncSpecialEvent();
     }
 
     public void RoundRestartAddEvent()
@@ -329,7 +371,7 @@ public class SpecialEventsHandler
                 Timing.CallDelayed(0.02f, () =>
                 {
                     ev.Player.UniqueRole = "Scp096_Anger";
-                    OverrideRoleName(ev.Player, "",ev.Player.DisplayNickname, "SCP-096: ANGER", "#C50000");
+                    ev.Player.CustomInfo = "<color=#C50000>SCP-096: ANGER</color>";
                     ev.Player.MaxArtificialHealth = 1000;
                     ev.Player.MaxHealth = 5000;
                     ev.Player.Health = 5000;
@@ -369,11 +411,11 @@ public class SpecialEventsHandler
             Vector3 spawnPoint = new Vector3(ShyguyPosition.x + 1f, ShyguyPosition.y + 0f, ShyguyPosition.z);
             Npc term_npc = Npc.Spawn("for096",RoleTypeId.ClassD,false,position:spawnPoint);
             term_npc.Transform.localEulerAngles = new Vector3(0,-90,0);
+            Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
         }
         
         public void EndlessAnger(Exiled.Events.EventArgs.Scp096.CalmingDownEventArgs ev)
         {
-            Log.Debug(ev.Player.UniqueRole);
             if (ev.Player.UniqueRole == "Scp096_Anger")
             {
                 ev.IsAllowed = false;

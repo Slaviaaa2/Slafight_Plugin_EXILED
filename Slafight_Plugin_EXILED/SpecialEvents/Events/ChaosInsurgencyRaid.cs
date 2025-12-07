@@ -65,7 +65,7 @@ public class ChaosInsurgencyRaid
         Timing.CallDelayed(8f, () =>
         {
             if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-            Cassie.MessageTranslated("pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command","<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。\n Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",false,false);
+            Cassie.MessageTranslated("pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command","<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",false,false);
             Timing.CallDelayed(45f, () =>
             {
                 if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
@@ -113,7 +113,8 @@ public class ChaosInsurgencyRaid
                                 }
                                 Timing.CallDelayed(0.5f, () =>
                                 {
-                                    schematicObject.Position = new Vector3(70f,500f,-45f);
+                                    schematicObject.Position = new Vector3(-90f,500f,-45f);
+                                    schematicObject.Rotation = Quaternion.Euler(new Vector3(0,0,55));
                                     Timing.RunCoroutine(NukeDownCoroutine(schematicObject));
                                 });
                                 foreach (Room room in Room.List)
@@ -182,8 +183,8 @@ public class ChaosInsurgencyRaid
     {
         float elapsedTime = 0f;
         float totalDuration = 150f;
-        Vector3 startPos = new Vector3(schem.transform.position.x, 500f, schem.transform.position.z);
-        Vector3 endPos = new Vector3(schem.transform.position.x, 350f, schem.transform.position.z);
+        Vector3 startPos = new Vector3(-90, 500f, schem.transform.position.z);
+        Vector3 endPos = new Vector3(70f, 300f, schem.transform.position.z);
         while (elapsedTime < totalDuration)
         {
             elapsedTime += Time.deltaTime;

@@ -62,6 +62,7 @@ using Scp330Handler = Exiled.Events.Handlers.Scp330;
 using Warhead = Exiled.API.Features.Warhead;
 using WarheadHandler = Exiled.Events.Handlers.Warhead;
 using MapHandler = Exiled.Events.Handlers.Map;
+using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -136,6 +137,19 @@ namespace Slafight_Plugin_EXILED
         // - System Flags - //
         public bool PluginLoaded = false;
 
+        public List<string> Tips = new List<string>()
+        {
+            "次回のアプデv1.2.2ではFifthistsRaidに改修が入ってもうちょっと深い物になる予定だよ！",
+            "Chaos Insurgency Raidにて登場するカオス コマンド―は、いずれ調整されて通常出現する予定だよ！",
+            "Nine-tailed Foxのサブロールが近日中に実装予定！",
+            "ゲームサーバー公開ツールの有料プランの更新が来年なせいで回線がカスだよ！助けて！",
+            "すらびあさんのバグ発生力は頭逝かれてます！",
+            "第五第五第五第五第五第五",
+            "実は何処かに隠し要素があるらしい...?",
+            "隠し要素の場所にはいずれのアプデで追加される要素と関係があるとか...?",
+            "Tipsっていいよね！！！！"
+        };
+
         public void OnPluginLoad()
         {
             Log.Info("OnPluginLoad is successfully called!");
@@ -151,7 +165,29 @@ namespace Slafight_Plugin_EXILED
             ev.Player.Broadcast(6,"\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>",Broadcast.BroadcastFlags.Normal,true);
             Timing.CallDelayed(0.05f, () =>
             {
-                ev.Player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"),55555f);
+                int tipsRandom = Random.Range(0,Tips.Count);
+                string tips = Tips[tipsRandom];
+                ev.Player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                                    $"\n\n<size=28>Tips: {tips}</size>"
+                                    ),5555f);
+            });
+        }
+
+        public void SyncSpecialEvent()
+        {
+            Timing.CallDelayed(0.05f, () =>
+            {
+                if (!Round.InProgress)
+                {
+                    foreach (Player player in Player.List)
+                    {
+                        int tipsRandom = Random.Range(0,Tips.Count);
+                        string tips = Tips[tipsRandom];
+                        player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                                            $"\n\n<size=28>Tips: {tips}</size>"
+                            ),5555f);
+                    }
+                }
             });
         }
 
@@ -180,6 +216,7 @@ namespace Slafight_Plugin_EXILED
             Funny = UnityEngine.Random.Range(0, 1f);
             foreach (Player player in Player.List)
             {
+                player.UniqueRole = String.Empty;
                 player.ShowHint("");
             }
         }
@@ -190,7 +227,6 @@ namespace Slafight_Plugin_EXILED
             {
                 player.ShowHint("");
             }
-            ev.Player.UniqueRole = String.Empty;
             SpawnRoll = 1;
             SpawnRoll = UnityEngine.Random.Range(0, 1f);
             /*if (ev.NewRole == RoleTypeId.Tutorial)
@@ -279,6 +315,7 @@ namespace Slafight_Plugin_EXILED
                         ev.IsAllowed = false;
                         Timing.CallDelayed(1f, () =>
                         {
+                            if (ev.Player.UniqueRole != null) return;
                             ev.Player.Role.Set(RoleTypeId.Scp3114);
                             Log.Debug("Scp3114 was Spawned!");
                             SkeletonRagdoll();
@@ -289,12 +326,18 @@ namespace Slafight_Plugin_EXILED
                         ev.IsAllowed = false;
                         Timing.CallDelayed(1f, () =>
                         {
+                            if (ev.Player.UniqueRole != null) return;
                             Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(ev.Player);
                             Log.Debug("Scp3005 was Spawned!");
                         });
                     }
                 }
             }
+
+            Timing.CallDelayed(1.05f, () =>
+            {
+                ev.Player.AddItem(ItemType.Flashlight);
+            });
         }
 
         public void SkeletonRagdoll()

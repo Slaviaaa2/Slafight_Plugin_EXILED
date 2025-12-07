@@ -33,7 +33,7 @@ public class OmegaWarhead
             Timing.CallDelayed(35, () =>
             {
                 if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-                Cassie.MessageTranslated("New Status for Containment Breach by O5 Command: Using OMEGA WARHEAD","O5による収容違反対応ステータス更新：<color=red>OMEGA WARHEAD</color>を用いた対応");
+                Cassie.MessageTranslated("New Status for Containment Breach by O5 Command: Using OMEGA WARHEAD","O5による収容違反対応ステータス更新：<color=blue>OMEGA WARHEAD</color>を用いた対応");
                 Cassie.MessageTranslated("New Status Accepted .","新ステータス：承認",false,false);
                 Timing.CallDelayed(300, () =>
                 {

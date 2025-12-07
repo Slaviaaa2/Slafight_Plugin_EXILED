@@ -31,5 +31,20 @@ namespace Slafight_Plugin_EXILED
         public HIDTurret HidTurretConfig { get; set; } = new();
         [Description("")]
         public KeycardFifthist KeycardFifthistConfig { get; set; } = new();
+        [Description("")]
+        public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
+        
+        [Description("")]
+        public KeycardOld_ContainmentEngineer KeycardOld_ContainmentEngineerConfig { get; set; } = new();
+        public KeycardOld_Janitor KeycardOld_JanitorConfig { get; set; } = new();
+        public KeycardOld_Guard KeycardOld_GuardConfig { get; set; } = new();
+        public KeycardOld_Scientist KeycardOld_ScientistConfig { get; set; } = new();
+        public KeycardOld_ResearchSupervisor KeycardOld_ResearchSupervisorConfig { get; set; } = new();
+        public KeycardOld_ZoneManager KeycardOld_ZoneManagerConfig { get; set; } = new();
+        public KeycardOld_FacilityManager KeycardOld_FacilityManagerConfig { get; set; } = new();
+        public KeycardOld_Cadet KeycardOld_CadetConfig { get; set; } = new();
+        public KeycardOld_Lieutenant KeycardOld_LieutenantConfig { get; set; } = new();
+        public KeycardOld_Commander KeycardOld_CommanderConfig { get; set; } = new();
+        public KeycardOld_O5 KeycardOld_O5Config { get; set; } = new();
     }
 }

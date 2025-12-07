@@ -123,4 +123,8 @@ D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\ProjectMER
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\AdvancedMERTools.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Newtonsoft.Json.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Assembly-CSharp-Publicized.dll
-D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\ASS-Exiled.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Text.Json.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.IO.Pipelines.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Text.Encodings.Web.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll

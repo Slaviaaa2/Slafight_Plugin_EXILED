@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.CustomStats;
 using Exiled.API.Features.DamageHandlers;
 using Exiled.API.Features.Roles;
 using Exiled.CustomItems.API.Features;
@@ -39,7 +40,6 @@ public class CustomRolesHandler
     {
         // Custom Role Name Area
         player.InfoArea |= PlayerInfoArea.CustomInfo;
-        player.InfoArea |= PlayerInfoArea.Nickname;
         // Hide Things
         player.InfoArea &= ~PlayerInfoArea.Role;
         player.InfoArea &= ~PlayerInfoArea.Nickname;
@@ -60,8 +60,8 @@ public class CustomRolesHandler
         Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.Schem3005(player);
         Vector3 offset;
         int MaxHealth = 55555;
-        
-        OverrideRoleName(player,"",player.DisplayNickname,"SCP-3005","#C50000");
+
+        player.CustomInfo = "<color=#C50000>SCP-3005</color>";
         
         Timing.CallDelayed(1.5f, () =>
         {
@@ -89,10 +89,10 @@ public class CustomRolesHandler
         player.Role.Set(RoleTypeId.Tutorial);
         Vector3 offset;
         int MaxHealth = 150;
+
+        player.CustomInfo = "<color=#ff00fa>FIFTHIST RESCURE - 第五教会 救出師</color>";
         
-        OverrideRoleName(player,"",player.DisplayNickname,"第五教会 救出師","#ff00fa");
-        
-        Timing.CallDelayed(1.5f, () =>
+        Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "FIFTHIST";
 
@@ -123,22 +123,19 @@ public class CustomRolesHandler
     {
         player.Role.Set(RoleTypeId.ChaosRepressor);
         Vector3 offset;
-        int MaxHealth = 200;
+        int MaxHealth = 100;
+
+        player.CustomInfo = "<color=#228b22>CI Commando - カオス コマンド―</color>";
         
-        OverrideRoleName(player,"",player.DisplayNickname,"カオス コマンドー","#228b22");
-        
-        Timing.CallDelayed(1.5f, () =>
+        Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "CI_Commando";
 
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
-            if (player.Role is IHumeShieldRole)
-            {
-                player.MaxHumeShield = 500;
-                player.HumeShield = 500;
-                player.HumeShieldRegenerationMultiplier = 1.05f;
-            }
+            player.CustomHumeShieldStat.MaxValue = 25;
+            player.CustomHumeShieldStat.CurValue = 25;
+            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
             
             player.ShowHint(
                 "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
@@ -179,7 +176,7 @@ public class CustomRolesHandler
 
     public void CryFuckSpawn(Player player)
     {
-        Timing.CallDelayed(0.25f, () =>
+        Timing.CallDelayed(0.05f, () =>
         {
             // Very Fuckin Stupid Code.
             Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.CryFuckSpawned = true;
@@ -220,11 +217,8 @@ public class CustomRolesHandler
     }
     public void CustomRoleRemover(ChangingRoleEventArgs ev)
     {
-        Timing.CallDelayed(0.01f, () =>
-        {
-            ev.Player.UniqueRole = null;
-            ev.Player.CustomInfo = null;
-        });
+        ev.Player.UniqueRole = null;
+        ev.Player.CustomInfo = null;
     }
 
     public void EndRound(Team winnerTeam = Team.SCPs,string specificReason = null)

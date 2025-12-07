@@ -19,5 +19,9 @@ public enum SpecialEventType
     /// <summary>THE FIFTHIST'S RAID</summary>
     FifthistsRaid = 5,
     /// <summary>Nuclear Attack</summary>
-    NuclearAttack = 6
+    NuclearAttack = 6,
+    /// <summary>Classic SCRAPPED. IT'S VERY F**</summary>
+    ClassicEvent = 7,
+    /// <summary></summary>
+    CassieHackSpeedrun = 8
 }

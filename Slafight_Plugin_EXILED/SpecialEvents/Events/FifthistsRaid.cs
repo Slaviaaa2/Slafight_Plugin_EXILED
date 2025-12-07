@@ -48,7 +48,7 @@ public class FifthistsRaid
                 break;
             }
         }
-        // TODO
-        //Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces .","新ステータス：承認",false,false);
+        
+        Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
     }
 }
