@@ -351,6 +351,7 @@ namespace Slafight_Plugin_EXILED
 
             Timing.CallDelayed(1.05f, () =>
             {
+                if (ev.Player == null) return;
                 ev.Player.AddItem(ItemType.Flashlight);
             });
         }

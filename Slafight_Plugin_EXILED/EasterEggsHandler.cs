@@ -13,13 +13,11 @@ public class EasterEggsHandler
     public EasterEggsHandler()
     {
         Exiled.Events.Handlers.Server.RoundStarted += MelancholyNuke;
-        Exiled.Events.Handlers.Server.EndingRound += removeAllSpeakers;
     }
 
     ~EasterEggsHandler()
     {
         Exiled.Events.Handlers.Server.RoundStarted -= MelancholyNuke;
-        Exiled.Events.Handlers.Server.EndingRound -= removeAllSpeakers;
     }
     public static void CreateAndPlayAudio(string fileName, string audioPlayerName, Vector3 position, bool destroyOnEnd = false, Transform parent = null, bool isSpatial = false, float maxDistance = 5, float minDistance = 5, bool loadClip = true)
     {
@@ -54,16 +52,6 @@ public class EasterEggsHandler
     public void loadClips()
     {
         AudioClipStorage.LoadClip(Path.Combine(Plugin.Singleton.Config.AudioReferences, "ee_melancholy.ogg"), "ee_melancholy.ogg");
-    }
-    public void removeAllSpeakers(EndingRoundEventArgs ev)
-    {
-        if (Exiled.API.Features.Toys.AdminToy.List.Count <= 0) return;
-        foreach (var adminToy in Exiled.API.Features.Toys.AdminToy.List)
-        {
-            if (adminToy == null) continue;
-            var speaker = (Exiled.API.Features.Toys.Speaker)adminToy;
-            speaker.Destroy();
-        }
     }
     public void MelancholyNuke()
     {
