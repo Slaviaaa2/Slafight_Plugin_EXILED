@@ -9,11 +9,11 @@ using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
-public class SpawnFifthist : ICommand
+public class SpawnDebugToolRole : ICommand
 {
-    public string Command => "spawnFifthist";
-    public string[] Aliases { get; } = { "spawn5","5church" };
-    public string Description => "Reroll Special Events.\n<color=red>(Attention)If you use this command, now running events with a few exceptions will be cancelled!!!</color>";
+    public string Command => "debugmode";
+    public string[] Aliases { get; } = { "debug","spawndebug" };
+    public string Description => "Debugging Mode. You can know Interacted Door Info and Coin Flipping Pos Info.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         if (!sender.CheckPermission($"slperm.{Command}"))
@@ -23,10 +23,8 @@ public class SpawnFifthist : ICommand
         }
 
         Player player = Player.Get(sender);
-        Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
-        //Npc a = Npc.Spawn("a",RoleTypeId.ClassD); // for Debug
-        //Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(a);
-        response = "You're now Fifthist: Rescue.";
+        player.UniqueRole = "Debug";
+        response = "You're now Entered Debugger Mode!";
         return true;
     }
 }

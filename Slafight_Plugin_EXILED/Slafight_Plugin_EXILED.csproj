@@ -73,6 +73,9 @@
         <Reference Include="Exiled.Permissions, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
           <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
+        <Reference Include="HintServiceMeow">
+          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
+        </Reference>
         <Reference Include="LabApi">
           <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\LabApi.dll</HintPath>
         </Reference>
@@ -96,9 +99,6 @@
         </Reference>
         <Reference Include="ProjectMER">
           <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\ProjectMER.dll</HintPath>
-        </Reference>
-        <Reference Include="RueI">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\RueI.dll</HintPath>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
@@ -127,11 +127,13 @@
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />
+        <Compile Include="API\Enums\SyncType.cs" />
         <Compile Include="Commands\DevToolFunctionHandler.cs" />
         <Compile Include="Commands\DevTools\PlaySurfaceAttack.cs" />
         <Compile Include="Commands\DevTools\ReRollSetQueue.cs" />
         <Compile Include="Commands\DevTools\ReRollSpecial.cs" />
         <Compile Include="Commands\DevTools\Spawn3005.cs" />
+        <Compile Include="Commands\DevTools\SpawnDebugToolRole.cs" />
         <Compile Include="Commands\DevTools\SpawnFifthistcs.cs" />
         <Compile Include="Commands\RootCommand.cs" />
         <Compile Include="Config.cs" />
@@ -140,6 +142,7 @@
         <Compile Include="CustomItems\GunN7CR.cs" />
         <Compile Include="CustomItems\HIDTurret.cs" />
         <Compile Include="CustomItems\KeycardFifthist.cs" />
+        <Compile Include="CustomItems\KeycardFifthistPriest.cs" />
         <Compile Include="CustomItems\KeycardOld_Cadet.cs" />
         <Compile Include="CustomItems\KeycardOld_Commander.cs" />
         <Compile Include="CustomItems\KeycardOld_ContainmentEngineer.cs" />
@@ -153,11 +156,14 @@
         <Compile Include="CustomItems\KeycardOld_ZoneManager.cs" />
         <Compile Include="CustomMap.cs" />
         <Compile Include="CustomRoles\CustomRolesHandler.cs" />
+        <Compile Include="CustomRoles\Fifthist\FifthistPriest.cs" />
+        <Compile Include="CustomRoles\Fifthist\FifthistRescue.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdCommander.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdInfantry.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfAide.cs" />
         <Compile Include="EasterEggsHandler.cs" />
         <Compile Include="EventHandler.cs" />
+        <Compile Include="Hints\PlayerHUD.cs" />
         <Compile Include="LabApiHandler.cs" />
         <Compile Include="ClassicEvent.cs" />
         <Compile Include="Plugin.cs" />
@@ -176,7 +182,10 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="CustomRoles\ChaosInsurgency\" />
-      <Folder Include="CustomRoles\Fifthist\" />
+      <Folder Include="CustomRoles\ClassD\" />
+      <Folder Include="CustomRoles\Scientist\" />
+      <Folder Include="CustomRoles\SCPs\" />
+      <Folder Include="extensions\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

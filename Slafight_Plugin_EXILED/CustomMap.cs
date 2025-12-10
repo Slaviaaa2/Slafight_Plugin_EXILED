@@ -4,7 +4,12 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Toys;
+using MapGeneration;
 using MEC;
+using ProjectMER.Events.Arguments;
+using ProjectMER.Features;
+using ProjectMER.Features.Objects;
+using ProjectMER.Features.Serializable;
 using UnityEngine;
 
 using Scp049Handler = Exiled.Events.Handlers.Scp049;
@@ -23,16 +28,22 @@ namespace Slafight_Plugin_EXILED
     {
         public CustomMap()
         {
-            
+            Exiled.Events.Handlers.Server.RoundStarted += SpawnToiletTeleport;
         }
         ~CustomMap()
         {
-            
+            Exiled.Events.Handlers.Server.RoundStarted -= SpawnToiletTeleport;
         }
 
-        public void LoadMap(string Type,string Flags)
+        public void SpawnToiletTeleport()
         {
-            
+            SchematicObject tp = ObjectSpawner.SpawnSchematic("HczToilet_TP",Vector3.zero);
+            Room room = Room.Get(RoomType.HczStraightC);
+            Log.Debug(room.Position);
+            Vector3 offset = new Vector3(0f,0f,0f);
+            tp.Position = room.Position + room.Rotation * offset;
+            tp.Rotation = room.Rotation;
         }
+
     }
 }

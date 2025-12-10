@@ -27,6 +27,7 @@ public class SpecialEventsHandler
         Exiled.Events.Handlers.Server.RestartingRound += RoundRestartSkipEvent;
         Exiled.Events.Handlers.Server.RestartingRound += RoundRestartAddEvent;
         Exiled.Events.Handlers.Server.WaitingForPlayers += eventLocSet;
+        Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayersInitEvent;
         
         // Need Handler Events Subscribes
         Exiled.Events.Handlers.Player.ChangingRole += CryFuckSpawn;
@@ -41,6 +42,7 @@ public class SpecialEventsHandler
         Exiled.Events.Handlers.Server.RestartingRound -= RoundRestartSkipEvent;
         Exiled.Events.Handlers.Server.RestartingRound -= RoundRestartAddEvent;
         Exiled.Events.Handlers.Server.WaitingForPlayers -= eventLocSet;
+        Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayersInitEvent;
         
         // Need Handler Events Unsubscribes
         Exiled.Events.Handlers.Player.ChangingRole -= CryFuckSpawn;
@@ -87,8 +89,12 @@ public class SpecialEventsHandler
             Log.Error("SEH: RunEvent失敗(存在しないSpecialEventType)");
             return;
         }
-        EventQueue.Insert(1, eventType);
-        SkipEvent();
+
+        if (EventQueue.Count == 0)
+            EventQueue.Add(eventType);
+        else
+            EventQueue[0] = eventType;
+
         eventLocSet();
         SpecialEventsController();
     }
@@ -129,6 +135,13 @@ public class SpecialEventsHandler
     public void SpecialEventsController()
     {
         Log.Debug(string.Join(", ", EventQueue));
+
+        if (EventQueue.Count == 0)
+        {
+            Log.Warn("SEH: SpecialEventsControllerが空のEventQueueで呼ばれたためスキップします。");
+            return;
+        }
+
         InitStats();
         SpecialEventType nowEvent = EventQueue[0];
         if (nowEvent == SpecialEventType.None)
@@ -184,7 +197,13 @@ public class SpecialEventsHandler
     public SpecialEventType SelectedEvent = SpecialEventType.None; // 初期値
     public void SelectRandom()
     {
-        Vector3 ToiletPosition = Room.Get(RoomType.HczStraightC).Position;
+        // Config がまだなら何もしない
+        if (Slafight_Plugin_EXILED.Plugin.Singleton == null ||
+            Slafight_Plugin_EXILED.Plugin.Singleton.Config == null)
+        {
+            Log.Warn("SEH: SelectRandom called before Config initialized. Skipping.");
+            return;
+        }
         List<SpecialEventType> allowedEvents = new List<SpecialEventType>();
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
         {
@@ -296,6 +315,18 @@ public class SpecialEventsHandler
         }
         Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SyncSpecialEvent();
     }
+    
+    public void OnWaitingForPlayersInitEvent()
+    {
+        // まだキューが空のときだけ初期イベントを入れる
+        if (EventQueue.Count == 0)
+        {
+            SelectRandom();
+            AddEvent(SelectedEvent);
+            eventLocSet();
+            Log.Info($"SEH: 初期イベント {SelectedEvent} をキューに追加しました。");
+        }
+    }
 
     public void RoundRestartAddEvent()
     {
@@ -319,6 +350,11 @@ public class SpecialEventsHandler
 
     public void RoundRestartSkipEvent()
     {
+        if (EventQueue.Count <= 1)
+        {
+            Log.Debug("SEH: RoundRestartSkipEvent - キューが1件以下のためスキップ");
+            return;
+        }
         SkipEvent();
     }
     // Need Handler Events

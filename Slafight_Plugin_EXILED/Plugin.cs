@@ -13,6 +13,7 @@ using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
+using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -34,6 +35,7 @@ namespace Slafight_Plugin_EXILED
         public CustomRolesHandler CustomRolesHandler { get; set; }
         public LabApiHandler LabApiHandler { get; set; }
         public EasterEggsHandler EasterEggsHandler { get; set; }
+        public PlayerHUD PlayerHUD { get; set; }
 
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
@@ -51,6 +53,7 @@ namespace Slafight_Plugin_EXILED
         public KeycardOld_ZoneManager _KeycardOld_ZoneManager;
 
         public HdInfantry CR_HdInfantry { get; set; }
+        public HdCommander CR_HdCommander { get; set; }
         public NtfAide CR_NtfAide { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
@@ -64,6 +67,7 @@ namespace Slafight_Plugin_EXILED
             CustomRolesHandler = new CustomRolesHandler();
             LabApiHandler = new();
             EasterEggsHandler = new();
+            PlayerHUD = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
 
             _HIDTurret = new();
@@ -83,6 +87,7 @@ namespace Slafight_Plugin_EXILED
             
             Config.HidTurretConfig.Register();
             Config.KeycardFifthistConfig.Register();
+            Config.KeycardFifthistPriestConfig.Register();
             Config.ArmorInfantryConfig.Register();
             Config.KeycardOld_CadetConfig.Register();
             Config.KeycardOld_CommanderConfig.Register();
@@ -99,12 +104,14 @@ namespace Slafight_Plugin_EXILED
             
             
             CR_HdInfantry = new();
+            CR_HdCommander = new();
             CR_NtfAide = new();
+
+            CustomRole.RegisterRoles(false);
+            
             SpawnSystem = new();
             
             Slafight_Plugin_EXILED.Plugin.Singleton.EasterEggsHandler.loadClips();
-            
-            Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.InitAddEvent();
 
             _ = SendPlayerCountLoop();
             

@@ -219,6 +219,21 @@ namespace Slafight_Plugin_EXILED
                 player.UniqueRole = String.Empty;
                 player.ShowHint("");
             }
+
+            int i = 0;
+            foreach (Player player in Player.List)
+            {
+                if (player.Role.Team == Team.SCPs)
+                {
+                    i++;
+                }
+            }
+
+            if (i==0)
+            {
+                Player player = Player.List.GetRandomValue();
+                player.Role.Set(RoleTypeId.Scp173);
+            }
         }
 
         public void OnChangingRole(ChangingRoleEventArgs ev)
@@ -510,7 +525,7 @@ namespace Slafight_Plugin_EXILED
         public void PositionGet(FlippingCoinEventArgs ev)
         {
             Vector3 playerPosition = ev.Player.Position;
-            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.Group.BadgeText == "SERVER OWNER")
+            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.UniqueRole == "Debug")
             {
                 if (ev.Player.CurrentRoom != null)
                 {
@@ -535,7 +550,7 @@ namespace Slafight_Plugin_EXILED
 
         public void DoorGet(InteractingDoorEventArgs ev)
         {
-            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.Group.BadgeText == "SERVER OWNER")
+            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.UniqueRole == "Debug")
             {
                 ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + ev.Door.Room.Type,5);
                 Log.Debug("Door Get: " + ev.Door.Type);

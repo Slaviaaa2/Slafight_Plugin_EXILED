@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Server;
 using LabApi.Events.Arguments.ServerEvents;
@@ -181,7 +182,6 @@ public class SpawnSystem
         if (spawnType == SpawnTypeId.MTF_NtfNormal)
         {
             designation = "Nine-tailed Fox";
-            Respawn.SummonNtfChopper();
             Respawn.ForceWave(SpawnableFaction.NtfWave);
             bool captainSpawned = false;
             Timing.CallDelayed(20f, () =>
@@ -219,7 +219,6 @@ public class SpawnSystem
         else if (spawnType == SpawnTypeId.MTF_NtfBackup)
         {
             designation = "Nine-tailed Fox";
-            Respawn.SummonNtfChopper();
             Respawn.ForceWave(SpawnableFaction.NtfMiniWave);
             bool captainSpawned = false;
             Timing.CallDelayed(20f, () =>
@@ -263,6 +262,13 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
+                    if (ii==0)
+                    {
+                        Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdCommander.SpawnRole(player);
+                        i++;
+                        ii++;
+                        continue;
+                    }
                     Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdInfantry.SpawnRole(player);
                     i++;
                 }
@@ -276,10 +282,18 @@ public class SpawnSystem
         {
             designation = "Hammer Down";
             int i=0;
+            int ii=0;
             foreach (Player player in Player.List)
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
+                    if (ii==0)
+                    {
+                        Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdCommander.SpawnRole(player);
+                        i++;
+                        ii++;
+                        continue;
+                    }
                     Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdInfantry.SpawnRole(player);
                     i++;
                 }
@@ -292,13 +306,11 @@ public class SpawnSystem
         else if (spawnType == SpawnTypeId.GOI_ChaosNormal)
         {
             designation = "Chaos Insurgents";
-            Respawn.SummonNtfChopper();
             Respawn.ForceWave(SpawnableFaction.ChaosWave);
         }
         else if (spawnType == SpawnTypeId.GOI_ChaosBackup)
         {
             designation = "Chaos Insurgents";
-            Respawn.SummonNtfChopper();
             Respawn.ForceWave(SpawnableFaction.ChaosMiniWave);
         }
         // SIDE - FIFTHIST
@@ -310,7 +322,7 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
+                    CustomRole.Get("FIFTHIST")?.AddRole(player);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/4f)) break;
@@ -325,7 +337,7 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
+                    CustomRole.Get("FIFTHIST")?.AddRole(player);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/6f)) break;

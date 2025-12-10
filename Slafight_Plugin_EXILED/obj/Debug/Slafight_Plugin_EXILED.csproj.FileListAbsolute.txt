@@ -128,3 +128,4 @@ D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Run
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.IO.Pipelines.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Text.Encodings.Web.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\HintServiceMeow-Exiled.dll

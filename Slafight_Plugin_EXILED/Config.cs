@@ -32,6 +32,8 @@ namespace Slafight_Plugin_EXILED
         [Description("")]
         public KeycardFifthist KeycardFifthistConfig { get; set; } = new();
         [Description("")]
+        public KeycardFifthistPriest KeycardFifthistPriestConfig { get; set; } = new();
+        [Description("")]
         public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
         
         [Description("")]

@@ -178,6 +178,37 @@ public class LabApiHandler : CustomEventsHandler
                 schem.Destroy();
                 yield break;
             }
+
+            if (player.UniqueRole == "FIFTHIST")
+            {
+                schem.Destroy();
+                yield break;
+            }
+            if (player.UniqueRole == "F_Priest")
+            {
+                schem.Destroy();
+                yield break;
+            }
+            if (player.UniqueRole == "Scp096_Anger")
+            {
+                schem.Destroy();
+                yield break;
+            }
+            if (player.UniqueRole == "CI_Commando")
+            {
+                schem.Destroy();
+                yield break;
+            }
+            if (player.UniqueRole == "HdInfantry")
+            {
+                schem.Destroy();
+                yield break;
+            }
+            if (player.UniqueRole == "HdCommando")
+            {
+                schem.Destroy();
+                yield break;
+            }
         }
     }
 }

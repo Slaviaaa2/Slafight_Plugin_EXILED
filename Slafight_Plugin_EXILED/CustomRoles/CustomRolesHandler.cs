@@ -27,6 +27,7 @@ public class CustomRolesHandler
         Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
         Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
+        Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
     }
     ~CustomRolesHandler()
     {
@@ -34,6 +35,30 @@ public class CustomRolesHandler
         Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
         Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
+        Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
+    }
+
+    public void RoundCoroutine()
+    {
+        Timing.CallDelayed(10f, () =>
+        {
+            Timing.RunCoroutine(FifthistCoroutine());
+        });
+    }
+
+    private IEnumerator<float> FifthistCoroutine()
+    {
+        for (;;)
+        {
+            foreach (Player player in Player.List)
+            {
+                if (player.UniqueRole != "FIFTHIST" && player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
+                {
+                    yield break;
+                }
+            }
+            EndRound(Team.SCPs,"FIFTHIST_WIN");
+        }
     }
 
     public static void OverrideRoleName(Player player, string CustomInfo, string DisplayName, string RoleName, string Color)
@@ -61,9 +86,9 @@ public class CustomRolesHandler
         Vector3 offset;
         int MaxHealth = 55555;
 
-        player.CustomInfo = "<color=#C50000>SCP-3005</color>";
+        player.CustomInfo = "<color=#ff00fa>SCP-3005</color>";
         
-        Timing.CallDelayed(1.5f, () =>
+        Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "SCP-3005";
 
@@ -116,6 +141,52 @@ public class CustomRolesHandler
             player.AddItem(ItemType.Adrenaline);
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.GrenadeHE);
+        });
+    }
+    
+    public void SpawnF_Priest(Player player)
+    {
+        player.Role.Set(RoleTypeId.Tutorial);
+        Vector3 offset;
+        int MaxHealth = 555;
+
+        player.CustomInfo = "<color=#ff00fa>FIFTHIST RESCURE - 第五教会 司祭</color>";
+        
+        Timing.CallDelayed(0.05f, () =>
+        {
+            player.UniqueRole = "F_Priest";
+            player.Scale = new Vector3(1.2f,1.2f,1.2f);
+
+            player.MaxHealth = MaxHealth;
+            player.Health = MaxHealth;
+            
+            player.ShowHint(
+                "<color=#ff00fa>第五教会 司祭</color>\n非常に<color=#ff00fa>第五的</color>な存在の恩寵を受けた第五主義者。\n施設を占領せよ！",
+                10);
+            Room SpawnRoom = Room.Get(RoomType.Surface);
+            Log.Debug(SpawnRoom.Position);
+            offset = new Vector3(0f,0f,0f);
+            player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
+            //player.Rotation = SpawnRoom.Rotation;
+            
+            player.ClearInventory();
+            player.AddItem(ItemType.GunSCP127);
+            player.AddItem(ItemType.ArmorHeavy);
+            CustomItem.TryGive(player, 6,false);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.Adrenaline);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.GrenadeHE);
+            
+            var light = Light.Create(Vector3.zero);
+            light.Position = player.Transform.position + new Vector3(0f, -0.08f, 0f);
+            light.Transform.parent = player.Transform;
+            light.Scale = new Vector3(1f,1f,1f);
+            light.Range = 10f;
+            light.Intensity = 1.25f;
+            light.Color = Color.magenta;
+            
+            Timing.RunCoroutine(Scp3005Coroutine(player));
         });
     }
 
@@ -219,6 +290,7 @@ public class CustomRolesHandler
     {
         ev.Player.UniqueRole = null;
         ev.Player.CustomInfo = null;
+        ev.Player.Scale = new Vector3(1f, 1f, 1f);
     }
 
     public void EndRound(Team winnerTeam = Team.SCPs,string specificReason = null)
@@ -266,7 +338,7 @@ public class CustomRolesHandler
             float distance;
             foreach (Player _player in Player.List)
             {
-                if (_player != player && _player.Role.Team != Team.SCPs && _player.UniqueRole != "FIFTHIST")
+                if (_player != player && _player.Role.Team != Team.SCPs && (_player.UniqueRole != "FIFTHIST"||_player.UniqueRole == "F_Priest"))
                 {
                     distance = Vector3.Distance(player.Position,_player.Position);
                     if (distance <= 2.75f)
@@ -276,17 +348,20 @@ public class CustomRolesHandler
                 }
             }
 
-            if (Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.isFifthistsRaidActive)
+            if (player.UniqueRole == "SCP-3005")
             {
-                if (player.Position.x >= 120f && player.Position.x <= 125f)
+                if (Plugin.Singleton.SpecialEventsHandler.isFifthistsRaidActive)
                 {
-                    if (player.Position.y >= 280f)
+                    if (player.Position.x >= 120f && player.Position.x <= 125f)
                     {
-                        if (player.Position.z >= 18f && player.Position.z <= 25f)
+                        if (player.Position.y >= 280f)
                         {
-                            player.UniqueRole = null;
-                            SpawnFifthist(player);
-                            EndRound(Team.SCPs,"FIFTHIST_WIN");
+                            if (player.Position.z >= 18f && player.Position.z <= 25f)
+                            {
+                                player.UniqueRole = null;
+                                SpawnF_Priest(player);
+                                yield break;
+                            }
                         }
                     }
                 }
@@ -307,7 +382,7 @@ public class CustomRolesHandler
                 player.Hurt(100f,"<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
             }
 
-            if (player.UniqueRole != "SCP-3005")
+            if (player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
             {
                 yield break;
             }

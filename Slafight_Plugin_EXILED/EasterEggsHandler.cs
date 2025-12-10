@@ -57,8 +57,10 @@ public class EasterEggsHandler
     }
     public void removeAllSpeakers(EndingRoundEventArgs ev)
     {
-        foreach (var adminToy in Exiled.API.Features.Toys.Speaker.List)
+        if (Exiled.API.Features.Toys.AdminToy.List.Count <= 0) return;
+        foreach (var adminToy in Exiled.API.Features.Toys.AdminToy.List)
         {
+            if (adminToy == null) continue;
             var speaker = (Exiled.API.Features.Toys.Speaker)adminToy;
             speaker.Destroy();
         }
