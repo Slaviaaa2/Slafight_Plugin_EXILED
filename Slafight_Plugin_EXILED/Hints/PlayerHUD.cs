@@ -200,7 +200,7 @@ public class PlayerHUD
                 // The Foundation Forces
                 if (player.UniqueRole == "NtfAide")
                 {
-                    SyncTextRole = "<color=#252525>"+"MTF E-11: Lieutenant"+"</color>";
+                    SyncTextRole = "<color=#00b7eb>"+"MTF E-11: Lieutenant"+"</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                 }
