@@ -14,6 +14,7 @@ using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using MEC;
 using PlayerRoles;
+using ProjectMER.Events.Arguments;
 using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
 using Logger = LabApi.Features.Console.Logger;
@@ -25,22 +26,26 @@ public class LabApiHandler : CustomEventsHandler
 {
     public LabApiHandler()
     {
-        LabApi.Events.Handlers.ServerEvents.WaitingForPlayers += PickupSetup;
+        LabApi.Events.Handlers.ServerEvents.RoundStarted += PickupSetup;
 
         Exiled.Events.Handlers.Player.Dying += DiedCassieAnnounce;
 
         LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionEvent;
 
         LabApi.Events.Handlers.ServerEvents.RoundStarted += init;
+
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += PickupSetupBySchemPoint;
     }
     ~LabApiHandler()
     {
-        LabApi.Events.Handlers.ServerEvents.WaitingForPlayers -= PickupSetup;
+        LabApi.Events.Handlers.ServerEvents.RoundStarted -= PickupSetup;
 
         Exiled.Events.Handlers.Player.Dying -= DiedCassieAnnounce;
 
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionEvent;
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= init;
+
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= PickupSetupBySchemPoint;
     }
     public bool activatedAntiMemeProtocol = false;
     public bool _activatedAntiMemeProtocolInPast = false;
@@ -121,6 +126,30 @@ public class LabApiHandler : CustomEventsHandler
         {
             var HIDTurret = CustomItem.TrySpawn(1,new Vector3(134.94f,300.65f,-65f),out var pickup);
         });
+    }
+
+    public void PickupSetupBySchemPoint(SchematicSpawnedEventArgs ev)
+    {
+        if (ev.Schematic.Name == "CISR_GoCRailgun")
+        {
+            Vector3 pos = ev.Schematic.gameObject.transform.position;
+            ev.Schematic.Destroy();
+            var GoCRailgun = CustomItem.TrySpawn(50, pos, out var pickup);
+        }
+        if (ev.Schematic.Name == "CISR_OldPrivateCard")
+        {
+            Vector3 pos = ev.Schematic.gameObject.transform.position;
+            ev.Schematic.Destroy();
+            var OldKeycard_NtfCadet = CustomItem.TrySpawn(104, pos, out var pickup);
+            pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+        }
+        if (ev.Schematic.Name == "CISR_OldCECard")
+        {
+            Vector3 pos = ev.Schematic.gameObject.transform.position;
+            ev.Schematic.Destroy();
+            var OldKeycard_ContainmentEngineer = CustomItem.TrySpawn(100, pos, out var pickup);
+            pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+        }
     }
 
     public void Schem3005(Player player)

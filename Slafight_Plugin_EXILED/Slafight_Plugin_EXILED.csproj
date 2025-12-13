@@ -12,7 +12,7 @@
         <AssemblyName>Slafight_Plugin_EXILED</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
-        <LangVersion>12</LangVersion>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -128,17 +128,21 @@
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />
         <Compile Include="API\Enums\SyncType.cs" />
+        <Compile Include="BadgeHandler.cs" />
         <Compile Include="Commands\DevToolFunctionHandler.cs" />
         <Compile Include="Commands\DevTools\PlaySurfaceAttack.cs" />
         <Compile Include="Commands\DevTools\ReRollSetQueue.cs" />
         <Compile Include="Commands\DevTools\ReRollSpecial.cs" />
         <Compile Include="Commands\DevTools\Spawn3005.cs" />
+        <Compile Include="Commands\DevTools\Spawn3114.cs" />
         <Compile Include="Commands\DevTools\SpawnDebugToolRole.cs" />
         <Compile Include="Commands\DevTools\SpawnFifthistcs.cs" />
+        <Compile Include="Commands\DevTools\SpawnMapEditRole.cs" />
         <Compile Include="Commands\RootCommand.cs" />
         <Compile Include="Config.cs" />
         <Compile Include="CustomItems\ArmorInfantry.cs" />
         <Compile Include="CustomItems\ArmorVIP.cs" />
+        <Compile Include="CustomItems\GunGoCRailgun.cs" />
         <Compile Include="CustomItems\GunN7CR.cs" />
         <Compile Include="CustomItems\HIDTurret.cs" />
         <Compile Include="CustomItems\KeycardFifthist.cs" />
@@ -161,6 +165,7 @@
         <Compile Include="CustomRoles\FoundationForces\HdCommander.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdInfantry.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfAide.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp3114Role.cs" />
         <Compile Include="EasterEggsHandler.cs" />
         <Compile Include="EventHandler.cs" />
         <Compile Include="Hints\PlayerHUD.cs" />
@@ -184,8 +189,7 @@
       <Folder Include="CustomRoles\ChaosInsurgency\" />
       <Folder Include="CustomRoles\ClassD\" />
       <Folder Include="CustomRoles\Scientist\" />
-      <Folder Include="CustomRoles\SCPs\" />
-      <Folder Include="extensions\" />
+      <Folder Include="Extensions\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

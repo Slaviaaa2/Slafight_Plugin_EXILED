@@ -35,6 +35,12 @@ namespace Slafight_Plugin_EXILED
         public KeycardFifthistPriest KeycardFifthistPriestConfig { get; set; } = new();
         [Description("")]
         public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
+        [Description("")]
+        public GunGoCRailgun GunGoCRailgunConfig { get; set; } = new();
+        [Description("")]
+        public GunN7CR GunN7CRConfig { get; set; } = new();
+        [Description("")]
+        public ArmorVip ArmorVipConfig { get; set; } = new();
         
         [Description("")]
         public KeycardOld_ContainmentEngineer KeycardOld_ContainmentEngineerConfig { get; set; } = new();

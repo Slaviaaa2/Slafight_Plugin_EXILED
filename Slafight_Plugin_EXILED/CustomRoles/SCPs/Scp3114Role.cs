@@ -1,0 +1,54 @@
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
+using MEC;
+using PlayerRoles;
+using UnityEngine;
+
+namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
+
+public class Scp3114Role
+{
+    public Scp3114Role()
+    {
+        Exiled.Events.Handlers.Scp3114.Disguised += ExtendTime;
+    }
+
+    ~Scp3114Role()
+    {
+        Exiled.Events.Handlers.Scp3114.Disguised -= ExtendTime;
+    }
+    public void SpawnRole(Player player)
+    {
+        player.Role.Set(RoleTypeId.Scp3114);
+        player.UniqueRole = "Scp3114";
+        Timing.CallDelayed(0.01f, () =>
+        {
+            player.MaxHealth = 3114;
+            player.Health = player.MaxHealth;
+            player.ClearInventory();
+
+            //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
+            player.CustomInfo = "<color=#C50000>SCP-3114</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            
+            Room SpawnRoom = Room.Get(RoomType.Hcz127);
+            Log.Debug(SpawnRoom.Position);
+            Vector3 offset = new Vector3(0f,13f,0f);
+            player.Position = SpawnRoom.Position + SpawnRoom.Rotation * offset;
+            player.Rotation = SpawnRoom.Rotation;
+            Timing.CallDelayed(0.05f, () =>
+            {
+                player.ShowHint("<color=red>SCP-3114</color>\nSkeleton Pan for you!",10f);
+                Ragdoll classd = Ragdoll.CreateAndSpawn(RoleTypeId.ClassD, "D-9341","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
+                Ragdoll scientist = Ragdoll.CreateAndSpawn(RoleTypeId.Scientist, "Dr. Maynard","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
+            });
+        });
+    }
+
+    public void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisedEventArgs ev)
+    {
+        ev.Scp3114.DisguiseDuration = 300f;
+    }
+}

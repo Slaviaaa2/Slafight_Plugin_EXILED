@@ -13,6 +13,7 @@ using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
+using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED
@@ -26,7 +27,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,2,2);
+        public override Version Version => new Version(1,3,0);
         public override Version RequiredExiledVersion { get; } = new Version(9, 10, 2);
 
         public EventHandler EventHandler { get; set; }
@@ -40,6 +41,10 @@ namespace Slafight_Plugin_EXILED
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
         public ArmorInfantry _ArmorInfantry;
+        public GunN7CR _GunN7CR;
+        public GunGoCRailgun _GunGoCRailgun;
+        public ArmorVip _ArmorVip;
+        
         public KeycardOld_Cadet _KeycardOld_Cadet;
         public KeycardOld_Commander _KeycardOld_Commander;
         public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer;
@@ -55,6 +60,7 @@ namespace Slafight_Plugin_EXILED
         public HdInfantry CR_HdInfantry { get; set; }
         public HdCommander CR_HdCommander { get; set; }
         public NtfAide CR_NtfAide { get; set; }
+        public Scp3114Role CRScp3114Role { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
         // Enable & Disable
@@ -73,6 +79,10 @@ namespace Slafight_Plugin_EXILED
             _HIDTurret = new();
             _KeycardFifthist = new();
             _ArmorInfantry = new();
+            _GunN7CR = new();
+            _GunGoCRailgun = new();
+            _ArmorVip = new();
+            
             _KeycardOld_Cadet = new();
             _KeycardOld_Commander = new();
             _KeycardOld_ContainmentEngineer = new();
@@ -89,6 +99,10 @@ namespace Slafight_Plugin_EXILED
             Config.KeycardFifthistConfig.Register();
             Config.KeycardFifthistPriestConfig.Register();
             Config.ArmorInfantryConfig.Register();
+            Config.GunN7CRConfig.Register();
+            Config.GunGoCRailgunConfig.Register();
+            Config.ArmorVipConfig.Register();
+            
             Config.KeycardOld_CadetConfig.Register();
             Config.KeycardOld_CommanderConfig.Register();
             Config.KeycardOld_ContainmentEngineerConfig.Register();
@@ -106,6 +120,7 @@ namespace Slafight_Plugin_EXILED
             CR_HdInfantry = new();
             CR_HdCommander = new();
             CR_NtfAide = new();
+            CRScp3114Role = new();
 
             CustomRole.RegisterRoles(false);
             

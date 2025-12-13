@@ -28,15 +28,6 @@ public class FifthistRescue : CustomRole
         Vector3 offset = new Vector3(0f,0f,0f);
         player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
         //player.Rotation = SpawnRoom.Rotation;
-            
-        player.ClearInventory();
-        player.AddItem(ItemType.GunSCP127);
-        player.AddItem(ItemType.ArmorHeavy);
-        CustomItem.TryGive(player, 5,false);
-        player.AddItem(ItemType.Medkit);
-        player.AddItem(ItemType.Adrenaline);
-        player.AddItem(ItemType.SCP500);
-        player.AddItem(ItemType.GrenadeHE);
         base.AddRole(player);
     }
 

@@ -162,7 +162,14 @@ public class PlayerHUD
                 {
                     SyncTextRole = "<color=#c50000>"+"SCP-096: ANGER"+"</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
+                    SyncTextObjective = "怒りに任せ、施設中で暴れまわれ！！！";
+                }
+
+                if (player.UniqueRole == "Scp3114")
+                {
+                    SyncTextRole = "<color=#c50000>SCP-3114</color>";
+                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                    SyncTextObjective = "皆に素敵なサプライズをして驚かせましょう！";
                 }
                 // Fifthists
                 if (player.UniqueRole == "SCP-3005")
@@ -193,7 +200,7 @@ public class PlayerHUD
                 // The Foundation Forces
                 if (player.UniqueRole == "NtfAide")
                 {
-                    SyncTextRole = "<color=#252525>"+"MTF E-11: Aide"+"</color>";
+                    SyncTextRole = "<color=#252525>"+"MTF E-11: Lieutenant"+"</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                 }

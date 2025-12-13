@@ -1,44 +1,53 @@
 using System.Collections.Generic;
+using System.Linq;
+using AdvancedMERTools;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
-using Exiled.API.Features.Roles;
 using Exiled.API.Features.Spawn;
 using Exiled.API.Structs;
 using Exiled.CustomItems.API.Features;
+using Exiled.Events.EventArgs.Item;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.Handlers;
 using InventorySystem.Items.Armor;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
 using UnityEngine;
 using YamlDotNet.Serialization;
+using Firearm = Exiled.API.Features.Items.Firearm;
+using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
+using Item = Exiled.API.Features.Items.Item;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.ArmorCombat)]
-public class ArmorVip : CustomArmor
+[CustomItem(ItemType.ParticleDisruptor)]
+public class GunGoCRailgun : CustomWeapon
 {
-    public override uint Id { get; set; } = 12;
-    public override string Name { get; set; } = "要人用アーマー";
-    public override string Description { get; set; } = "要人の命を守るために、防護に超特化したアーマー。";
-    public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.ArmorHeavy;
+    public override uint Id { get; set; } = 50;
+    public override string Name { get; set; } = "GoCレールガン";
+    public override string Description { get; set; } = "GoCのホワイトスーツに搭載される予定の主砲を財団との協定の一環として歩兵用に改造した物。\n<color=red>一発のみ撃てる。最大6000ダメの即死級武器</color>";
+    public override float Weight { get; set; } = 1.15f;
+    public override ItemType Type { get; set; } = ItemType.ParticleDisruptor;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-
-    public override int VestEfficacy { get; set; } = 100;
-    public override int HelmetEfficacy { get; set; } = 100;
-    public override float StaminaUseMultiplier { get; set; } = 0.2f;
+    
+    public override float Damage { get; set; } = 45f;
+    public override Vector3 Scale { get; set; } = new (1.15f,1f,1.15f);
+    public override byte ClipSize { get; set; } = 1;
 
     public Color glowColor = Color.magenta;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.Hurting += Debug_HurtingDamage;
+        
         Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
         Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
         
@@ -50,6 +59,8 @@ public class ArmorVip : CustomArmor
 
     protected override void UnsubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.Hurting -= Debug_HurtingDamage;
+        
         Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
         Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
         
@@ -59,19 +70,24 @@ public class ArmorVip : CustomArmor
         base.UnsubscribeEvents();
     }
 
+    private void Debug_HurtingDamage(HurtingEventArgs ev)
+    {
+        if (Check(ev.Attacker?.CurrentItem))
+        {
+            ev.Player.ExplodeEffect(ProjectileType.FragGrenade);
+            ev.Player.Hurt(2000f,DamageType.Explosion);
+        }
+    }
+
     private void LimitPatch(PickingUpItemEventArgs ev)
     {
         if (Check(ev.Pickup))
         {
-            ev.Player.SetAmmoLimit(AmmoType.Nato9,400);
-            ev.Player.SetAmmoLimit(AmmoType.Nato556,400);
-            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
-            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-
-            ev.Player.CustomHumeShieldStat.MaxValue = 50;
-            ev.Player.CustomHumeShieldStat.CurValue = 50;
-            ev.Player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
-            ev.Player.CustomHumeShieldStat.Update();
+            if (ev.Pickup is FirearmPickup item)
+            {
+                item.MaxAmmo = 1;
+                item.Ammo = 1;
+            }
         }
     }
 
@@ -79,13 +95,13 @@ public class ArmorVip : CustomArmor
     {
         if (Check(ev.Item))
         {
-            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
-            ev.Player.ResetAmmoLimit(AmmoType.Nato556);
-            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
-            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
-
-            ev.Player.CustomHumeShieldStat.MaxValue = 0f;
-            ev.Player.HumeShieldRegenerationMultiplier = 0f;
+            if (ev.Item is Firearm item)
+            {
+                if (item.TotalAmmo != 1)
+                {
+                    item.Destroy();
+                }
+            }
         }
     }
     

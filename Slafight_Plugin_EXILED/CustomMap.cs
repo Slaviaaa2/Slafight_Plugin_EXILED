@@ -37,12 +37,7 @@ namespace Slafight_Plugin_EXILED
 
         public void SpawnToiletTeleport()
         {
-            SchematicObject tp = ObjectSpawner.SpawnSchematic("HczToilet_TP",Vector3.zero);
-            Room room = Room.Get(RoomType.HczStraightC);
-            Log.Debug(room.Position);
-            Vector3 offset = new Vector3(0f,0f,0f);
-            tp.Position = room.Position + room.Rotation * offset;
-            tp.Rotation = room.Rotation;
+            return;
         }
 
     }

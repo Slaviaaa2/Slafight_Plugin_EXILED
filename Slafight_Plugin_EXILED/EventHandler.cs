@@ -244,6 +244,18 @@ namespace Slafight_Plugin_EXILED
             }
             SpawnRoll = 1;
             SpawnRoll = UnityEngine.Random.Range(0, 1f);
+
+            Timing.CallDelayed(1.05f, () =>
+            {
+                RoleTypeId role = ev.Player.Role;
+                Team allowed = PlayerRolesUtils.GetTeam(role);
+                if (ev.Player == null) return;
+                if (allowed == Team.SCPs) return;
+                if (!Round.InProgress) return;
+                if (ev.Player.HasItem(ItemType.Flashlight)) return;
+                Log.Debug("Giving Flashlight to " + ev.Player.Nickname);
+                ev.Player.AddItem(ItemType.Flashlight);
+            });
             /*if (ev.NewRole == RoleTypeId.Tutorial)
             {
                 Funny = UnityEngine.Random.Range(0, 1f);
@@ -331,7 +343,7 @@ namespace Slafight_Plugin_EXILED
                         Timing.CallDelayed(1f, () =>
                         {
                             if (ev.Player.UniqueRole != null) return;
-                            ev.Player.Role.Set(RoleTypeId.Scp3114);
+                            Slafight_Plugin_EXILED.Plugin.Singleton.CRScp3114Role.SpawnRole(ev.Player);
                             Log.Debug("Scp3114 was Spawned!");
                             SkeletonRagdoll();
                         });
@@ -348,16 +360,12 @@ namespace Slafight_Plugin_EXILED
                     }
                 }
             }
-
-            Timing.CallDelayed(1.05f, () =>
-            {
-                if (ev.Player == null) return;
-                ev.Player.AddItem(ItemType.Flashlight);
-            });
         }
 
         public void SkeletonRagdoll()
         {
+            return;
+            // IT'S ALL DEPRECATED. GOOD BYE FUNNY BOYS.
             Timing.CallDelayed(1, () =>
             {
                     Player ev = null;
@@ -526,7 +534,7 @@ namespace Slafight_Plugin_EXILED
         public void PositionGet(FlippingCoinEventArgs ev)
         {
             Vector3 playerPosition = ev.Player.Position;
-            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.UniqueRole == "Debug")
+            if (ev.Player.UniqueRole == "Debug")
             {
                 if (ev.Player.CurrentRoom != null)
                 {
@@ -551,7 +559,7 @@ namespace Slafight_Plugin_EXILED
 
         public void DoorGet(InteractingDoorEventArgs ev)
         {
-            if (ev.Player.Role == RoleTypeId.Tutorial && ev.Player.UniqueRole == "Debug")
+            if (ev.Player.UniqueRole == "Debug")
             {
                 ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + ev.Door.Room.Type,5);
                 Log.Debug("Door Get: " + ev.Door.Type);

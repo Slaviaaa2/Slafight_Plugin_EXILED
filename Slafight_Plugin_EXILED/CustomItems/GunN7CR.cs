@@ -20,14 +20,14 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.ArmorCombat)]
+[CustomItem(ItemType.GunE11SR)]
 public class GunN7CR : CustomWeapon
 {
     public override uint Id { get; set; } = 11;
     public override string Name { get; set; } = "MTF-N7-CR";
-    public override string Description { get; set; } = "Nu-7 Commanderが使用する";
+    public override string Description { get; set; } = "Nu-7 Commanderが使用する銃。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.ArmorCombat;
+    public override ItemType Type { get; set; } = ItemType.GunE11SR;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
     public override float Damage { get; set; } = 45f;

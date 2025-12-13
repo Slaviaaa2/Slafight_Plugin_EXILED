@@ -17,18 +17,19 @@ public class ClassicEvent
     private bool classicenabled = false;
     public ClassicEvent()
     {
-        Exiled.Events.Handlers.Server.RoundStarted += SchemHandler;
+        //Exiled.Events.Handlers.Server.RoundStarted += SchemHandler;
     }
 
     ~ClassicEvent()
     {
-        Exiled.Events.Handlers.Server.RoundStarted -= SchemHandler;
+        //Exiled.Events.Handlers.Server.RoundStarted -= SchemHandler;
     }
 
     public void ClassicEvent_()
     {
-        classicenabled = true;
-        SchemHandler();
+        classicenabled = false;
+        //classicenabled = true;
+        //SchemHandler();
     }
     private void SchemHandler()
     {

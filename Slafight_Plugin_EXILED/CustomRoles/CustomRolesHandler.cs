@@ -52,30 +52,13 @@ public class CustomRolesHandler
         {
             foreach (Player player in Player.List)
             {
+                if (!player.IsAlive) continue;
                 if (player.UniqueRole != "FIFTHIST" && player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
                 {
                     yield break;
                 }
             }
             EndRound(Team.SCPs,"FIFTHIST_WIN");
-        }
-    }
-
-    public static void OverrideRoleName(Player player, string CustomInfo, string DisplayName, string RoleName, string Color)
-    {
-        // Custom Role Name Area
-        player.InfoArea |= PlayerInfoArea.CustomInfo;
-        // Hide Things
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.InfoArea &= ~PlayerInfoArea.Nickname;
-        
-        if (CustomInfo is null || CustomInfo.Length < 1)
-        {
-            player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"<color={Color}>{DisplayName}\n{player.UniqueRole}</color>";
-        }
-        else
-        {
-            player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"<color={Color}>{CustomInfo}\n{DisplayName}\n{player.UniqueRole}</color>";
         }
     }
 
@@ -86,12 +69,14 @@ public class CustomRolesHandler
         Vector3 offset;
         int MaxHealth = 55555;
 
-        player.CustomInfo = "<color=#ff00fa>SCP-3005</color>";
+        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","SCP-3005");
         
         Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "SCP-3005";
-
+            player.CustomInfo = "<color=#FF0090>SCP-3005</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
             Log.Debug("3005");
@@ -115,12 +100,14 @@ public class CustomRolesHandler
         Vector3 offset;
         int MaxHealth = 150;
 
-        player.CustomInfo = "<color=#ff00fa>FIFTHIST RESCURE - 第五教会 救出師</color>";
+        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","FIFTHIST RESCURE");
         
         Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "FIFTHIST";
-
+            player.CustomInfo = "<color=#FF0090>Fifthist Rescure</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
             
@@ -134,6 +121,7 @@ public class CustomRolesHandler
             //player.Rotation = SpawnRoom.Rotation;
             
             player.ClearInventory();
+            Log.Debug("Giving Items to Fifthist");
             player.AddItem(ItemType.GunSCP127);
             player.AddItem(ItemType.ArmorHeavy);
             CustomItem.TryGive(player, 5,false);
@@ -150,13 +138,15 @@ public class CustomRolesHandler
         Vector3 offset;
         int MaxHealth = 555;
 
-        player.CustomInfo = "<color=#ff00fa>FIFTHIST RESCURE - 第五教会 司祭</color>";
+        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","FIFTHIST PRIEST");
         
         Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "F_Priest";
             player.Scale = new Vector3(1.2f,1.2f,1.2f);
-
+            player.CustomInfo = "<color=#FF0090>Fifthist Priest</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
             
@@ -170,6 +160,7 @@ public class CustomRolesHandler
             //player.Rotation = SpawnRoom.Rotation;
             
             player.ClearInventory();
+            Log.Debug("Giving Items to F_Priest");
             player.AddItem(ItemType.GunSCP127);
             player.AddItem(ItemType.ArmorHeavy);
             CustomItem.TryGive(player, 6,false);
@@ -196,12 +187,14 @@ public class CustomRolesHandler
         Vector3 offset;
         int MaxHealth = 100;
 
-        player.CustomInfo = "<color=#228b22>CI Commando - カオス コマンド―</color>";
+        //PlayerExtensions.OverrideRoleName(player,"","Chaos Insurgency Commando");
         
         Timing.CallDelayed(0.05f, () =>
         {
             player.UniqueRole = "CI_Commando";
-
+            player.CustomInfo = "Chaos Insurgency Commando";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
             player.CustomHumeShieldStat.MaxValue = 25;
@@ -218,6 +211,7 @@ public class CustomRolesHandler
             //player.Rotation = SpawnRoom.Rotation;
             
             player.ClearInventory();
+            Log.Debug("Giving Items to CI_Commando");
             player.AddItem(ItemType.GunLogicer);
             player.AddItem(ItemType.ArmorHeavy);
             player.AddItem(ItemType.KeycardChaosInsurgency);
@@ -253,7 +247,7 @@ public class CustomRolesHandler
             Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.CryFuckSpawned = true;
             player.Role.Set(RoleTypeId.Scp096);
             player.UniqueRole = "Scp096_Anger";
-            OverrideRoleName(player, "",player.DisplayNickname, "SCP-096: ANGER", "#C50000");
+            
             player.MaxArtificialHealth = 1000;
             player.MaxHealth = 5000;
             player.Health = 5000;
@@ -367,19 +361,22 @@ public class CustomRolesHandler
                 }
             }
 
-            if (Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler._activatedAntiMemeProtocolInPast)
+            if (player.UniqueRole == "SCP-3005")
             {
-                player.DisableEffect(EffectType.Slowness);
-                player.EnableEffect(EffectType.MovementBoost, 25);
-            }
-            else
-            {
-                player.DisableEffect(EffectType.MovementBoost);
-                player.EnableEffect(EffectType.Slowness, 25);
-            }
-            if (Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
-            {
-                player.Hurt(100f,"<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
+                if (Plugin.Singleton.LabApiHandler._activatedAntiMemeProtocolInPast)
+                {
+                    player.DisableEffect(EffectType.Slowness);
+                    player.EnableEffect(EffectType.MovementBoost, 25);
+                }
+                else
+                {
+                    player.DisableEffect(EffectType.MovementBoost);
+                    player.EnableEffect(EffectType.Slowness, 25);
+                }
+                if (Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
+                {
+                    player.Hurt(100f,"<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
+                }
             }
 
             if (player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")

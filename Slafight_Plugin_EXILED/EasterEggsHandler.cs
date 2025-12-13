@@ -13,11 +13,13 @@ public class EasterEggsHandler
     public EasterEggsHandler()
     {
         Exiled.Events.Handlers.Server.RoundStarted += MelancholyNuke;
+        Exiled.Events.Handlers.Server.RestartingRound += clearSpeakers;
     }
 
     ~EasterEggsHandler()
     {
         Exiled.Events.Handlers.Server.RoundStarted -= MelancholyNuke;
+        Exiled.Events.Handlers.Server.RestartingRound -= clearSpeakers;
     }
     public static void CreateAndPlayAudio(string fileName, string audioPlayerName, Vector3 position, bool destroyOnEnd = false, Transform parent = null, bool isSpatial = false, float maxDistance = 5, float minDistance = 5, bool loadClip = true)
     {
@@ -47,6 +49,16 @@ public class EasterEggsHandler
         }
 
         audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
+    }
+
+    public void clearSpeakers()
+    {
+        foreach (string ap in AudioPlayer.AudioPlayerByName.Keys)
+        {
+            if (ap == null) continue;
+            AudioPlayer.TryGet(ap, out AudioPlayer speaker);
+            speaker.Destroy();
+        }
     }
 
     public void loadClips()

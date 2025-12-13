@@ -16,19 +16,21 @@ public class NtfAide
             player.MaxHealth = 100;
             player.Health = player.MaxHealth;
             player.ClearInventory();
-            player.AddItem(ItemType.GunCrossvec);
-            player.AddItem(ItemType.KeycardMTFOperative);
+            Log.Debug("Giving Items to NtfAide");
+            player.AddItem(ItemType.GunE11SR);
+            player.AddItem(ItemType.KeycardMTFCaptain);
             player.AddItem(ItemType.Adrenaline);
             player.AddItem(ItemType.Adrenaline);
             player.AddItem(ItemType.Medkit);
             player.AddItem(ItemType.GrenadeFlash);
-            player.AddItem(ItemType.ArmorCombat);
+            player.AddItem(ItemType.ArmorHeavy);
             player.AddItem(ItemType.Radio);
 
-            player.CustomInfo = ("<color=#00b7eb>Ntf Aide - 補佐官</color>");
+            //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Nine-tailed Fox Aide");
+            player.CustomInfo = "Nine-tailed Fox Lieutenant";
             Timing.CallDelayed(0.05f, () =>
             {
-                player.ShowHint("<color=#00b7eb>九尾狐 補佐官</color>\n隊長の補佐を目的とし",10f);
+                player.ShowHint("<color=#00b7eb>九尾狐 補佐官</color>\n隊長の補佐を目的とし、万一の際は代理・臨時隊長として指示を下せる。",10f);
             });
         });
     }

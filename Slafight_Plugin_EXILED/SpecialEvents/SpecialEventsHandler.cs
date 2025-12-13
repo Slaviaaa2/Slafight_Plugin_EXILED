@@ -78,7 +78,7 @@ public class SpecialEventsHandler
             return;
         }
         EventQueue.RemoveAt(EventQueueId);
-        EventPID += 1;
+        EventPID++;
     }
 
 
@@ -130,6 +130,7 @@ public class SpecialEventsHandler
         CryFuckEnabled = false;
         CryFuckSpawned = false;
         isFifthistsRaidActive = false;
+        EventPID++;
     }
     // Automatic Event Controls
     public void SpecialEventsController()
@@ -318,6 +319,8 @@ public class SpecialEventsHandler
     
     public void OnWaitingForPlayersInitEvent()
     {
+        Cassie.Clear();
+        EventPID++;
         // まだキューが空のときだけ初期イベントを入れる
         if (EventQueue.Count == 0)
         {

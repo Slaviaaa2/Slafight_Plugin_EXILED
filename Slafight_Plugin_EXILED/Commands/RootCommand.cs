@@ -15,10 +15,13 @@ public class RootCommand : ParentCommand
     public override string Description => "Slafight Plugin root command.";
     public override void LoadGeneratedCommands()
     {
+        RegisterCommand(new SpawnDebugToolRole());
+        RegisterCommand(new SpawnMapEditRole());
         RegisterCommand(new ReRollSpecial());
         RegisterCommand(new ReRollSetQueue());
         RegisterCommand(new Spawn3005());
         RegisterCommand(new SpawnFifthist());
+        RegisterCommand(new Spawn3114());
         RegisterCommand(new PlaySurfaceAttack());
     }
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
