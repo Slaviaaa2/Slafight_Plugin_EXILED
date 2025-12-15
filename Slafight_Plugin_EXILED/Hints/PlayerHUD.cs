@@ -40,6 +40,7 @@ public class PlayerHUD
     private string PHUD_Objective_Text;
     private string PHUD_Team_Text;
     private string PHUD_Event_Text;
+    private string PHUD_Specific_Text;
     public void ServerInfoHint(VerifiedEventArgs ev)
     {
         PlayerUI ui = PlayerUI.Get(ev.Player);
@@ -103,10 +104,21 @@ public class PlayerHUD
                 XCoordinate = XCordinate,
                 YCoordinate = 120
             };
+            Hint PlayerHUD_Specific = new Hint()
+            {
+                Id = "PlayerHUD_Specific",
+                Text = "",
+                Alignment = HintAlignment.Left,
+                SyncSpeed = HintSyncSpeed.Fastest,
+                FontSize = 24,
+                XCoordinate = XCordinate + 350,
+                YCoordinate = 885
+            };
             display.AddHint(PlayerHUD_Role);
             display.AddHint(PlayerHUD_Objective);
             display.AddHint(PlayerHUD_Team);
             display.AddHint(PlayerHUD_Event);
+            display.AddHint(PlayerHUD_Specific);
         }
     }
 
@@ -142,379 +154,342 @@ public class PlayerHUD
             PlayerDisplay display = PlayerDisplay.Get(player);
             display.GetHint("PlayerHUD_Event").Text = "[Event]\n" + "<size=28>"+PHUD_Event_Text+"</size>";
         }
+        else if (syncType == SyncType.PHUD_Specific)
+        {
+            PHUD_Specific_Text = hintText;
+            PlayerDisplay display = PlayerDisplay.Get(player);
+            display.GetHint("PlayerHUD_Specific").Text = PHUD_Specific_Text;
+        }
+    }
+    
+    string SyncTextRole = null;
+    string SyncTextTeam = null;
+    string SyncTextObjective = null;
+    string SyncTextEvent = null;
+
+    public void SyncTexts(Player _player = null)
+    {
+        SyncTextRole = null;
+        SyncTextTeam = null;
+        SyncTextObjective = null;
+        SyncTextEvent = null;
+        if (_player == null)
+        {
+            foreach (Player player in Player.List)
+            {
+                if (player == null) continue;
+                if (player.CustomInfo != null)
+                {
+                    // SCiPs
+                    if (player.UniqueRole == "Scp096_Anger")
+                    {
+                        SyncTextRole = "<color=#c50000>" + "SCP-096: ANGER" + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "怒りに任せ、施設中で暴れまわれ！！！";
+                    }
+
+                    if (player.UniqueRole == "Scp3114")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-3114</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "皆に素敵なサプライズをして驚かせましょう！";
+                    }
+
+                    if (player.UniqueRole == "Scp966")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-966</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "背後から忍び寄り、奴らに恐怖を与えよ！";
+                    }
+                    
+                    if (player.UniqueRole == "Scp682")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-682</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "無敵の爬虫類の力を見せてやれ！！！";
+                    }
+
+                    // Fifthists
+                    if (player.UniqueRole == "SCP-3005")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "SCP-3005" + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
+                    }
+
+                    if (player.UniqueRole == "FIFTHIST")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "Fifthist: Rescue" + "</color>";
+                        SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "第五に従い、施設を占領せよ";
+                    }
+
+                    if (player.UniqueRole == "F_Priest")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "Fifthist: Priest" + "</color>";
+                        SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "全てを第五せよ";
+                    }
+
+                    // Chaos Insurgents
+                    if (player.UniqueRole == "CI_Commando")
+                    {
+                        SyncTextRole = "<color=#228b22>" + "CI: Commando" + "</color>";
+                        SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                        SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    }
+
+                    // The Foundation Forces
+                    if (player.UniqueRole == "NtfAide")
+                    {
+                        SyncTextRole = "<color=#00b7eb>" + "MTF E-11: Lieutenant" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+
+                    if (player.UniqueRole == "HdInfantry")
+                    {
+                        SyncTextRole = "<color=#353535>" + "MTF Nu-7: Infantry" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+
+                    if (player.UniqueRole == "HdCommander")
+                    {
+                        SyncTextRole = "<color=#252525>" + "MTF Nu-7: Commander" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+                    // Scientists
+                    // Class-D Personnel
+                    // Other Unknown Threads
+                }
+                else
+                {
+                    if (player.Role.Team == Team.ClassD)
+                    {
+                        SyncTextRole = "<color=#ee7600>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
+                        SyncTextObjective = "施設から脱出せよ";
+                    }
+                    else if (player.Role.Team == Team.Scientists)
+                    {
+                        SyncTextRole = "<color=#faff86>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
+                        SyncTextObjective = "施設から脱出せよ";
+                    }
+                    else if (player.Role.Team == Team.ChaosInsurgency)
+                    {
+                        SyncTextRole = "<color=#228b22>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                        SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    }
+                    else if (player.Role.Team == Team.FoundationForces)
+                    {
+                        SyncTextRole = "<color=#00b7eb>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+                    else if (player.Role.Team == Team.SCPs)
+                    {
+                        SyncTextRole = "<color=#c50000>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "己の本能・復讐心と利益の為に動け";
+                    }
+                    else if (player.Role.Team == Team.Dead)
+                    {
+                        continue;
+                        SyncTextRole = "<color=#727472>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "The Dead";
+                        SyncTextObjective = "観戦しましょう";
+                    }
+                    else if (player.Role.Team == Team.Flamingos)
+                    {
+                        SyncTextRole = "<color=#ff96de>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ff96de>The Flamingos</color>";
+                        SyncTextObjective = "フラミンゴ！";
+                    }
+                    else
+                    {
+                        SyncTextRole = "<color=#ffffff>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ffffff>[Unknown]</color>";
+                        SyncTextObjective = "[Unknown]";
+                    }
+                }
+
+                SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.localizedEventName;
+                HintSync(SyncType.PHUD_Role, SyncTextRole, player);
+                HintSync(SyncType.PHUD_Objective, SyncTextObjective, player);
+                HintSync(SyncType.PHUD_Team, SyncTextTeam, player);
+                HintSync(SyncType.PHUD_Event, SyncTextEvent, player);
+            }
+        }
+        else
+        {
+            Player player = _player;
+                if (player.CustomInfo != null)
+                {
+                    // SCiPs
+                    if (player.UniqueRole == "Scp096_Anger")
+                    {
+                        SyncTextRole = "<color=#c50000>" + "SCP-096: ANGER" + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "怒りに任せ、施設中で暴れまわれ！！！";
+                    }
+
+                    if (player.UniqueRole == "Scp3114")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-3114</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "皆に素敵なサプライズをして驚かせましょう！";
+                    }
+
+                    if (player.UniqueRole == "Scp966")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-966</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "背後から忍び寄り、奴らに恐怖を与えよ！";
+                    }
+                    
+                    if (player.UniqueRole == "Scp682")
+                    {
+                        SyncTextRole = "<color=#c50000>SCP-682</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "無敵の爬虫類の力を見せてやれ！！！";
+                    }
+
+                    // Fifthists
+                    if (player.UniqueRole == "SCP-3005")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "SCP-3005" + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
+                    }
+
+                    if (player.UniqueRole == "FIFTHIST")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "Fifthist: Rescue" + "</color>";
+                        SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "第五に従い、施設を占領せよ";
+                    }
+
+                    if (player.UniqueRole == "F_Priest")
+                    {
+                        SyncTextRole = "<color=#ff00fa>" + "Fifthist: Priest" + "</color>";
+                        SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "全てを第五せよ";
+                    }
+
+                    // Chaos Insurgents
+                    if (player.UniqueRole == "CI_Commando")
+                    {
+                        SyncTextRole = "<color=#228b22>" + "CI: Commando" + "</color>";
+                        SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                        SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    }
+
+                    // The Foundation Forces
+                    if (player.UniqueRole == "NtfAide")
+                    {
+                        SyncTextRole = "<color=#00b7eb>" + "MTF E-11: Lieutenant" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+
+                    if (player.UniqueRole == "HdInfantry")
+                    {
+                        SyncTextRole = "<color=#353535>" + "MTF Nu-7: Infantry" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+
+                    if (player.UniqueRole == "HdCommander")
+                    {
+                        SyncTextRole = "<color=#252525>" + "MTF Nu-7: Commander" + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+                    // Scientists
+                    // Class-D Personnel
+                    // Other Unknown Threads
+                }
+                else
+                {
+                    if (player.Role.Team == Team.ClassD)
+                    {
+                        SyncTextRole = "<color=#ee7600>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
+                        SyncTextObjective = "施設から脱出せよ";
+                    }
+                    else if (player.Role.Team == Team.Scientists)
+                    {
+                        SyncTextRole = "<color=#faff86>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
+                        SyncTextObjective = "施設から脱出せよ";
+                    }
+                    else if (player.Role.Team == Team.ChaosInsurgency)
+                    {
+                        SyncTextRole = "<color=#228b22>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                        SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    }
+                    else if (player.Role.Team == Team.FoundationForces)
+                    {
+                        SyncTextRole = "<color=#00b7eb>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                        SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    }
+                    else if (player.Role.Team == Team.SCPs)
+                    {
+                        SyncTextRole = "<color=#c50000>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "己の本能・復讐心と利益の為に動け";
+                    }
+                    else if (player.Role.Team == Team.Dead)
+                    {
+                        return;
+                        SyncTextRole = "<color=#727472>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "The Dead";
+                        SyncTextObjective = "観戦しましょう";
+                    }
+                    else if (player.Role.Team == Team.Flamingos)
+                    {
+                        SyncTextRole = "<color=#ff96de>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ff96de>The Flamingos</color>";
+                        SyncTextObjective = "フラミンゴ！";
+                    }
+                    else
+                    {
+                        SyncTextRole = "<color=#ffffff>" + player.Role.Name + "</color>";
+                        SyncTextTeam = "<color=#ffffff>[Unknown]</color>";
+                        SyncTextObjective = "[Unknown]";
+                    }
+                }
+
+                SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.localizedEventName;
+                HintSync(SyncType.PHUD_Role, SyncTextRole, player);
+                HintSync(SyncType.PHUD_Objective, SyncTextObjective, player);
+                HintSync(SyncType.PHUD_Team, SyncTextTeam, player);
+                HintSync(SyncType.PHUD_Event, SyncTextEvent, player);
+        }
     }
 
     public void AllSyncHUD(ChangingRoleEventArgs ev)
     {
         Timing.CallDelayed(1.05f, () =>
         {
-        string SyncTextRole = null;
-        string SyncTextTeam = null;
-        string SyncTextObjective = null;
-        string SyncTextEvent = null;
-        foreach (Player player in Player.List)
-        {
-            if (player == null) continue;
-            if (player.CustomInfo != null)
-            {
-                // SCiPs
-                if (player.UniqueRole == "Scp096_Anger")
-                {
-                    SyncTextRole = "<color=#c50000>"+"SCP-096: ANGER"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "怒りに任せ、施設中で暴れまわれ！！！";
-                }
-
-                if (player.UniqueRole == "Scp3114")
-                {
-                    SyncTextRole = "<color=#c50000>SCP-3114</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "皆に素敵なサプライズをして驚かせましょう！";
-                }
-                // Fifthists
-                if (player.UniqueRole == "SCP-3005")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"SCP-3005"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
-                }
-                if (player.UniqueRole == "FIFTHIST")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"Fifthist: Rescue"+"</color>";
-                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五に従い、施設を占領せよ";
-                }
-                if (player.UniqueRole == "F_Priest")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"Fifthist: Priest"+"</color>";
-                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "全てを第五せよ";
-                }
-                // Chaos Insurgents
-                if (player.UniqueRole == "CI_Commando")
-                {
-                    SyncTextRole = "<color=#228b22>"+"CI: Commando"+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                // The Foundation Forces
-                if (player.UniqueRole == "NtfAide")
-                {
-                    SyncTextRole = "<color=#00b7eb>"+"MTF E-11: Lieutenant"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdInfantry")
-                {
-                    SyncTextRole = "<color=#353535>"+"MTF Nu-7: Infantry"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdCommander")
-                {
-                    SyncTextRole = "<color=#252525>"+"MTF Nu-7: Commander"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                // Scientists
-                // Class-D Personnel
-                // Other Unknown Threads
-            }
-            else
-            {
-                if (player.Role.Team == Team.ClassD)
-                {
-                    SyncTextRole = "<color=#ee7600>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.Scientists)
-                {
-                    SyncTextRole = "<color=#faff86>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.ChaosInsurgency)
-                {
-                    SyncTextRole = "<color=#228b22>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                else if (player.Role.Team == Team.FoundationForces)
-                {
-                    SyncTextRole = "<color=#00b7eb>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                else if (player.Role.Team == Team.SCPs)
-                {
-                    SyncTextRole = "<color=#c50000>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
-                }
-                else if (player.Role.Team == Team.Dead)
-                {
-                    continue;
-                    SyncTextRole = "<color=#727472>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "The Dead";
-                    SyncTextObjective = "観戦しましょう";
-                }
-                else if (player.Role.Team == Team.Flamingos)
-                {
-                    SyncTextRole = "<color=#ff96de>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ff96de>The Flamingos</color>";
-                    SyncTextObjective = "フラミンゴ！";
-                }
-                else
-                {
-                    SyncTextRole = "<color=#ffffff>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ffffff>[Unknown]</color>";
-                    SyncTextObjective = "[Unknown]";
-                }
-            }
-            SyncTextEvent = Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName;
-            HintSync(SyncType.PHUD_Role,SyncTextRole,player);
-            HintSync(SyncType.PHUD_Objective,SyncTextObjective,player);
-            HintSync(SyncType.PHUD_Team,SyncTextTeam,player);
-            HintSync(SyncType.PHUD_Event,SyncTextEvent,player);
-        }
+            SyncTexts(null);
         });
     }
 
     public void Spectate(ChangingSpectatedPlayerEventArgs ev)
     {
         Player player = ev.NewTarget;
-        string SyncTextRole = null;
-        string SyncTextTeam = null;
-        string SyncTextObjective = null;
-        string SyncTextEvent = null;
-            if (player == null) return;
-            if (player.CustomInfo != null)
-            {
-                // SCiPs
-                if (player.UniqueRole == "Scp096_Anger")
-                {
-                    SyncTextRole = "<color=#c50000>"+"SCP-096: ANGER"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
-                }
-                // Fifthists
-                if (player.UniqueRole == "SCP-3005")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"SCP-3005"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
-                }
-                if (player.UniqueRole == "FIFTHIST")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"Fifthist: Rescue"+"</color>";
-                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五に従い、施設を占領せよ";
-                }
-                // Chaos Insurgents
-                if (player.UniqueRole == "CI_Commando")
-                {
-                    SyncTextRole = "<color=#228b22>"+"CI: Commando"+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                // The Foundation Forces
-                if (player.UniqueRole == "NtfAide")
-                {
-                    SyncTextRole = "<color=#252525>"+"MTF E-11: Aide"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdInfantry")
-                {
-                    SyncTextRole = "<color=#353535>"+"MTF Nu-7: Infantry"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdCommander")
-                {
-                    SyncTextRole = "<color=#252525>"+"MTF Nu-7: Commander"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                // Scientists
-                // Class-D Personnel
-                // Other Unknown Threads
-            }
-            else
-            {
-                if (player.Role.Team == Team.ClassD)
-                {
-                    SyncTextRole = "<color=#ee7600>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.Scientists)
-                {
-                    SyncTextRole = "<color=#faff86>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.ChaosInsurgency)
-                {
-                    SyncTextRole = "<color=#228b22>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                else if (player.Role.Team == Team.FoundationForces)
-                {
-                    SyncTextRole = "<color=#00b7eb>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                else if (player.Role.Team == Team.SCPs)
-                {
-                    SyncTextRole = "<color=#c50000>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
-                }
-                else if (player.Role.Team == Team.Dead)
-                {
-                    return;
-                    SyncTextRole = "<color=#727472>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "The Dead";
-                    SyncTextObjective = "観戦しましょう";
-                }
-                else if (player.Role.Team == Team.Flamingos)
-                {
-                    SyncTextRole = "<color=#ff96de>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ff96de>The Flamingos</color>";
-                    SyncTextObjective = "フラミンゴ！";
-                }
-                else
-                {
-                    SyncTextRole = "<color=#ffffff>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ffffff>[Unknown]</color>";
-                    SyncTextObjective = "[Unknown]";
-                }
-            }
-            HintSync(SyncType.PHUD_Role,SyncTextRole,ev.Player);
-            HintSync(SyncType.PHUD_Objective,SyncTextObjective,ev.Player);
-            HintSync(SyncType.PHUD_Team,SyncTextTeam,ev.Player);
+        SyncTexts(player);
     }
     public void AllSyncHUD_()
     {
-        string SyncTextRole = null;
-        string SyncTextTeam = null;
-        string SyncTextObjective = null;
-        string SyncTextEvent = null;
-        foreach (Player player in Player.List)
-        {
-            if (player == null) continue;
-            if (player.CustomInfo != null)
-            {
-                // SCiPs
-                if (player.UniqueRole == "Scp096_Anger")
-                {
-                    SyncTextRole = "<color=#c50000>"+"SCP-096: ANGER"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
-                }
-                // Fifthists
-                if (player.UniqueRole == "SCP-3005")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"SCP-3005"+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
-                }
-                if (player.UniqueRole == "FIFTHIST")
-                {
-                    SyncTextRole = "<color=#ff00fa>"+"Fifthist: Rescue"+"</color>";
-                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五に従い、施設を占領せよ";
-                }
-                // Chaos Insurgents
-                if (player.UniqueRole == "CI_Commando")
-                {
-                    SyncTextRole = "<color=#228b22>"+"CI: Commando"+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                // The Foundation Forces
-                if (player.UniqueRole == "NtfAide")
-                {
-                    SyncTextRole = "<color=#252525>"+"MTF E-11: Aide"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdInfantry")
-                {
-                    SyncTextRole = "<color=#353535>"+"MTF Nu-7: Infantry"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                if (player.UniqueRole == "HdCommander")
-                {
-                    SyncTextRole = "<color=#252525>"+"MTF Nu-7: Commander"+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                // Scientists
-                // Class-D Personnel
-                // Other Unknown Threads
-            }
-            else
-            {
-                if (player.Role.Team == Team.ClassD)
-                {
-                    SyncTextRole = "<color=#ee7600>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.Scientists)
-                {
-                    SyncTextRole = "<color=#faff86>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
-                    SyncTextObjective = "施設から脱出せよ";
-                }
-                else if (player.Role.Team == Team.ChaosInsurgency)
-                {
-                    SyncTextRole = "<color=#228b22>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
-                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
-                }
-                else if (player.Role.Team == Team.FoundationForces)
-                {
-                    SyncTextRole = "<color=#00b7eb>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
-                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
-                }
-                else if (player.Role.Team == Team.SCPs)
-                {
-                    SyncTextRole = "<color=#c50000>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
-                    SyncTextObjective = "己の本能・復讐心と利益の為に動け";
-                }
-                //else if (player.Role.Team == Team.Dead)
-                //{
-                //    SyncTextRole = "<color=#727472>"+player.Role.Name+"</color>";
-                //    SyncTextTeam = "The Dead";
-                //    SyncTextObjective = "観戦しましょう";
-                //}
-                else if (player.Role.Team == Team.Flamingos)
-                {
-                    SyncTextRole = "<color=#ff96de>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ff96de>The Flamingos</color>";
-                    SyncTextObjective = "フラミンゴ！";
-                }
-                else
-                {
-                    SyncTextRole = "<color=#ffffff>"+player.Role.Name+"</color>";
-                    SyncTextTeam = "<color=#ffffff>[Unknown]</color>";
-                    SyncTextObjective = "[Unknown]";
-                }
-            }
-            SyncTextEvent = Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName;
-            HintSync(SyncType.PHUD_Role,SyncTextRole,player);
-            HintSync(SyncType.PHUD_Objective,SyncTextObjective,player);
-            HintSync(SyncType.PHUD_Team,SyncTextTeam,player);
-            HintSync(SyncType.PHUD_Event,SyncTextEvent,player);
-        }
+        SyncTexts();
     }
 
     public void DestroyHints()
@@ -531,7 +506,7 @@ public class PlayerHUD
     {
         for (;;)
         {
-            AllSyncHUD_();
+            SyncTexts();
             yield return Timing.WaitForSeconds(30);
         }
     }

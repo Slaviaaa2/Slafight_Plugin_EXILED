@@ -247,14 +247,16 @@ namespace Slafight_Plugin_EXILED
 
             Timing.CallDelayed(1.05f, () =>
             {
-                RoleTypeId role = ev.Player.Role;
+                RoleTypeId role = ev.Player?.Role;
                 Team allowed = PlayerRolesUtils.GetTeam(role);
                 if (ev.Player == null) return;
                 if (allowed == Team.SCPs) return;
                 if (!Round.InProgress) return;
                 if (ev.Player.HasItem(ItemType.Flashlight)) return;
-                Log.Debug("Giving Flashlight to " + ev.Player.Nickname);
-                ev.Player.AddItem(ItemType.Flashlight);
+                if (ev.Player.Items.Count >= 8) return;
+                if (ev.NewRole == null) return;
+                Log.Debug("Giving Flashlight to " + ev.Player?.Nickname);
+                ev.Player?.AddItem(ItemType.Flashlight);
             });
             /*if (ev.NewRole == RoleTypeId.Tutorial)
             {
@@ -333,7 +335,7 @@ namespace Slafight_Plugin_EXILED
             {
                 if (UnityEngine.Random.Range(1,3) == 1)
                 {
-                    List<string> SpecificSCiPs = new List<string>() { "Scp3114","Scp3005" };
+                    List<string> SpecificSCiPs = new List<string>() { "Scp3114","Scp3005","Scp966" };
                     string SCiP = String.Empty;
                     int getRandomValue = UnityEngine.Random.Range(0, SpecificSCiPs.Count);
                     SCiP = SpecificSCiPs[getRandomValue];
@@ -356,6 +358,16 @@ namespace Slafight_Plugin_EXILED
                             if (ev.Player.UniqueRole != null) return;
                             Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(ev.Player);
                             Log.Debug("Scp3005 was Spawned!");
+                        });
+                    }
+                    else if (SCiP == "Scp966")
+                    {
+                        ev.IsAllowed = false;
+                        Timing.CallDelayed(1f, () =>
+                        {
+                            if (ev.Player.UniqueRole != null) return;
+                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_Scp966Role.SpawnRole(ev.Player);
+                            Log.Debug("Scp966 was Spawned!");
                         });
                     }
                 }

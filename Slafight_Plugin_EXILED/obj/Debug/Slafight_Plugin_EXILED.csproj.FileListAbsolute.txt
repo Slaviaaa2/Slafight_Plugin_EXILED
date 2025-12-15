@@ -129,3 +129,4 @@ D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.IO.
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\System.Text.Encodings.Web.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\HintServiceMeow-Exiled.dll
+D:\RiderWorks\Slafight_Plugin_EXILED\Slafight_Plugin_EXILED\bin\Debug\0Harmony.dll

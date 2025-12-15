@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED
         public bool IsEnabled { get; set; } = true;
         [Description("Show Debug Logs?")]
         public bool Debug { get; set; } = true;
+        [Description("Please Set Season Info. 0=normal,1=halloween,234...is not available now")]
+        public int Season { get; set; } = 0;
         
         [Description("")]
         public string AudioReferences { get; set; } = "C:\\Users\\zeros\\AppData\\Roaming\\EXILED\\ServerContents\\";
@@ -41,6 +43,11 @@ namespace Slafight_Plugin_EXILED
         public GunN7CR GunN7CRConfig { get; set; } = new();
         [Description("")]
         public ArmorVip ArmorVipConfig { get; set; } = new();
+        [Description("")]
+        public MagicMissile MagicMissileConfig { get; set; } = new();
+        [Description("")]
+        public DummyRoad DummyRoadConfig { get; set; } = new();
+        
         
         [Description("")]
         public KeycardOld_ContainmentEngineer KeycardOld_ContainmentEngineerConfig { get; set; } = new();

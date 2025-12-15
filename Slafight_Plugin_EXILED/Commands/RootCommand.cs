@@ -22,7 +22,9 @@ public class RootCommand : ParentCommand
         RegisterCommand(new Spawn3005());
         RegisterCommand(new SpawnFifthist());
         RegisterCommand(new Spawn3114());
+        RegisterCommand(new Spawn966());
         RegisterCommand(new PlaySurfaceAttack());
+        RegisterCommand(new PlayOmegaWarhead());
     }
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

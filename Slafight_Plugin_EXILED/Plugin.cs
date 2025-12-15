@@ -37,6 +37,7 @@ namespace Slafight_Plugin_EXILED
         public LabApiHandler LabApiHandler { get; set; }
         public EasterEggsHandler EasterEggsHandler { get; set; }
         public PlayerHUD PlayerHUD { get; set; }
+        public CandyChanges CandyChanges { get; set; }
 
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
@@ -44,6 +45,8 @@ namespace Slafight_Plugin_EXILED
         public GunN7CR _GunN7CR;
         public GunGoCRailgun _GunGoCRailgun;
         public ArmorVip _ArmorVip;
+        public MagicMissile _MagicMissile;
+        public DummyRoad _DummyRoad;
         
         public KeycardOld_Cadet _KeycardOld_Cadet;
         public KeycardOld_Commander _KeycardOld_Commander;
@@ -61,8 +64,10 @@ namespace Slafight_Plugin_EXILED
         public HdCommander CR_HdCommander { get; set; }
         public NtfAide CR_NtfAide { get; set; }
         public Scp3114Role CRScp3114Role { get; set; }
+        public Scp966Role CR_Scp966Role { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
+        public EscapeHandler EscapeHandler { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -74,14 +79,19 @@ namespace Slafight_Plugin_EXILED
             LabApiHandler = new();
             EasterEggsHandler = new();
             PlayerHUD = new();
+            EscapeHandler = new();
+            CandyChanges = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
-
+            CustomHandlersManager.RegisterEventsHandler(CustomMap);
+            
             _HIDTurret = new();
             _KeycardFifthist = new();
             _ArmorInfantry = new();
             _GunN7CR = new();
             _GunGoCRailgun = new();
             _ArmorVip = new();
+            _MagicMissile = new();
+            _DummyRoad = new();
             
             _KeycardOld_Cadet = new();
             _KeycardOld_Commander = new();
@@ -102,6 +112,8 @@ namespace Slafight_Plugin_EXILED
             Config.GunN7CRConfig.Register();
             Config.GunGoCRailgunConfig.Register();
             Config.ArmorVipConfig.Register();
+            Config.MagicMissileConfig.Register();
+            Config.DummyRoadConfig.Register();
             
             Config.KeycardOld_CadetConfig.Register();
             Config.KeycardOld_CommanderConfig.Register();
@@ -121,6 +133,7 @@ namespace Slafight_Plugin_EXILED
             CR_HdCommander = new();
             CR_NtfAide = new();
             CRScp3114Role = new();
+            CR_Scp966Role = new();
 
             CustomRole.RegisterRoles(false);
             

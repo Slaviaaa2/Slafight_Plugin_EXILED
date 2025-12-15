@@ -91,4 +91,32 @@ public class DevToolFunctionHandler
             yield return 0f;
         }
     }
+
+    public void PlayOmegaWarhead()
+    {
+        foreach (Room rooms in Room.List)
+        {
+            rooms.Color = Color.blue;
+        }
+
+        foreach (Door door in Door.List)
+        {
+            if (door.Type != DoorType.ElevatorGateA && door.Type != DoorType.ElevatorGateB && door.Type != DoorType.ElevatorLczA && door.Type != DoorType.ElevatorLczB && door.Type != DoorType.ElevatorNuke && door.Type != DoorType.ElevatorScp049 && door.Type != DoorType.ElevatorServerRoom)
+            {
+                door.IsOpen = true;
+                door.Lock(DoorLockType.Warhead);
+            }
+        }
+        Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
+        CreateAndPlayAudio("omega_v2.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
+        Timing.CallDelayed(Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime, () =>
+        {
+            foreach (Player player in Player.List)
+            {
+                if (player == null) continue;
+                player.ExplodeEffect(ProjectileType.FragGrenade);
+                player.Kill("OMEGA WARHEADに爆破された");
+            }
+        });
+    }
 }

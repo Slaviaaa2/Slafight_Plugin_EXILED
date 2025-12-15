@@ -25,7 +25,7 @@ public class OmegaWarhead
         
         if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
         
-        Cassie.MessageTranslated("Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation.","緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、非難を開始してください。", true);
+        Cassie.MessageTranslated("Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation.","緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。", true);
         Timing.CallDelayed(30, () =>
         {
             if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;

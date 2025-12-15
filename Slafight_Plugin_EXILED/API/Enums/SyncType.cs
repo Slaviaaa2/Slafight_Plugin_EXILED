@@ -6,5 +6,6 @@ public enum SyncType
     PHUD_Role = 1,
     PHUD_Objective = 2,
     PHUD_Team = 3,
-    PHUD_Event = 4
+    PHUD_Event = 4,
+    PHUD_Specific = 5
 }

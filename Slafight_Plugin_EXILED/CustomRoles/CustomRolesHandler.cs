@@ -50,15 +50,34 @@ public class CustomRolesHandler
     {
         for (;;)
         {
+            if (!Round.InProgress)
+            {
+                yield break;
+            }
+            int i = 0;
             foreach (Player player in Player.List)
             {
                 if (!player.IsAlive) continue;
                 if (player.UniqueRole != "FIFTHIST" && player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
                 {
-                    yield break;
+                    i++;
                 }
             }
-            EndRound(Team.SCPs,"FIFTHIST_WIN");
+            int ii = 0;
+            foreach (Player player in Player.List)
+            {
+                if (!player.IsAlive) continue;
+                if (player.UniqueRole == "FIFTHIST" || player.UniqueRole == "SCP-3005" || player.UniqueRole == "F_Priest")
+                {
+                    ii++;
+                }
+            }
+            if (i==0 && ii!=0)
+            {
+                EndRound(Team.SCPs,"FIFTHIST_WIN");
+            }
+
+            yield return Timing.WaitForSeconds(1f);
         }
     }
 
@@ -338,25 +357,6 @@ public class CustomRolesHandler
                     if (distance <= 2.75f)
                     {
                         _player.Hurt(25f,"<color=#ff00fa>第五的</color>な力による影響");
-                    }
-                }
-            }
-
-            if (player.UniqueRole == "SCP-3005")
-            {
-                if (Plugin.Singleton.SpecialEventsHandler.isFifthistsRaidActive)
-                {
-                    if (player.Position.x >= 120f && player.Position.x <= 125f)
-                    {
-                        if (player.Position.y >= 280f)
-                        {
-                            if (player.Position.z >= 18f && player.Position.z <= 25f)
-                            {
-                                player.UniqueRole = null;
-                                SpawnF_Priest(player);
-                                yield break;
-                            }
-                        }
                     }
                 }
             }

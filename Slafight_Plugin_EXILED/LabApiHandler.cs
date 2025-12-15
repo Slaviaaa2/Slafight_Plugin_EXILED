@@ -74,10 +74,13 @@ public class LabApiHandler : CustomEventsHandler
                         player.EnableEffect(EffectType.Decontaminating,255);
                     }
                 }
+
+                int i = 0;
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
                     if (player.UniqueRole == "SCP-3005")
                     {
+                        i++;
                         if (!_activatedAntiMemeProtocolInPast)
                         {
                             Cassie.MessageTranslated("By order of Facility Manager Control Room , Anti me mu Protocol Activated .",
@@ -93,6 +96,10 @@ public class LabApiHandler : CustomEventsHandler
                         break;
                     }
                 }
+                if (i<=0)
+                {
+                    ev.Player.SendHint("<size=26>※対象が見つかりませんでした</size>",3.5f);
+                }
             }
             else
             {
@@ -106,13 +113,10 @@ public class LabApiHandler : CustomEventsHandler
                 }
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
-                    if (player.UniqueRole == "SCP-3005")
-                    {
-                        Cassie.MessageTranslated("Anti me mu Protocol Stopped .",
-                            "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",false,false);
-                        activatedAntiMemeProtocol = false;
-                        break;
-                    }
+                    Cassie.MessageTranslated("Anti me mu Protocol Stopped .",
+                        "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",false,false);
+                    activatedAntiMemeProtocol = false;
+                    break;
                 }
             }
         }

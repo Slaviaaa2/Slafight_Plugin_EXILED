@@ -34,6 +34,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="0Harmony">
+          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
+        </Reference>
         <Reference Include="AdvancedMERTools">
           <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
         </Reference>
@@ -124,17 +127,21 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Abilities\MagicMissileAbility.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />
         <Compile Include="API\Enums\SyncType.cs" />
         <Compile Include="BadgeHandler.cs" />
+        <Compile Include="CandyChanges.cs" />
         <Compile Include="Commands\DevToolFunctionHandler.cs" />
+        <Compile Include="Commands\DevTools\PlayOmegaWarhead.cs" />
         <Compile Include="Commands\DevTools\PlaySurfaceAttack.cs" />
         <Compile Include="Commands\DevTools\ReRollSetQueue.cs" />
         <Compile Include="Commands\DevTools\ReRollSpecial.cs" />
         <Compile Include="Commands\DevTools\Spawn3005.cs" />
         <Compile Include="Commands\DevTools\Spawn3114.cs" />
+        <Compile Include="Commands\DevTools\Spawn966.cs" />
         <Compile Include="Commands\DevTools\SpawnDebugToolRole.cs" />
         <Compile Include="Commands\DevTools\SpawnFifthistcs.cs" />
         <Compile Include="Commands\DevTools\SpawnMapEditRole.cs" />
@@ -142,6 +149,7 @@
         <Compile Include="Config.cs" />
         <Compile Include="CustomItems\ArmorInfantry.cs" />
         <Compile Include="CustomItems\ArmorVIP.cs" />
+        <Compile Include="CustomItems\DummyRoad.cs" />
         <Compile Include="CustomItems\GunGoCRailgun.cs" />
         <Compile Include="CustomItems\GunN7CR.cs" />
         <Compile Include="CustomItems\HIDTurret.cs" />
@@ -158,6 +166,7 @@
         <Compile Include="CustomItems\KeycardOld_ResearchSupervisor.cs" />
         <Compile Include="CustomItems\KeycardOld_Scientist.cs" />
         <Compile Include="CustomItems\KeycardOld_ZoneManager.cs" />
+        <Compile Include="CustomItems\MagicMissile.cs" />
         <Compile Include="CustomMap.cs" />
         <Compile Include="CustomRoles\CustomRolesHandler.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistPriest.cs" />
@@ -166,13 +175,16 @@
         <Compile Include="CustomRoles\FoundationForces\HdInfantry.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfAide.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3114Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp682Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp966Role.cs" />
         <Compile Include="EasterEggsHandler.cs" />
+        <Compile Include="EscapeHandler.cs" />
         <Compile Include="EventHandler.cs" />
         <Compile Include="Hints\PlayerHUD.cs" />
         <Compile Include="LabApiHandler.cs" />
         <Compile Include="ClassicEvent.cs" />
         <Compile Include="Plugin.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs"/>
+        <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="SpawnSystem.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />
         <Compile Include="SpecialEvents\Events\DeltaWarhead.cs" />
