@@ -16,10 +16,10 @@ public class DevToolFunctionHandler
     Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
     public void PlaySurfaceAttack()
     {
-        Exiled.API.Features.Cassie.MessageTranslated("pitch_.8 All Insurgency Agents Tasks completed . Last Order . . pitch_.75 Destroy the Facility . pitch_.4 .g1 pitch_.26 .g5 .g6 .g4 pitch_2 .g1 pitch_.75 Good by all anomalys and foundation personnels .","全インサージェンシーエージェントの任務完了を確認。最後の指令を下す：<b><color=red>施設を破壊せよ</color></b>");
+        Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 All Insurgency Agents Tasks completed . Last Order . . $pitch_.75 Destroy the Facility . $pitch_.4 .g1 $pitch_.26 .g5 .g6 .g4 $pitch_2 .g1 $pitch_.75 Good by all anomalys and foundation personnels .","全インサージェンシーエージェントの任務完了を確認。最後の指令を下す：<b><color=red>施設を破壊せよ</color></b>");
         Timing.CallDelayed(15f, () =>
         {
-                            Exiled.API.Features.Cassie.MessageTranslated("pitch_.2 .g4 .g4 pitch_1 pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . PLEASE D .g4 IE .g6 .g3 .g4","BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. <color=red><b>PLEASE DIE</b></color>",false,false);
+                            Exiled.API.Features.Cassie.MessageTranslated("$pitch_.2 .g4 .g4 $pitch_1 $pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . PLEASE D .g4 IE .g6 .g3 .g4","BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. <color=red><b>PLEASE DIE</b></color>",false,false);
                             Timing.CallDelayed(10f, () =>
                             {
                                 CreateAndPlayAudio("cir.ogg","Exiled.API.Features.Cassie",Vector3.zero,true,null,false,999999999,0);

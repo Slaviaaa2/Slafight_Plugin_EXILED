@@ -359,7 +359,7 @@ public class SpawnSystem
                 }
                 if (i >= Math.Truncate(Player.List.Count/4f)) break;
             }
-            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} pitch_1.05 5 5 5 pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
+            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
         }
         else if (spawnType == SpawnTypeId.GOI_FifthistBackup)
         {
@@ -374,7 +374,7 @@ public class SpawnSystem
                 }
                 if (i >= Math.Truncate(Player.List.Count/6f)) break;
             }
-            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} pitch_1.05 5 5 5 pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
+            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
         }
 
         Timing.CallDelayed(0.02f, () =>
