@@ -12,6 +12,7 @@ using Exiled.Events.EventArgs.Server;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -450,7 +451,8 @@ public class SpecialEventsHandler
             Vector3 spawnPoint = new Vector3(ShyguyPosition.x + 1f, ShyguyPosition.y + 0f, ShyguyPosition.z);
             Npc term_npc = Npc.Spawn("for096",RoleTypeId.ClassD,false,position:spawnPoint);
             term_npc.Transform.localEulerAngles = new Vector3(0,-90,0);
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
+            //Exiled.API.Features.Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
+            CassieExtensions.CassieTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>",true);
         }
         
         public void EndlessAnger(Exiled.Events.EventArgs.Scp096.CalmingDownEventArgs ev)

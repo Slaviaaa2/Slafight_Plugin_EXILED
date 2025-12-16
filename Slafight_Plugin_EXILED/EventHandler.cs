@@ -46,6 +46,7 @@ using NetworkManagerUtils.Dummies;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp096;
+using Slafight_Plugin_EXILED.Extensions;
 using Subtitles;
 using UnityEngine;
 using CassieHandler = Exiled.Events.Handlers.Cassie;
@@ -254,6 +255,7 @@ namespace Slafight_Plugin_EXILED
                 if (ev.Player.HasItem(ItemType.Flashlight)) return;
                 if (ev.Player.Items.Count >= 8) return;
                 if (ev.NewRole == null) return;
+                if (ev.Player.Inventory == null) return;
                 Log.Debug("Giving Flashlight to " + ev.Player?.Nickname);
                 ev.Player?.AddItem(ItemType.Flashlight);
             });
@@ -514,7 +516,7 @@ namespace Slafight_Plugin_EXILED
                         if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
                         {
                             WarheadLocked = true;
-                            Exiled.API.Features.Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true,true,true);
+                            CassieExtensions.CassieTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true);
                         }
                     });
                 }
