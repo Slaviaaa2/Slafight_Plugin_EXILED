@@ -85,8 +85,8 @@ public class ChaosInsurgencyRaid
                 CassieExtensions.CassieTranslated("$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .",
                     "次の指令：テスラゲートの無効化 ...承認",false);
                 teslaDisabled = true;
-                //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 All Agents . Work Time .","エージェント達よ、働く時間だ。",false,false);
-                CassieExtensions.CassieTranslated("$pitch_.8 All Agents . Work Time .",
+                //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 All Agent . Work Time .","エージェント達よ、働く時間だ。",false,false);
+                CassieExtensions.CassieTranslated("$pitch_.8 All Agent . Work Time .",
                     "エージェント達よ、働く時間だ。",false);
                 float testingDelayedInt = 400f;
                 Timing.CallDelayed(testingDelayedInt, () =>
