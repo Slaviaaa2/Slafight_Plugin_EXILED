@@ -35,73 +35,73 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
         </Reference>
         <Reference Include="AdvancedMERTools">
-          <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
         </Reference>
         <Reference Include="ASS-Exiled">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\ASS-Exiled.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\ASS-Exiled.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
-          <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
         <Reference Include="AudioPlayerApi">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
         </Reference>
         <Reference Include="CommandSystem.Core">
-          <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
+            <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.API, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.API.dll</HintPath>
+        <Reference Include="Exiled.API, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.API.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CreditTags, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.CreditTags.dll</HintPath>
+        <Reference Include="Exiled.CreditTags, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CreditTags.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomItems, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.CustomItems.dll</HintPath>
+        <Reference Include="Exiled.CustomItems, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CustomItems.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomRoles, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.CustomRoles.dll</HintPath>
+        <Reference Include="Exiled.CustomRoles, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CustomRoles.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Events, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.Events.dll</HintPath>
+        <Reference Include="Exiled.Events, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Events.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Loader, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.Loader.dll</HintPath>
+        <Reference Include="Exiled.Loader, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Loader.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Permissions, Version=9.10.2.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\Exiled.Permissions.dll</HintPath>
+        <Reference Include="Exiled.Permissions, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
         <Reference Include="HintServiceMeow">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
         </Reference>
         <Reference Include="LabApi">
-          <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\LabApi.dll</HintPath>
+            <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\LabApi.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
-          <HintPath>..\..\..\Tools\depBuild\references\Mirror.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\Mirror.dll</HintPath>
         </Reference>
         <Reference Include="Mirror.Components">
-          <HintPath>..\..\..\Tools\depBuild\references\Mirror.Components.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\Mirror.Components.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib">
-          <HintPath>..\..\..\Tools\depBuild\references\mscorlib.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\mscorlib.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json">
-          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\NorthwoodLib.dll</HintPath>
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
-          <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="ProjectMER">
-          <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\ProjectMER.dll</HintPath>
+            <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\ProjectMER.dll</HintPath>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
@@ -110,20 +110,20 @@
         <Reference Include="System.Net.Http" />
         <Reference Include="System.Net.Http.WebRequest" />
         <Reference Include="System.Text.Json">
-          <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\System.Text.Json.dll</HintPath>
+            <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\System.Text.Json.dll</HintPath>
         </Reference>
         <Reference Include="System.Xml"/>
         <Reference Include="UnityEngine">
-          <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.CoreModule.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-          <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
+            <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.10.2\lib\net48\YamlDotNet.dll</HintPath>
+            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\YamlDotNet.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>

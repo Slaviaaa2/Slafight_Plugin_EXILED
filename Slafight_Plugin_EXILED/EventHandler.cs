@@ -48,7 +48,6 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp096;
 using Subtitles;
 using UnityEngine;
-using Cassie = Exiled.API.Features.Cassie;
 using CassieHandler = Exiled.Events.Handlers.Cassie;
 using ElevatorDoor = Exiled.API.Features.Doors.ElevatorDoor;
 using Log = Exiled.API.Features.Log;
@@ -515,7 +514,7 @@ namespace Slafight_Plugin_EXILED
                         if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
                         {
                             WarheadLocked = true;
-                            Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true,true,true);
+                            Exiled.API.Features.Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true,true,true);
                         }
                     });
                 }

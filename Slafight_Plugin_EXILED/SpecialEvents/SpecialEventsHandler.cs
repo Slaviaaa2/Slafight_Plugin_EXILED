@@ -319,7 +319,7 @@ public class SpecialEventsHandler
     
     public void OnWaitingForPlayersInitEvent()
     {
-        Cassie.Clear();
+        Exiled.API.Features.Cassie.Clear();
         EventPID++;
         // まだキューが空のときだけ初期イベントを入れる
         if (EventQueue.Count == 0)
@@ -450,7 +450,7 @@ public class SpecialEventsHandler
             Vector3 spawnPoint = new Vector3(ShyguyPosition.x + 1f, ShyguyPosition.y + 0f, ShyguyPosition.z);
             Npc term_npc = Npc.Spawn("for096",RoleTypeId.ClassD,false,position:spawnPoint);
             term_npc.Transform.localEulerAngles = new Vector3(0,-90,0);
-            Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
         }
         
         public void EndlessAnger(Exiled.Events.EventArgs.Scp096.CalmingDownEventArgs ev)

@@ -19,13 +19,13 @@ public class Scp682Role
     
     public Scp682Role()
     {
-        Exiled.Events.Handlers.Player.Dying += DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.Hurting += Hurting;
     }
 
     ~Scp682Role()
     {
-        Exiled.Events.Handlers.Player.Dying -= DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.Hurting -= Hurting;
     }
     
@@ -80,14 +80,14 @@ public class Scp682Role
         }
     }
     
-    public void DiedCassieAnnounce(DyingEventArgs ev)
+    public void DiedCassie(DyingEventArgs ev)
     {
         if (ev.Player.UniqueRole == "SCP-682")
         {
             Slafight_Plugin_EXILED.Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,"",ev.Player);
             //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Cassie.Clear();
-            Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .","<color=red>SCP-966</color>の無力化に成功しました。");
+            Exiled.API.Features.Cassie.Clear();
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .","<color=red>SCP-966</color>の無力化に成功しました。");
         }
     }
 }

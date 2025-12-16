@@ -17,14 +17,14 @@ public class Scp966Role
     public Scp966Role()
     {
         Exiled.Events.Handlers.Scp3114.Disguising += ExtendTime;
-        Exiled.Events.Handlers.Player.Dying += DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.Hurting += Hurting;
     }
 
     ~Scp966Role()
     {
         Exiled.Events.Handlers.Scp3114.Disguising -= ExtendTime;
-        Exiled.Events.Handlers.Player.Dying -= DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.Hurting -= Hurting;
     }
     
@@ -133,13 +133,13 @@ public class Scp966Role
             ev.Amount = 15f;
         }
     }
-    public void DiedCassieAnnounce(DyingEventArgs ev)
+    public void DiedCassie(DyingEventArgs ev)
     {
         if (ev.Player.UniqueRole == "SCP-966")
         {
             //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Cassie.Clear();
-            Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .","<color=red>SCP-966</color>の終了に成功しました。");
+            Exiled.API.Features.Cassie.Clear();
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .","<color=red>SCP-966</color>の終了に成功しました。");
         }
     }
 }

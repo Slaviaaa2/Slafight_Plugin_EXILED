@@ -27,8 +27,8 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,3,0);
-        public override Version RequiredExiledVersion { get; } = new Version(9, 10, 2);
+        public override Version Version => new Version(1,3,1);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 11, 2);
 
         public EventHandler EventHandler { get; set; }
         public SpecialEventsHandler SpecialEventsHandler { get; set; }

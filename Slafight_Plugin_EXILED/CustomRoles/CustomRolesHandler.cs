@@ -23,7 +23,7 @@ public class CustomRolesHandler
 {
     public CustomRolesHandler()
     {
-        Exiled.Events.Handlers.Player.Dying += DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
         Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
@@ -31,7 +31,7 @@ public class CustomRolesHandler
     }
     ~CustomRolesHandler()
     {
-        Exiled.Events.Handlers.Player.Dying -= DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
         Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
@@ -281,14 +281,14 @@ public class CustomRolesHandler
         });
     }
 
-    public void DiedCassieAnnounce(DyingEventArgs ev)
+    public void DiedCassie(DyingEventArgs ev)
     {
         Log.Debug(ev.Player.UniqueRole);
         if (ev.Player.UniqueRole == "SCP-3005")
         {
             //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Cassie.Clear();
-            Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by Anti me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true,false);
+            Exiled.API.Features.Cassie.Clear();
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by Anti me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true,false);
         }
     }
 

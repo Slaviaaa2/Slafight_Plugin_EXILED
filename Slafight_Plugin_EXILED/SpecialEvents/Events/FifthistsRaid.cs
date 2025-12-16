@@ -49,6 +49,6 @@ public class FifthistsRaid
             }
         }
         
-        Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
+        Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
     }
 }

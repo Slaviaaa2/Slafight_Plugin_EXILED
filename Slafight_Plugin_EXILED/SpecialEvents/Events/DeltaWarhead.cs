@@ -26,18 +26,18 @@ public class DeltaWarhead
         //EventHandler.DeconCancellFlag = true;
         
         if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-        Cassie.MessageTranslated("Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...","危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・");
+        Exiled.API.Features.Cassie.MessageTranslated("Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...","危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・");
         Timing.CallDelayed(60, () =>
         {
             if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
             //DecontaminationController.Singleton.DecontaminationOverride = DecontaminationController.DecontaminationStatus.Disabled;
             //DecontaminationController.Singleton.TimeOffset = int.MinValue;
             //DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
-            Cassie.MessageTranslated("My Approaches confirmed by O5 Command, Setup Delta System...","対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・");
+            Exiled.API.Features.Cassie.MessageTranslated("My Approaches confirmed by O5 Command, Setup Delta System...","対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・");
             Timing.CallDelayed(180, () =>
             {
                 if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-                Cassie.MessageTranslated($"By Order of O5 Command . Delta Warhead Sequence Activated . Heavy Containment Zone Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime} Seconds.",$"O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。重度収容区画を{Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime}秒後に爆破します。",true);
+                Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Delta Warhead Sequence Activated . Heavy Containment Zone Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime} Seconds.",$"O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。重度収容区画を{Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime}秒後に爆破します。",true);
                 foreach (Room rooms in Room.List)
                 {
                     if (rooms.Zone == ZoneType.HeavyContainment)
@@ -45,7 +45,7 @@ public class DeltaWarhead
                         rooms.Color = Color.green;
                     }
                 }
-                CreateAndPlayAudio("delta.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
+                CreateAndPlayAudio("delta.ogg","Exiled.API.Features.Cassie",Vector3.zero,true,null,false,999999999,0);
                 Timing.CallDelayed(Slafight_Plugin_EXILED.Plugin.Singleton.Config.DwBoomTime, () =>
                 {
                     if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;

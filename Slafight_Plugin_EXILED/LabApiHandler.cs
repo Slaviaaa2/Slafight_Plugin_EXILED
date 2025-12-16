@@ -28,7 +28,7 @@ public class LabApiHandler : CustomEventsHandler
     {
         LabApi.Events.Handlers.ServerEvents.RoundStarted += PickupSetup;
 
-        Exiled.Events.Handlers.Player.Dying += DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying += DiedCassie;
 
         LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionEvent;
 
@@ -40,7 +40,7 @@ public class LabApiHandler : CustomEventsHandler
     {
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= PickupSetup;
 
-        Exiled.Events.Handlers.Player.Dying -= DiedCassieAnnounce;
+        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
 
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionEvent;
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= init;
@@ -83,13 +83,13 @@ public class LabApiHandler : CustomEventsHandler
                         i++;
                         if (!_activatedAntiMemeProtocolInPast)
                         {
-                            Cassie.MessageTranslated("By order of Facility Manager Control Room , Anti me mu Protocol Activated .",
+                            Exiled.API.Features.Cassie.MessageTranslated("By order of Facility Manager Control Room , Anti me mu Protocol Activated .",
                                 "<color=#ff0087>施設管理者制御室</color>からの命令により、<color=#ff00fa>アンチミームプロトコロル</color>が有効化されました。エージェントによりミーム性物体の非活性化が開始されます。",true,false);
                             _activatedAntiMemeProtocolInPast = true;
                         }
                         else
                         {
-                            Cassie.MessageTranslated("Anti me mu Protocol Resumed .",
+                            Exiled.API.Features.Cassie.MessageTranslated("Anti me mu Protocol Resumed .",
                                 "<color=#ff00fa>アンチミームプロトコル</color>が再開されました。",false,false);
                         }
                         activatedAntiMemeProtocol = true;
@@ -113,7 +113,7 @@ public class LabApiHandler : CustomEventsHandler
                 }
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
-                    Cassie.MessageTranslated("Anti me mu Protocol Stopped .",
+                    Exiled.API.Features.Cassie.MessageTranslated("Anti me mu Protocol Stopped .",
                         "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",false,false);
                     activatedAntiMemeProtocol = false;
                     break;
@@ -193,7 +193,7 @@ public class LabApiHandler : CustomEventsHandler
         });
     }
 
-    public void DiedCassieAnnounce(DyingEventArgs ev)
+    public void DiedCassie(DyingEventArgs ev)
     {
         if (ev.Player.UniqueRole == "SCP-3005")
         {
