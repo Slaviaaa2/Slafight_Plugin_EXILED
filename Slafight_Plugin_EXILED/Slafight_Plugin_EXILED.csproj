@@ -191,6 +191,7 @@
         <Compile Include="SpecialEvents\Events\DeltaWarhead.cs" />
         <Compile Include="SpecialEvents\Events\FifthistsRaid.cs" />
         <Compile Include="SpecialEvents\Events\OmegaWarhead.cs" />
+        <Compile Include="SpecialEvents\Events\OperationBlackout.cs" />
         <Compile Include="SpecialEvents\Events\Scp1509BattleField.cs" />
         <Compile Include="SpecialEvents\SpecialEventsHandler.cs" />
     </ItemGroup>

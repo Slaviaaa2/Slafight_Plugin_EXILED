@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Hazards;
+using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs.Scp330;
 using InventorySystem.Items.Usables.Scp330;
 
@@ -10,11 +13,13 @@ public class CandyChanges
     public CandyChanges()
     {
         Exiled.Events.Handlers.Scp330.InteractingScp330 += CandyRoll;
+        Exiled.Events.Handlers.Scp330.EatenScp330 += SpecialCandiesEffect;
     }
 
     ~CandyChanges()
     {
         Exiled.Events.Handlers.Scp330.InteractingScp330 -= CandyRoll;
+        Exiled.Events.Handlers.Scp330.EatenScp330 -= SpecialCandiesEffect;
     }
 
     public void CandyRoll(InteractingScp330EventArgs ev)
@@ -45,15 +50,15 @@ public class CandyChanges
         {
             if (ev.Candy.Kind == CandyKindID.Black)
             {
-                ev.Player.ShowHint("<size=26>※現在は効果がありません。提案してください</size>");
+                // Good bye. MASARU Black...
             }
             else if (ev.Candy.Kind == CandyKindID.Brown)
             {
-                ev.Player.ShowHint("<size=26>※現在は効果がありません。提案してください</size>");
+                TantrumHazard.PlaceTantrum(ev.Player.Position);
             }
             else if (ev.Candy.Kind == CandyKindID.Gray)
             {
-                ev.Player.ShowHint("<size=26>※現在は効果がありません。提案してください</size>");
+                TimeGrenadeProjectile.CreateAndSpawn(ProjectileType.Flashbang, ev.Player.Position, ev.Player.Rotation);
             }
             else if (ev.Candy.Kind == CandyKindID.Orange)
             {

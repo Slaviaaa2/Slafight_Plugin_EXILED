@@ -134,6 +134,7 @@ public class SpecialEventsHandler
         EventPID++;
     }
     // Automatic Event Controls
+    public SpecialEventType nowEvent = SpecialEventType.None;
     public void SpecialEventsController()
     {
         Log.Debug(string.Join(", ", EventQueue));
@@ -145,7 +146,7 @@ public class SpecialEventsHandler
         }
 
         InitStats();
-        SpecialEventType nowEvent = EventQueue[0];
+        nowEvent = EventQueue[0];
         if (nowEvent == SpecialEventType.None)
         {
             
@@ -186,7 +187,7 @@ public class SpecialEventsHandler
         }
         else
         {
-            
+            Plugin.Singleton.OperationBlackout.Event();
         }
         Log.Info("今回の特殊イベント： "+localizedEventName);
     }
@@ -237,6 +238,10 @@ public class SpecialEventsHandler
             {
                 // SCRAPPED. IT'S VERY FUCKIN ISSUES HAVE.
                 //allowedEvents.Add(SpecialEventType.ClassicEvent);
+            } // scrapped
+            if (Player.List.Count >= 4)
+            {
+                allowedEvents.Add(SpecialEventType.OperationBlackout);
             }
         }
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
@@ -308,6 +313,11 @@ public class SpecialEventsHandler
         else if (nowEvent == SpecialEventType.ClassicEvent)
         {
             localizedEventName = "MEGAPATCH II";
+            eventNeedTriggers = "無し";
+        }
+        else if (nowEvent == SpecialEventType.OperationBlackout)
+        {
+            localizedEventName = "Operation: Blackout";
             eventNeedTriggers = "無し";
         }
         else

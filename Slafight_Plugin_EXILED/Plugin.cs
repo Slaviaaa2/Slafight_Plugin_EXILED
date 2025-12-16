@@ -15,6 +15,7 @@ using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.SpecialEvents.Events;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -68,6 +69,8 @@ namespace Slafight_Plugin_EXILED
         
         public SpawnSystem SpawnSystem { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
+        
+        public OperationBlackout OperationBlackout { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -81,6 +84,7 @@ namespace Slafight_Plugin_EXILED
             PlayerHUD = new();
             EscapeHandler = new();
             CandyChanges = new();
+            OperationBlackout = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
@@ -150,6 +154,8 @@ namespace Slafight_Plugin_EXILED
         {
             Singleton = null!;
             CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
+            CustomHandlersManager.UnregisterEventsHandler(CustomMap);
+            
             LabApiHandler = null;
             
             _HIDTurret = null;

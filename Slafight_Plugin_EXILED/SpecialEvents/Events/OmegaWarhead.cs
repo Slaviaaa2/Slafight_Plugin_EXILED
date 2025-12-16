@@ -60,17 +60,13 @@ public class OmegaWarhead
 
                     foreach (Door door in Door.List)
                     {
-                        if (door.Type != DoorType.ElevatorGateA || door.Type != DoorType.ElevatorGateB || door.Type != DoorType.ElevatorLczA || door.Type != DoorType.ElevatorLczB || door.Type != DoorType.ElevatorNuke || door.Type != DoorType.ElevatorScp049 || door.Type != DoorType.ElevatorServerRoom)
+                        if (door.Type != DoorType.ElevatorGateA && door.Type != DoorType.ElevatorGateB && door.Type != DoorType.ElevatorLczA && door.Type != DoorType.ElevatorLczB && door.Type != DoorType.ElevatorNuke && door.Type != DoorType.ElevatorScp049 && door.Type != DoorType.ElevatorServerRoom)
                         {
                             door.IsOpen = true;
                             door.Lock(DoorLockType.Warhead);
                         }
                     }
-                    //Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",false,false,false);
-                    foreach (Player player in Player.List)
-                    {
-                        MirrorExtensions.MessageTranslated(player,$"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime} Seconds.","",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",false,false);
-                    }
+                    Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
                     CreateAndPlayAudio("omega_v2.ogg","Exiled.API.Features.Cassie",Vector3.zero,true,null,false,999999999,0);
                     Timing.CallDelayed(Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime, () =>
                     {

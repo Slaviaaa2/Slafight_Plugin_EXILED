@@ -30,9 +30,16 @@ public class SpawnSystem
     }
 
     private bool isDefaultWave = true;
+
+    public static bool Disable = false;
     
     public void SpawnHandler(RespawningTeamEventArgs ev)
     {
+        if (Disable)
+        {
+            ev.IsAllowed = false;
+            return;
+        }
         if (isDefaultWave)
         {
             ev.IsAllowed = false;

@@ -23,5 +23,5 @@ public enum SpecialEventType
     /// <summary>Classic SCRAPPED. IT'S VERY F**</summary>
     ClassicEvent = 7,
     /// <summary></summary>
-    CassieHackSpeedrun = 8
+    OperationBlackout = 8
 }
