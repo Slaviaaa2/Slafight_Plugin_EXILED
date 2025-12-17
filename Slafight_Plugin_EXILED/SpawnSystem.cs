@@ -346,6 +346,30 @@ public class SpawnSystem
         {
             designation = "Chaos Insurgents";
             Respawn.ForceWave(SpawnableFaction.ChaosWave);
+            Timing.CallDelayed(8f, () =>
+            {
+                foreach (Player player in Player.List)
+                {
+                    if (player.Role == RoleTypeId.Spectator)
+                    {
+                        RandomSel = Random.Range(0, 5);
+                        if (RandomSel==0)
+                        {
+                            List<string> subroles = new List<string>()
+                            {
+                                "ChaosCommando"
+                            };
+                            if (subroles.Count <= 0) continue;
+                            RandomSel = Random.Range(0, subroles.Count);
+                            // Subroles: Aide
+                            if (RandomSel==0)
+                            {
+                                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player);
+                            }
+                        }
+                    }
+                }
+            });
         }
         else if (spawnType == SpawnTypeId.GOI_ChaosBackup)
         {

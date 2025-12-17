@@ -340,6 +340,7 @@ public class SpecialEventsHandler
             eventLocSet();
             Log.Info($"SEH: 初期イベント {SelectedEvent} をキューに追加しました。");
         }
+        Log.Info("現在選択中の特殊イベント： "+localizedEventName);
     }
 
     public void RoundRestartAddEvent()

@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.API.Features.Objectives;
 using Exiled.Events.EventArgs.Map;
+using Exiled.Events.EventArgs.Scp079;
 using LabApi.Events.CustomHandlers;
 using LightContainmentZoneDecontamination;
 using MapGeneration;
@@ -25,18 +26,20 @@ public class OperationBlackout
 {
     public OperationBlackout()
     {
-
         Exiled.Events.Handlers.Map.Generated += OnMAPGenerated;
         Exiled.Events.Handlers.Map.GeneratorActivating += OnGenerated;
+
+        Exiled.Events.Handlers.Scp079.Recontaining += DisableRecontainFunnies;
     }
     ~OperationBlackout()
     {
-
         Exiled.Events.Handlers.Map.Generated -= OnMAPGenerated;
         Exiled.Events.Handlers.Map.GeneratorActivating -= OnGenerated;
+
+        Exiled.Events.Handlers.Scp079.Recontaining -= DisableRecontainFunnies;
     }
 
-    private int globalEventPID = 0;
+    private int globalEventPID = -1;
     Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
     
     public void Event()
@@ -98,18 +101,27 @@ public class OperationBlackout
                 player.Role.Set(RoleTypeId.ClassD);
             }
         }
+        Exiled.API.Features.Cassie.Clear();
         CassieExtensions.CassieTranslated("Attention, All personnel. Facility electric systems is malfunctioning . please manual charge up the all generators.","全職員に通達。施設の電力システムに<color=red>問題</color>が発生しました。全ての非常用発電機を<color=#00b7eb>再起動</color>してください。",true);
     }
 
     public void OnMAPGenerated()
     {
-        if (Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.OperationBlackout)
+        if (Plugin.Singleton.SpecialEventsHandler.EventQueue[0] == SpecialEventType.OperationBlackout)
         {
             int i = 0;
             int spawnedCount = 0;
             while (spawnedCount < 3) // 3個スポーンするまで繰り返す
             {
-                GameObject generatorObj = PrefabHelper.Spawn(PrefabType.GeneratorStructure, Room.Random(ZoneType.LightContainment).WorldPosition(new Vector3(0f,1.25f,0f)));
+                GameObject generatorObj = PrefabHelper.Spawn(PrefabType.GeneratorStructure, Room.Random(ZoneType.LightContainment).WorldPosition(new Vector3(0f,0.05f,0f)));
+                generatorObj.transform.eulerAngles += new Vector3(-90f,0f,0f);
+                foreach (Generator generator in Generator.List)
+                {
+                    if (generator.GameObject == generatorObj)
+                    {
+                        generator.KeycardPermissions = KeycardPermissions.Intercom;
+                    }
+                }
                 Log.Debug($"Spawned object: {generatorObj != null}"); // スポーン確認
                 Log.Debug($"Pos: {generatorObj.transform.position}");
                 Log.Debug($"Rot: {generatorObj.transform.eulerAngles}");
@@ -186,6 +198,13 @@ public class OperationBlackout
                 });
             });
         }
+    }
+
+    public void DisableRecontainFunnies(RecontainingEventArgs ev)
+    {
+        if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        ev.IsAllowed = false;
+        ev.Player.ShowHint("<size=26>電力が無いようだ・・・</size>");
     }
 
     private IEnumerator<float> Coroutine()

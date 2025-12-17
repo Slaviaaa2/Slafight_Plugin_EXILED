@@ -13,6 +13,7 @@ using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
+using HarmonyLib;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
@@ -28,9 +29,11 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,3,1);
+        public override Version Version => new Version(1,4,0);
         public override Version RequiredExiledVersion { get; } = new Version(9, 11, 2);
 
+        public Harmony HarmonyInstance { get; private set; }
+        
         public EventHandler EventHandler { get; set; }
         public SpecialEventsHandler SpecialEventsHandler { get; set; }
         public CustomMap CustomMap { get; set; }
@@ -144,6 +147,9 @@ namespace Slafight_Plugin_EXILED
             SpawnSystem = new();
             
             Slafight_Plugin_EXILED.Plugin.Singleton.EasterEggsHandler.loadClips();
+            
+            HarmonyInstance = new Harmony(this.Name);
+            HarmonyInstance.PatchAll();  // 全HarmonyPatch属性を自動適用
 
             _ = SendPlayerCountLoop();
             
@@ -163,6 +169,9 @@ namespace Slafight_Plugin_EXILED
             _ArmorInfantry = null;
             CustomItem.UnregisterItems();
             CustomRole.UnregisterRoles();
+            
+            HarmonyInstance.UnpatchAll(this.Name);
+            HarmonyInstance = null;
             
             base.OnDisabled();
         }

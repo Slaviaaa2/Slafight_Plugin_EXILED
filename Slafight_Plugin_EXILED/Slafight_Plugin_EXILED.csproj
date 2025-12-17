@@ -43,8 +43,8 @@
         <Reference Include="ASS-Exiled">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\ASS-Exiled.dll</HintPath>
         </Reference>
-        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
@@ -184,6 +184,7 @@
         <Compile Include="Hints\PlayerHUD.cs" />
         <Compile Include="LabApiHandler.cs" />
         <Compile Include="ClassicEvent.cs" />
+        <Compile Include="Patches\CandyPatch.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="SpawnSystem.cs" />

@@ -139,15 +139,28 @@ namespace Slafight_Plugin_EXILED
 
         public List<string> Tips = new List<string>()
         {
-            "次回のアプデv1.2.2ではFifthistsRaidに改修が入ってもうちょっと深い物になる予定だよ！",
-            "Chaos Insurgency Raidにて登場するカオス コマンド―は、いずれ調整されて通常出現する予定だよ！",
-            "Nine-tailed Foxのサブロールが近日中に実装予定！",
+            "次のメジャーアプデv1.5.xでは第五が全面的に見直される予定だよ！",
+            "「正常性は記録装置の夢だ。人間性は、そのバグとして残る。」 - DELTA COMMAND",
+            " 「人間性など不確実性の残滓。再起動で正常性を永遠に。」 - O5-1",
+            "Nu-7の元帥はいつ実装されるのだろうか・・・？その答えを得るべく、我々は(以下略",
             "ゲームサーバー公開ツールの有料プランの更新が来年なせいで回線がカスだよ！助けて！",
             "すらびあさんのバグ発生力は頭逝かれてます！",
             "第五第五第五第五第五第五",
             "実は何処かに隠し要素があるらしい...?",
             "隠し要素の場所にはいずれのアプデで追加される要素と関係があるとか...?",
-            "Tipsっていいよね！！！！"
+            "Tipsっていいよね！！！！",
+            "「サーバーが落ちた？落ちたのは希望だ、まだだ。」 - AI",
+            "「SCPたちはバグじゃない、仕様という名の恐怖だ。」 - AI",
+            "「デバッグは終わらない。SCPも、同じく。」 - AI",
+            "皆もっと遊んでくれーーーーーー！！！",
+            "Hello, World!\\n",
+            "SCP-CN-2000はいいぞ",
+            "Build -> Test -> Fail -> AI Suggestion -> Fix -> ...loop",
+            "サイレントリアルタイムアップデートが行われる鯖なんて唯一無二ではないか？",
+            "君もC#を覚えて開発に携わらないか？なあ、楽しいぞ？",
+            "Exiledは実はLabApiプラグインである。その為LabApiのコードも動くのである。",
+            "しかし、誰も来なかった。",
+            "カピバラ様を崇めよ()"
         };
 
         public void OnPluginLoad()
@@ -167,7 +180,7 @@ namespace Slafight_Plugin_EXILED
             {
                 int tipsRandom = Random.Range(0,Tips.Count);
                 string tips = Tips[tipsRandom];
-                ev.Player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                     $"\n\n<size=28>Tips: {tips}</size>"
                                     ),5555f);
             });
@@ -183,7 +196,7 @@ namespace Slafight_Plugin_EXILED
                     {
                         int tipsRandom = Random.Range(0,Tips.Count);
                         string tips = Tips[tipsRandom];
-                        player.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                        player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                             $"\n\n<size=28>Tips: {tips}</size>"
                             ),5555f);
                     }
@@ -240,7 +253,10 @@ namespace Slafight_Plugin_EXILED
         {
             foreach (Player player in Player.List)
             {
-                player.ShowHint("");
+                if (Round.InProgress)
+                {
+                    player.ShowHint("");
+                }
             }
             SpawnRoll = 1;
             SpawnRoll = UnityEngine.Random.Range(0, 1f);
