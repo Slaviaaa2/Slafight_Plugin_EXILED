@@ -33,7 +33,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,0);
+        public override Version Version => new Version(1,4,1);
         public override Version RequiredExiledVersion { get; } = new Version(9, 11, 2);
 
         public Harmony HarmonyInstance { get; private set; }
