@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +18,9 @@ using System.Text.Json;
 using HarmonyLib;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.ProximityChat;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
+using UserSettings.ServerSpecific;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -42,6 +46,7 @@ namespace Slafight_Plugin_EXILED
         public EasterEggsHandler EasterEggsHandler { get; set; }
         public PlayerHUD PlayerHUD { get; set; }
         public CandyChanges CandyChanges { get; set; }
+        public ActivateHandler ProximityChatActiveHandler { get; set; }
 
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
@@ -88,6 +93,8 @@ namespace Slafight_Plugin_EXILED
             EscapeHandler = new();
             CandyChanges = new();
             OperationBlackout = new();
+            ProximityChat.Handler.RegisterEvents();
+            ProximityChatActiveHandler = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
@@ -145,6 +152,12 @@ namespace Slafight_Plugin_EXILED
             CustomRole.RegisterRoles(false);
             
             SpawnSystem = new();
+
+            var Settings = ServerSpecifics.Settings();
+            var a = Settings.ToList();
+            ServerSpecificSettingsSync.DefinedSettings = a.ToArray();
+            ServerSpecificSettingsSync.SendToAll();
+            Log.Debug($"Settings List: \n{ServerSpecificSettingsSync.DefinedSettings}");
             
             Slafight_Plugin_EXILED.Plugin.Singleton.EasterEggsHandler.loadClips();
             
@@ -159,6 +172,7 @@ namespace Slafight_Plugin_EXILED
         public override void OnDisabled()
         {
             Singleton = null!;
+            ProximityChat.Handler.UnregisterEvents();
             CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
             
@@ -172,6 +186,9 @@ namespace Slafight_Plugin_EXILED
             
             HarmonyInstance.UnpatchAll(this.Name);
             HarmonyInstance = null;
+            
+            ServerSpecificSettingsSync.DefinedSettings = [];
+            ServerSpecificSettingsSync.SendToAll();
             
             base.OnDisabled();
         }

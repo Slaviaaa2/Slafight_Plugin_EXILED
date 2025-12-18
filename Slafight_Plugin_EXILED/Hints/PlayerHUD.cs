@@ -208,6 +208,13 @@ public class PlayerHUD
                         SyncTextTeam = "<color=#c50000>The SCPs</color>";
                         SyncTextObjective = "無敵の爬虫類の力を見せてやれ！！！";
                     }
+                    
+                    if (player.UniqueRole == "Zombified")
+                    {
+                        SyncTextRole = "<color=#c50000>Zombified Subject</color>";
+                        SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                        SyncTextObjective = "何らかの要因でゾンビの様になってしまった。とにかく暴れろ！";
+                    }
 
                     // Fifthists
                     if (player.UniqueRole == "SCP-3005")

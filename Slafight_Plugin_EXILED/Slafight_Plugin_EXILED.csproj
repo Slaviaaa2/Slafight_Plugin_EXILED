@@ -187,6 +187,9 @@
         <Compile Include="Patches\CandyPatch.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="ProximityChat\ActivateHandler.cs" />
+        <Compile Include="ProximityChat\Handler.cs" />
+        <Compile Include="ServerSpecifics.cs" />
         <Compile Include="SpawnSystem.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />
         <Compile Include="SpecialEvents\Events\DeltaWarhead.cs" />

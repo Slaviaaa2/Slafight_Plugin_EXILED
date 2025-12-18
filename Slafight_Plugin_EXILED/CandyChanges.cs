@@ -8,6 +8,7 @@ using InventorySystem.Items;
 using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
 using VoiceChat;
 
@@ -121,7 +122,19 @@ public class CandyChanges
             {
                 ev.Player?.Role.Set(RoleTypeId.Scp0492,RoleSpawnFlags.None);
                 ev.Player?.EnableEffect(EffectType.Scp207, 2);
-                ev.Player?.VoiceChannel = VoiceChatChannel.Proximity;
+                ev.Player?.UniqueRole = "Zombified";
+                ev.Player?.CustomInfo = "<color=#C50000>Zombified Subject</color>";
+                ev.Player?.InfoArea |= PlayerInfoArea.Nickname;
+                ev.Player?.InfoArea &= ~PlayerInfoArea.Role;
+                ev.Player?.SetScale(new Vector3(1.08f,1.08f,1.08f));
+                if (!Handler.CanUsePlayers.Contains(ev.Player))
+                {
+                    Handler.CanUsePlayers.Add(ev.Player);
+                }
+                if (!Handler.ActivatedPlayers.Contains(ev.Player))
+                {
+                    Handler.ActivatedPlayers.Add(ev.Player);
+                }
                 ev.Player?.ShowHint("<size=24>冒涜的な匂いに気が狂いそうになる...</size>");
             }
         }
