@@ -270,6 +270,12 @@ public class PlayerHUD
                     // Scientists
                     // Class-D Personnel
                     // Other Unknown Threads
+                    if (player.UniqueRole == "SnowWarrier")
+                    {
+                        SyncTextRole = "<b><color=ffffff>SNOW WARRIER</color></b>";
+                        SyncTextRole = "<b><color=ffffff>SNOW WARRIER's DIVISION</color></b>";
+                        SyncTextObjective = "全施設にクリスマスと雪玉の正義を執行しろ";
+                    }
                 }
                 else
                 {

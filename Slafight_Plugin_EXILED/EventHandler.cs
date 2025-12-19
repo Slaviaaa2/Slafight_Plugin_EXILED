@@ -206,21 +206,24 @@ namespace Slafight_Plugin_EXILED
 
         public void OnRoundRestarted()
         {
-            // Setup Variables
-            DeadmanDisable = false;
-            SkeletonSpawned = false;
+            Timing.CallDelayed(0.1f, () =>
+            {
+                // Setup Variables
+                DeadmanDisable = false;
+                SkeletonSpawned = false;
             
-            // - Event Flags - //
-            DeconCancellFlag = false;
+                // - Event Flags - //
+                DeconCancellFlag = false;
             
-            SpecialWarhead =  false;
-            WarheadID = 0;
-            WarheadLocked = false;
+                SpecialWarhead =  false;
+                WarheadID = 0;
+                WarheadLocked = false;
             
-            CryFuckEnabled = false;
-            CryFuckSpawned = false;
+                CryFuckEnabled = false;
+                CryFuckSpawned = false;
             
-            EventPID = EventPID + 1;
+                EventPID = EventPID + 1;
+            });
         }
 
         public void OnRoundStarted()

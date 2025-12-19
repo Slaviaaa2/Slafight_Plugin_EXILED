@@ -22,6 +22,8 @@ public enum SpecialEventType
     NuclearAttack = 6,
     /// <summary>Classic SCRAPPED. IT'S VERY F**</summary>
     ClassicEvent = 7,
-    /// <summary></summary>
-    OperationBlackout = 8
+    /// <summary>It's very tired</summary>
+    OperationBlackout = 8,
+    /// <summary>MEGABALL ATTACK YEAHHHH</summary>
+    SnowWarriersAttack = 9
 }

@@ -43,6 +43,10 @@ public class CustomRolesHandler
         Timing.CallDelayed(10f, () =>
         {
             Timing.RunCoroutine(FifthistCoroutine());
+            if (Plugin.Singleton.Config.Season == 2)
+            {
+                Timing.RunCoroutine(SnowmanCoroutine());
+            }
         });
     }
 
@@ -75,6 +79,40 @@ public class CustomRolesHandler
             if (i==0 && ii!=0)
             {
                 EndRound(Team.SCPs,"FIFTHIST_WIN");
+            }
+
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+    private IEnumerator<float> SnowmanCoroutine()
+    {
+        for (;;)
+        {
+            if (!Round.InProgress)
+            {
+                yield break;
+            }
+            int i = 0;
+            foreach (Player player in Player.List)
+            {
+                if (!player.IsAlive) continue;
+                if (player.UniqueRole != "SnowWarrier")
+                {
+                    i++;
+                }
+            }
+            int ii = 0;
+            foreach (Player player in Player.List)
+            {
+                if (!player.IsAlive) continue;
+                if (player.UniqueRole == "SnowWarrier")
+                {
+                    ii++;
+                }
+            }
+            if (i==0 && ii!=0)
+            {
+                EndRound(Team.ChaosInsurgency,"SW_WIN");
             }
 
             yield return Timing.WaitForSeconds(1f);
@@ -216,9 +254,8 @@ public class CustomRolesHandler
             player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
-            player.CustomHumeShieldStat.MaxValue = 25;
+            Timing.RunCoroutine(ForceHume(player,"CI_Commando",25f,1.05f));
             player.CustomHumeShieldStat.CurValue = 25;
-            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
             
             player.ShowHint(
                 "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
@@ -241,6 +278,53 @@ public class CustomRolesHandler
             
             player.AddAmmo(AmmoType.Nato762,800);
         });
+    }
+    
+    public void SpawnSnowWarrier(Player player)
+    {
+        player.Role.Set(RoleTypeId.ChaosRifleman,RoleSpawnFlags.All);
+        player.Role.Set(RoleTypeId.Tutorial,RoleSpawnFlags.AssignInventory);
+        Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.SchemSnowWarrier(player);
+        //Vector3 offset;
+        int MaxHealth = 1000;
+
+        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","SCP-3005");
+        
+        Timing.CallDelayed(0.05f, () =>
+        {
+            player.UniqueRole = "SnowWarrier";
+            player.CustomInfo = "<color=#FFFFFF>SNOW WARRIER</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            player.MaxHealth = MaxHealth;
+            player.Health = MaxHealth;
+            Timing.RunCoroutine(ForceHume(player,"SnowWarrier",500f,1.05f));
+            player.CustomHumeShieldStat.CurValue = 500f;
+            player.EnableEffect(EffectType.Slowness,10);
+            
+            player.ShowHint(
+                "<color=white>SNOW WARRIER</color>\n非常に<color=#ffffff>雪玉的</color>である。そうは思わんかね？",
+                10);
+
+            player.AddItem(ItemType.SCP1509);
+            player.AddItem(ItemType.GunCOM18);
+            player.AddItem(ItemType.ArmorHeavy);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.SCP500);
+            
+            player.AddAmmo(AmmoType.Nato9,50);
+        });
+    }
+
+    private IEnumerator<float> ForceHume(Player player,string RequiredUnique,float MaxValue,float Multiplier)
+    {
+        for (;;)
+        {
+            if (player.UniqueRole != RequiredUnique) yield break;
+            player.CustomHumeShieldStat.MaxValue = MaxValue;
+            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = Multiplier;
+            yield return Timing.WaitForSeconds(0.5f);
+        }
     }
 
     public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
@@ -319,7 +403,7 @@ public class CustomRolesHandler
             foreach (Player player in Player.List)
             {
                 player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>",8f);
-                Round.RestartSilently();
+                Round.Restart();
             }
         }
         else if (winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD)
@@ -328,6 +412,14 @@ public class CustomRolesHandler
             {
                 Round.EscapedDClasses = 999;
                 Round.EndRound(true);
+            }
+        }
+        else if (winnerTeam == Team.ChaosInsurgency && specificReason == "SW_WIN")
+        {
+            foreach (Player player in Player.List)
+            {
+                player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>",8f);
+                Round.Restart();
             }
         }
         else if (winnerTeam == Team.FoundationForces || winnerTeam == Team.Scientists)

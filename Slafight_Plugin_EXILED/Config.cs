@@ -11,7 +11,7 @@ namespace Slafight_Plugin_EXILED
         public bool IsEnabled { get; set; } = true;
         [Description("Show Debug Logs?")]
         public bool Debug { get; set; } = true;
-        [Description("Please Set Season Info. 0=normal,1=halloween,234...is not available now")]
+        [Description("Please Set Season Info. 0=normal,1=halloween,2=christmas,34...is not available now")]
         public int Season { get; set; } = 0;
         
         [Description("")]

@@ -192,6 +192,41 @@ public class LabApiHandler : CustomEventsHandler
             });
         });
     }
+    
+    public void SchemSnowWarrier(Player player)
+    {
+        Timing.CallDelayed(1.5f, () =>
+        {
+            
+            SchematicObject schematicObject;
+            try
+            {
+                schematicObject = ObjectSpawner.SpawnSchematic("SnowWarrier",Vector3.zero);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("error schem");
+                schematicObject = null;
+                return;
+            }
+            schematicObject.transform.SetParent(player.GameObject.transform);
+            Timing.CallDelayed(0.5f, () =>
+            {
+                //schematicObject.transform.GetChild(0).localScale = new Vector3(1000f,1f,1000f); // 沼みたいで何かに使えそう
+                //schematicObject.transform.GetChild(0).localScale = new Vector3(1f,1f,1f);
+                schematicObject.transform.position = player.GameObject.transform.position + new Vector3(0f, 0f, 0f);
+                var light = Light.Create(Vector3.zero);
+                light.Position = schematicObject.transform.position + new Vector3(0f, -0.08f, 0f);
+                light.Transform.parent = schematicObject.transform;
+                light.Scale = new Vector3(1f,1f,1f);
+                light.Range = 10f;
+                light.Intensity = 1.25f;
+                light.Color = Color.white;
+
+                Timing.RunCoroutine(DestroyCoroutine(schematicObject, player));
+            });
+        });
+    }
 
     public void DiedCassie(DyingEventArgs ev)
     {

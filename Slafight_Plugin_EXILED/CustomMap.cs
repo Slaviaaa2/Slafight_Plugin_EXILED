@@ -43,6 +43,8 @@ namespace Slafight_Plugin_EXILED
             LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
 
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned += GetSchems;
+
+            Exiled.Events.Handlers.Server.RoundStarted += HolidaySeasonMapLoader;
         }
         ~CustomMap()
         {
@@ -53,6 +55,8 @@ namespace Slafight_Plugin_EXILED
             LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
 
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= GetSchems;
+
+            Exiled.Events.Handlers.Server.RoundStarted -= HolidaySeasonMapLoader;
         }
 
         public void SetDoorState()
@@ -131,6 +135,29 @@ namespace Slafight_Plugin_EXILED
             if (Vector3.Distance(ev.Interactable.Position,new Vector3(-17.25f, 291.60f, -36.89f)) <= PositionTolerance)
             {
                 Timing.RunCoroutine(PlayBarAnim(ChaosBar, 3f));
+            }
+        }
+        
+        ///////////////////////////
+        /// SEASONABLE CONTENTS ///
+        ///////////////////////////
+        public void HolidaySeasonMapLoader()
+        {
+            // 0=Normal,
+            // 1=Halloween,
+            // 2=Christmas,
+            // over=not available
+            if (Plugin.Singleton.Config.Season == 0)
+            {
+                return;
+            }
+            else if (Plugin.Singleton.Config.Season == 1)
+            {
+                MapUtils.LoadMap("Holiday_HalloweenMap");
+            }
+            else if (Plugin.Singleton.Config.Season == 2)
+            {
+                MapUtils.LoadMap("Holiday_ChristmasMap");
             }
         }
     }

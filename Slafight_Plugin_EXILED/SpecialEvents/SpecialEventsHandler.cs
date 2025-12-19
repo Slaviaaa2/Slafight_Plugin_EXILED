@@ -185,6 +185,11 @@ public class SpecialEventsHandler
             ClassicEvent ClassicEvent = new ClassicEvent();
             ClassicEvent.ClassicEvent_();
         }
+        else if (nowEvent == SpecialEventType.SnowWarriersAttack)
+        {
+            SnowWarriersAttack SnowWarriersAttack = new SnowWarriersAttack();
+            SnowWarriersAttack.SWAEvent();
+        }
         else
         {
             Plugin.Singleton.OperationBlackout.Event();
@@ -242,6 +247,10 @@ public class SpecialEventsHandler
             if (Player.List.Count >= 4)
             {
                 allowedEvents.Add(SpecialEventType.OperationBlackout);
+            }
+            if (Player.List.Count >= 5 && Plugin.Singleton.Config.Season == 2)
+            {
+                allowedEvents.Add(SpecialEventType.SnowWarriersAttack);
             }
         }
         if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
@@ -308,7 +317,7 @@ public class SpecialEventsHandler
         else if (nowEvent == SpecialEventType.NuclearAttack)
         {
             localizedEventName = "Chaos Insurgency Raid";
-            eventNeedTriggers = "6人以上のプレイヤー";
+            eventNeedTriggers = "5人以上のプレイヤー";
         }
         else if (nowEvent == SpecialEventType.ClassicEvent)
         {
@@ -319,6 +328,11 @@ public class SpecialEventsHandler
         {
             localizedEventName = "Operation: Blackout";
             eventNeedTriggers = "無し";
+        }
+        else if (nowEvent == SpecialEventType.SnowWarriersAttack)
+        {
+            localizedEventName = "Snow Warriers Raid";
+            eventNeedTriggers = "5人以上のプレイヤー";
         }
         else
         {
