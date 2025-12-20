@@ -1,0 +1,45 @@
+using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
+using UserSettings.ServerSpecific;
+
+namespace Slafight_Plugin_EXILED.ProximityChat;
+
+public class RPNameSetter
+{
+    public RPNameSetter()
+    {
+        ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingValueReceived;
+    }
+
+    ~RPNameSetter()
+    {
+        ServerSpecificSettingsSync.ServerOnSettingValueReceived -= OnSettingValueReceived;
+    }
+
+    public static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
+    {
+        var textSettings = @base as SSPlaintextSetting;
+        if (textSettings == null || textSettings.SyncInputText == null)
+        {
+            return;
+        }
+        Log.Debug("SSPlainText Setting");
+        if (textSettings.SettingId == 2)
+        {
+            var player = Player.Get(hub);
+            if (player != null)
+            {
+                Log.Debug("nickname updated");
+                var realName = player.Nickname;
+                if (!string.IsNullOrEmpty(textSettings.SyncInputText))
+                {
+                    player.CustomName = $"{textSettings.SyncInputText} ({realName})";
+                }
+                else
+                {
+                    player.CustomName = $"{realName}";
+                }
+            }
+        }
+    }
+}

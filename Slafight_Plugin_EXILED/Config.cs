@@ -29,24 +29,17 @@ namespace Slafight_Plugin_EXILED
         [Description("")]
         public float DwBoomTime { get; set; } = 100f;
         
-        [Description("")]
-        public HIDTurret HidTurretConfig { get; set; } = new();
-        [Description("")]
-        public KeycardFifthist KeycardFifthistConfig { get; set; } = new();
-        [Description("")]
-        public KeycardFifthistPriest KeycardFifthistPriestConfig { get; set; } = new();
-        [Description("")]
-        public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
-        [Description("")]
-        public GunGoCRailgun GunGoCRailgunConfig { get; set; } = new();
-        [Description("")]
-        public GunN7CR GunN7CRConfig { get; set; } = new();
-        [Description("")]
-        public ArmorVip ArmorVipConfig { get; set; } = new();
-        [Description("")]
-        public MagicMissile MagicMissileConfig { get; set; } = new();
-        [Description("")]
-        public DummyRoad DummyRoadConfig { get; set; } = new();
+        [Description("")] public HIDTurret HidTurretConfig { get; set; } = new();
+        [Description("")] public KeycardFifthist KeycardFifthistConfig { get; set; } = new();
+        [Description("")] public KeycardFifthistPriest KeycardFifthistPriestConfig { get; set; } = new();
+        [Description("")] public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
+        [Description("")] public GunGoCRailgun GunGoCRailgunConfig { get; set; } = new();
+        [Description("")] public GunN7CR GunN7CRConfig { get; set; } = new();
+        [Description("")] public ArmorVip ArmorVipConfig { get; set; } = new();
+        [Description("")] public MagicMissile MagicMissileConfig { get; set; } = new();
+        [Description("")] public DummyRoad DummyRoadConfig { get; set; } = new();
+
+        [Description("")] public FakeGrenade FakeGrenadeConfig { get; set; } = new();
         
         
         [Description("")]

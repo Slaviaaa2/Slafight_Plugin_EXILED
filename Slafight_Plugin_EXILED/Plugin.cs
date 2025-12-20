@@ -33,8 +33,8 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,2);
-        public override Version RequiredExiledVersion { get; } = new Version(9, 11, 2);
+        public override Version Version => new Version(1,4,3);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 11, 3);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -47,6 +47,7 @@ namespace Slafight_Plugin_EXILED
         public PlayerHUD PlayerHUD { get; set; }
         public CandyChanges CandyChanges { get; set; }
         public ActivateHandler ProximityChatActiveHandler { get; set; }
+        public RPNameSetter RolePlayNameSetter { get; set; }
 
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
@@ -56,6 +57,7 @@ namespace Slafight_Plugin_EXILED
         public ArmorVip _ArmorVip;
         public MagicMissile _MagicMissile;
         public DummyRoad _DummyRoad;
+        public FakeGrenade _FakeGrenade;
         
         public KeycardOld_Cadet _KeycardOld_Cadet;
         public KeycardOld_Commander _KeycardOld_Commander;
@@ -74,6 +76,10 @@ namespace Slafight_Plugin_EXILED
         public NtfAide CR_NtfAide { get; set; }
         public Scp3114Role CRScp3114Role { get; set; }
         public Scp966Role CR_Scp966Role { get; set; }
+        public ZoneManager CR_ZoneManager { get; set; }
+        public FacilityManager CR_FacilityManager { get; set; }
+        public EvacuationGuard CR_ESGuard { get; set; }
+        public Janitor CR_Janitor { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
@@ -95,6 +101,7 @@ namespace Slafight_Plugin_EXILED
             OperationBlackout = new();
             ProximityChat.Handler.RegisterEvents();
             ProximityChatActiveHandler = new();
+            RolePlayNameSetter = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
@@ -106,6 +113,7 @@ namespace Slafight_Plugin_EXILED
             _ArmorVip = new();
             _MagicMissile = new();
             _DummyRoad = new();
+            _FakeGrenade = new();
             
             _KeycardOld_Cadet = new();
             _KeycardOld_Commander = new();
@@ -128,6 +136,7 @@ namespace Slafight_Plugin_EXILED
             Config.ArmorVipConfig.Register();
             Config.MagicMissileConfig.Register();
             Config.DummyRoadConfig.Register();
+            Config.FakeGrenadeConfig.Register();
             
             Config.KeycardOld_CadetConfig.Register();
             Config.KeycardOld_CommanderConfig.Register();
@@ -148,6 +157,10 @@ namespace Slafight_Plugin_EXILED
             CR_NtfAide = new();
             CRScp3114Role = new();
             CR_Scp966Role = new();
+            CR_ZoneManager = new();
+            CR_FacilityManager = new();
+            CR_ESGuard = new();
+            CR_Janitor = new();
 
             CustomRole.RegisterRoles(false);
             

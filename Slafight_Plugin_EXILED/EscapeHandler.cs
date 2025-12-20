@@ -104,7 +104,7 @@ public class EscapeHandler
     {
         for (;;)
         {
-            if (!Round.IsLobby) yield break;
+            if (Round.IsLobby) yield break;
             //Log.Debug("Coroutine is Alive!");
             foreach (Player player in Player.List)
             {

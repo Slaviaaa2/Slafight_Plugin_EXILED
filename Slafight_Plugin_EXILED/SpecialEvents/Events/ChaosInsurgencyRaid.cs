@@ -57,13 +57,14 @@ public class ChaosInsurgencyRaid
             if (player.Role.Team != Team.SCPs)
             {
                 Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player);
-                player.Broadcast(10,"※本イベント中、懐中電灯やライトアタッチメントの使用を推奨します。");
                 i++;
             }
             if (i >= Math.Truncate(Player.List.Count/3f)) break;
         }
         //Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2","警告、不明な部隊がGate Aで検出されました。確認を",true);
-        CassieExtensions.CassieTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
+        Timing.CallDelayed(8f, () =>
+        {
+CassieExtensions.CassieTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
             $"警告、不明な部隊がGate Aで検出されました。確認を",true);
         Timing.CallDelayed(8f, () =>
         {
@@ -182,6 +183,7 @@ public class ChaosInsurgencyRaid
                     }
                 });
             });
+        });
         });
 
     }

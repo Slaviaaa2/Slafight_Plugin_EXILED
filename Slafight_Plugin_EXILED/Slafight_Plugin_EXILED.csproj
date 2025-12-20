@@ -40,9 +40,6 @@
         <Reference Include="AdvancedMERTools">
             <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
         </Reference>
-        <Reference Include="ASS-Exiled">
-            <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\ASS-Exiled.dll</HintPath>
-        </Reference>
         <Reference Include="Assembly-CSharp">
           <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
@@ -53,34 +50,34 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
         </Reference>
         <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\CommandSystem.Core.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\CommandSystem.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.API, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.API.dll</HintPath>
+        <Reference Include="Exiled.API, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.API.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CreditTags, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CreditTags.dll</HintPath>
+        <Reference Include="Exiled.CreditTags, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CreditTags.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomItems, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CustomItems.dll</HintPath>
+        <Reference Include="Exiled.CustomItems, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CustomItems.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomRoles, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.CustomRoles.dll</HintPath>
+        <Reference Include="Exiled.CustomRoles, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CustomRoles.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Events, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Events.dll</HintPath>
+        <Reference Include="Exiled.Events, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Events.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Loader, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Loader.dll</HintPath>
+        <Reference Include="Exiled.Loader, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Loader.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Permissions, Version=9.11.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\Exiled.Permissions.dll</HintPath>
+        <Reference Include="Exiled.Permissions, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
         <Reference Include="HintServiceMeow">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
         </Reference>
         <Reference Include="LabApi, Version=1.1.4.2, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\LabApi.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\LabApi.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
             <HintPath>..\..\..\Tools\depBuild\references\Mirror.dll</HintPath>
@@ -95,7 +92,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\NorthwoodLib.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
             <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
@@ -113,6 +110,9 @@
             <HintPath>..\..\..\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\System.Text.Json.dll</HintPath>
         </Reference>
         <Reference Include="System.Xml"/>
+        <Reference Include="Unity.TextMeshPro">
+          <HintPath>..\..\..\Tools\depBuild\references\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.dll</HintPath>
         </Reference>
@@ -122,12 +122,22 @@
         <Reference Include="UnityEngine.PhysicsModule">
             <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
-        <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.11.0\lib\net48\YamlDotNet.dll</HintPath>
+        <Reference Include="YamlDotNet">
+          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\YamlDotNet.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Abilities\MagicMissileAbility.cs" />
+        <Compile Include="Commands\DevTools\SpawnCICommando.cs" />
+        <Compile Include="Commands\DevTools\SpawnFacilityManager.cs" />
+        <Compile Include="Commands\DevTools\SpawnNtfLieutenant.cs" />
+        <Compile Include="Commands\DevTools\SpawnSnowWarrier.cs" />
+        <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
+        <Compile Include="Commands\DevTools\SpawnZoneManager.cs" />
+        <Compile Include="CustomItems\FakeGrenade.cs" />
+        <Compile Include="CustomRoles\ClassD\Janitor.cs" />
+        <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
+        <Compile Include="RPNameSetter.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />
@@ -174,6 +184,8 @@
         <Compile Include="CustomRoles\FoundationForces\HdCommander.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdInfantry.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfAide.cs" />
+        <Compile Include="CustomRoles\Scientist\FacilityManager.cs" />
+        <Compile Include="CustomRoles\Scientist\ZoneManager.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3114Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp682Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp966Role.cs" />
@@ -206,8 +218,6 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="CustomRoles\ChaosInsurgency\" />
-      <Folder Include="CustomRoles\ClassD\" />
-      <Folder Include="CustomRoles\Scientist\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

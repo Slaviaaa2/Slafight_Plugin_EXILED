@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.API.Features.Pickups;
 using LightContainmentZoneDecontamination;
+using MEC;
 using PlayerRoles;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -34,7 +35,10 @@ public class Scp1509BattleField
                 pickup.Destroy();
             }
         }
-        int i = 0;
+
+        Timing.CallDelayed(1.11f, () =>
+        {
+int i = 0;
         if (Random.Range(1,3) == 1)
         {
             foreach (Player player in Player.List)
@@ -99,6 +103,7 @@ public class Scp1509BattleField
                 i++;
             }
         }
+        });
 
         List<ElevatorType> lockEvTypes = new List<ElevatorType>() { ElevatorType.GateA,ElevatorType.GateB,ElevatorType.LczA,ElevatorType.LczB };
         foreach (Lift lift in Lift.List){

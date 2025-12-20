@@ -199,7 +199,7 @@ public class SpecialEventsHandler
     
     public void RoundStartedAddEvent()
     {
-        SpecialEventsController();
+        Timing.CallDelayed(0.1f, SpecialEventsController);
     }
 
     public SpecialEventType SelectedEvent = SpecialEventType.None; // 初期値

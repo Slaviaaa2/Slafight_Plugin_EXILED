@@ -58,15 +58,17 @@ public class SnowWarriersAttack
             if (player.Role.Team != Team.SCPs)
             {
                 Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player);
-                player.Broadcast(10,"※本イベント中、懐中電灯やライトアタッチメントの使用を推奨します。");
                 i++;
             }
             if (i >= Math.Truncate(Player.List.Count/3f)) break;
         }
-        //Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2","警告、不明な部隊がGate Aで検出されました。確認を",true);
+
+        Timing.CallDelayed(8f, () =>
+        {
+//Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2","警告、不明な部隊がGate Aで検出されました。確認を",true);
         CassieExtensions.CassieTranslated("$pitch_1.02 Danger Detected Unknown Organism in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
             $"警告、不明な生命体がGate Aで検出されました。確認を",true);
-        Timing.CallDelayed(8f, () =>
+        Timing.CallDelayed(12f, () =>
         {
             if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
             //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command","<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",false,false);
@@ -76,16 +78,21 @@ public class SnowWarriersAttack
             {
                 if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
                 //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 First Order of Delta Command . Turn off all facilitys . Accepted .","<b><color=#228b22>DELTA COMMAND</color></b>の最初の指令：全施設の消灯 ...承認",false,false);
-                CassieExtensions.CassieTranslated("$pitch_.8 First Order . Turn off all facilitys . Accepted .",
+                CassieExtensions.CassieTranslated("$pitch_.8 First Order . Light up all facility . Accepted .",
                     "<b><color=#ffffff>雪の帝王</color></b>の最初の指令：全施設のライトアップ ...承認",false);
                 Timing.RunCoroutine(LightUpCoroutine());
-                //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .","次の指令：テスラゲートの無効化 ...承認",false,false);
-                CassieExtensions.CassieTranslated("$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .",
-                    "次の指令：テスラゲートの無効化 ...承認",false);
-                teslaDisabled = true;
-                //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 All Agent . Work Time .","エージェント達よ、働く時間だ。",false,false);
-                CassieExtensions.CassieTranslated("$pitch_.8 All Division . Work Time .",
-                    "戦士達よ、働く時間だ。",false);
+                Timing.CallDelayed(8f, () =>
+                {
+                    CassieExtensions.CassieTranslated("$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .",
+                        "次の指令：テスラゲートの無効化 ...承認",false);
+                    teslaDisabled = true;
+                    Timing.CallDelayed(8f, () =>
+                    {
+                        //Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 All Agent . Work Time .","エージェント達よ、働く時間だ。",false,false);
+                        CassieExtensions.CassieTranslated("$pitch_.8 All Division . Work Time .",
+                            "戦士達よ、働く時間だ。",false);     
+                    });
+                });
                 float testingDelayedInt = 400f;
                 Timing.CallDelayed(testingDelayedInt, () =>
                 {
@@ -180,6 +187,7 @@ public class SnowWarriersAttack
                     }
                 });
             });
+        });
         });
 
     }

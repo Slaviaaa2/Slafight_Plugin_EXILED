@@ -5,13 +5,18 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.CustomStats;
 using Exiled.API.Features.DamageHandlers;
+using Exiled.API.Features.Items;
 using Exiled.API.Features.Roles;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Server;
 using InventorySystem;
+using InventorySystem.Items.Firearms.Modules.Scp127;
 using MEC;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.HumeShield;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
 using Light = Exiled.API.Features.Toys.Light;
@@ -28,6 +33,9 @@ public class CustomRolesHandler
         Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
         Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
+        //Exiled.Events.Handlers.Player.ChangedItem += ForceHume;
+
+        Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
     }
     ~CustomRolesHandler()
     {
@@ -36,6 +44,9 @@ public class CustomRolesHandler
         Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
         Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
         Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
+        //Exiled.Events.Handlers.Player.ChangedItem -= ForceHume;
+
+        Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
     }
 
     public void RoundCoroutine()
@@ -54,14 +65,14 @@ public class CustomRolesHandler
     {
         for (;;)
         {
-            if (!Round.InProgress)
+            if (Round.IsLobby)
             {
                 yield break;
             }
             int i = 0;
             foreach (Player player in Player.List)
             {
-                if (!player.IsAlive) continue;
+                if (player == null || !player.IsAlive) continue;
                 if (player.UniqueRole != "FIFTHIST" && player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
                 {
                     i++;
@@ -70,7 +81,7 @@ public class CustomRolesHandler
             int ii = 0;
             foreach (Player player in Player.List)
             {
-                if (!player.IsAlive) continue;
+                if (player == null || !player.IsAlive) continue;
                 if (player.UniqueRole == "FIFTHIST" || player.UniqueRole == "SCP-3005" || player.UniqueRole == "F_Priest")
                 {
                     ii++;
@@ -88,14 +99,14 @@ public class CustomRolesHandler
     {
         for (;;)
         {
-            if (!Round.InProgress)
+            if (Round.IsLobby)
             {
                 yield break;
             }
             int i = 0;
             foreach (Player player in Player.List)
             {
-                if (!player.IsAlive) continue;
+                if (player == null || !player.IsAlive) continue;
                 if (player.UniqueRole != "SnowWarrier")
                 {
                     i++;
@@ -104,7 +115,7 @@ public class CustomRolesHandler
             int ii = 0;
             foreach (Player player in Player.List)
             {
-                if (!player.IsAlive) continue;
+                if (player == null || !player.IsAlive) continue;
                 if (player.UniqueRole == "SnowWarrier")
                 {
                     ii++;
@@ -113,6 +124,59 @@ public class CustomRolesHandler
             if (i==0 && ii!=0)
             {
                 EndRound(Team.ChaosInsurgency,"SW_WIN");
+            }
+
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+
+    public void CancelEnd(EndingRoundEventArgs ev)
+    {
+        int i = 0;
+        List<string> Uniques = new List<string>()
+        {
+            "FIFTHIST",
+            "F_Priest",
+            "SnowWarrier"
+        };
+        foreach (Player player in Player.List)
+        {
+            if (Uniques.Contains(player.UniqueRole))
+            {
+                i++;
+            }
+        }
+        if (i!=0)
+        {
+            ev.IsAllowed = false;
+            Round.IsLocked = true;
+            Timing.RunCoroutine(RoundLocker());
+        }
+    }
+
+    private IEnumerator<float> RoundLocker()
+    {
+        for (;;)
+        {
+            int i = 0;
+            List<string> Uniques = new List<string>()
+            {
+                "FIFTHIST",
+                "F_Priest",
+                "SnowWarrier"
+            };
+            foreach (Player player in Player.List)
+            {
+                if (Uniques.Contains(player.UniqueRole))
+                {
+                    i++;
+                }
+            }
+
+            if (i==0)
+            {
+                Round.IsLocked = false;
+                yield break;
             }
 
             yield return Timing.WaitForSeconds(1f);
@@ -254,8 +318,10 @@ public class CustomRolesHandler
             player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
-            Timing.RunCoroutine(ForceHume(player,"CI_Commando",25f,1.05f));
+            player.CustomHumeShieldStat._maxValueOverride = true;
+            player.CustomHumeShieldStat.MaxValue = 25;
             player.CustomHumeShieldStat.CurValue = 25;
+            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
             
             player.ShowHint(
                 "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
@@ -298,8 +364,6 @@ public class CustomRolesHandler
             player.InfoArea &= ~PlayerInfoArea.Role;
             player.MaxHealth = MaxHealth;
             player.Health = MaxHealth;
-            Timing.RunCoroutine(ForceHume(player,"SnowWarrier",500f,1.05f));
-            player.CustomHumeShieldStat.CurValue = 500f;
             player.EnableEffect(EffectType.Slowness,10);
             
             player.ShowHint(
@@ -311,20 +375,10 @@ public class CustomRolesHandler
             player.AddItem(ItemType.ArmorHeavy);
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.KeycardO5);
             
             player.AddAmmo(AmmoType.Nato9,50);
         });
-    }
-
-    private IEnumerator<float> ForceHume(Player player,string RequiredUnique,float MaxValue,float Multiplier)
-    {
-        for (;;)
-        {
-            if (player.UniqueRole != RequiredUnique) yield break;
-            player.CustomHumeShieldStat.MaxValue = MaxValue;
-            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = Multiplier;
-            yield return Timing.WaitForSeconds(0.5f);
-        }
     }
 
     public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
@@ -372,7 +426,13 @@ public class CustomRolesHandler
         {
             //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
             Exiled.API.Features.Cassie.Clear();
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by Anti me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true,false);
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true,false);
+        }
+        else if (ev.Player.UniqueRole == "SCP-966")
+        {
+            //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
+            Exiled.API.Features.Cassie.Clear();
+            CassieExtensions.CassieTranslated("SCP 9 6 6 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true);
         }
     }
 
@@ -403,10 +463,13 @@ public class CustomRolesHandler
             foreach (Player player in Player.List)
             {
                 player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>",8f);
-                Round.Restart();
+                Timing.CallDelayed(1f, () =>
+                {
+                    Round.Restart(false);
+                });
             }
         }
-        else if (winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD)
+        else if ((winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD) && specificReason == null)
         {
             if (specificReason == null)
             {
@@ -419,7 +482,10 @@ public class CustomRolesHandler
             foreach (Player player in Player.List)
             {
                 player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>",8f);
-                Round.Restart();
+                Timing.CallDelayed(1f, () =>
+                {
+                    Round.Restart(false);
+                });
             }
         }
         else if (winnerTeam == Team.FoundationForces || winnerTeam == Team.Scientists)
@@ -449,6 +515,7 @@ public class CustomRolesHandler
                     if (distance <= 2.75f)
                     {
                         _player.Hurt(25f,"<color=#ff00fa>第五的</color>な力による影響");
+                        player.ShowHitMarker();
                     }
                 }
             }

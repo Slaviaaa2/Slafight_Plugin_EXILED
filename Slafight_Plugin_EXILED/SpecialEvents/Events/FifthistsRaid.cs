@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.API.Features.Pickups;
 using LightContainmentZoneDecontamination;
+using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -49,8 +50,11 @@ public class FifthistsRaid
                 break;
             }
         }
-        
-        //Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
-        CassieExtensions.CassieTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false);
+
+        Timing.CallDelayed(8f, () =>
+        {
+            //Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
+            CassieExtensions.CassieTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false);
+        });
     }
 }

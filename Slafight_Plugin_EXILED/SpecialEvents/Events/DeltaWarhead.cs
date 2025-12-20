@@ -27,7 +27,9 @@ public class DeltaWarhead
         //EventHandler.DeconCancellFlag = true;
         
         if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-        //Exiled.API.Features.Cassie.MessageTranslated("Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...","危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・");
+        Timing.CallDelayed(8f, () =>
+        {
+//Exiled.API.Features.Cassie.MessageTranslated("Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...","危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・");
         CassieExtensions.CassieTranslated("Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...",
             "危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・",true);
         Timing.CallDelayed(60, () =>
@@ -36,7 +38,7 @@ public class DeltaWarhead
             //DecontaminationController.Singleton.DecontaminationOverride = DecontaminationController.DecontaminationStatus.Disabled;
             //DecontaminationController.Singleton.TimeOffset = int.MinValue;
             //DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
-            Exiled.API.Features.Cassie.MessageTranslated("My Approaches confirmed by O5 Command, Setup Delta System...","対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・");
+            Exiled.API.Features.Cassie.MessageTranslated("My Approach confirmed by O5 Command, power upping Delta System . . .","対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・");
             CassieExtensions.CassieTranslated("My Approaches confirmed by O5 Command, Setup Delta System...",
                 "対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・",true);
             Timing.CallDelayed(180, () =>
@@ -92,6 +94,7 @@ public class DeltaWarhead
                     Log.Debug("Delta Passed Kill Player Foreach");
                 });
             });
+        });
         });
     }
 }
