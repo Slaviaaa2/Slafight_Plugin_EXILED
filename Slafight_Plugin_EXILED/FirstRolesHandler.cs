@@ -83,7 +83,7 @@ public class FirstRolesHandler
         var nowEvent = Plugin.Singleton.SpecialEventsHandler.EventQueue[0];
         if (nowEvent == SpecialEventType.None)
         {
-            RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager,3);
+            RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager,2);
             RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager,1);
             RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard,1);
         }
