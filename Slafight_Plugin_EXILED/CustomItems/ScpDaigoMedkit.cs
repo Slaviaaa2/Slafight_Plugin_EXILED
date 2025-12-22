@@ -50,11 +50,13 @@ public class ScpDaigoMedkit : CustomItem
     //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
     //}
     
-    private void OnUsing(UsedItemEventArgs ev)
+    private void OnUsed(UsedItemEventArgs ev)
     {
         if (Check(ev.Item))
         {
-
+            // TODO: Create Universal Spawn Handler And Universal CR Types Enum.
+            // and Add new methods for not Changing Position.
+            Plugin.Singleton.CustomRolesHandler.SpawnFiftihst(ev.Player);
         }
     }
     
