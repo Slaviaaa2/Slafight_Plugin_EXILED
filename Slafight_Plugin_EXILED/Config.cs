@@ -38,8 +38,9 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public ArmorVip ArmorVipConfig { get; set; } = new();
         [Description("")] public MagicMissile MagicMissileConfig { get; set; } = new();
         [Description("")] public DummyRoad DummyRoadConfig { get; set; } = new();
-
         [Description("")] public FakeGrenade FakeGrenadeConfig { get; set; } = new();
+        [Description("")] public KeycardSecurityChief  KeycardSecurityChiefConfig { get; set; } = new();
+        [Description("")] public KeycardConscripts KeycardConscriptsConfig { get; set; } = new();
         
         
         [Description("")]

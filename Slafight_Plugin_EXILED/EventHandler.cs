@@ -76,6 +76,7 @@ namespace Slafight_Plugin_EXILED
         public EventHandler()
         {
             PlayerHandler.Verified += OnVerified;
+            PlayerHandler.Left += OnLeft;
             ServerHandler.RestartingRound += OnRoundRestarted;
             ServerHandler.RoundStarted += OnRoundStarted;
             ServerHandler.ReloadedPlugins += OnPluginLoad;
@@ -83,7 +84,6 @@ namespace Slafight_Plugin_EXILED
             MapHandler.Decontaminating += DeconCancell;
             
             PlayerHandler.ChangingRole += OnChangingRole;
-            PlayerHandler.ChangingRole += SpecificSCiPSpawn;
             PlayerHandler.ChangingRole += StatusManager;
             PlayerHandler.Hurting += OnTouchedEnemy;
             PlayerHandler.FlippingCoin += PositionGet;
@@ -101,6 +101,7 @@ namespace Slafight_Plugin_EXILED
         ~EventHandler()
         {
             PlayerHandler.Verified -= OnVerified;
+            PlayerHandler.Left -= OnLeft;
             ServerHandler.RoundStarted -= OnRoundRestarted;
             ServerHandler.RoundStarted -= OnRoundStarted;
             ServerHandler.ReloadedPlugins -= OnPluginLoad;
@@ -108,7 +109,6 @@ namespace Slafight_Plugin_EXILED
             MapHandler.Decontaminating -= DeconCancell;
             
             PlayerHandler.ChangingRole -= OnChangingRole;
-            PlayerHandler.ChangingRole -= SpecificSCiPSpawn;
             PlayerHandler.ChangingRole -= StatusManager;
             PlayerHandler.Hurting -= OnTouchedEnemy;
             PlayerHandler.FlippingCoin -= PositionGet;
@@ -142,6 +142,7 @@ namespace Slafight_Plugin_EXILED
         public bool CryFuckSpawned = false;
 
         private bool GateDoorLocked = false;
+        public bool IsScpAutoSpawnLocked = false;
         // - System Flags - //
         public bool PluginLoaded = false;
 
@@ -194,6 +195,45 @@ namespace Slafight_Plugin_EXILED
             });
         }
 
+        public void OnLeft(LeftEventArgs ev)
+        {
+            if (ev.Player.Role.Team != Team.SCPs)
+                return;
+
+            if (Round.ElapsedTime.TotalSeconds > 179)
+                return;
+
+            int scpAlive = Player.List.Count(p => p.IsAlive && p.Role.Team == Team.SCPs);
+            if (scpAlive >= 1)
+                return;
+
+            var candidate = Player.List.FirstOrDefault(p => !p.IsAlive);
+            if (candidate == null)
+                return;
+
+            // 元プレイヤーのカスタムロールを取得
+            var custom = ev.Player.GetCustomRole();
+
+            // SCP用のCRoleTypeIdだけを補充対象にする
+            bool isScpCustom = custom is CRoleTypeId.Scp3005
+                    or CRoleTypeId.Scp966
+                    or CRoleTypeId.Scp096Anger
+                ;
+
+            if (custom == null || custom == CRoleTypeId.None || !isScpCustom)
+            {
+                // 通常SCPロールで補充
+                candidate.SetRole(ev.Player.Role);
+            }
+            else
+            {
+                // SCPカスタムロールで補充
+                candidate.SetRole(custom);
+            }
+
+            candidate.ShowHint("※SCPプレイヤーが切断したため代わりにスポーンしました");
+        }
+
         public void SyncSpecialEvent()
         {
             Timing.CallDelayed(0.05f, () =>
@@ -211,7 +251,6 @@ namespace Slafight_Plugin_EXILED
                 }
             });
         }
-
         public void OnRoundRestarted()
         {
             Timing.CallDelayed(0.1f, () =>
@@ -231,10 +270,11 @@ namespace Slafight_Plugin_EXILED
                 CryFuckSpawned = false;
 
                 GateDoorLocked = false;
+                IsScpAutoSpawnLocked = false;
             });
         }
 
-        public Vector3 Scp173SpawnPoint = Vector3.zero;
+        public static Vector3 Scp173SpawnPoint = Vector3.zero;
         public void SetupSpawnPoints(SchematicSpawnedEventArgs ev)
         {
             if (ev.Schematic.Name == "Scp173SpawnPoint")
@@ -246,100 +286,100 @@ namespace Slafight_Plugin_EXILED
 
         public void OnRoundStarted()
         {
-            Timing.CallDelayed(0.01f, () =>
+            foreach (Player player in Player.List.Where(p => p != null))
             {
-                // UniqueRoleリセット（LINQで簡潔）
-                foreach (Player player in Player.List.Where(p => p != null))
+                player.ShowHint("");
+            }
+
+            var roundPID = Plugin.Singleton.SpecialEventsHandler.EventPID;
+            foreach (Door door in Door.List)
+            {
+                if (door.Type == DoorType.GateA || door.Type == DoorType.GateB)
                 {
-                    player.UniqueRole = String.Empty;
-                    player.ShowHint("");
+                    door.Lock(120f,DoorLockType.None);
                 }
 
-                var roundPID = Plugin.Singleton.SpecialEventsHandler.EventPID;
+                if (door.Type == DoorType.PrisonDoor)
+                {
+                    door.Lock(DoorLockType.AdminCommand);
+                }
+            }
+
+            Timing.CallDelayed(1f, () =>
+            {
+                if (Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.OperationBlackout && Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.Scp1509BattleField)
+                {
+                    if (Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.OmegaWarhead)
+                    {
+                        CassieExtensions.CassieTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                            "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。",true);
+                    }
+                    else
+                    {
+                        CassieExtensions.CassieTranslated($"Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                            "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。",true);
+                    }
+                    foreach (Room room in Room.List)
+                    {
+                        room.RoomLightController.ServerFlickerLights(3f);
+                    }
+                }
+
                 foreach (Door door in Door.List)
                 {
-                    if (door.Type == DoorType.GateA || door.Type == DoorType.GateB)
+                    if (door.Type == DoorType.PrisonDoor || door.Type == DoorType.Scp173Gate)
                     {
-                        door.Lock(120f,DoorLockType.None);
-                    }
-
-                    if (door.Type == DoorType.PrisonDoor)
-                    {
-                        door.Lock(DoorLockType.AdminCommand);
+                        door.Unlock();
+                        door.IsOpen = true;
                     }
                 }
 
-                // SCP数をLINQでカウント
-                int scpCount = Player.List.Count(p => p != null && p.Role.Team == Team.SCPs);
-        
-                if (scpCount == 0 && Player.List.Count > 0)
+                int i = 0;
+                foreach (Item item in Item.List)
                 {
-                    Player player = Player.List.GetRandomValue();
-                    if (player != null)
+                    item.Base.transform.position.TryGetRoom(out var room);
+                    if (room.Name == RoomName.LczArmory)
                     {
-                        player.Role.Set(RoleTypeId.Scp173);
-                        player.Position = Scp173SpawnPoint;
-                        player.EnableEffect(EffectType.Slowness, 95,60f);
-                        player.UniqueRole = null;
-                        Log.Debug("Forced SCP-173 spawned.");
+                        i++;
                     }
                 }
 
-                Timing.CallDelayed(1f, () =>
+                if (i==0)
                 {
-                    if (Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.OperationBlackout && Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.Scp1509BattleField)
+                    var FSP = Pickup.Create(ItemType.GunFSP9);
+                    FSP.Base.transform.position =
+                        Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1f, 0f));
+                    var CROSSVEC = Pickup.Create(ItemType.GunCrossvec);
+                    CROSSVEC.Base.transform.position =
+                        Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1f, 0f));
+                    for (int j = 0; j < 20; j++)
                     {
-                        if (Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.OmegaWarhead)
-                        {
-                            CassieExtensions.CassieTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
-                                "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。",true);
-                        }
-                        else
-                        {
-                            CassieExtensions.CassieTranslated($"Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
-                                "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。",true);
-                        }
-                        foreach (Room room in Room.List)
-                        {
-                            room.RoomLightController.ServerFlickerLights(3f);
-                        }
-                    }
-
-                    foreach (Door door in Door.List)
-                    {
-                        if (door.Type == DoorType.PrisonDoor || door.Type == DoorType.Scp173Gate)
-                        {
-                            door.Unlock();
-                            door.IsOpen = true;
-                        }
-                    }
-
-                    int i = 0;
-                    foreach (Item item in Item.List)
-                    {
-                        item.Base.transform.position.TryGetRoom(out var room);
-                        if (room.Name == RoomName.LczArmory)
-                        {
-                            i++;
-                        }
-                    }
-
-                    if (i==0)
-                    {
-                        var FSP = Pickup.Create(ItemType.GunFSP9);
-                        FSP.Base.transform.position =
+                        var AMMO = Pickup.Create(ItemType.Ammo9x19);
+                        AMMO.Base.transform.position =
                             Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1f, 0f));
-                        var CROSSVEC = Pickup.Create(ItemType.GunCrossvec);
-                        CROSSVEC.Base.transform.position =
-                            Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1f, 0f));
-                        for (int j = 0; j < 20; j++)
+                    }
+                }
+
+                Timing.CallDelayed(3f, () =>
+                {
+                    if (!IsScpAutoSpawnLocked)
+                    {
+                        int scpCount = Player.List.Count(p => p != null && p.Role.Team == Team.SCPs);
+                        Log.Debug($"[AutoSCP] SCP count = {scpCount}, players = {Player.List.Count}");
+
+                        foreach (var p in Player.List)
+                            Log.Debug($"[AutoSCP] {p.Nickname}: {p.Role.Type} / {p.Role.Team}");
+
+                        if (scpCount == 0 && Player.List.Count > 0)
                         {
-                            var AMMO = Pickup.Create(ItemType.Ammo9x19);
-                            AMMO.Base.transform.position =
-                                Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1f, 0f));
+                            var player = Player.List.GetRandomValue();
+                            Log.Debug($"[AutoSCP] Forcing 173 to {player.Nickname}");
+                            player.SetRole(RoleTypeId.Scp173);
+                            player.ShowHint("※SCPが正常に生成されなかった為、SCP-173に変更されました。");
                         }
                     }
                 });
+
             });
         }
 
@@ -438,143 +478,6 @@ namespace Slafight_Plugin_EXILED
             AudioClipStorage.LoadClip(Path.Combine(Slafight_Plugin_EXILED.Plugin.Singleton.Config.AudioReferences, fileName), fileName);
 
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
-        }
-        
-        public void SpecificSCiPSpawn(ChangingRoleEventArgs ev)
-        {
-            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-            var GetPlayerTeam = RoleExtensions.GetTeam(ev.NewRole);
-            Log.Debug($"Player: {ev.Player}, NewRoleTeam: {GetPlayerTeam}, Unique: {ev.Player.UniqueRole}");
-            if (ev.Reason == SpawnReason.RoundStart && GetPlayerTeam == Team.SCPs)
-            {
-                if (UnityEngine.Random.Range(1,3) == 1)
-                {
-                    List<string> SpecificSCiPs = new List<string>() { "Scp3114","Scp3005","Scp966" };
-                    string SCiP = String.Empty;
-                    int getRandomValue = UnityEngine.Random.Range(0, SpecificSCiPs.Count);
-                    SCiP = SpecificSCiPs[getRandomValue];
-                    if (SCiP == "Scp3114") // SCP 3114
-                    {
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CRScp3114Role.SpawnRole(ev.Player);
-                            Log.Debug("Scp3114 was Spawned!");
-                        });
-                    }
-                    else if (SCiP == "Scp3005")
-                    {
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(ev.Player);
-                            Log.Debug("Scp3005 was Spawned!");
-                        });
-                    }
-                    else if (SCiP == "Scp966")
-                    {
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_Scp966Role.SpawnRole(ev.Player);
-                            Log.Debug("Scp966 was Spawned!");
-                        });
-                    }
-                }
-                else if (ev.NewRole == RoleTypeId.Scp173)
-                {
-                    Timing.CallDelayed(1.1f, () =>
-                    {
-                        if (String.IsNullOrEmpty(ev.Player?.UniqueRole) && ev.Player?.Role == RoleTypeId.Scp173)
-                        {
-                            ev.Player?.Position = Scp173SpawnPoint;
-                            ev.Player?.EnableEffect(EffectType.Slowness, 95,60f);
-                            ev.Player?.UniqueRole = null;
-                        }
-                    });
-                }
-            }
-            else if (ev.Reason == SpawnReason.RoundStart && ev.NewRole == RoleTypeId.Scientist)
-            {
-                if (UnityEngine.Random.Range(1,3) == 1)
-                {
-                    Log.Debug($"{ev.Player} is Managers.");
-                    List<string> SpecificRoles = new List<string>() { "ZoneManager","FacilityManager" };
-                    string Role = SpecificRoles.RandomItem();
-                    Log.Debug($"Manager Role: {Role}");
-                    if (Role == "ZoneManager")
-                    {
-                        Log.Debug("Before Cancel SpawnEvent");
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            Log.Debug("Before Cancel UniqueRole");
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_ZoneManager.SpawnRole(ev.Player);
-                            Log.Debug("ZoneManager was Spawned!");
-                        });
-                    }
-                    else if (Role == "FacilityManager")
-                    {
-                        Log.Debug("Before Cancel SpawnEvent");
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            Log.Debug("Before Cancel UniqueRole");
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_FacilityManager.SpawnRole(ev.Player);
-                            Log.Debug("FacilityManager was Spawned!");
-                        });
-                    }
-                }
-            }
-            else if (ev.Reason == SpawnReason.RoundStart && ev.NewRole == RoleTypeId.FacilityGuard)
-            {
-                if (UnityEngine.Random.Range(1,3) == 1)
-                {
-                    Log.Debug($"{ev.Player} is Guard Subroles.");
-                    List<string> SpecificRoles = new List<string>() { "ESGuard" };
-                    string Role = SpecificRoles.RandomItem();
-                    Log.Debug($"Guards Role: {Role}");
-                    if (Role == "ESGuard")
-                    {
-                        Log.Debug("Before Cancel SpawnEvent");
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            Log.Debug("Before Cancel UniqueRole");
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_ESGuard.SpawnRole(ev.Player);
-                            Log.Debug("ESGuard was Spawned!");
-                        });
-                    }
-                }
-            }
-            else if (ev.Reason == SpawnReason.RoundStart && ev.NewRole == RoleTypeId.ClassD)
-            {
-                if (UnityEngine.Random.Range(1,3) == 1)
-                {
-                    Log.Debug($"{ev.Player} is ClassD Subroles.");
-                    List<string> SpecificRoles = new List<string>() { "Janitor" };
-                    string Role = SpecificRoles.RandomItem();
-                    Log.Debug($"ClassD Role: {Role}");
-                    if (Role == "Janitor")
-                    {
-                        Log.Debug("Before Cancel SpawnEvent");
-                        ev.IsAllowed = false;
-                        Timing.CallDelayed(1.1f, () =>
-                        {
-                            Log.Debug("Before Cancel UniqueRole");
-                            if (!String.IsNullOrEmpty(ev.Player.UniqueRole)) return;
-                            Slafight_Plugin_EXILED.Plugin.Singleton.CR_Janitor.SpawnRole(ev.Player);
-                            Log.Debug("Janitor was Spawned!");
-                        });
-                    }
-                }
-            }
         }
 
         public void SkeletonRagdoll()

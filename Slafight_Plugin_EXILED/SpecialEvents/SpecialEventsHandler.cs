@@ -12,6 +12,7 @@ using Exiled.Events.EventArgs.Server;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UnityEngine;
@@ -432,24 +433,8 @@ public class SpecialEventsHandler
             {
                 ev.IsAllowed = false;
                 Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.CryFuckSpawned = true;
-                ev.Player.Role.Set(RoleTypeId.Scp096);
-                Timing.CallDelayed(0.02f, () =>
-                {
-                    ev.Player.UniqueRole = "Scp096_Anger";
-                    ev.Player.CustomInfo = "<color=#C50000>SCP-096: ANGER</color>";
-                    ev.Player.MaxArtificialHealth = 1000;
-                    ev.Player.MaxHealth = 5000;
-                    ev.Player.Health = 5000;
-                    StatusEffectBase? movement = ev.Player.GetEffect(EffectType.MovementBoost);
-                    movement.Intensity = 50;
-                    ev.Player.ShowHint(
-                        "<color=red>SCP-096: ANGER</color>\nSCP-096の怒りと悲しみが頂点に達し、その化身へと変貌して大いなる力を手に入れた。\n<color=red>とにかく破壊しまくれ！！！！！</color>",
-                        10);
-                    ev.Player.Transform.eulerAngles = new Vector3(0, -90, 0);
-                    Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.ShyguyPosition = ev.Player.Position;
-                    Log.Debug("Scp096: Anger was Spawned!");
-                    Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.StartAnger();
-                });
+                Scp096Anger scp096Anger = new Scp096Anger();
+                scp096Anger.SpawnRole(ev.Player);
             }
         }
 

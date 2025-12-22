@@ -20,15 +20,6 @@ public class RootCommand : ParentCommand
         RegisterCommand(new ReRollSpecial());
         RegisterCommand(new ReRollSetQueue());
         RegisterCommand(new SpawnUniversal());
-        RegisterCommand(new Spawn3005());
-        RegisterCommand(new SpawnFifthist());
-        RegisterCommand(new Spawn3114());
-        RegisterCommand(new Spawn966());
-        RegisterCommand(new SpawnNtfLieutenant());
-        RegisterCommand(new SpawnCiCommando());
-        RegisterCommand(new SpawnSnowWarrier());
-        RegisterCommand(new SpawnZoneManager());
-        RegisterCommand(new SpawnFacilityManager());
         RegisterCommand(new PlaySurfaceAttack());
         RegisterCommand(new PlayOmegaWarhead());
     }

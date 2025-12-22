@@ -364,7 +364,7 @@ public class SpawnSystem
                             // Subroles: Aide
                             if (RandomSel==0)
                             {
-                                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player);
+                                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player,RoleSpawnFlags.All);
                             }
                         }
                     }
@@ -385,7 +385,7 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
+                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/4f)) break;
@@ -400,7 +400,7 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
+                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/6f)) break;

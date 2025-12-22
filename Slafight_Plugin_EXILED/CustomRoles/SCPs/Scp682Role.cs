@@ -9,11 +9,12 @@ using MEC;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp939;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
-public class Scp682Role
+public class Scp682Role : CRole
 {
     // SCRAPPED!!!!!!!!!!!!!
     
@@ -31,30 +32,28 @@ public class Scp682Role
     
     private float speedLevel = 1;
     
-    public void SpawnRole(Player player)
+    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
+        base.SpawnRole(player);
         player.Role.Set(RoleTypeId.Scp173);
         //Vector3 pos = player.Position;
         player.Role.Set(RoleTypeId.Scp939,RoleSpawnFlags.None);
         player.UniqueRole = "Scp682";
-        Timing.CallDelayed(0.01f, () =>
-        {
-            player.MaxHealth = 999;
-            player.Health = player.MaxHealth;
-            player.MaxHumeShield = 10000;
-            player.ClearInventory();
+        player.MaxHealth = 999;
+        player.Health = player.MaxHealth;
+        player.MaxHumeShield = 10000;
+        player.ClearInventory();
 
-            //player.Position = pos;
-            player.SetFakeScale(new Vector3(1.75f, 0.75f, 3f),Player.List);
-            player.CustomInfo = "<color=#C50000>SCP-682</color>";
-            player.InfoArea |= PlayerInfoArea.Nickname;
-            player.InfoArea &= ~PlayerInfoArea.Role;
-            Timing.CallDelayed(0.05f, () =>
-            {
-                player.ShowHint("<color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！",10f);
-            });
-            Timing.RunCoroutine(Coroutine(player));
+        //player.Position = pos;
+        player.SetFakeScale(new Vector3(1.75f, 0.75f, 3f),Player.List);
+        player.CustomInfo = "<color=#C50000>SCP-682</color>";
+        player.InfoArea |= PlayerInfoArea.Nickname;
+        player.InfoArea &= ~PlayerInfoArea.Role;
+        Timing.CallDelayed(0.05f, () =>
+        {
+            player.ShowHint("<color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！",10f);
         });
+        Timing.RunCoroutine(Coroutine(player));
     }
 
     private IEnumerator<float> Coroutine(Player player)
@@ -65,6 +64,9 @@ public class Scp682Role
             {
                 yield break;
             }
+
+            player.EnableEffect(EffectType.FocusedVision);
+            player.EnableEffect(EffectType.NightVision, 255);
             player.SetScale(new Vector3(1.75f, 0.75f, 3f)*speedLevel,Player.List);
             speedLevel *= 1.00001f;
             Slafight_Plugin_EXILED.Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,("Big Multiplier: "+speedLevel),player);

@@ -31,7 +31,7 @@ public class FifthistsRaid
         {
             if (player.Role.Team != Team.SCPs)
             {
-                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player);
+                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
                 i++;
             }
             if (i >= Math.Truncate(Player.List.Count/4f)) break;
@@ -41,7 +41,7 @@ public class FifthistsRaid
         {
             if (player.Role.Team == Team.SCPs)
             {
-                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(player);
+                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.Spawn3005(player,RoleSpawnFlags.All);
                 break;
             }
 

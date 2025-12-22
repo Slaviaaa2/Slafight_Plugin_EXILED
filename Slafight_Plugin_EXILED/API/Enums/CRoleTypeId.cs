@@ -19,5 +19,8 @@ public enum CRoleTypeId
     EvacuationGuard = 10,
     ZoneManager = 11,
     FacilityManager = 12,
-    FifthistConvert = 13
+    FifthistConvert = 13,
+    Janitor = 14,
+    SnowWarrier = 15,
+    Scp682 = 16
 }

@@ -89,7 +89,7 @@ public class EscapeHandler
                 if (Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.isFifthistsRaidActive)
                 {
                     player.UniqueRole = null;
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnF_Priest(player);
+                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnF_Priest(player,RoleSpawnFlags.All);
                 }
             }
         }

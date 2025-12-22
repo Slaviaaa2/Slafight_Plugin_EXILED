@@ -41,7 +41,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-Publicized.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
@@ -49,35 +49,35 @@
         <Reference Include="AudioPlayerApi">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
         </Reference>
-        <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\CommandSystem.Core.dll</HintPath>
+        <Reference Include="CommandSystem.Core">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\CommandSystem.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.API, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.API.dll</HintPath>
+        <Reference Include="Exiled.API, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.API.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CreditTags, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CreditTags.dll</HintPath>
+        <Reference Include="Exiled.CreditTags, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.CreditTags.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomItems, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CustomItems.dll</HintPath>
+        <Reference Include="Exiled.CustomItems, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.CustomItems.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomRoles, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.CustomRoles.dll</HintPath>
+        <Reference Include="Exiled.CustomRoles, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.CustomRoles.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Events, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Events.dll</HintPath>
+        <Reference Include="Exiled.Events, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.Events.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Loader, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Loader.dll</HintPath>
+        <Reference Include="Exiled.Loader, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.Loader.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Permissions, Version=9.11.3.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\Exiled.Permissions.dll</HintPath>
+        <Reference Include="Exiled.Permissions, Version=9.12.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
         <Reference Include="HintServiceMeow">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
         </Reference>
-        <Reference Include="LabApi, Version=1.1.4.2, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\LabApi.dll</HintPath>
+        <Reference Include="LabApi">
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\LabApi.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
             <HintPath>..\..\..\Tools\depBuild\references\Mirror.dll</HintPath>
@@ -92,7 +92,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\NorthwoodLib.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
             <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
@@ -123,20 +123,28 @@
             <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="YamlDotNet">
-          <HintPath>..\packages\ExMod.Exiled.9.11.3\lib\net48\YamlDotNet.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.12.1\lib\net48\YamlDotNet.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Abilities\MagicMissileAbility.cs" />
-        <Compile Include="Commands\DevTools\SpawnCICommando.cs" />
-        <Compile Include="Commands\DevTools\SpawnFacilityManager.cs" />
-        <Compile Include="Commands\DevTools\SpawnNtfLieutenant.cs" />
-        <Compile Include="Commands\DevTools\SpawnSnowWarrier.cs" />
+        <Compile Include="API\Features\CRole.cs" />
+        <Compile Include="API\Features\CustomBooleans.cs" />
+        <Compile Include="API\Features\RoleLimitManager.cs" />
+        <Compile Include="API\Features\RoleParseHelper.cs" />
+        <Compile Include="API\Objects\RoleTables.cs" />
+        <Compile Include="ChristmasChanges.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
-        <Compile Include="Commands\DevTools\SpawnZoneManager.cs" />
         <Compile Include="CustomItems\FakeGrenade.cs" />
+        <Compile Include="CustomItems\KeycardConscripts.cs" />
+        <Compile Include="CustomItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
+        <Compile Include="Extensions\ItemExtensions.cs" />
+        <Compile Include="Extensions\PlayerExtensions.cs" />
+        <Compile Include="Extensions\PlayerRoleHelpers.cs" />
+        <Compile Include="FirstRolesHandler.cs" />
         <Compile Include="RPNameSetter.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
@@ -149,11 +157,7 @@
         <Compile Include="Commands\DevTools\PlaySurfaceAttack.cs" />
         <Compile Include="Commands\DevTools\ReRollSetQueue.cs" />
         <Compile Include="Commands\DevTools\ReRollSpecial.cs" />
-        <Compile Include="Commands\DevTools\Spawn3005.cs" />
-        <Compile Include="Commands\DevTools\Spawn3114.cs" />
-        <Compile Include="Commands\DevTools\Spawn966.cs" />
         <Compile Include="Commands\DevTools\SpawnDebugToolRole.cs" />
-        <Compile Include="Commands\DevTools\SpawnFifthistcs.cs" />
         <Compile Include="Commands\DevTools\SpawnMapEditRole.cs" />
         <Compile Include="Commands\RootCommand.cs" />
         <Compile Include="Config.cs" />
@@ -218,6 +222,7 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="CustomRoles\ChaosInsurgency\" />
+      <Folder Include="Managers\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

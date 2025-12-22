@@ -57,7 +57,7 @@ public class SnowWarriersAttack
         {
             if (player.Role.Team != Team.SCPs)
             {
-                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player);
+                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player,RoleSpawnFlags.All);
                 i++;
             }
             if (i >= Math.Truncate(Player.List.Count/3f)) break;

@@ -33,8 +33,8 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,3);
-        public override Version RequiredExiledVersion { get; } = new Version(9, 11, 3);
+        public override Version Version => new Version(1,4,4);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 1);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -48,6 +48,7 @@ namespace Slafight_Plugin_EXILED
         public CandyChanges CandyChanges { get; set; }
         public ActivateHandler ProximityChatActiveHandler { get; set; }
         public RPNameSetter RolePlayNameSetter { get; set; }
+        public FirstRolesHandler FirstRolesHandler { get; set; }
 
         public HIDTurret _HIDTurret;
         public KeycardFifthist _KeycardFifthist;
@@ -58,6 +59,8 @@ namespace Slafight_Plugin_EXILED
         public MagicMissile _MagicMissile;
         public DummyRoad _DummyRoad;
         public FakeGrenade _FakeGrenade;
+        public KeycardSecurityChief _KeycardSecurityChief;
+        public KeycardConscripts _KeycardConscripts;
         
         public KeycardOld_Cadet _KeycardOld_Cadet;
         public KeycardOld_Commander _KeycardOld_Commander;
@@ -102,6 +105,7 @@ namespace Slafight_Plugin_EXILED
             ProximityChat.Handler.RegisterEvents();
             ProximityChatActiveHandler = new();
             RolePlayNameSetter = new();
+            FirstRolesHandler = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
@@ -114,6 +118,8 @@ namespace Slafight_Plugin_EXILED
             _MagicMissile = new();
             _DummyRoad = new();
             _FakeGrenade = new();
+            _KeycardSecurityChief = new();
+            _KeycardConscripts = new();
             
             _KeycardOld_Cadet = new();
             _KeycardOld_Commander = new();
@@ -137,6 +143,8 @@ namespace Slafight_Plugin_EXILED
             Config.MagicMissileConfig.Register();
             Config.DummyRoadConfig.Register();
             Config.FakeGrenadeConfig.Register();
+            Config.KeycardSecurityChiefConfig.Register();
+            Config.KeycardConscriptsConfig.Register();
             
             Config.KeycardOld_CadetConfig.Register();
             Config.KeycardOld_CommanderConfig.Register();

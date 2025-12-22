@@ -90,19 +90,26 @@ public class OperationBlackout
             }
         }
 
-        foreach (Player player in Player.List)
+        Timing.CallDelayed(0.5f, () =>
         {
-            if (player.Role.Type == RoleTypeId.FacilityGuard)
+            Plugin.Singleton.EventHandler.IsScpAutoSpawnLocked = true;
+            foreach (Player player in Player.List)
             {
-                player.Teleport(Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f,1.5f,0f)));
+                if (player.Role.Type == RoleTypeId.FacilityGuard)
+                {
+                    player.Teleport(Room.Get(RoomType.LczArmory).WorldPosition(new Vector3(0f, 1.5f, 0f)));
+                }
+                else if (player.Role.Team == Team.SCPs)
+                {
+                    player.Role.Set(RoleTypeId.ClassD);
+                }
             }
-            else if (player.Role.Team == Team.SCPs)
-            {
-                player.Role.Set(RoleTypeId.ClassD);
-            }
-        }
-        Exiled.API.Features.Cassie.Clear();
-        CassieExtensions.CassieTranslated("Attention, All personnel. Facility electric systems is malfunctioning . please manual charge up the all generators.","全職員に通達。施設の電力システムに<color=red>問題</color>が発生しました。全ての非常用発電機を<color=#00b7eb>再起動</color>してください。",true);
+
+            Exiled.API.Features.Cassie.Clear();
+            CassieExtensions.CassieTranslated(
+                "Attention, All personnel. Facility electric systems is malfunctioning . please manual charge up the all generators.",
+                "全職員に通達。施設の電力システムに<color=red>問題</color>が発生しました。全ての非常用発電機を<color=#00b7eb>再起動</color>してください。", true);
+        });
     }
 
     public void OnMAPGenerated()

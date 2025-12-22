@@ -9,6 +9,7 @@ using HintServiceMeow.UI.Utilities;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
 namespace Slafight_Plugin_EXILED.Hints;
@@ -169,7 +170,7 @@ public class PlayerHUD
 
     private void ApplyRoleInfo(Player sourcePlayer, Player targetForHint)
     {
-        if (sourcePlayer.CustomInfo != null)
+        if (sourcePlayer.GetCustomRole() != CRoleTypeId.None)
         {
             switch (sourcePlayer.UniqueRole)
             {
@@ -217,7 +218,7 @@ public class PlayerHUD
                     break;
                 // Chaos Insurgents
                 case "CI_Commando":
-                    SyncTextRole = "<color=#228b22>CI: Commando</color>";
+                    SyncTextRole = "<color=#228b22>Chaos Insurgency Commando</color>";
                     SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                     SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
                     break;
