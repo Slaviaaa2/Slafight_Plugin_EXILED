@@ -49,15 +49,6 @@ public class ScpDaigoMedkit : CustomItem
     //{
     //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
     //}
-
-    private void disRight(ChangingMicroHIDStateEventArgs ev)
-    {
-        if (!Check(ev.Item)) { return; }
-        if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.ChargeFire && ev.NewPhase == MicroHidPhase.Firing)
-        {
-            ev.IsAllowed = false;
-        }
-    }
     
     private void OnUsing(UsedItemEventArgs ev)
     {
