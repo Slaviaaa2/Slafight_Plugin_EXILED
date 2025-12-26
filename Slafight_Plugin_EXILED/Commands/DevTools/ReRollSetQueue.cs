@@ -20,9 +20,9 @@ public class ReRollSetQueue : ICommand
             return false;
         }
 
-        Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.SetQueueRandomEvent();
+        Plugin.Singleton.SpecialEventsHandler.SetQueueRandomEvent();
 
-        response = ("Special Events now Rerolled!\nNew Event: "+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName);
+        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.localizedEventName);
         return true;
     }
 }

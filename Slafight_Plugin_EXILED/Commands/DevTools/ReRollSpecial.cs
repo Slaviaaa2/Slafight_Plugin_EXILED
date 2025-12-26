@@ -20,9 +20,9 @@ public class ReRollSpecial : ICommand
             return false;
         }
 
-        Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.RunRandomEvent();
+        Plugin.Singleton.SpecialEventsHandler.RunRandomEvent();
 
-        response = ("Special Events now Rerolled!\nNew Event: "+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName);
+        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.localizedEventName);
         return true;
     }
 }

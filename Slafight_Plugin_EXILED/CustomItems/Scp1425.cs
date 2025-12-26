@@ -10,18 +10,21 @@ using Exiled.Events.Handlers;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.Medkit)]
-public class ScpDaigoMedkit : CustomItem
+public class Scp1425 : CustomItem
 {
-    public override uint Id { get; set; } = 1;
-    public override string Name { get; set; } = "SCP-NNNN";
+    public override uint Id { get; set; } = 1102;
+    public override string Name { get; set; } = "SCP-1425";
     public override string Description { get; set; } = "第五的な力を感じる・・・";
-    public override float Weight { get; set; } = 1f;
+    public override float Weight { get; set; } = 1.05f;
     public override ItemType Type { get; set; } = ItemType.Medkit;
 
     public Color glowColor = Color.magenta;
@@ -31,6 +34,8 @@ public class ScpDaigoMedkit : CustomItem
 
     protected override void SubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.UsedItem += OnUsed;
+        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         
@@ -39,24 +44,19 @@ public class ScpDaigoMedkit : CustomItem
 
     protected override void UnsubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.UsedItem -= OnUsed;
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
     }
-
-    //private void PickMessage(PickingUpItemEventArgs ev)
-    //{
-    //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
-    //}
     
     private void OnUsed(UsedItemEventArgs ev)
     {
         if (Check(ev.Item))
         {
-            // TODO: Create Universal Spawn Handler And Universal CR Types Enum.
-            // and Add new methods for not Changing Position.
-            Plugin.Singleton.CustomRolesHandler.SpawnFiftihst(ev.Player);
+            ev.Player.SetRole(CRoleTypeId.FifthistConvert,RoleSpawnFlags.AssignInventory);
         }
     }
     

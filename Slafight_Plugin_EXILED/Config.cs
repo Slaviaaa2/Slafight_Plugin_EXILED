@@ -28,32 +28,31 @@ namespace Slafight_Plugin_EXILED
         public float OwBoomTime { get; set; } = 160f;
         [Description("")]
         public float DwBoomTime { get; set; } = 100f;
-        
-        [Description("")] public HIDTurret HidTurretConfig { get; set; } = new();
-        [Description("")] public KeycardFifthist KeycardFifthistConfig { get; set; } = new();
-        [Description("")] public KeycardFifthistPriest KeycardFifthistPriestConfig { get; set; } = new();
-        [Description("")] public ArmorInfantry ArmorInfantryConfig { get; set; } = new();
-        [Description("")] public GunGoCRailgun GunGoCRailgunConfig { get; set; } = new();
-        [Description("")] public GunN7CR GunN7CRConfig { get; set; } = new();
-        [Description("")] public ArmorVip ArmorVipConfig { get; set; } = new();
-        [Description("")] public MagicMissile MagicMissileConfig { get; set; } = new();
-        [Description("")] public DummyRoad DummyRoadConfig { get; set; } = new();
-        [Description("")] public FakeGrenade FakeGrenadeConfig { get; set; } = new();
-        [Description("")] public KeycardSecurityChief  KeycardSecurityChiefConfig { get; set; } = new();
-        [Description("")] public KeycardConscripts KeycardConscriptsConfig { get; set; } = new();
-        
-        
-        [Description("")]
-        public KeycardOld_ContainmentEngineer KeycardOld_ContainmentEngineerConfig { get; set; } = new();
-        public KeycardOld_Janitor KeycardOld_JanitorConfig { get; set; } = new();
-        public KeycardOld_Guard KeycardOld_GuardConfig { get; set; } = new();
-        public KeycardOld_Scientist KeycardOld_ScientistConfig { get; set; } = new();
-        public KeycardOld_ResearchSupervisor KeycardOld_ResearchSupervisorConfig { get; set; } = new();
-        public KeycardOld_ZoneManager KeycardOld_ZoneManagerConfig { get; set; } = new();
-        public KeycardOld_FacilityManager KeycardOld_FacilityManagerConfig { get; set; } = new();
-        public KeycardOld_Cadet KeycardOld_CadetConfig { get; set; } = new();
-        public KeycardOld_Lieutenant KeycardOld_LieutenantConfig { get; set; } = new();
-        public KeycardOld_Commander KeycardOld_CommanderConfig { get; set; } = new();
-        public KeycardOld_O5 KeycardOld_O5Config { get; set; } = new();
+
+        [Description("")] public HIDTurret _HIDTurret { get; set; } = new();
+        [Description("")] public KeycardFifthist _KeycardFifthist { get; set; } = new();
+        [Description("")] public KeycardFifthistPriest _KeycardFifthistPriest { get; set; } = new();
+        [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new();
+        [Description("")] public GunGoCRailgun _GunGoCRailgun { get; set; } = new();
+        [Description("")] public GunN7CR _GunN7CR { get; set; } = new();
+        [Description("")] public ArmorVip _ArmorVip { get; set; } = new();
+        [Description("")] public MagicMissile _MagicMissile { get; set; } = new();
+        [Description("")] public DummyRoad _DummyRoad { get; set; } = new();
+        [Description("")] public FakeGrenade _FakeGrenade { get; set; } = new();
+        [Description("")] public KeycardSecurityChief _KeycardSecurityChief { get; set; } = new();
+        [Description("")] public KeycardConscripts _KeycardConscripts { get; set; } = new();
+        [Description("")] public Scp1425 _Scp1425 { get; set; } = new();
+
+        [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new();
+        [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new();
+        [Description("")] public KeycardOld_Guard _KeycardOld_Guard { get; set; } = new();
+        [Description("")] public KeycardOld_Scientist _KeycardOld_Scientist { get; set; } = new();
+        [Description("")] public KeycardOld_ResearchSupervisor _KeycardOld_ResearchSupervisor { get; set; } = new();
+        [Description("")] public KeycardOld_ZoneManager _KeycardOld_ZoneManager { get; set; } = new();
+        [Description("")] public KeycardOld_FacilityManager _KeycardOld_FacilityManager { get; set; } = new();
+        [Description("")] public KeycardOld_Cadet _KeycardOld_Cadet { get; set; } = new();
+        [Description("")] public KeycardOld_Lieutenant _KeycardOld_Lieutenant { get; set; } = new();
+        [Description("")] public KeycardOld_Commander _KeycardOld_Commander { get; set; } = new();
+        [Description("")] public KeycardOld_O5 _KeycardOld_O5 { get; set; } = new();
     }
 }

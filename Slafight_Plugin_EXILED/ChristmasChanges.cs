@@ -22,19 +22,19 @@ public class ChristmasChanges
 {
     public ChristmasChanges()
     {
-        Exiled.Events.Handlers.Scp2536.GrantingGift += TreeChange;
+        //Exiled.Events.Handlers.Scp2536.GrantingGift += TreeChange;
     }
 
     ~ChristmasChanges()
     {
-        Exiled.Events.Handlers.Scp2536.GrantingGift -= TreeChange;
+        //Exiled.Events.Handlers.Scp2536.GrantingGift -= TreeChange;
     }
 
     public void TreeChange(GrantingGiftEventArgs ev)
     {
         if (ev.Player.Role.Team != Team.SCPs)
         {
-            var Lucky = Random.Range(0f,10f);
+            var Lucky = Random.Range(0f,1f);
             var player = ev.Player;
             ev.IsAllowed = false;
             if (Lucky <= 0f)
@@ -127,7 +127,7 @@ public class ChristmasChanges
                     player.ShowHint("Boooooooo!!!");
                 }
             }
-            else if (Lucky <= 0.75f)
+            else
             {
                 if (!player.IsInventoryFull)
                 {

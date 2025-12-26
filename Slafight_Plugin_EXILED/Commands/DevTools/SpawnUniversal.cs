@@ -14,48 +14,48 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class SpawnUniversal : ICommand
 {
     public string Command => "spawn";
-    public string[] Aliases { get; } = { "spawn", "us" };
-    public string Description => "Universal Customrole Spawner";
+    public string[] Aliases { get; } = ["spawn", "us"];
+    public string Description => "Universal CustomRole Spawner";
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         // パーミッションチェック
         if (!sender.CheckPermission($"slperm.{Command}"))
         {
-            response = $"You don't have permission to execute this command. Required permission: mpr.{Command}";
+            response = $"You don't have permission to execute this command. Required permission: slperm.{Command}";
             return false;
         }
 
-        var player = Player.Get(sender);
-        if (player == null)
+        var executor = Player.Get(sender);
+        if (executor == null)
         {
             response = "Player not found.";
             return false;
         }
 
-        // 引数なし → 使い方（必要ならここで一覧を出してもOK）
+        // 引数なし → 使い方
         if (arguments.Count == 0)
         {
             var names = RoleParseHelper.GetAllRoleNames();
-            response = "Usage: spawn <roleId>\nAvailable roles:\n" + string.Join(", ", names);
+            response = "Usage: spawn <roleId> [targetPlayerId]\nAvailable roles:\n" + string.Join(", ", names);
             return false;
         }
 
-        var roleId = arguments.First(); // 最初の引数
+        var roleId = arguments.At(0); // 1番目の引数（roleId）
 
         // 特殊系だけ個別処理
         if (roleId.Equals("mp", StringComparison.OrdinalIgnoreCase))
         {
-            player.UniqueRole = "MapEditor";
+            executor.UniqueRole = "MapEditor";
             Plugin.Singleton.PlayerHUD.DestroyHints();
-            response = $"You're now {player.UniqueRole}";
+            response = $"{executor.Nickname} is now {executor.UniqueRole}";
             return true;
         }
 
         if (roleId.Equals("debug", StringComparison.OrdinalIgnoreCase))
         {
-            player.UniqueRole = "Debug";
-            response = $"You're now {player.UniqueRole}";
+            executor.UniqueRole = "Debug";
+            response = $"{executor.Nickname} is now {executor.UniqueRole}";
             return true;
         }
 
@@ -67,19 +67,38 @@ public class SpawnUniversal : ICommand
             return false;
         }
 
-        // 通常ロール
+        // ターゲットプレイヤー判定（2番目の引数）
+        Player target = executor;
+        if (arguments.Count >= 2)
+        {
+            if (int.TryParse(arguments.At(1), out int targetId))
+            {
+                target = Player.Get(targetId);
+                if (target == null)
+                {
+                    response = $"Player with ID {targetId} not found.";
+                    return false;
+                }
+            }
+            else
+            {
+                response = $"Invalid player ID: {arguments.At(1)}. Use numeric ID.";
+                return false;
+            }
+        }
+
+        // ロール付与
         if (vanilla.HasValue)
         {
-            player.SetRole(vanilla.Value, RoleSpawnFlags.All);
-            response = $"You're now {vanilla.Value}";
+            target.SetRole(vanilla.Value, RoleSpawnFlags.All);
+            response = $"{target.Nickname} is now {vanilla.Value}";
             return true;
         }
 
-        // カスタムロール
         if (custom.HasValue)
         {
-            player.SetRole(custom.Value, RoleSpawnFlags.All);
-            response = $"You're now {player.UniqueRole}";
+            target.SetRole(custom.Value, RoleSpawnFlags.All);
+            response = $"{target.Nickname} is now {target.UniqueRole}";
             return true;
         }
 

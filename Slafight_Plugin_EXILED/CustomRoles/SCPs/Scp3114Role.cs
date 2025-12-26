@@ -10,15 +10,18 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp3114Role : CRole
 {
-    public Scp3114Role()
+    public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguised += ExtendTime;
+        base.RegisterEvents();
     }
 
-    ~Scp3114Role()
+    public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguised -= ExtendTime;
+        base.UnregisterEvents();
     }
+    
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
@@ -46,7 +49,7 @@ public class Scp3114Role : CRole
         });
     }
 
-    public void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisedEventArgs ev)
+    private void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisedEventArgs ev)
     {
         ev.Scp3114.DisguiseDuration = 300f;
     }

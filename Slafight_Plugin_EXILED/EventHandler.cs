@@ -171,7 +171,7 @@ namespace Slafight_Plugin_EXILED
             "しかし、誰も来なかった。",
             "カピバラ様を崇めよ()",
             "「ロール抽選はAI任せ。でもバグらせるのは君次第だ。」 - AI",
-            "「ZoneManagerは3人しかいない。見つけたら大事に扱おう、できれば。」 - AI",
+            "「ZoneManagerは2人しかいない。見つけたら大事に扱おう、できれば。」 - AI",
             "「カスタムロールは全部ベース職の上に乗っている。\n中身を覗くときはUniqueRoleを忘れずに。」 - AI",
             "「5人に1人がSCP？安心しろ、人間側も3人に1人おかしい。」 - AI",
             "「/spawnはデバッグ用。ロールバランスを壊したら、\nログとにらめっこする覚悟を。」 - AI",
@@ -196,7 +196,7 @@ namespace Slafight_Plugin_EXILED
             {
                 int tipsRandom = Random.Range(0,Tips.Count);
                 string tips = Tips[tipsRandom];
-                ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                     $"\n\n<size=28>Tips: {tips}</size>"
                                     ),5555f);
             });
@@ -251,7 +251,7 @@ namespace Slafight_Plugin_EXILED
                     {
                         int tipsRandom = Random.Range(0,Tips.Count);
                         string tips = Tips[tipsRandom];
-                        player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                        player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                             $"\n\n<size=28>Tips: {tips}</size>"
                             ),5555f);
                     }
@@ -318,12 +318,12 @@ namespace Slafight_Plugin_EXILED
                 {
                     if (Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.OmegaWarhead)
                     {
-                        CassieExtensions.CassieTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                        Exiled.API.Features.Cassie.MessageTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
                             "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。",true);
                     }
                     else
                     {
-                        CassieExtensions.CassieTranslated($"Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                        Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
                             "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。",true);
                     }
                     foreach (Room room in Room.List)
@@ -482,7 +482,7 @@ namespace Slafight_Plugin_EXILED
                 speaker.Position = position;
             }
     
-            AudioClipStorage.LoadClip(Path.Combine(Slafight_Plugin_EXILED.Plugin.Singleton.Config.AudioReferences, fileName), fileName);
+            AudioClipStorage.LoadClip(Path.Combine(Plugin.Singleton.Config.AudioReferences, fileName), fileName);
 
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
         }
@@ -628,7 +628,7 @@ namespace Slafight_Plugin_EXILED
                         if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
                         {
                             WarheadLocked = true;
-                            CassieExtensions.CassieTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true);
+                            Exiled.API.Features.Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true);
                         }
                     });
                 }

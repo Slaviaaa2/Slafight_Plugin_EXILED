@@ -15,21 +15,23 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp966Role : CRole
 {
-    public Scp966Role()
+    public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguising += ExtendTime;
         Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.Hurting += Hurting;
+        base.RegisterEvents();
     }
 
-    ~Scp966Role()
+    public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguising -= ExtendTime;
         Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.Hurting -= Hurting;
+        base.UnregisterEvents();
     }
     
-    int speedLevel=0;
+    private static readonly Dictionary<Player, int> SpeedLevels = new();
     
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
@@ -39,6 +41,7 @@ public class Scp966Role : CRole
         player.MaxHealth = 1400;
         player.Health = player.MaxHealth;
         player.MaxHumeShield = 500;
+        SpeedLevels[player] = 0;
         player.ClearInventory();
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
@@ -62,9 +65,10 @@ public class Scp966Role : CRole
     {
         for (;;)
         {
+            var speedLevel = SpeedLevels[player];
             if (player.UniqueRole != "Scp966")
             {
-                Slafight_Plugin_EXILED.Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,"",player);
+                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,"",player);
                 player.DisableEffect(EffectType.Invisible);
                 player.DisableEffect(EffectType.NightVision);
                 player.DisableEffect(EffectType.Slowness);
@@ -103,41 +107,38 @@ public class Scp966Role : CRole
                 player.EnableEffect(EffectType.MovementBoost, 20);
             }
             
-            Slafight_Plugin_EXILED.Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,("Speed Level: "+(Math.Abs(speedLevel+1))+"/5"),player);
+            Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,("Speed Level: "+(Math.Abs(speedLevel+1))+"/5"),player);
             yield return Timing.WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
         }
     }
 
-    public void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisingEventArgs ev)
+    private void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisingEventArgs ev)
     {
-        if (ev.Player.UniqueRole == "Scp966")
+        if (ev.Player?.UniqueRole != "Scp966") return;
+    
+        SpeedLevels[ev.Player] = SpeedLevels.GetValueOrDefault(ev.Player) + 1;
+        if (SpeedLevels[ev.Player] > 4)
         {
-            ev.IsAllowed = false;
-            ev.Ragdoll.Destroy();
-            if (speedLevel <= 4)
-            {
-                speedLevel++;
-            }
-            else
-            {
-                ev.Player.Heal(35f);
-            }
+            ev.Player.Heal(35f);
+            SpeedLevels[ev.Player] = 4;
         }
+        ev.IsAllowed = false;
+        ev.Ragdoll.Destroy();
     }
 
-    public void Hurting(HurtingEventArgs ev)
+    private void Hurting(HurtingEventArgs ev)
     {
         if (ev.Attacker?.UniqueRole == "Scp966")
         {
             ev.Amount = 15f;
         }
     }
-    public void DiedCassie(DyingEventArgs ev)
+
+    private void DiedCassie(DyingEventArgs ev)
     {
-        if (ev.Player.UniqueRole == "SCP-966")
+        if (ev.Player?.UniqueRole == "Scp966")
         {
-            //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Exiled.API.Features.Cassie.Clear();
+            SpeedLevels.Remove(ev.Player);
             Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .","<color=red>SCP-966</color>の終了に成功しました。");
         }
     }

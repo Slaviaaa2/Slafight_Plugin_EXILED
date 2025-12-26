@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Commands.Utility;
 using ProjectMER.Events.Arguments;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED;
@@ -39,59 +43,106 @@ public class EscapeHandler
             ev.Schematic.Destroy();
         }
     }
-    
-    public void Escape(Player player)
+
+    public void SaveItems(Player player)
     {
-        Log.Debug("Escape Triggered. by: "+player.Nickname);
-        if (string.IsNullOrEmpty(player.UniqueRole))
+        var nowPos = player.Position;
+        player.DropItems();
+        List<Pickup> saveItems = new();
+        foreach (var items in Pickup.List)
         {
-            if (player.Role == RoleTypeId.ClassD)
+            if (items.PreviousOwner == player)
             {
-                if (player.Cuffer?.Role.Team == Team.FoundationForces || player.Cuffer?.Role.Team == Team.Scientists)
+                if (Vector3.Distance(nowPos,items.Position) <= 1.05f)
                 {
-                    player.Role.Set(RoleTypeId.NtfSpecialist,RoleSpawnFlags.All);
-                }
-                else
-                {
-                    player.Role.Set(RoleTypeId.ChaosConscript,RoleSpawnFlags.All);
-                }
-            }
-            else if (player.Role == RoleTypeId.Scientist)
-            {
-                if (player.Cuffer?.Role.Team == Team.ChaosInsurgency || player.Cuffer?.Role.Team == Team.ClassD)
-                {
-                    player.Role.Set(RoleTypeId.ChaosConscript,RoleSpawnFlags.All);
-                }
-                else
-                {
-                    player.Role.Set(RoleTypeId.NtfSpecialist,RoleSpawnFlags.All);
-                }
-            }
-            else if (player.Role.Team == Team.ChaosInsurgency)
-            {
-                if (player.Cuffer?.Role.Team == Team.FoundationForces || player.Cuffer?.Role.Team == Team.Scientists)
-                {
-                    player.Role.Set(RoleTypeId.NtfPrivate,RoleSpawnFlags.All);
-                }
-            }
-            else if (player.Role.Team == Team.FoundationForces)
-            {
-                if (player.Cuffer?.Role.Team == Team.ChaosInsurgency || player.Cuffer?.Role.Team == Team.ClassD)
-                {
-                    player.Role.Set(RoleTypeId.ChaosConscript,RoleSpawnFlags.All);
+                    saveItems.Add(items);
                 }
             }
         }
-        else
+
+        Timing.CallDelayed(0.5f, () =>
         {
-            if (player.UniqueRole == "SCP-3005")
+            var newPos = player.Position + new Vector3(0f,0.15f,0f);
+            foreach (var item in saveItems)
             {
-                if (Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.isFifthistsRaidActive)
-                {
-                    player.UniqueRole = null;
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnF_Priest(player,RoleSpawnFlags.All);
-                }
+                if (item == null) continue;
+                item.Position = newPos;
             }
+        });
+    }
+    
+    public struct EscapeTargetRole
+    {
+        public RoleTypeId? Vanilla;   // 通常ロールに変身したいとき用
+        public CRoleTypeId? Custom;   // カスタムロールに変身したいとき用
+    }
+
+    
+    private EscapeTargetRole GetEscapeTarget(CTeam myTeam, CTeam cufferTeam)
+    {
+        return (myTeam, cufferTeam) switch
+        {
+            // Class-D Personnel
+            (CTeam.ClassD, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            (CTeam.ClassD, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.ClassD, _)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+
+            // Scientists
+            (CTeam.Scientists, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.Scientists, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.Scientists, _)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfSpecialist, Custom = null },
+
+            // Chaos Insurgency
+            (CTeam.ChaosInsurgency, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            (CTeam.ChaosInsurgency, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+
+            // Foundation Forces (with Guards)
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            
+            // Fifthists
+            (CTeam.Fifthists, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.Fifthists, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+
+            // デフォルト：変身しない
+            _ => new EscapeTargetRole { Vanilla = null, Custom = null },
+        };
+    }
+    
+    public void Escape(Player player)
+    {
+        Log.Debug($"Escape Triggered. by: "+player.Nickname+$", CTeam: {player.GetTeam()}");
+        
+        var myTeam     = player.GetTeam();
+        var cufferTeam = player.Cuffer.GetTeam();
+
+        var target = GetEscapeTarget(myTeam, cufferTeam);
+
+        // 何も指定されていないなら変身しない
+        if (target.Vanilla is null && target.Custom is null)
+            return;
+
+        SaveItems(player);
+
+        if (target.Custom is { } customRole)
+        {
+            player.SetRole(customRole);
+        }
+        else if (target.Vanilla is { } vanillaRole)
+        {
+            player.SetRole(vanillaRole);
         }
     }
 

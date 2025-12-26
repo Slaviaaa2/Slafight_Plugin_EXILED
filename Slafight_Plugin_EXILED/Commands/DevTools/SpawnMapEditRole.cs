@@ -25,7 +25,7 @@ public class SpawnMapEditRole : ICommand
 
         Player player = Player.Get(sender);
         player.UniqueRole = "MapEditor";
-        Slafight_Plugin_EXILED.Plugin.Singleton.PlayerHUD.DestroyHints();
+        Plugin.Singleton.PlayerHUD.DestroyHints();
         response = "You're now Entered Map Editor Mode!";
         return true;
     }

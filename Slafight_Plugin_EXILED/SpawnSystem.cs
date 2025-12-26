@@ -248,7 +248,7 @@ public class SpawnSystem
                             // Subroles: Aide
                             if (RandomSel==0)
                             {
-                                Slafight_Plugin_EXILED.Plugin.Singleton.CR_NtfAide.SpawnRole(player);
+                                player.SetRole(CRoleTypeId.NtfLieutenant);
                             }
                         }
                     }
@@ -285,7 +285,7 @@ public class SpawnSystem
                             // Subroles: Aide
                             if (RandomSel==0)
                             {
-                                Slafight_Plugin_EXILED.Plugin.Singleton.CR_NtfAide.SpawnRole(player);
+                                player.SetRole(CRoleTypeId.NtfLieutenant);
                             }
                         }
                     }
@@ -303,17 +303,17 @@ public class SpawnSystem
                 {
                     if (ii==0)
                     {
-                        Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdCommander.SpawnRole(player);
+                        player.SetRole(CRoleTypeId.HdCommander);
                         i++;
                         ii++;
                         continue;
                     }
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdInfantry.SpawnRole(player);
+                    player.SetRole(CRoleTypeId.HdInfantry);
                     i++;
                 }
                 //if (i >= Math.Truncate(Player.List.Count/4f)) break;
             }
-            CassieExtensions.CassieTranslated($"MtfUnit Nu 7 Designated {natoForce} {natoForceNum} HasEntered AllRemaining This Forces Work Epsilon 11 Task and operated by O5 Command . for Big Containment Breachs .",
+            Exiled.API.Features.Cassie.MessageTranslated($"MtfUnit Nu 7 Designated {natoForce} {natoForceNum} HasEntered AllRemaining This Forces Work Epsilon 11 Task and operated by O5 Command . for Big Containment Breachs .",
                 $"<b><color=#353535>機動部隊Nu-7 \"下される鉄槌 - ハンマーダウン\"-{natoForceL}-{natoForceNum}</color></b>が施設に到着しました。残存する全職員は、機動部隊が目的地に到着するまで、標準避難プロトコルに従って行動してください。" +
                 $"<split>本部隊は<color=#5bc5ff>Epsilon-11 \"九尾狐\"</color>の任務の代替として大規模な収容違反の対応の為O5評議会に招集されました。",true);
         }
@@ -328,17 +328,17 @@ public class SpawnSystem
                 {
                     if (ii==0)
                     {
-                        Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdCommander.SpawnRole(player);
+                        player.SetRole(CRoleTypeId.HdCommander);
                         i++;
                         ii++;
                         continue;
                     }
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CR_HdInfantry.SpawnRole(player);
+                    player.SetRole(CRoleTypeId.HdInfantry);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/2f)) break;
             }
-            CassieExtensions.CassieTranslated($"Her man down Backup unit has entered the facility .",
+            Exiled.API.Features.Cassie.MessageTranslated($"Her man down Backup unit has entered the facility .",
                 $"<b><color=#353535>下される鉄槌 - ハンマーダウンの予備部隊</color></b>が施設に到着しました。",true);
         }
         // SIDE - CHAOS INSURGENCY
@@ -364,7 +364,7 @@ public class SpawnSystem
                             // Subroles: Aide
                             if (RandomSel==0)
                             {
-                                Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player,RoleSpawnFlags.All);
+                                Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player,RoleSpawnFlags.All);
                             }
                         }
                     }
@@ -385,12 +385,12 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
+                    Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/4f)) break;
             }
-            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
+            Exiled.API.Features.Cassie.MessageTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
         }
         else if (spawnType == SpawnTypeId.GOI_FifthistBackup)
         {
@@ -400,12 +400,12 @@ public class SpawnSystem
             {
                 if (player.Role == RoleTypeId.Spectator)
                 {
-                    Slafight_Plugin_EXILED.Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
+                    Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
                     i++;
                 }
                 if (i >= Math.Truncate(Player.List.Count/6f)) break;
             }
-            CassieExtensions.CassieTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
+            Exiled.API.Features.Cassie.MessageTranslated($"Attention All personnel . Detected {i} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",true);
         }
 
         Timing.CallDelayed(0.02f, () =>

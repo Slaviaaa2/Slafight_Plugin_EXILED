@@ -30,11 +30,6 @@ public class SpecialEventsHandler
         Exiled.Events.Handlers.Server.RestartingRound += RoundRestartAddEvent;
         Exiled.Events.Handlers.Server.WaitingForPlayers += eventLocSet;
         Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayersInitEvent;
-        
-        // Need Handler Events Subscribes
-        Exiled.Events.Handlers.Player.ChangingRole += CryFuckSpawn;
-        Exiled.Events.Handlers.Scp096.CalmingDown += EndlessAnger;
-        Exiled.Events.Handlers.Scp096.Enraging += CleanShyDummy;
     }
 
     ~SpecialEventsHandler()
@@ -45,11 +40,6 @@ public class SpecialEventsHandler
         Exiled.Events.Handlers.Server.RestartingRound -= RoundRestartAddEvent;
         Exiled.Events.Handlers.Server.WaitingForPlayers -= eventLocSet;
         Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayersInitEvent;
-        
-        // Need Handler Events Unsubscribes
-        Exiled.Events.Handlers.Player.ChangingRole -= CryFuckSpawn;
-        Exiled.Events.Handlers.Scp096.CalmingDown -= EndlessAnger;
-        Exiled.Events.Handlers.Scp096.Enraging -= CleanShyDummy;
     }
     // Setup & Utils
     public string localizedEventName = String.Empty;
@@ -57,9 +47,6 @@ public class SpecialEventsHandler
     public List<SpecialEventType> EventQueue = new List<SpecialEventType>() { };
     public List<SpecialEventType> HappenedEvents = new List<SpecialEventType>() { };
     public int EventPID = 1;
-    // Need Handler Events Variables
-    public bool CryFuckEnabled = false;
-    public bool CryFuckSpawned = false;
     public bool isFifthistsRaidActive = false;
     
     public void AddEvent(SpecialEventType eventType)
@@ -122,15 +109,33 @@ public class SpecialEventsHandler
         SkipEvent();
         eventLocSet();
     }
+    
+    public void SetQueueEvent(SpecialEventType eventType)
+    {
+        if (!Enum.IsDefined(typeof(SpecialEventType), eventType))
+        {
+            Log.Error($"SEH: SetQueueEvent failed (invalid SpecialEventType: {eventType})");
+            return;
+        }
+
+        // 既存キューを維持したまま、先頭だけ差し替え
+        if (EventQueue.Count == 0)
+            EventQueue.Add(eventType);
+        else
+            EventQueue[0] = eventType;
+
+        // ローカライズ更新
+        eventLocSet();
+
+        Log.Info($"SEH: Next special event forced to {eventType} ({localizedEventName})");
+    }
 
     public void InitStats()
     {
-        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.DeconCancellFlag = false;
-        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.DeadmanDisable = false;
-        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.WarheadLocked = false;
-        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SpecialWarhead = false;
-        CryFuckEnabled = false;
-        CryFuckSpawned = false;
+        Plugin.Singleton.EventHandler.DeconCancellFlag = false;
+        Plugin.Singleton.EventHandler.DeadmanDisable = false;
+        Plugin.Singleton.EventHandler.WarheadLocked = false;
+        Plugin.Singleton.EventHandler.SpecialWarhead = false;
         isFifthistsRaidActive = false;
         EventPID++;
     }
@@ -207,14 +212,14 @@ public class SpecialEventsHandler
     public void SelectRandom()
     {
         // Config がまだなら何もしない
-        if (Slafight_Plugin_EXILED.Plugin.Singleton == null ||
-            Slafight_Plugin_EXILED.Plugin.Singleton.Config == null)
+        if (Plugin.Singleton == null ||
+            Plugin.Singleton.Config == null)
         {
             Log.Warn("SEH: SelectRandom called before Config initialized. Skipping.");
             return;
         }
         List<SpecialEventType> allowedEvents = new List<SpecialEventType>();
-        if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
+        if (Plugin.Singleton.Config.EventAllowed)
         {
             if (Player.List.Count >= 0)
             {
@@ -254,7 +259,7 @@ public class SpecialEventsHandler
                 allowedEvents.Add(SpecialEventType.SnowWarriersAttack);
             }
         }
-        if (Slafight_Plugin_EXILED.Plugin.Singleton.Config.EventAllowed)
+        if (Plugin.Singleton.Config.EventAllowed)
         {
             SelectedEvent = SpecialEventType.None;
             if (Random.Range(1,3) == 1)
@@ -280,7 +285,7 @@ public class SpecialEventsHandler
         {
             localizedEventName = "無し";
             eventNeedTriggers = "無し";
-            Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SyncSpecialEvent();
+            Plugin.Singleton.EventHandler.SyncSpecialEvent();
             return;
         }
 
@@ -340,7 +345,7 @@ public class SpecialEventsHandler
             localizedEventName = "[エラー：存在しないイベント]";
             eventNeedTriggers = "What The Fuck";
         }
-        Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler.SyncSpecialEvent();
+        Plugin.Singleton.EventHandler.SyncSpecialEvent();
     }
     
     public void OnWaitingForPlayersInitEvent()
@@ -390,22 +395,24 @@ public class SpecialEventsHandler
     // Need Handler Events
      // Scp096 CryFuck //
     public void Scp096CryFuckEvent()
+    {
+        int eventPID = EventPID;
+        Log.Debug("Scp096's CryFuckEvent called. PID:"+eventPID);
+        if (eventPID != EventPID) return;
+        Timing.CallDelayed(0.5f, () =>
         {
-            int eventPID = EventPID;
-            Log.Debug("Scp096's CryFuckEvent called. PID:"+eventPID);
-            if (eventPID != EventPID) return;
-            
-            CryFuckEnabled = true;
             foreach (Player player in Player.List)
             {
                 if (eventPID != EventPID) return;
                 if (player.Role.Team == Team.SCPs)
                 {
-                    player.Role.Set(RoleTypeId.Scp096);
+                    Exiled.API.Features.Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5", "<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>", true);
+                    player.SetRole(CRoleTypeId.Scp096Anger);
                     break;
                 }
             }
-        }
+        });
+    }
     
     public static void OverrideRoleName(Player player, string CustomInfo, string DisplayName, string RoleName, string Color)
     {
@@ -424,68 +431,4 @@ public class SpecialEventsHandler
             player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"<color={Color}>{CustomInfo}\n{DisplayName}\n{player.UniqueRole}</color>";
         }
     }
-
-        public Vector3 ShyguyPosition = Vector3.zero;
-        public void CryFuckSpawn(ChangingRoleEventArgs ev)
-        {
-            var GetPlayerTeam = RoleExtensions.GetTeam(ev.NewRole);
-            if (CryFuckEnabled && !CryFuckSpawned && GetPlayerTeam == Team.SCPs && (ev.Reason == SpawnReason.RoundStart || ev.Reason == SpawnReason.ForceClass))
-            {
-                ev.IsAllowed = false;
-                Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.CryFuckSpawned = true;
-                Scp096Anger scp096Anger = new Scp096Anger();
-                scp096Anger.SpawnRole(ev.Player);
-            }
-        }
-
-        public void StartAnger()
-        {
-            /*Vector3 shyroom = Room.Get(RoomType.Hcz096).Position;
-            foreach (Room rooms in Room.List)
-            {
-                if (rooms.Type == RoomType.Hcz096)
-                {
-                    shyroom = rooms.Position;
-                    Log.Debug("Position Get from for096 Npc_shyroom_get vector3: "+"X:" + shyroom.x + " Y:" + shyroom.y + " Z:" + shyroom.z);
-                }
-            }*/
-
-            foreach (Door door in Door.List)
-            {
-                if (door.Type == DoorType.HeavyContainmentDoor && door.Room.Type == RoomType.Hcz096) // This Door Lock is Don't working in 14.2 or later version. TODO:Create MER's Locked Door
-                {
-                    door.Lock(DoorLockType.AdminCommand);
-                }
-            }
-            
-            Vector3 spawnPoint = new Vector3(ShyguyPosition.x + 1f, ShyguyPosition.y + 0f, ShyguyPosition.z);
-            Npc term_npc = Npc.Spawn("for096",RoleTypeId.ClassD,false,position:spawnPoint);
-            term_npc.Transform.localEulerAngles = new Vector3(0,-90,0);
-            //Exiled.API.Features.Cassie.MessageTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>");
-            CassieExtensions.CassieTranslated("SCP 0 9 6 . SCP 0 9 6 . .g4 .g3 .g7 .g6 .g2 .g2 .g5","<color=red>SCP-096！SCP-096！うわl...(ノイズ音)</color>",true);
-        }
-        
-        public void EndlessAnger(Exiled.Events.EventArgs.Scp096.CalmingDownEventArgs ev)
-        {
-            if (ev.Player.UniqueRole == "Scp096_Anger")
-            {
-                ev.IsAllowed = false;
-                ev.ShouldClearEnragedTimeLeft = true;
-            }
-        }
-
-        public void CleanShyDummy(EnragingEventArgs ev)
-        {
-            if (ev.Player.UniqueRole == "Scp096_Anger")
-            {
-                foreach (Npc npc in Npc.List)
-                {
-                    if (npc.CustomName == "for096")
-                    {
-                        npc.Destroy();
-                    }
-                }
-                ev.InitialDuration = Single.MaxValue;
-            }
-        }
 }

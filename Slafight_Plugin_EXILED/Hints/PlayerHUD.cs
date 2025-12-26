@@ -170,99 +170,111 @@ public class PlayerHUD
 
     private void ApplyRoleInfo(Player sourcePlayer, Player targetForHint)
     {
+        var custom = sourcePlayer.GetCustomRole();
+        Log.Debug($"[HUD] {sourcePlayer.Nickname} UniqueRole={sourcePlayer.UniqueRole}, Custom={custom}, Vanilla={sourcePlayer.Role.Type}");
         if (sourcePlayer.GetCustomRole() != CRoleTypeId.None)
         {
-            switch (sourcePlayer.UniqueRole)
+            switch (sourcePlayer.GetCustomRole())
             {
                 // SCiPs
-                case "Scp096_Anger":
+                case CRoleTypeId.Scp096Anger:
                     SyncTextRole = "<color=#c50000>SCP-096: ANGER</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "怒りに任せ、施設中で暴れまわれ！！！";
                     break;
-                case "Scp3114":
+                case CRoleTypeId.Scp3114:
                     SyncTextRole = "<color=#c50000>SCP-3114</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "皆に素敵なサプライズをして驚かせましょう！";
                     break;
-                case "Scp966":
+                case CRoleTypeId.Scp966:
                     SyncTextRole = "<color=#c50000>SCP-966</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "背後から忍び寄り、奴らに恐怖を与えよ！";
                     break;
-                case "Scp682":
+                case CRoleTypeId.Scp682:
                     SyncTextRole = "<color=#c50000>SCP-682</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "無敵の爬虫類の力を見せてやれ！！！";
                     break;
-                case "Zombified":
+                case CRoleTypeId.Zombified:
                     SyncTextRole = "<color=#c50000>Zombified Subject</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "何らかの要因でゾンビの様になってしまった。とにかく暴れろ！";
                     break;
+                case CRoleTypeId.Scp106:
+                    SyncTextRole = "<color=#c50000>SCP-106</color>";
+                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                    SyncTextObjective = "自身の欲求に従い、財団職員共を弄べ！";
+                    break;
                 // Fifthists
-                case "SCP-3005":
+                case CRoleTypeId.Scp3005:
                     SyncTextRole = "<color=#ff00fa>SCP-3005</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color> - <color=#ff00fa>The Fifthists</color>";
                     SyncTextObjective = "第五教会に道を示し、施設を占領せよ";
                     break;
-                case "FIFTHIST":
+                case CRoleTypeId.FifthistRescure:
                     SyncTextRole = "<color=#ff00fa>Fifthist: Rescue</color>";
                     SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
                     SyncTextObjective = "第五に従い、施設を占領せよ";
                     break;
-                case "F_Priest":
+                case CRoleTypeId.FifthistPriest:
                     SyncTextRole = "<color=#ff00fa>Fifthist: Priest</color>";
                     SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
                     SyncTextObjective = "全てを第五せよ";
                     break;
+                case CRoleTypeId.FifthistConvert:
+                    SyncTextRole = "<color=#ff5ffa>Fifthist: Convert</color>";
+                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                    SyncTextObjective = "第五に従い、施設を占領せよ";
+                    break;
                 // Chaos Insurgents
-                case "CI_Commando":
+                case CRoleTypeId.ChaosCommando:
                     SyncTextRole = "<color=#228b22>Chaos Insurgency Commando</color>";
                     SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                     SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
                     break;
                 // The Foundation Forces
-                case "NtfAide":
+                case CRoleTypeId.NtfLieutenant:
                     SyncTextRole = "<color=#00b7eb>MTF E-11: Lieutenant</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
-                case "HdInfantry":
+                case CRoleTypeId.HdInfantry:
                     SyncTextRole = "<color=#353535>MTF Nu-7: Infantry</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
-                case "HdCommander":
+                case CRoleTypeId.HdCommander:
                     SyncTextRole = "<color=#252525>MTF Nu-7: Commander</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
                 // Scientists
-                case "ZoneManager":
+                case CRoleTypeId.ZoneManager:
                     SyncTextRole = "<color=#00ffff>Zone Manager</color>";
                     SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
                     SyncTextObjective = "施設から脱出せよ";
                     break;
-                case "FacilityManager":
+                case CRoleTypeId.FacilityManager:
                     SyncTextRole = "<color=#dc143c>Facility Manager</color>";
                     SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
                     SyncTextObjective = "施設から脱出せよ";
                     break;
                 // Facility Guards
-                case "EvacuationGuard":
+                case CRoleTypeId.EvacuationGuard:
                     SyncTextRole = "<color=#00b7eb>Emergency Evacuation Guard</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "職員達を上部階層へ避難させ、施設の秩序を守護せよ。";
                     break;
                 // Class-D Personnel
-                case "Janitor":
+                case CRoleTypeId.Janitor:
                     SyncTextRole = "<color=#ee7600>Janitor</color>";
                     SyncTextTeam = "<color=#ee7600>Neutral - Side Chaos</color>";
                     SyncTextObjective = "施設から脱出せよ。また、汚物をグレネードで清掃せよ。";
                     break;
                 // Other Unknown Threads
-                case "SnowWarrier":
+                case CRoleTypeId.SnowWarrier:
                     SyncTextRole = "<b><color=#ffffff>SNOW WARRIER</color></b>";
                     SyncTextTeam = "<b><color=#ffffff>SNOW WARRIER's DIVISION</color></b>";
                     SyncTextObjective = "全施設にクリスマスと雪玉の正義を執行しろ";

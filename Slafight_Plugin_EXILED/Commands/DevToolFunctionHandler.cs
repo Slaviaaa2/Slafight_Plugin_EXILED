@@ -107,9 +107,9 @@ public class DevToolFunctionHandler
                 door.Lock(DoorLockType.Warhead);
             }
         }
-        Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
+        Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
         CreateAndPlayAudio("omega_v2.ogg","Exiled.API.Features.Cassie",Vector3.zero,true,null,false,999999999,0);
-        Timing.CallDelayed(Slafight_Plugin_EXILED.Plugin.Singleton.Config.OwBoomTime, () =>
+        Timing.CallDelayed(Plugin.Singleton.Config.OwBoomTime, () =>
         {
             foreach (Player player in Player.List)
             {

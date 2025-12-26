@@ -44,12 +44,12 @@ public class OperationBlackout
     
     public void Event()
     {
-        var EventHandler = Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler;
-        var SpecialEventHandler = Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler;
+        var EventHandler = Plugin.Singleton.EventHandler;
+        var SpecialEventHandler = Plugin.Singleton.SpecialEventsHandler;
         int eventPID = SpecialEventHandler.EventPID;
         globalEventPID = eventPID;
         
-        if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
 
         SpawnSystem.Disable = true; // Disable All Respawning.
 
@@ -106,7 +106,7 @@ public class OperationBlackout
             }
 
             Exiled.API.Features.Cassie.Clear();
-            CassieExtensions.CassieTranslated(
+            Exiled.API.Features.Cassie.MessageTranslated(
                 "Attention, All personnel. Facility electric systems is malfunctioning . please manual charge up the all generators.",
                 "全職員に通達。施設の電力システムに<color=red>問題</color>が発生しました。全ての非常用発電機を<color=#00b7eb>再起動</color>してください。", true);
         });
@@ -144,7 +144,7 @@ public class OperationBlackout
     int generatedCount = 0;
     public void OnGenerated(GeneratorActivatingEventArgs ev)
     {
-        if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
         generatedCount++;
         if (generatedCount == 3)
         {
@@ -157,12 +157,12 @@ public class OperationBlackout
                         door.Unlock();
                     }
                 }
-                CassieExtensions.CassieTranslated("All Light Containment Zone emergency generators is now power upped . and Heavy Containment Zone Elevators now Online.",
+                Exiled.API.Features.Cassie.MessageTranslated("All Light Containment Zone emergency generators is now power upped . and Heavy Containment Zone Elevators now Online.",
                     "全ての軽度収容区画の非常用発電機が起動され、重度収容区画とのエレベーターが再起動しました。",true);
                 Timing.CallDelayed(15f, () =>
                 {
-                    if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-                    CassieExtensions.CassieTranslated("Warning, The Facility O 2 Supply Systems power down effect Detected. Please evacuation to the Upper Facility Zone.",
+                    if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                    Exiled.API.Features.Cassie.MessageTranslated("Warning, The Facility O 2 Supply Systems power down effect Detected. Please evacuation to the Upper Facility Zone.",
                         "警告、施設の酸素供給システムにて<color=red>停電による影響</color>が検出されました。出来るだけ早く施設の上部区画へ避難してください。",true);
                 });
             });
@@ -178,20 +178,20 @@ public class OperationBlackout
                         door.Unlock();
                     }
                 }
-                CassieExtensions.CassieTranslated("All Heavy Containment Zone emergency generators is now power upped . and Entrance Zone Door systems now Online. Power upping Gate Elevator by Emergency Electric Power . . .",
+                Exiled.API.Features.Cassie.MessageTranslated("All Heavy Containment Zone emergency generators is now power upped . and Entrance Zone Door systems now Online. Power upping Gate Elevator by Emergency Electric Power . . .",
                     "全ての重度収容区画の非常用発電機が起動され、エントランスゾーンのドアシステムが全て復帰しました。非常電源を用いてゲートのエレベーターを再起動しています・・・",true);
                 Timing.CallDelayed(60f, () =>
                 {
-                    if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-                    CassieExtensions.CassieTranslated("Emergency Attention to the All personnel, Emergency Electric Power is Locked by Unknown Forces. and Facility O 2 is very very bad. Please evacuation to the Shelter or . .g1",
+                    if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                    Exiled.API.Features.Cassie.MessageTranslated("Emergency Attention to the All personnel, Emergency Electric Power is Locked by Unknown Forces. and Facility O 2 is very very bad. Please evacuation to the Shelter or . .g1",
                         "全職員に緊急通達。非常用電源が何者かの影響によりロックされました。更に、現在の施設内酸素は<color=red>非常に悪く、危険</color>です。シェルター等に避難し、少しでも...(電力が切れる音)",true);
                     Timing.CallDelayed(15f, () =>
                     {
-                        if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
                         CreateAndPlayAudio("oxygen.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
                         Timing.CallDelayed(232f, () =>
                         {
-                            if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                            if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
                             foreach (Player player in Player.List)
                             {
                                 player.EnableEffect(EffectType.Asphyxiated, 255);
@@ -209,7 +209,7 @@ public class OperationBlackout
 
     public void DisableRecontainFunnies(RecontainingEventArgs ev)
     {
-        if (globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
         ev.IsAllowed = false;
         ev.Player.ShowHint("<size=26>電力が無いようだ・・・</size>");
     }
@@ -218,7 +218,7 @@ public class OperationBlackout
     {
         for (;;)
         {
-            if (Round.IsLobby || globalEventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) yield break;
+            if (Round.IsLobby || globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) yield break;
             foreach (Player player in Player.List)
             {
                 player.EnableEffect(EffectType.Asphyxiated, 255);

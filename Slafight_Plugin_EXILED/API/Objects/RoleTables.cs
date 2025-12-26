@@ -6,7 +6,7 @@ namespace Slafight_Plugin_EXILED;
 
 public static class RoleTables
 {
-    // SCP用：デフォ + カスタム混合
+    // FirstSpawnHandler時のスポーンテーブル。
     public static readonly List<object> ScpRoles = new()
     {
         RoleTypeId.Scp173,

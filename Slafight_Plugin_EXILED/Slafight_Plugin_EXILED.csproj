@@ -127,21 +127,36 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Abilities\CreateSinkholeAbility.cs" />
         <Compile Include="Abilities\MagicMissileAbility.cs" />
+        <Compile Include="API\Enums\CTeam.cs" />
+        <Compile Include="API\Features\AbilityBase.cs" />
+        <Compile Include="API\Features\AbilityInputHandler.cs" />
+        <Compile Include="API\Features\AbilityLoadout.cs" />
+        <Compile Include="API\Features\AbilityManager.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
         <Compile Include="API\Features\RoleParseHelper.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="ChristmasChanges.cs" />
+        <Compile Include="Commands\DevTools\RunEvent.cs" />
+        <Compile Include="Commands\DevTools\SetQueue.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="CustomItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\KeycardConscripts.cs" />
         <Compile Include="CustomItems\KeycardSecurityChief.cs" />
+        <Compile Include="CustomItems\Scp1425.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
+        <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
+        <Compile Include="Extensions\AbilityResetUtil.cs" />
         <Compile Include="Extensions\ItemExtensions.cs" />
+        <Compile Include="Extensions\PlayerAbilityExtensions.cs" />
+        <Compile Include="Extensions\PlayerCustomItemExtensions.cs" />
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
         <Compile Include="FirstRolesHandler.cs" />
@@ -205,6 +220,7 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ProximityChat\ActivateHandler.cs" />
         <Compile Include="ProximityChat\Handler.cs" />
+        <Compile Include="Scp914Changes.cs" />
         <Compile Include="ServerSpecifics.cs" />
         <Compile Include="SpawnSystem.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />

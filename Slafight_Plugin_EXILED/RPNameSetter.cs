@@ -1,8 +1,7 @@
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Player;
 using UserSettings.ServerSpecific;
 
-namespace Slafight_Plugin_EXILED.ProximityChat;
+namespace Slafight_Plugin_EXILED;
 
 public class RPNameSetter
 {

@@ -5,11 +5,12 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
-using Slafight_Plugin_EXILED;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
+
+namespace Slafight_Plugin_EXILED;
 
 public class FirstRolesHandler
 {
@@ -79,15 +80,16 @@ public class FirstRolesHandler
 
     private void _LimitChecker()
     {
-        RoleLimitManager.Reset();
+        RoleLimitManager.ClearAll();
+
         var nowEvent = Plugin.Singleton.SpecialEventsHandler.EventQueue[0];
         if (nowEvent == SpecialEventType.None)
         {
-            RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager,2);
-            RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager,1);
-            RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard,1);
+            RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager, 2);
+            RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager, 1);
+            RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard, 1);
         }
-        
+
         Log.Debug("[FirstRoles] _LimitChecker called");
     }
 

@@ -18,23 +18,23 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.KeycardChaosInsurgency)]
+[CustomItem(ItemType.KeycardCustomSite02)]
 public class KeycardConscripts : CustomKeycard
 {
     public override uint Id { get; set; } = 1101;
-    public override string Name { get; set; } = "カオス徴収兵 アクセスデバイス";
-    public override string Description { get; set; } = "新入りが持つ軽いアクセスデバイス";
+    public override string Name { get; set; } = "カオス 破壊カード";
+    public override string Description { get; set; } = "新入りが持つ、アクセスデバイスの代わりとなるカード。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.KeycardChaosInsurgency;
+    public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-    public override string KeycardLabel { get; set; } = "カオス徴収兵 アクセスデバイス";
+    public override string KeycardLabel { get; set; } = "BREAKING CARD";
     [YamlIgnore]
-    public override Color32? KeycardLabelColor { get; set; } = new Color32(0,68,0,255);
+    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
     public override string KeycardName { get; set; } = "Chaos Conscript";
     [YamlIgnore]
     public override Color32? TintColor { get; set; } = new Color32(0,68,0,255);
     [YamlIgnore]
-    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(255,255,255,255);
+    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
     public override KeycardPermissions Permissions { get; set; } =
         KeycardPermissions.ContainmentLevelOne |

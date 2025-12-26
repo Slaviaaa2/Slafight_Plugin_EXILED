@@ -16,6 +16,7 @@ using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
 using HarmonyLib;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.ProximityChat;
@@ -49,40 +50,8 @@ namespace Slafight_Plugin_EXILED
         public ActivateHandler ProximityChatActiveHandler { get; set; }
         public RPNameSetter RolePlayNameSetter { get; set; }
         public FirstRolesHandler FirstRolesHandler { get; set; }
-
-        public HIDTurret _HIDTurret;
-        public KeycardFifthist _KeycardFifthist;
-        public ArmorInfantry _ArmorInfantry;
-        public GunN7CR _GunN7CR;
-        public GunGoCRailgun _GunGoCRailgun;
-        public ArmorVip _ArmorVip;
-        public MagicMissile _MagicMissile;
-        public DummyRoad _DummyRoad;
-        public FakeGrenade _FakeGrenade;
-        public KeycardSecurityChief _KeycardSecurityChief;
-        public KeycardConscripts _KeycardConscripts;
-        
-        public KeycardOld_Cadet _KeycardOld_Cadet;
-        public KeycardOld_Commander _KeycardOld_Commander;
-        public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer;
-        public KeycardOld_FacilityManager _KeycardOld_FacilityManager;
-        public KeycardOld_Guard _KeycardOld_Guard;
-        public KeycardOld_Janitor _KeycardOld_Janitor;
-        public KeycardOld_Lieutenant _KeycardOld_Lieutenant;
-        public KeycardOld_O5 _KeycardOld_O5;
-        public KeycardOld_ResearchSupervisor _KeycardOld_ResearchSupervisor;
-        public KeycardOld_Scientist _KeycardOld_Scientist;
-        public KeycardOld_ZoneManager _KeycardOld_ZoneManager;
-
-        public HdInfantry CR_HdInfantry { get; set; }
-        public HdCommander CR_HdCommander { get; set; }
-        public NtfAide CR_NtfAide { get; set; }
-        public Scp3114Role CRScp3114Role { get; set; }
-        public Scp966Role CR_Scp966Role { get; set; }
-        public ZoneManager CR_ZoneManager { get; set; }
-        public FacilityManager CR_FacilityManager { get; set; }
-        public EvacuationGuard CR_ESGuard { get; set; }
-        public Janitor CR_Janitor { get; set; }
+        public ChristmasChanges ChristmasChanges { get; set; }
+        public Scp914Changes Scp914Changes { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
@@ -106,71 +75,15 @@ namespace Slafight_Plugin_EXILED
             ProximityChatActiveHandler = new();
             RolePlayNameSetter = new();
             FirstRolesHandler = new();
+            ChristmasChanges = new();
+            Scp914Changes = new();
+            _ = typeof(AbilityInputHandler);
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
-            _HIDTurret = new();
-            _KeycardFifthist = new();
-            _ArmorInfantry = new();
-            _GunN7CR = new();
-            _GunGoCRailgun = new();
-            _ArmorVip = new();
-            _MagicMissile = new();
-            _DummyRoad = new();
-            _FakeGrenade = new();
-            _KeycardSecurityChief = new();
-            _KeycardConscripts = new();
-            
-            _KeycardOld_Cadet = new();
-            _KeycardOld_Commander = new();
-            _KeycardOld_ContainmentEngineer = new();
-            _KeycardOld_FacilityManager = new();
-            _KeycardOld_Guard = new();
-            _KeycardOld_Janitor = new();
-            _KeycardOld_Lieutenant = new();
-            _KeycardOld_O5 = new();
-            _KeycardOld_ResearchSupervisor = new();
-            _KeycardOld_Scientist = new();
-            _KeycardOld_ZoneManager = new();
-            
-            Config.HidTurretConfig.Register();
-            Config.KeycardFifthistConfig.Register();
-            Config.KeycardFifthistPriestConfig.Register();
-            Config.ArmorInfantryConfig.Register();
-            Config.GunN7CRConfig.Register();
-            Config.GunGoCRailgunConfig.Register();
-            Config.ArmorVipConfig.Register();
-            Config.MagicMissileConfig.Register();
-            Config.DummyRoadConfig.Register();
-            Config.FakeGrenadeConfig.Register();
-            Config.KeycardSecurityChiefConfig.Register();
-            Config.KeycardConscriptsConfig.Register();
-            
-            Config.KeycardOld_CadetConfig.Register();
-            Config.KeycardOld_CommanderConfig.Register();
-            Config.KeycardOld_ContainmentEngineerConfig.Register();
-            Config.KeycardOld_FacilityManagerConfig.Register();
-            Config.KeycardOld_GuardConfig.Register();
-            Config.KeycardOld_JanitorConfig.Register();
-            Config.KeycardOld_LieutenantConfig.Register();
-            Config.KeycardOld_O5Config.Register();
-            Config.KeycardOld_ResearchSupervisorConfig.Register();
-            Config.KeycardOld_ScientistConfig.Register();
-            Config.KeycardOld_ZoneManagerConfig.Register();
-
-            
-            
-            CR_HdInfantry = new();
-            CR_HdCommander = new();
-            CR_NtfAide = new();
-            CRScp3114Role = new();
-            CR_Scp966Role = new();
-            CR_ZoneManager = new();
-            CR_FacilityManager = new();
-            CR_ESGuard = new();
-            CR_Janitor = new();
-
+            CRole.RegisterAllEvents();
             CustomRole.RegisterRoles(false);
+            CustomItem.RegisterItems(skipReflection: false, overrideClass: Config);
             
             SpawnSystem = new();
 
@@ -180,7 +93,7 @@ namespace Slafight_Plugin_EXILED
             ServerSpecificSettingsSync.SendToAll();
             Log.Debug($"Settings List: \n{ServerSpecificSettingsSync.DefinedSettings}");
             
-            Slafight_Plugin_EXILED.Plugin.Singleton.EasterEggsHandler.loadClips();
+            Plugin.Singleton.EasterEggsHandler.loadClips();
             
             HarmonyInstance = new Harmony(this.Name);
             HarmonyInstance.PatchAll();  // 全HarmonyPatch属性を自動適用
@@ -198,10 +111,9 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
             
             LabApiHandler = null;
+            AbilityInputHandler.Unregister();
             
-            _HIDTurret = null;
-            _KeycardFifthist = null;
-            _ArmorInfantry = null;
+            CRole.UnregisterAllEvents();
             CustomItem.UnregisterItems();
             CustomRole.UnregisterRoles();
             

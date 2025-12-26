@@ -22,5 +22,9 @@ public enum CRoleTypeId
     FifthistConvert = 13,
     Janitor = 14,
     SnowWarrier = 15,
-    Scp682 = 16
+    Scp682 = 16,
+    Scp999 = 17,
+    Zombified = 18,
+    Scp106 = 19,
+    Scp3114 = 20
 }

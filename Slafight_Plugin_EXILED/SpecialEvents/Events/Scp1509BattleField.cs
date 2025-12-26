@@ -17,15 +17,15 @@ public class Scp1509BattleField
 {
     public void Scp1509BattleFieldEvent()
     {
-        var EventHandler = Slafight_Plugin_EXILED.Plugin.Singleton.EventHandler;
-        var SpecialEventHandler = Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler;
+        var EventHandler = Plugin.Singleton.EventHandler;
+        var SpecialEventHandler = Plugin.Singleton.SpecialEventsHandler;
         Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
         int eventPID = SpecialEventHandler.EventPID;
         int battlefield_map = Random.Range(1,5); // X以上Y未満ということらしい。1,4に設定して地獄を見た
         DecontaminationController.Singleton.DecontaminationOverride = DecontaminationController.DecontaminationStatus.Disabled;
         DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
         
-        if (eventPID != Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
 
         List<ItemType> keepPickups = new List<ItemType>() { ItemType.Painkillers,ItemType.Medkit,ItemType.Adrenaline };
         foreach (Pickup pickup in Pickup.List)

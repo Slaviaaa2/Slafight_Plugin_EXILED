@@ -15,6 +15,8 @@ using ProjectMER.Features.Objects;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
 using Logger = LabApi.Features.Console.Logger;
@@ -154,6 +156,13 @@ public class LabApiHandler : CustomEventsHandler
             var OldKeycard_ContainmentEngineer = CustomItem.TrySpawn(100, pos, out var pickup);
             pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
         }
+        if (ev.Schematic.Name == "CISR_Scp1425")
+        {
+            Vector3 pos = ev.Schematic.gameObject.transform.position;
+            ev.Schematic.Destroy();
+            var Scp1425 = CustomItem.TrySpawn(1102, pos, out var pickup);
+            pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+        }
     }
 
     public void Schem3005(Player player)
@@ -236,43 +245,17 @@ public class LabApiHandler : CustomEventsHandler
         }
     }
 
+    private List<CRoleTypeId> HasModels = new()
+    {
+        CRoleTypeId.Scp3005,
+        CRoleTypeId.SnowWarrier
+    };
     private IEnumerator<float> DestroyCoroutine(SchematicObject schem, Exiled.API.Features.Player player)
     {
         for (;;)
         {
             yield return Timing.WaitForSeconds(1);
-            if (player.UniqueRole == null)
-            {
-                schem.Destroy();
-                yield break;
-            }
-
-            if (player.UniqueRole == "FIFTHIST")
-            {
-                schem.Destroy();
-                yield break;
-            }
-            if (player.UniqueRole == "F_Priest")
-            {
-                schem.Destroy();
-                yield break;
-            }
-            if (player.UniqueRole == "Scp096_Anger")
-            {
-                schem.Destroy();
-                yield break;
-            }
-            if (player.UniqueRole == "CI_Commando")
-            {
-                schem.Destroy();
-                yield break;
-            }
-            if (player.UniqueRole == "HdInfantry")
-            {
-                schem.Destroy();
-                yield break;
-            }
-            if (player.UniqueRole == "HdCommando")
+            if (!HasModels.Contains(player.GetCustomRole()))
             {
                 schem.Destroy();
                 yield break;

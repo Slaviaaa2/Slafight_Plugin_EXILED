@@ -1,8 +1,11 @@
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 namespace Slafight_Plugin_EXILED.Extensions;
@@ -13,6 +16,7 @@ public static class PlayerExtensions
         RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         Log.Debug($"[SetRole-Vanilla] {player.Nickname} -> {roleTypeId} (flags: {roleSpawnFlags})");
+        player.UniqueRole = null;
         switch (roleTypeId)
         {
             // ==== SCP ====
@@ -35,7 +39,8 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp106:
-                player.Role.Set(RoleTypeId.Scp106, roleSpawnFlags);
+                // Cast to SetRole(Custom)
+                player.SetRole(CRoleTypeId.Scp106);
                 break;
 
             case RoleTypeId.Scp0492:
@@ -47,7 +52,8 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp3114:
-                Plugin.Singleton.CRScp3114Role.SpawnRole(player, roleSpawnFlags);
+                // Cast to SetRole(Custom)
+                player.SetRole(CRoleTypeId.Scp3114);
                 break;
 
             // ==== 人間ロール ====
@@ -83,6 +89,14 @@ public static class PlayerExtensions
             // ==== Chaos ====
             case RoleTypeId.ChaosConscript:
                 player.Role.Set(RoleTypeId.ChaosConscript, roleSpawnFlags);
+                foreach (var item in player.Items.ToList())
+                {
+                    if (item.Type == ItemType.KeycardChaosInsurgency)
+                    {
+                        player.RemoveItem(item);
+                    }
+                }
+                player.TryAddCustomItem(1101);
                 break;
 
             case RoleTypeId.ChaosRifleman:
@@ -131,7 +145,6 @@ public static class PlayerExtensions
                 player.Role.Set(RoleTypeId.Tutorial, roleSpawnFlags);
                 break;
         }
-        player.UniqueRole = null;
     }
 
     public static void SetRole(this Player player, CRoleTypeId roleTypeId,
@@ -144,14 +157,19 @@ public static class PlayerExtensions
                 player.UniqueRole = null;
                 break;
             case CRoleTypeId.Scp096Anger:
-                var scp096Anger = new Scp096Anger();
-                scp096Anger.SpawnRole(player, roleSpawnFlags);
+                new Scp096Anger().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Scp3005:
                 Plugin.Singleton.CustomRolesHandler.Spawn3005(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Scp966:
-                Plugin.Singleton.CR_Scp966Role.SpawnRole(player, roleSpawnFlags);
+                new Scp966Role().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.Scp3114:
+                new Scp3114Role().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.Scp106:
+                new Scp106Role().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FifthistRescure:
                 Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player, roleSpawnFlags);
@@ -163,35 +181,45 @@ public static class PlayerExtensions
                 Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.NtfLieutenant:
-                Plugin.Singleton.CR_NtfAide.SpawnRole(player, roleSpawnFlags);
+                new NtfAide().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.HdInfantry:
-                Plugin.Singleton.CR_HdInfantry.SpawnRole(player, roleSpawnFlags);
+                new HdInfantry().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.HdCommander:
-                Plugin.Singleton.CR_HdCommander.SpawnRole(player, roleSpawnFlags);
+                new HdCommander().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.EvacuationGuard:
-                Plugin.Singleton.CR_ESGuard.SpawnRole(player, roleSpawnFlags);
+                new EvacuationGuard().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ZoneManager:
-                Plugin.Singleton.CR_ZoneManager.SpawnRole(player, roleSpawnFlags);
+                new ZoneManager().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FacilityManager:
-                Plugin.Singleton.CR_FacilityManager.SpawnRole(player, roleSpawnFlags);
+                new FacilityManager().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FifthistConvert:
+                new FifthistConvert().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Janitor:
-                Plugin.Singleton.CR_Janitor.SpawnRole(player, roleSpawnFlags);
+                new Janitor().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.SnowWarrier:
                 Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Scp682:
-                Scp682Role scp682Role = new Scp682Role();
-                scp682Role.SpawnRole(player, roleSpawnFlags);
+                new Scp682Role().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.Scp999:
+                new Scp999Role().SpawnRole(player, roleSpawnFlags);
                 break;
         }
+    }
+
+    public static void SetCustomInfo(this Player player,string Info)
+    {
+        player.CustomInfo = Info;
+        player.InfoArea |= PlayerInfoArea.Nickname;
+        player.InfoArea &= ~PlayerInfoArea.Role;
     }
 }

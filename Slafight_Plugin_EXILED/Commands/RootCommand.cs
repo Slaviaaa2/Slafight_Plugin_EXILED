@@ -19,6 +19,8 @@ public class RootCommand : ParentCommand
         RegisterCommand(new SpawnMapEditRole());
         RegisterCommand(new ReRollSpecial());
         RegisterCommand(new ReRollSetQueue());
+        RegisterCommand(new SetQueue());
+        RegisterCommand(new RunEvent());
         RegisterCommand(new SpawnUniversal());
         RegisterCommand(new PlaySurfaceAttack());
         RegisterCommand(new PlayOmegaWarhead());

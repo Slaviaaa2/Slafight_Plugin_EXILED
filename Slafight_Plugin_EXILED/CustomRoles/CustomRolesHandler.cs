@@ -16,6 +16,7 @@ using MEC;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
@@ -36,6 +37,7 @@ public class CustomRolesHandler
         //Exiled.Events.Handlers.Player.ChangedItem += ForceHume;
 
         Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
+        Exiled.Events.Handlers.Server.WaitingForPlayers += ResetAbilities;
     }
     ~CustomRolesHandler()
     {
@@ -47,6 +49,12 @@ public class CustomRolesHandler
         //Exiled.Events.Handlers.Player.ChangedItem -= ForceHume;
 
         Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
+        Exiled.Events.Handlers.Server.WaitingForPlayers -= ResetAbilities;
+    }
+
+    public void ResetAbilities()
+    {
+        AbilityResetUtil.ResetAllAbilities();
     }
 
     public void RoundCoroutine()
@@ -63,6 +71,10 @@ public class CustomRolesHandler
 
     private IEnumerator<float> FifthistCoroutine()
     {
+        List<string> FifthistRoles = new List<string>()
+        {
+            "FIFTHIST","SCP-3005","F_Priest","FifthistConvert"
+        };
         for (;;)
         {
             if (Round.IsLobby)
@@ -73,7 +85,7 @@ public class CustomRolesHandler
             foreach (Player player in Player.List)
             {
                 if (player == null || !player.IsAlive) continue;
-                if (player.UniqueRole != "FIFTHIST" && player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
+                if (!FifthistRoles.Contains(player.UniqueRole))
                 {
                     i++;
                 }
@@ -82,7 +94,7 @@ public class CustomRolesHandler
             foreach (Player player in Player.List)
             {
                 if (player == null || !player.IsAlive) continue;
-                if (player.UniqueRole == "FIFTHIST" || player.UniqueRole == "SCP-3005" || player.UniqueRole == "F_Priest")
+                if (FifthistRoles.Contains(player.UniqueRole))
                 {
                     ii++;
                 }
@@ -137,6 +149,7 @@ public class CustomRolesHandler
         {
             "FIFTHIST",
             "F_Priest",
+            "FifthistConvert",
             "SnowWarrier"
         };
         foreach (Player player in Player.List)
@@ -186,7 +199,7 @@ public class CustomRolesHandler
     public void Spawn3005(Player player,RoleSpawnFlags roleSpawnFlags)
     {
         player.Role.Set(RoleTypeId.Scp0492);
-        Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.Schem3005(player);
+        Plugin.Singleton.LabApiHandler.Schem3005(player);
         Vector3 offset;
         int MaxHealth = 55555;
 
@@ -337,7 +350,7 @@ public class CustomRolesHandler
     {
         player.Role.Set(RoleTypeId.ChaosRifleman,RoleSpawnFlags.All);
         player.Role.Set(RoleTypeId.Tutorial,RoleSpawnFlags.AssignInventory);
-        Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.SchemSnowWarrier(player);
+        Plugin.Singleton.LabApiHandler.SchemSnowWarrier(player);
         //Vector3 offset;
         int MaxHealth = 1000;
 
@@ -383,29 +396,6 @@ public class CustomRolesHandler
         }
     }
 
-    public void CryFuckSpawn(Player player)
-    {
-        Timing.CallDelayed(0.05f, () =>
-        {
-            // Very Fuckin Stupid Code.
-            Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.CryFuckSpawned = true;
-            player.Role.Set(RoleTypeId.Scp096);
-            player.UniqueRole = "Scp096_Anger";
-            
-            player.MaxArtificialHealth = 1000;
-            player.MaxHealth = 5000;
-            player.Health = 5000;
-            player.EnableEffect(EffectType.Slowness,25);
-            player.ShowHint(
-                "<color=red>SCP-096: ANGER</color>\nSCP-096の怒りと悲しみが頂点に達し、その化身へと変貌して大いなる力を手に入れた。\n<color=red>とにかく破壊しまくれ！！！！！</color>",
-                10);
-            player.Transform.eulerAngles = new Vector3(0, -90, 0);
-            Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.ShyguyPosition = player.Position;
-            Log.Debug("Scp096: Anger was Spawned!");
-            Slafight_Plugin_EXILED.Plugin.Singleton.SpecialEventsHandler.StartAnger();
-        });
-    }
-
     public void DiedCassie(DyingEventArgs ev)
     {
         Log.Debug(ev.Player.UniqueRole);
@@ -419,7 +409,7 @@ public class CustomRolesHandler
         {
             //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
             Exiled.API.Features.Cassie.Clear();
-            CassieExtensions.CassieTranslated("SCP 9 6 6 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true);
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true);
         }
     }
 
@@ -432,9 +422,16 @@ public class CustomRolesHandler
     }
     public void CustomRoleRemover(ChangingRoleEventArgs ev)
     {
+        // 見た目系はお好みで
         ev.Player.UniqueRole = null;
         ev.Player.CustomInfo = null;
         ev.Player.Scale = new Vector3(1f, 1f, 1f);
+
+        // 1) このプレイヤーのロードアウトを削除
+        AbilityManager.ClearPlayer(ev.Player);          // Loadouts.Remove(player.Id);
+
+        // 2) AbilityBase 側の状態も削除
+        AbilityBase.RevokeAbility(ev.Player.Id);        // playerStates.Remove(player.Id);
     }
 
     public void EndRound(Team winnerTeam = Team.SCPs,string specificReason = null)
@@ -519,7 +516,7 @@ public class CustomRolesHandler
                     player.DisableEffect(EffectType.MovementBoost);
                     player.EnableEffect(EffectType.Slowness, 25);
                 }
-                if (Slafight_Plugin_EXILED.Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
+                if (Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
                 {
                     player.Hurt(100f,"<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
                 }
