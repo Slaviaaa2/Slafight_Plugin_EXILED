@@ -16,6 +16,7 @@ using MEC;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.HumeShield;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -38,6 +39,7 @@ public class CustomRolesHandler
 
         Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
         Exiled.Events.Handlers.Server.WaitingForPlayers += ResetAbilities;
+        Exiled.Events.Handlers.Server.RestartingRound += AbilityResetInRoundRestarting;
     }
     ~CustomRolesHandler()
     {
@@ -50,6 +52,7 @@ public class CustomRolesHandler
 
         Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
         Exiled.Events.Handlers.Server.WaitingForPlayers -= ResetAbilities;
+        Exiled.Events.Handlers.Server.RestartingRound -= AbilityResetInRoundRestarting;
     }
 
     public void ResetAbilities()
@@ -422,16 +425,38 @@ public class CustomRolesHandler
     }
     public void CustomRoleRemover(ChangingRoleEventArgs ev)
     {
-        // 見た目系はお好みで
-        ev.Player.UniqueRole = null;
-        ev.Player.CustomInfo = null;
-        ev.Player.Scale = new Vector3(1f, 1f, 1f);
+        Log.Debug($"[CustomRoleRemover] Reset ALL for {ev.Player?.Nickname} (role change {ev.Player?.Role} -> {ev.NewRole})");
 
-        // 1) このプレイヤーのロードアウトを削除
-        AbilityManager.ClearPlayer(ev.Player);          // Loadouts.Remove(player.Id);
+        ev.Player?.UniqueRole = null;
+        ev.Player?.CustomInfo = null;
+        ev.Player?.Scale = new Vector3(1f, 1f, 1f);
 
-        // 2) AbilityBase 側の状態も削除
-        AbilityBase.RevokeAbility(ev.Player.Id);        // playerStates.Remove(player.Id);
+        if (ev.Player != null)
+        {
+            var player = ev.Player; // ★ここで退避
+
+            AbilityManager.ClearSlots(player);
+            AbilityBase.RevokeAbility(player.Id);
+
+            Timing.CallDelayed(1f, () =>
+            {
+                try
+                {
+                    if (Plugin.Singleton?.PlayerHUD != null && player != null && player.IsConnected)
+                        Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, string.Empty, player);
+                }
+                catch
+                {
+                    // 何かあっても無視してよい処理なので握りつぶしでOK
+                }
+            });
+        }
+    }
+
+    public void AbilityResetInRoundRestarting()
+    {
+        AbilityManager.Loadouts.Clear();
+        AbilityBase.RevokeAllPlayers();
     }
 
     public void EndRound(Team winnerTeam = Team.SCPs,string specificReason = null)

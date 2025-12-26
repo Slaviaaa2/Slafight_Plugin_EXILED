@@ -7,6 +7,7 @@ using Exiled.Events.EventArgs.Player;
 using Hazards;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Features;
@@ -17,7 +18,7 @@ namespace Slafight_Plugin_EXILED.Abilities;
 
 public class CreateSinkholeAbility : AbilityBase
 {
-    public CreateSinkholeAbility() : base(3,30f,3) { }
+    public CreateSinkholeAbility() : base(30f,3) { }
 
     protected override void ExecuteAbility(Player player)
     {
@@ -41,5 +42,17 @@ public class CreateSinkholeAbility : AbilityBase
         {
             Log.Error($"Sinkhole Prefabスポーン失敗: {ex.Message}");
         }
+        // クールダウン秒数を AbilityBase から取ってこれるように小ヘルパーを置く
+        float cd = AbilityBase.CanUseNow(player.Id) ? 0f : 30f; // 例: 30秒固定なら直書きでもOK
+
+        // 実際は _defaultCooldown を外から見えるようにするか、
+        // CreateSinkholeAbility 側で const Cooldown = 30f を持っておく
+        const float cooldownSeconds = 30f;
+
+        Timing.CallDelayed(cooldownSeconds, () =>
+        {
+            if (player != null && player.IsConnected && HasAbility<CreateSinkholeAbility>(player))
+                player.ShowHint("<color=yellow>Sinkhole のクールダウンが終了しました。</color>", 3f);
+        });
     }
 }

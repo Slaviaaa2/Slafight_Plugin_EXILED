@@ -55,6 +55,7 @@ namespace Slafight_Plugin_EXILED
         
         public SpawnSystem SpawnSystem { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
+        public AbilityInputHandler AbilityInputHandler { get; set; }
         
         public OperationBlackout OperationBlackout { get; set; }
         // Enable & Disable
@@ -77,7 +78,7 @@ namespace Slafight_Plugin_EXILED
             FirstRolesHandler = new();
             ChristmasChanges = new();
             Scp914Changes = new();
-            _ = typeof(AbilityInputHandler);
+            AbilityInputHandler = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
@@ -111,7 +112,6 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
             
             LabApiHandler = null;
-            AbilityInputHandler.Unregister();
             
             CRole.UnregisterAllEvents();
             CustomItem.UnregisterItems();

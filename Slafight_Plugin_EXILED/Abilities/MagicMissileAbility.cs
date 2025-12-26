@@ -14,7 +14,7 @@ namespace Slafight_Plugin_EXILED.ProximityChat;
 
 public class MagicMissileAbility : AbilityBase
 {
-    public MagicMissileAbility() : base(3,5f,5) { }  // SettingId=3
+    public MagicMissileAbility() : base(5f,5) { }  // SettingId=3
 
     protected override void ExecuteAbility(Player player)
     {

@@ -9,15 +9,16 @@ public static class PlayerAbilityExtensions
     public static bool AddAbility<TAbility>(this Player player)
         where TAbility : AbilityBase, new()
     {
-        var loadout = AbilityManager.GetLoadout(player);
+        Log.Debug($"[Ability] Add {typeof(TAbility).Name} to {player.Nickname} ({player.Role.Type})");
+        var loadout = AbilityManager.GetOrCreateLoadout(player);
         var ability = new TAbility();
         return loadout.AddAbility(ability);
     }
 
-    // 直接インスタンス渡し版（必要なら）
+    // 直接インスタンス渡し版
     public static bool AddAbility(this Player player, AbilityBase ability)
     {
-        var loadout = AbilityManager.GetLoadout(player);
+        var loadout = AbilityManager.GetOrCreateLoadout(player);
         return loadout.AddAbility(ability);
     }
 
@@ -25,7 +26,9 @@ public static class PlayerAbilityExtensions
     public static void RemoveAbility<TAbility>(this Player player)
         where TAbility : AbilityBase
     {
-        var loadout = AbilityManager.GetLoadout(player);
+        if (!AbilityManager.TryGetLoadout(player, out var loadout))
+            return;
+
         for (int i = 0; i < AbilityLoadout.MaxSlots; i++)
         {
             if (loadout.Slots[i] is TAbility)
@@ -42,14 +45,18 @@ public static class PlayerAbilityExtensions
     // 現在のアクティブアビリティ発動
     public static void UseActiveAbility(this Player player)
     {
-        var loadout = AbilityManager.GetLoadout(player);
+        if (!AbilityManager.TryGetLoadout(player, out var loadout))
+            return;
+
         loadout.ActiveAbility?.TryActivateFromInput(player);
     }
 
     // アクティブアビリティ切り替え
     public static void NextAbility(this Player player)
     {
-        var loadout = AbilityManager.GetLoadout(player);
+        if (!AbilityManager.TryGetLoadout(player, out var loadout))
+            return;
+
         loadout.CycleNext();
     }
 }
