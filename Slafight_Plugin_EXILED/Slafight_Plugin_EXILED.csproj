@@ -134,12 +134,14 @@
         <Compile Include="API\Features\AbilityInputHandler.cs" />
         <Compile Include="API\Features\AbilityLoadout.cs" />
         <Compile Include="API\Features\AbilityManager.cs" />
+        <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
         <Compile Include="API\Features\RoleParseHelper.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="ChristmasChanges.cs" />
+        <Compile Include="Commands\DevTools\AbilityUniversal.cs" />
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />

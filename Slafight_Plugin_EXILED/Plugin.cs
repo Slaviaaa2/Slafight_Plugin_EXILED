@@ -34,7 +34,8 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,4);
+        public override Version Version => new Version(1,4,5);
+        
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 1);
 
         public Harmony HarmonyInstance { get; private set; }
@@ -83,6 +84,7 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
             CRole.RegisterAllEvents();
+            AbilityBase.RegisterEvents();
             CustomRole.RegisterRoles(false);
             CustomItem.RegisterItems(skipReflection: false, overrideClass: Config);
             
@@ -114,6 +116,7 @@ namespace Slafight_Plugin_EXILED
             LabApiHandler = null;
             
             CRole.UnregisterAllEvents();
+            AbilityBase.UnregisterEvents();
             CustomItem.UnregisterItems();
             CustomRole.UnregisterRoles();
             

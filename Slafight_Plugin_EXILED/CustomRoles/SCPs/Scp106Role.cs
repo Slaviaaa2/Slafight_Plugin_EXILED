@@ -40,19 +40,8 @@ public class Scp106Role : CRole
         //player.MaxHumeShield = 500;
         player.ClearInventory();
         player.SetCustomInfo("SCP-106");
-        
-        // 状態を作る
-        AbilityBase.GrantAbility(player.Id, cooldown: 30f, maxUses: 3);
 
-        // アビリティをスロットに追加
-        player.AddAbility<CreateSinkholeAbility>();
-
-        // クールダウン終了時の Hint を設定
-        AbilityBase.SetOnCooldownEnd(player.Id, p =>
-        {
-            if (p != null && p.IsConnected && AbilityBase.HasAbility<CreateSinkholeAbility>(p))
-                p.ShowHint("<color=yellow>Sinkhole のクールダウンが終了しました。</color>", 3f);
-        });
+        player.AddAbility(new CreateSinkholeAbility(player));
         Timing.CallDelayed(0.05f, () =>
         {
             player.ShowHint("<color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで陥没穴を創り出せるぞ！陥没穴は中に\n人を引き込めるから沢山作れ！",10f);

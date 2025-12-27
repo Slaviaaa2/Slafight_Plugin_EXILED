@@ -2,61 +2,76 @@ using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Player;
 using MEC;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
-using UserSettings.ServerSpecific;
 
-namespace Slafight_Plugin_EXILED.ProximityChat;
-
-public class MagicMissileAbility : AbilityBase
+namespace Slafight_Plugin_EXILED.ProximityChat
 {
-    public MagicMissileAbility() : base(5f,5) { }  // SettingId=3
-
-    protected override void ExecuteAbility(Player player)
+    public class MagicMissileAbility : AbilityBase
     {
-        Vector3 startPos = player.Position;
-        try
-        {
-            var schem = ObjectSpawner.SpawnSchematic("SCP3005", startPos, player.CameraTransform.forward);
-            Timing.RunCoroutine(MissileCoroutine(schem, player));
-        }
-        catch (Exception ex)
-        {
-            Log.Error("MagicMissile spawn failed: " + ex.Message);
-        }
-    }
-    
-    private static IEnumerator<float> MissileCoroutine(SchematicObject schem, Player pushPlayer)
-    {
-        float elapsedTime = 0f;
-        float totalDuration = 0.8f;
-        Vector3 startPos = schem.transform.position;
-        // カメラの完全な方向（Y成分そのまま）で発射
-        Vector3 cameraForward = pushPlayer.CameraTransform.forward.normalized;
-        Vector3 endPos = startPos + cameraForward * 5f;  // 上・下どちらもOK
+        // AbilityBase 抽象プロパティの実装（デフォルト値）
+        protected override float DefaultCooldown => 5f;
+        protected override int DefaultMaxUses => 5;
 
-        while (elapsedTime < totalDuration)
+        // 完全デフォルト
+        public MagicMissileAbility(Player owner)
+            : base(owner) { }
+
+        // クールダウンだけ変える
+        public MagicMissileAbility(Player owner, float cooldownSeconds)
+            : base(owner, cooldownSeconds, null) { }
+
+        // 両方カスタム
+        public MagicMissileAbility(Player owner, float cooldownSeconds, int maxUses)
+            : base(owner, cooldownSeconds, maxUses) { }
+
+        protected override void ExecuteAbility(Player player)
         {
-            foreach (Player player in Player.List)
+            Vector3 startPos = player.Position;
+            try
             {
-                if (Vector3.Distance(schem.transform.position, player.Transform.position) <= 1f)
+                var schem = ObjectSpawner.SpawnSchematic("SCP3005", startPos, player.CameraTransform.forward);
+                Timing.RunCoroutine(MissileCoroutine(schem, player));
+            }
+            catch (Exception ex)
+            {
+                Log.Error("MagicMissile spawn failed: " + ex.Message);
+            }
+        }
+
+        private static IEnumerator<float> MissileCoroutine(SchematicObject schem, Player pushPlayer)
+        {
+            float elapsedTime = 0f;
+            float totalDuration = 0.8f;
+            Vector3 startPos = schem.transform.position;
+
+            Vector3 cameraForward = pushPlayer.CameraTransform.forward.normalized;
+            Vector3 endPos = startPos + cameraForward * 5f;
+
+            while (elapsedTime < totalDuration)
+            {
+                foreach (Player player in Player.List)
                 {
-                    if (player != pushPlayer)
+                    if (Vector3.Distance(schem.transform.position, player.Transform.position) <= 1f)
                     {
-                        player.Hurt(pushPlayer,10f,DamageType.Unknown);
-                        pushPlayer.ShowHitMarker();
+                        if (player != pushPlayer)
+                        {
+                            player.Hurt(pushPlayer, 10f, DamageType.Unknown);
+                            pushPlayer.ShowHitMarker();
+                        }
                     }
                 }
+
+                elapsedTime += Time.deltaTime;
+                float progress = elapsedTime / totalDuration;
+                schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
+                yield return 0f;
             }
-            elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / totalDuration;
-            schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
-            yield return 0f;
+
+            schem.Destroy();
         }
-        schem.Destroy();
     }
 }
