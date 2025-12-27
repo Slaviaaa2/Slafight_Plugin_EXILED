@@ -8,6 +8,7 @@ using Exiled.API.Features.Pickups;
 using LightContainmentZoneDecontamination;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -41,11 +42,11 @@ public class FifthistsRaid
         {
             if (player.Role.Team == Team.SCPs)
             {
-                Plugin.Singleton.CustomRolesHandler.Spawn3005(player,RoleSpawnFlags.All);
+                player.SetRole(CRoleTypeId.Scp3005);
                 break;
             }
 
-            if (player.UniqueRole == "SCP-3005")
+            if (player.GetCustomRole() == CRoleTypeId.Scp3005)
             {
                 break;
             }

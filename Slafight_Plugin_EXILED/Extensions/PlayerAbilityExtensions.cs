@@ -1,3 +1,4 @@
+using System;
 using Slafight_Plugin_EXILED.API.Features;
 using Exiled.API.Features;
 
@@ -7,11 +8,13 @@ public static class PlayerAbilityExtensions
 {
     // アビリティ追加（スロット制限付き）
     public static bool AddAbility<TAbility>(this Player player)
-        where TAbility : AbilityBase, new()
+        where TAbility : AbilityBase
     {
-        Log.Debug($"[Ability] Add {typeof(TAbility).Name} to {player.Nickname} ({player.Role.Type})");
+        Log.Debug($"[Ability] Add {typeof(TAbility).Name} to {player.Nickname}");
         var loadout = AbilityManager.GetOrCreateLoadout(player);
-        var ability = new TAbility();
+
+        // TAbility は (Player owner) コンストラクタを持っている前提
+        var ability = (TAbility)Activator.CreateInstance(typeof(TAbility), player)!;
         return loadout.AddAbility(ability);
     }
 

@@ -22,6 +22,7 @@ public class RootCommand : ParentCommand
         RegisterCommand(new SetQueue());
         RegisterCommand(new RunEvent());
         RegisterCommand(new SpawnUniversal());
+        RegisterCommand(new AbilityUniversal());
         RegisterCommand(new PlaySurfaceAttack());
         RegisterCommand(new PlayOmegaWarhead());
     }

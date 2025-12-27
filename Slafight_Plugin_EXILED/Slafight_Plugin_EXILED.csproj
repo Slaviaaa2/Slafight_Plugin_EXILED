@@ -154,6 +154,7 @@
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
         <Compile Include="Extensions\AbilityResetUtil.cs" />
         <Compile Include="Extensions\ItemExtensions.cs" />
@@ -162,6 +163,7 @@
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
         <Compile Include="FirstRolesHandler.cs" />
+        <Compile Include="MapExtensions\Sinkhole.cs" />
         <Compile Include="RPNameSetter.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />

@@ -6,6 +6,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -29,6 +30,8 @@ public class Scp682Role : CRole
         base.UnregisterEvents();
     }
     
+    List<Player> FakeScalePlayer = new();
+    
     public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
@@ -39,8 +42,7 @@ public class Scp682Role : CRole
         player.Health = player.MaxHealth;
         player.MaxHumeShield = 10000;
         player.ClearInventory();
-
-        player.SetFakeScale(new Vector3(1.75f, 0.75f, 3f), Player.List);
+        player.SetScale(new Vector3(1.05f, 0.75f, 1.25f));
         player.CustomInfo = "<color=#C50000>SCP-682</color>";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
@@ -68,7 +70,7 @@ public class Scp682Role : CRole
             float speedLevel = SpeedLevels[player];
             player.EnableEffect(EffectType.FocusedVision);
             player.EnableEffect(EffectType.NightVision, 255);
-            player.SetFakeScale(new Vector3(1.75f, 0.75f, 3f) * speedLevel, Player.List);
+            player.SetScale(new Vector3(1.05f, 0.75f, 1.25f) * speedLevel);
             
             // プレイヤーごとのspeedLevel更新
             SpeedLevels[player] *= 1.00001f;
@@ -92,9 +94,11 @@ public class Scp682Role : CRole
     
     private void DiedCassie(DyingEventArgs ev)
     {
-        if (ev.Player?.UniqueRole == "Scp682")  // "Scp682"に統一
+        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp682)  // "Scp682"に統一
         {
             SpeedLevels.Remove(ev.Player);  // クリーンアップ
+            FakeScalePlayer.Clear();
+            ev.Player?.SetFakeScale(Vector3.one,Player.List);
             Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, "", ev.Player);
             Exiled.API.Features.Cassie.Clear();
             Exiled.API.Features.Cassie.MessageTranslated(

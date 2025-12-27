@@ -6,6 +6,8 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.Spectating;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
@@ -33,13 +35,14 @@ public static class Handler
     public static List<Player> ActivatedPlayers = new List<Player>();
     public static List<Player> CanUsePlayers = new List<Player>();
     
-    public static List<string> AllowedUniqueRoles = new List<string>()
+    public static List<CRoleTypeId> AllowedUniqueRoles = new()
     {
-        "Zombified"
+        CRoleTypeId.Zombified,
+        CRoleTypeId.Scp3114
     };
-    public static List<string> OnlyProximityUnique = new List<string>()
+    public static List<CRoleTypeId> OnlyProximityUnique = new()
     {
-        "Zombified"
+        CRoleTypeId.Zombified
     };
     
     public static List<RoleTypeId> AllowedRoleTypes = new List<RoleTypeId>()
@@ -59,12 +62,12 @@ public static class Handler
         {
             ActivatedPlayers.Remove(ev.Player);
             CanUsePlayers.Remove(ev.Player);
-            if (String.IsNullOrEmpty(ev.Player.UniqueRole))
+            if (ev.Player.GetCustomRole() == CRoleTypeId.None)
             {
                 if (AllowedRoleTypes.Contains(ev.Player.Role))
                     CanUsePlayers.Add(ev.Player);
             }
-            else if (AllowedUniqueRoles.Contains(ev.Player.UniqueRole))
+            else if (AllowedUniqueRoles.Contains(ev.Player.GetCustomRole()))
             {
                 CanUsePlayers.Add(ev.Player);
             }
@@ -126,7 +129,7 @@ public static class Handler
 
         // 「OnlyProximity」の人だけ元のSCPチャットを殺すならこう
         if (OnlyProximity.Contains(args.Player.Role) ||
-            OnlyProximityUnique.Contains(args.Player.UniqueRole))
+            OnlyProximityUnique.Contains(args.Player.GetCustomRole()))
             args.IsAllowed = false;
     }
 

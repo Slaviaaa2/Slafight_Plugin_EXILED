@@ -29,12 +29,12 @@ public class KeycardSecurityChief : CustomKeycard
     public override SpawnProperties SpawnProperties { get; set; } = new();
     public override string KeycardLabel { get; set; } = "警備主任キーカード";
     [YamlIgnore]
-    public override Color32? KeycardLabelColor { get; set; } = new Color32(68,68,68,255);
+    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
     public override string KeycardName { get; set; } = "Chf. Security";
     [YamlIgnore]
     public override Color32? TintColor { get; set; } = new Color32(68,68,68,255);
     [YamlIgnore]
-    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(255,255,255,255);
+    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
     public override KeycardPermissions Permissions { get; set; } =
         KeycardPermissions.ContainmentLevelOne |

@@ -19,6 +19,7 @@ public static class PlayerRoleHelpers
         { "Scp682",       CRoleTypeId.Scp682 },           // 682ロールを使うなら CRoleTypeId を追加してもよい
         { "Zombified",    CRoleTypeId.Zombified },
         { "Scp106",       CRoleTypeId.Scp106 },
+        { "Scp999",       CRoleTypeId.Scp999 },
 
         // Fifthists
         { "SCP-3005",        CRoleTypeId.Scp3005 },

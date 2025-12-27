@@ -24,416 +24,342 @@ using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
 using Light = Exiled.API.Features.Toys.Light;
 using Object = UnityEngine.Object;
 
-namespace Slafight_Plugin_EXILED.CustomRoles;
-
-public class CustomRolesHandler
+namespace Slafight_Plugin_EXILED.CustomRoles
 {
-    public CustomRolesHandler()
+    public class CustomRolesHandler
     {
-        Exiled.Events.Handlers.Player.Dying += DiedCassie;
-        Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
-        Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
-        Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
-        Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
-        //Exiled.Events.Handlers.Player.ChangedItem += ForceHume;
-
-        Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
-        Exiled.Events.Handlers.Server.WaitingForPlayers += ResetAbilities;
-        Exiled.Events.Handlers.Server.RestartingRound += AbilityResetInRoundRestarting;
-    }
-    ~CustomRolesHandler()
-    {
-        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
-        Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
-        Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
-        Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
-        Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
-        //Exiled.Events.Handlers.Player.ChangedItem -= ForceHume;
-
-        Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
-        Exiled.Events.Handlers.Server.WaitingForPlayers -= ResetAbilities;
-        Exiled.Events.Handlers.Server.RestartingRound -= AbilityResetInRoundRestarting;
-    }
-
-    public void ResetAbilities()
-    {
-        AbilityResetUtil.ResetAllAbilities();
-    }
-
-    public void RoundCoroutine()
-    {
-        Timing.CallDelayed(10f, () =>
+        public CustomRolesHandler()
         {
-            Timing.RunCoroutine(FifthistCoroutine());
-            if (Plugin.Singleton.Config.Season == 2)
+            Exiled.Events.Handlers.Player.Dying += DiedCassie;
+            Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
+            Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
+            Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
+            Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
+
+            Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += ResetAbilities;
+            Exiled.Events.Handlers.Server.RestartingRound += AbilityResetInRoundRestarting;
+        }
+
+        ~CustomRolesHandler()
+        {
+            Exiled.Events.Handlers.Player.Dying -= DiedCassie;
+            Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
+            Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
+            Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
+            Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
+
+            Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= ResetAbilities;
+            Exiled.Events.Handlers.Server.RestartingRound -= AbilityResetInRoundRestarting;
+        }
+
+        public void ResetAbilities()
+        {
+            AbilityResetUtil.ResetAllAbilities();
+        }
+
+        public void RoundCoroutine()
+        {
+            Timing.CallDelayed(10f, () =>
             {
-                Timing.RunCoroutine(SnowmanCoroutine());
-            }
-        });
-    }
+                Timing.RunCoroutine(FifthistCoroutine());
+                if (Plugin.Singleton.Config.Season == 2)
+                    Timing.RunCoroutine(SnowmanCoroutine());
+            });
+        }
 
-    private IEnumerator<float> FifthistCoroutine()
-    {
-        List<string> FifthistRoles = new List<string>()
+        private IEnumerator<float> FifthistCoroutine()
         {
-            "FIFTHIST","SCP-3005","F_Priest","FifthistConvert"
+            List<string> fifthistRoles = new()
+            {
+                "FIFTHIST",
+                "SCP-3005",         // UniqueRole 依存のまま運用
+                "F_Priest",
+                "FifthistConvert"
+            };
+
+            for (;;)
+            {
+                if (Round.IsLobby)
+                    yield break;
+
+                int nonFifthists = 0;
+                int fifthists = 0;
+
+                foreach (Player player in Player.List)
+                {
+                    if (player == null || !player.IsAlive)
+                        continue;
+
+                    if (!fifthistRoles.Contains(player.UniqueRole))
+                        nonFifthists++;
+                    else
+                        fifthists++;
+                }
+
+                if (nonFifthists == 0 && fifthists != 0)
+                    EndRound(Team.SCPs, "FIFTHIST_WIN");
+
+                yield return Timing.WaitForSeconds(1f);
+            }
+        }
+
+        private IEnumerator<float> SnowmanCoroutine()
+        {
+            for (;;)
+            {
+                if (Round.IsLobby)
+                    yield break;
+
+                int nonSnow = 0;
+                int snow = 0;
+
+                foreach (Player player in Player.List)
+                {
+                    if (player == null || !player.IsAlive)
+                        continue;
+
+                    if (player.UniqueRole != "SnowWarrier")
+                        nonSnow++;
+                    else
+                        snow++;
+                }
+
+                if (nonSnow == 0 && snow != 0)
+                    EndRound(Team.ChaosInsurgency, "SW_WIN");
+
+                yield return Timing.WaitForSeconds(1f);
+            }
+        }
+        
+        List<CRoleTypeId> uniques = new()
+        {
+            CRoleTypeId.FifthistRescure,
+            CRoleTypeId.FifthistPriest,
+            CRoleTypeId.FifthistConvert,
+            CRoleTypeId.SnowWarrier
         };
-        for (;;)
+
+        public void CancelEnd(EndingRoundEventArgs ev)
         {
-            if (Round.IsLobby)
-            {
-                yield break;
-            }
-            int i = 0;
+            int count = 0;
+
             foreach (Player player in Player.List)
             {
-                if (player == null || !player.IsAlive) continue;
-                if (!FifthistRoles.Contains(player.UniqueRole))
-                {
-                    i++;
-                }
-            }
-            int ii = 0;
-            foreach (Player player in Player.List)
-            {
-                if (player == null || !player.IsAlive) continue;
-                if (FifthistRoles.Contains(player.UniqueRole))
-                {
-                    ii++;
-                }
-            }
-            if (i==0 && ii!=0)
-            {
-                EndRound(Team.SCPs,"FIFTHIST_WIN");
+                if (uniques.Contains(player.GetCustomRole()))
+                    count++;
             }
 
-            yield return Timing.WaitForSeconds(1f);
-        }
-    }
-    private IEnumerator<float> SnowmanCoroutine()
-    {
-        for (;;)
-        {
-            if (Round.IsLobby)
-            {
-                yield break;
-            }
-            int i = 0;
-            foreach (Player player in Player.List)
-            {
-                if (player == null || !player.IsAlive) continue;
-                if (player.UniqueRole != "SnowWarrier")
-                {
-                    i++;
-                }
-            }
-            int ii = 0;
-            foreach (Player player in Player.List)
-            {
-                if (player == null || !player.IsAlive) continue;
-                if (player.UniqueRole == "SnowWarrier")
-                {
-                    ii++;
-                }
-            }
-            if (i==0 && ii!=0)
-            {
-                EndRound(Team.ChaosInsurgency,"SW_WIN");
-            }
+            if (count == 0)
+                return;
 
-            yield return Timing.WaitForSeconds(1f);
-        }
-    }
-
-    public void CancelEnd(EndingRoundEventArgs ev)
-    {
-        int i = 0;
-        List<string> Uniques = new List<string>()
-        {
-            "FIFTHIST",
-            "F_Priest",
-            "FifthistConvert",
-            "SnowWarrier"
-        };
-        foreach (Player player in Player.List)
-        {
-            if (Uniques.Contains(player.UniqueRole))
-            {
-                i++;
-            }
-        }
-        if (i!=0)
-        {
             ev.IsAllowed = false;
             Round.IsLocked = true;
             Timing.RunCoroutine(RoundLocker());
         }
-    }
 
-    private IEnumerator<float> RoundLocker()
-    {
-        for (;;)
+        private IEnumerator<float> RoundLocker()
         {
-            int i = 0;
-            List<string> Uniques = new List<string>()
+            for (;;)
             {
-                "FIFTHIST",
-                "F_Priest",
-                "SnowWarrier"
-            };
-            foreach (Player player in Player.List)
-            {
-                if (Uniques.Contains(player.UniqueRole))
+                int count = 0;
+
+                foreach (Player player in Player.List)
                 {
-                    i++;
+                    if (uniques.Contains(player.GetCustomRole()))
+                        count++;
                 }
-            }
 
-            if (i==0)
-            {
-                Round.IsLocked = false;
-                yield break;
-            }
+                if (count == 0)
+                {
+                    Round.IsLocked = false;
+                    yield break;
+                }
 
-            yield return Timing.WaitForSeconds(1f);
+                yield return Timing.WaitForSeconds(1f);
+            }
         }
-    }
 
-    public void Spawn3005(Player player,RoleSpawnFlags roleSpawnFlags)
-    {
-        player.Role.Set(RoleTypeId.Scp0492);
-        Plugin.Singleton.LabApiHandler.Schem3005(player);
-        Vector3 offset;
-        int MaxHealth = 55555;
+        // ★ ここから下は SCP-3005 を除くスポーン系
 
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","SCP-3005");
-        
-        player.UniqueRole = "SCP-3005";
-        player.CustomInfo = "<color=#FF0090>SCP-3005</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.MaxHealth = MaxHealth;
-        player.Health = MaxHealth;
-        Log.Debug("3005");
-        player.EnableEffect(EffectType.MovementBoost,50);
-            
-        player.ShowHint(
-            "<color=red>SCP-3005</color>\n非常に<color=#ff00fa>第五的</color>である。そうは思わんかね？",
-            10);
-        Room SpawnRoom = Room.Get(RoomType.LczPlants);
-        Log.Debug(SpawnRoom.Position);
-        offset = new Vector3(0f,7.35f,0f);
-        player.Position = SpawnRoom.Position + SpawnRoom.Rotation * offset;
-        player.Rotation = SpawnRoom.Rotation;
-        Timing.RunCoroutine(Scp3005Coroutine(player));
-    }
-    
-    public void SpawnFifthist(Player player,RoleSpawnFlags roleSpawnFlags)
-    {
-        player.Role.Set(RoleTypeId.Tutorial);
-        Vector3 offset;
-        int MaxHealth = 150;
-
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","FIFTHIST RESCURE");
-        
-        player.UniqueRole = "FIFTHIST";
-        player.CustomInfo = "<color=#FF0090>Fifthist Rescure</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.MaxHealth = MaxHealth;
-        player.Health = MaxHealth;
-            
-        player.ShowHint(
-            "<color=#ff00fa>第五教会 救出師</color>\n非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない",
-            10);
-        Room SpawnRoom = Room.Get(RoomType.Surface);
-        Log.Debug(SpawnRoom.Position);
-        offset = new Vector3(0f,0f,0f);
-        player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
-        //player.Rotation = SpawnRoom.Rotation;
-            
-        player.ClearInventory();
-        Log.Debug("Giving Items to Fifthist");
-        player.AddItem(ItemType.GunSCP127);
-        player.AddItem(ItemType.ArmorHeavy);
-        CustomItem.TryGive(player, 5,false);
-        player.AddItem(ItemType.Medkit);
-        player.AddItem(ItemType.Adrenaline);
-        player.AddItem(ItemType.SCP500);
-        player.AddItem(ItemType.GrenadeHE);
-    }
-    
-    public void SpawnF_Priest(Player player,RoleSpawnFlags roleSpawnFlags)
-    {
-        player.Role.Set(RoleTypeId.Tutorial);
-        Vector3 offset;
-        int MaxHealth = 555;
-
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","FIFTHIST PRIEST");
-        
-        player.UniqueRole = "F_Priest";
-        player.Scale = new Vector3(1.2f,1.2f,1.2f);
-        player.CustomInfo = "<color=#FF0090>Fifthist Priest</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.MaxHealth = MaxHealth;
-        player.Health = MaxHealth;
-            
-        player.ShowHint(
-            "<color=#ff00fa>第五教会 司祭</color>\n非常に<color=#ff00fa>第五的</color>な存在の恩寵を受けた第五主義者。\n施設を占領せよ！",
-            10);
-        Room SpawnRoom = Room.Get(RoomType.Surface);
-        Log.Debug(SpawnRoom.Position);
-        offset = new Vector3(0f,0f,0f);
-        player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
-        //player.Rotation = SpawnRoom.Rotation;
-            
-        player.ClearInventory();
-        Log.Debug("Giving Items to F_Priest");
-        player.AddItem(ItemType.GunSCP127);
-        player.AddItem(ItemType.ArmorHeavy);
-        CustomItem.TryGive(player, 6,false);
-        player.AddItem(ItemType.SCP500);
-        player.AddItem(ItemType.Adrenaline);
-        player.AddItem(ItemType.SCP500);
-        player.AddItem(ItemType.GrenadeHE);
-            
-        var light = Light.Create(Vector3.zero);
-        light.Position = player.Transform.position + new Vector3(0f, -0.08f, 0f);
-        light.Transform.parent = player.Transform;
-        light.Scale = new Vector3(1f,1f,1f);
-        light.Range = 10f;
-        light.Intensity = 1.25f;
-        light.Color = Color.magenta;
-            
-        Timing.RunCoroutine(Scp3005Coroutine(player));
-    }
-
-    public void SpawnChaosCommando(Player player, RoleSpawnFlags roleSpawnFlags)
-    {
-        player.Role.Set(RoleTypeId.ChaosRepressor);
-        Vector3 offset;
-        int MaxHealth = 100;
-
-        //PlayerExtensions.OverrideRoleName(player,"","Chaos Insurgency Commando");
-        
-        player.UniqueRole = "CI_Commando";
-        player.CustomInfo = "Chaos Insurgency Commando";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.MaxHealth = MaxHealth;
-        player.Health = MaxHealth;
-        player.CustomHumeShieldStat.MaxValue = 25;
-        player.CustomHumeShieldStat.CurValue = 25;
-        player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
-            
-        player.ShowHint(
-            "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
-            10);
-        Room SpawnRoom = Room.Get(RoomType.Surface);
-        Log.Debug(SpawnRoom.Position);
-        offset = new Vector3(0f,0f,0f);
-        //player.Position = new Vector3(124f,289f,21f);//SpawnRoom.Position + SpawnRoom.Rotation * offset;
-        //player.Rotation = SpawnRoom.Rotation;
-            
-        player.ClearInventory();
-        Log.Debug("Giving Items to CI_Commando");
-        player.AddItem(ItemType.GunLogicer);
-        player.AddItem(ItemType.ArmorHeavy);
-        player.AddItem(ItemType.KeycardChaosInsurgency);
-        player.AddItem(ItemType.Medkit);
-        player.AddItem(ItemType.Medkit);
-        player.AddItem(ItemType.Adrenaline);
-        player.AddItem(ItemType.GrenadeHE);
-            
-        player.AddAmmo(AmmoType.Nato762,800);
-    }
-    
-    public void SpawnSnowWarrier(Player player, RoleSpawnFlags roleSpawnFlags)
-    {
-        player.Role.Set(RoleTypeId.ChaosRifleman,RoleSpawnFlags.All);
-        player.Role.Set(RoleTypeId.Tutorial,RoleSpawnFlags.AssignInventory);
-        Plugin.Singleton.LabApiHandler.SchemSnowWarrier(player);
-        //Vector3 offset;
-        int MaxHealth = 1000;
-
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","SCP-3005");
-        
-        Timing.CallDelayed(0.05f, () =>
+        public void SpawnFifthist(Player player, RoleSpawnFlags roleSpawnFlags)
         {
-            player.UniqueRole = "SnowWarrier";
-            player.CustomInfo = "<color=#FFFFFF>SNOW WARRIER</color>";
+            player.Role.Set(RoleTypeId.Tutorial);
+            int maxHealth = 150;
+
+            player.UniqueRole = "FIFTHIST";
+            player.CustomInfo = "<color=#FF0090>Fifthist Rescure</color>";
             player.InfoArea |= PlayerInfoArea.Nickname;
             player.InfoArea &= ~PlayerInfoArea.Role;
-            player.MaxHealth = MaxHealth;
-            player.Health = MaxHealth;
-            player.EnableEffect(EffectType.Slowness,10);
-            
+            player.MaxHealth = maxHealth;
+            player.Health = maxHealth;
+
             player.ShowHint(
-                "<color=white>SNOW WARRIER</color>\n非常に<color=#ffffff>雪玉的</color>である。そうは思わんかね？",
+                "<color=#ff00fa>第五教会 救出師</color>\n非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない",
                 10);
 
-            player.AddItem(ItemType.SCP1509);
-            player.AddItem(ItemType.GunCOM18);
-            player.AddItem(ItemType.ArmorHeavy);
-            player.AddItem(ItemType.SCP500);
-            player.AddItem(ItemType.SCP500);
-            player.AddItem(ItemType.KeycardO5);
-            
-            player.AddAmmo(AmmoType.Nato9,50);
-        });
-    }
+            Room spawnRoom = Room.Get(RoomType.Surface);
+            Vector3 offset = new(0f, 0f, 0f);
+            player.Position = new Vector3(124f, 289f, 21f);
+            // player.Rotation = spawnRoom.Rotation;
 
-    public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
-    {
-        if (ev.Attacker == null || ev.Player == null)
-            return; // 攻撃者またはプレイヤーがnullの場合は処理終了
-        if (ev.Attacker?.UniqueRole == "FIFTHIST")
+            player.ClearInventory();
+            Log.Debug("Giving Items to Fifthist");
+            player.AddItem(ItemType.GunSCP127);
+            player.AddItem(ItemType.ArmorHeavy);
+            CustomItem.TryGive(player, 5, false);
+            player.AddItem(ItemType.Medkit);
+            player.AddItem(ItemType.Adrenaline);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.GrenadeHE);
+        }
+
+        public void SpawnF_Priest(Player player, RoleSpawnFlags roleSpawnFlags)
         {
-            if (ev.Player?.UniqueRole == "SCP-3005")
+            player.Role.Set(RoleTypeId.Tutorial);
+            int maxHealth = 555;
+
+            player.UniqueRole = "F_Priest";
+            player.Scale = new Vector3(1.2f, 1.2f, 1.2f);
+            player.CustomInfo = "<color=#FF0090>Fifthist Priest</color>";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            player.MaxHealth = maxHealth;
+            player.Health = maxHealth;
+
+            player.ShowHint(
+                "<color=#ff00fa>第五教会 司祭</color>\n非常に<color=#ff00fa>第五的</color>な存在の恩寵を受けた第五主義者。\n施設を占領せよ！",
+                10);
+
+            Room spawnRoom = Room.Get(RoomType.Surface);
+            Vector3 offset = new(0f, 0f, 0f);
+            player.Position = new Vector3(124f, 289f, 21f);
+            // player.Rotation = spawnRoom.Rotation;
+
+            player.ClearInventory();
+            Log.Debug("Giving Items to F_Priest");
+            player.AddItem(ItemType.GunSCP127);
+            player.AddItem(ItemType.ArmorHeavy);
+            CustomItem.TryGive(player, 6, false);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.Adrenaline);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.GrenadeHE);
+
+            var light = Light.Create(Vector3.zero);
+            light.Position = player.Transform.position + new Vector3(0f, -0.08f, 0f);
+            light.Transform.parent = player.Transform;
+            light.Scale = new Vector3(1f, 1f, 1f);
+            light.Range = 10f;
+            light.Intensity = 1.25f;
+            light.Color = Color.magenta;
+        }
+
+        public void SpawnChaosCommando(Player player, RoleSpawnFlags roleSpawnFlags)
+        {
+            player.Role.Set(RoleTypeId.ChaosRepressor);
+            int maxHealth = 100;
+
+            player.UniqueRole = "CI_Commando";
+            player.CustomInfo = "Chaos Insurgency Commando";
+            player.InfoArea |= PlayerInfoArea.Nickname;
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            player.MaxHealth = maxHealth;
+            player.Health = maxHealth;
+
+            player.CustomHumeShieldStat.MaxValue = 25;
+            player.CustomHumeShieldStat.CurValue = 25;
+            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
+
+            player.ShowHint(
+                "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
+                10);
+
+            Room spawnRoom = Room.Get(RoomType.Surface);
+            Vector3 offset = new(0f, 0f, 0f);
+            // player.Position = new Vector3(124f,289f,21f);
+
+            player.ClearInventory();
+            Log.Debug("Giving Items to CI_Commando");
+            player.AddItem(ItemType.GunLogicer);
+            player.AddItem(ItemType.ArmorHeavy);
+            player.AddItem(ItemType.KeycardChaosInsurgency);
+            player.AddItem(ItemType.Medkit);
+            player.AddItem(ItemType.Medkit);
+            player.AddItem(ItemType.Adrenaline);
+            player.AddItem(ItemType.GrenadeHE);
+
+            player.AddAmmo(AmmoType.Nato762, 800);
+        }
+
+        public void SpawnSnowWarrier(Player player, RoleSpawnFlags roleSpawnFlags)
+        {
+            player.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
+            player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
+            Plugin.Singleton.LabApiHandler.SchemSnowWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+
+            int maxHealth = 1000;
+
+            Timing.CallDelayed(0.05f, () =>
+            {
+                player.UniqueRole = "SnowWarrier";
+                player.CustomInfo = "<color=#FFFFFF>SNOW WARRIER</color>";
+                player.InfoArea |= PlayerInfoArea.Nickname;
+                player.InfoArea &= ~PlayerInfoArea.Role;
+                player.MaxHealth = maxHealth;
+                player.Health = maxHealth;
+                player.EnableEffect(EffectType.Slowness, 10);
+
+                player.ShowHint(
+                    "<color=white>SNOW WARRIER</color>\n非常に<color=#ffffff>雪玉的</color>である。そうは思わんかね？",
+                    10);
+
+                player.AddItem(ItemType.SCP1509);
+                player.AddItem(ItemType.GunCOM18);
+                player.AddItem(ItemType.ArmorHeavy);
+                player.AddItem(ItemType.SCP500);
+                player.AddItem(ItemType.SCP500);
+                player.AddItem(ItemType.KeycardO5);
+
+                player.AddAmmo(AmmoType.Nato9, 50);
+            });
+        }
+
+        public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
+        {
+            if (ev.Attacker == null || ev.Player == null)
+                return;
+
+            if (ev.Attacker.UniqueRole == "FIFTHIST" && ev.Player.UniqueRole == "SCP-3005")
             {
                 ev.IsAllowed = false;
-                ev.Attacker.Hurt(15f,"<color=#ff00fa>第五的存在</color>に反逆した為");
-                ev.Attacker.ShowHint("<color=#ff00fa>第五的存在</color>に反逆するとは何事か！？",5f);
+                ev.Attacker.Hurt(15f, "<color=#ff00fa>第五的存在</color>に反逆した為");
+                ev.Attacker.ShowHint("<color=#ff00fa>第五的存在</color>に反逆するとは何事か！？", 5f);
             }
         }
-    }
 
-    public void DiedCassie(DyingEventArgs ev)
-    {
-        Log.Debug(ev.Player.UniqueRole);
-        if (ev.Player.UniqueRole == "SCP-3005")
+        public void DiedCassie(DyingEventArgs ev)
         {
-            //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Exiled.API.Features.Cassie.Clear();
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true,false);
+            // ここは他ロール用の CASSIE があれば実装、それ以外は空でOK
         }
-        else if (ev.Player.UniqueRole == "SCP-966")
+
+        public void CencellRagdoll(SpawningRagdollEventArgs ev)
         {
-            //SchematicObject schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",ev.Player.Position,ev.Player.Rotation,Vector3.one,null);
-            Exiled.API.Features.Cassie.Clear();
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.","<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",true);
+            // ここも他ロール用に使うなら実装、なければ空でOK
         }
-    }
 
-    public void CencellRagdoll(SpawningRagdollEventArgs ev)
-    {
-        if (ev.Player.UniqueRole == "SCP-3005")
+        public void CustomRoleRemover(ChangingRoleEventArgs ev)
         {
-            ev.IsAllowed = false;
-        }
-    }
-    public void CustomRoleRemover(ChangingRoleEventArgs ev)
-    {
-        Log.Debug($"[CustomRoleRemover] Reset ALL for {ev.Player?.Nickname} (role change {ev.Player?.Role} -> {ev.NewRole})");
+            Log.Debug($"[CustomRoleRemover] Reset ALL for {ev.Player?.Nickname} (role change {ev.Player?.Role} -> {ev.NewRole})");
 
-        ev.Player?.UniqueRole = null;
-        ev.Player?.CustomInfo = null;
-        ev.Player?.Scale = new Vector3(1f, 1f, 1f);
+            ev.Player!.UniqueRole = null;
+            ev.Player.CustomInfo = null;
+            ev.Player.Scale = new Vector3(1f, 1f, 1f);
+            
+            ev.Player.ClearCustomInfo();
 
-        if (ev.Player != null)
-        {
-            var player = ev.Player; // ★ここで退避
+            var player = ev.Player;
 
             AbilityManager.ClearSlots(player);
             AbilityBase.RevokeAbility(player.Id);
@@ -447,111 +373,55 @@ public class CustomRolesHandler
                 }
                 catch
                 {
-                    // 何かあっても無視してよい処理なので握りつぶしでOK
+                    // 無視してOK
                 }
             });
         }
-    }
 
-    public void AbilityResetInRoundRestarting()
-    {
-        AbilityManager.Loadouts.Clear();
-        AbilityBase.RevokeAllPlayers();
-    }
-
-    public void EndRound(Team winnerTeam = Team.SCPs,string specificReason = null)
-    {
-        if (winnerTeam == Team.SCPs && specificReason == null)
+        public void AbilityResetInRoundRestarting()
         {
-            Round.KillsByScp = 999;
-            Round.EndRound(true);
+            AbilityManager.Loadouts.Clear();
+            AbilityBase.RevokeAllPlayers();
         }
-        else if (winnerTeam == Team.SCPs && specificReason == "FIFTHIST_WIN")
+
+        public void EndRound(Team winnerTeam = Team.SCPs, string specificReason = null)
         {
-            Round.KillsByScp = 555;
-            foreach (Player player in Player.List)
+            if (winnerTeam == Team.SCPs && specificReason == null)
             {
-                player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>",8f);
-                Timing.CallDelayed(1f, () =>
-                {
-                    Round.Restart(false);
-                });
+                Round.KillsByScp = 999;
+                Round.EndRound(true);
             }
-        }
-        else if ((winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD) && specificReason == null)
-        {
-            if (specificReason == null)
+            else if (winnerTeam == Team.SCPs && specificReason == "FIFTHIST_WIN")
+            {
+                Round.KillsByScp = 555;
+                foreach (Player player in Player.List)
+                {
+                    player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>", 8f);
+                    Timing.CallDelayed(1f, () => { Round.Restart(false); });
+                }
+            }
+            else if ((winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD) && specificReason == null)
             {
                 Round.EscapedDClasses = 999;
                 Round.EndRound(true);
             }
-        }
-        else if (winnerTeam == Team.ChaosInsurgency && specificReason == "SW_WIN")
-        {
-            foreach (Player player in Player.List)
+            else if (winnerTeam == Team.ChaosInsurgency && specificReason == "SW_WIN")
             {
-                player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>",8f);
-                Timing.CallDelayed(1f, () =>
+                foreach (Player player in Player.List)
                 {
-                    Round.Restart(false);
-                });
+                    player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>", 8f);
+                    Timing.CallDelayed(1f, () => { Round.Restart(false); });
+                }
             }
-        }
-        else if (winnerTeam == Team.FoundationForces || winnerTeam == Team.Scientists)
-        {
-            if (specificReason == null)
+            else if (winnerTeam == Team.FoundationForces || winnerTeam == Team.Scientists)
             {
                 Round.EscapedScientists = 999;
                 Round.EndRound(true);
             }
-        }
-        else
-        {
-            Round.EndRound(true);
-        }
-    }
-
-    private IEnumerator<float> Scp3005Coroutine(Player player)
-    {
-        for (;;)
-        {
-            float distance;
-            foreach (Player _player in Player.List)
+            else
             {
-                if (_player != player && _player.Role.Team != Team.SCPs && (_player.UniqueRole != "FIFTHIST"||_player.UniqueRole == "F_Priest"))
-                {
-                    distance = Vector3.Distance(player.Position,_player.Position);
-                    if (distance <= 2.75f)
-                    {
-                        _player.Hurt(25f,"<color=#ff00fa>第五的</color>な力による影響");
-                        player.ShowHitMarker();
-                    }
-                }
+                Round.EndRound(true);
             }
-
-            if (player.UniqueRole == "SCP-3005")
-            {
-                if (Plugin.Singleton.LabApiHandler._activatedAntiMemeProtocolInPast)
-                {
-                    player.DisableEffect(EffectType.Slowness);
-                    player.EnableEffect(EffectType.MovementBoost, 25);
-                }
-                else
-                {
-                    player.DisableEffect(EffectType.MovementBoost);
-                    player.EnableEffect(EffectType.Slowness, 25);
-                }
-                if (Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
-                {
-                    player.Hurt(100f,"<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
-                }
-            }
-
-            if (player.UniqueRole != "SCP-3005" && player.UniqueRole != "F_Priest")
-            {
-                yield break;
-            }
-            yield return Timing.WaitForSeconds(1.5f);
         }
     }
 }

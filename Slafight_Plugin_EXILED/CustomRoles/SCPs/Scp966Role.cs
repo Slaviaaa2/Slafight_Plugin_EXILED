@@ -9,6 +9,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -66,7 +67,7 @@ public class Scp966Role : CRole
         for (;;)
         {
             var speedLevel = SpeedLevels[player];
-            if (player.UniqueRole != "Scp966")
+            if (player.GetCustomRole() != CRoleTypeId.Scp966)
             {
                 Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,"",player);
                 player.DisableEffect(EffectType.Invisible);
@@ -114,7 +115,7 @@ public class Scp966Role : CRole
 
     private void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisingEventArgs ev)
     {
-        if (ev.Player?.UniqueRole != "Scp966") return;
+        if (ev.Player?.GetCustomRole() != CRoleTypeId.Scp966) return;
     
         SpeedLevels[ev.Player] = SpeedLevels.GetValueOrDefault(ev.Player) + 1;
         if (SpeedLevels[ev.Player] > 4)
@@ -128,7 +129,7 @@ public class Scp966Role : CRole
 
     private void Hurting(HurtingEventArgs ev)
     {
-        if (ev.Attacker?.UniqueRole == "Scp966")
+        if (ev.Attacker?.GetCustomRole() == CRoleTypeId.Scp966)
         {
             ev.Amount = 15f;
         }
@@ -136,7 +137,7 @@ public class Scp966Role : CRole
 
     private void DiedCassie(DyingEventArgs ev)
     {
-        if (ev.Player?.UniqueRole == "Scp966")
+        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp966)
         {
             SpeedLevels.Remove(ev.Player);
             Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .","<color=red>SCP-966</color>の終了に成功しました。");

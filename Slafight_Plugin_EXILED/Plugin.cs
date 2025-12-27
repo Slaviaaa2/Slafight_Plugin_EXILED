@@ -19,6 +19,7 @@ using HarmonyLib;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.MapExtensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UserSettings.ServerSpecific;
@@ -59,6 +60,7 @@ namespace Slafight_Plugin_EXILED
         public AbilityInputHandler AbilityInputHandler { get; set; }
         
         public OperationBlackout OperationBlackout { get; set; }
+        public Sinkhole Sinkhole { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -80,11 +82,13 @@ namespace Slafight_Plugin_EXILED
             ChristmasChanges = new();
             Scp914Changes = new();
             AbilityInputHandler = new();
+            Sinkhole = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
             CRole.RegisterAllEvents();
             AbilityBase.RegisterEvents();
+            AbilityManager.RegisterEvents();
             CustomRole.RegisterRoles(false);
             CustomItem.RegisterItems(skipReflection: false, overrideClass: Config);
             
@@ -117,6 +121,7 @@ namespace Slafight_Plugin_EXILED
             
             CRole.UnregisterAllEvents();
             AbilityBase.UnregisterEvents();
+            AbilityManager.UnregisterEvents();
             CustomItem.UnregisterItems();
             CustomRole.UnregisterRoles();
             

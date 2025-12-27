@@ -303,7 +303,7 @@ namespace Slafight_Plugin_EXILED
             {
                 if (door.Type == DoorType.GateA || door.Type == DoorType.GateB)
                 {
-                    door.Lock(120f,DoorLockType.None);
+                    door.Lock(120f,DoorLockType.AdminCommand);
                 }
 
                 if (door.Type == DoorType.PrisonDoor)
@@ -332,14 +332,21 @@ namespace Slafight_Plugin_EXILED
                     }
                 }
 
-                foreach (Door door in Door.List)
+                Timing.CallDelayed(5f, () =>
                 {
-                    if (door.Type == DoorType.PrisonDoor || door.Type == DoorType.Scp173Gate)
+                    foreach (Door door in Door.List)
                     {
-                        door.Unlock();
-                        door.IsOpen = true;
+                        if (door.Type == DoorType.Scp173Gate)
+                        {
+                            door.Unlock();
+                            door.IsOpen = true;
+                        }
+                        else if (door.Type == DoorType.PrisonDoor)
+                        {
+                            door.IsOpen = true;
+                        }
                     }
-                }
+                });
 
                 int i = 0;
                 foreach (Item item in Item.List)

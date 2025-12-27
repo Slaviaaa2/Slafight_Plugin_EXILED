@@ -160,7 +160,7 @@ public static class PlayerExtensions
                 new Scp096Anger().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Scp3005:
-                Plugin.Singleton.CustomRolesHandler.Spawn3005(player, roleSpawnFlags);
+                new Scp3005Role().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Scp966:
                 new Scp966Role().SpawnRole(player, roleSpawnFlags);
@@ -221,5 +221,16 @@ public static class PlayerExtensions
         player.CustomInfo = Info;
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
+    }
+
+    public static void ClearCustomInfo(this Player player)
+    {
+        player.CustomInfo = null;
+        player.InfoArea |= PlayerInfoArea.Nickname;
+        player.InfoArea |= PlayerInfoArea.Badge;
+        player.InfoArea |= PlayerInfoArea.CustomInfo;
+        player.InfoArea |= PlayerInfoArea.UnitName;
+        player.InfoArea |= PlayerInfoArea.PowerStatus;
+        player.InfoArea |= PlayerInfoArea.Role;
     }
 }
