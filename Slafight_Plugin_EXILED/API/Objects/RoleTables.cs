@@ -17,25 +17,27 @@ public static class RoleTables
         RoleTypeId.Scp939,
         RoleTypeId.Scp3114,
         CRoleTypeId.Scp3005,
-        CRoleTypeId.Scp966
+        CRoleTypeId.Scp966,
+        CRoleTypeId.Scp682
     };
 
     public static readonly List<object> ScientistRoles = new()
     {
         RoleTypeId.Scientist,
         CRoleTypeId.ZoneManager,
-        CRoleTypeId.FacilityManager,
+        CRoleTypeId.FacilityManager
     };
 
     public static readonly List<object> GuardRoles = new()
     {
         RoleTypeId.FacilityGuard,
-        CRoleTypeId.EvacuationGuard
+        CRoleTypeId.EvacuationGuard,
+        CRoleTypeId.SecurityChief
     };
 
     public static readonly List<object> ClassDRoles = new()
     {
         RoleTypeId.ClassD,
-        CRoleTypeId.Janitor,
+        CRoleTypeId.Janitor
     };
 }

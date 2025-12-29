@@ -221,7 +221,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             int maxHealth = 555;
 
             player.UniqueRole = "F_Priest";
-            player.Scale = new Vector3(1.2f, 1.2f, 1.2f);
+            player.Scale = new Vector3(1.1f, 1.1f, 1.1f);
             player.CustomInfo = "<color=#FF0090>Fifthist Priest</color>";
             player.InfoArea |= PlayerInfoArea.Nickname;
             player.InfoArea &= ~PlayerInfoArea.Role;

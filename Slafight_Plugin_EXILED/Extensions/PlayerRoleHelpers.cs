@@ -152,6 +152,8 @@ public static class PlayerRoleHelpers
                 // Guards
                 case CRoleTypeId.EvacuationGuard:
                     return CTeam.Guards;
+                case CRoleTypeId.SecurityChief:
+                    return CTeam.Guards;
                 // Class-D Personnel
                 case CRoleTypeId.Janitor:
                     return CTeam.ClassD;

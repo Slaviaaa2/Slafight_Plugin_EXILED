@@ -35,6 +35,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new();
         [Description("")] public GunGoCRailgun _GunGoCRailgun { get; set; } = new();
         [Description("")] public GunN7CR _GunN7CR { get; set; } = new();
+        [Description("")] public GunFSP18 _GunFSP18 { get; set; } = new();
         [Description("")] public ArmorVip _ArmorVip { get; set; } = new();
         [Description("")] public MagicMissile _MagicMissile { get; set; } = new();
         [Description("")] public DummyRoad _DummyRoad { get; set; } = new();

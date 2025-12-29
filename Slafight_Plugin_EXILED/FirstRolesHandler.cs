@@ -88,6 +88,9 @@ public class FirstRolesHandler
             RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager, 2);
             RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager, 1);
             RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard, 1);
+            RoleLimitManager.SetLimit(CRoleTypeId.SecurityChief, 1);
+            
+            RoleLimitManager.SetLimit(CRoleTypeId.Scp682, 1);
         }
 
         Log.Debug("[FirstRoles] _LimitChecker called");

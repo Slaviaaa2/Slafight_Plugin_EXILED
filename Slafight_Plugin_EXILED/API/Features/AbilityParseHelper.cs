@@ -10,7 +10,7 @@ namespace Slafight_Plugin_EXILED.API.Features;
 public static class AbilityParseHelper
 {
     public static IEnumerable<string> GetAllAbilityNames() =>
-        new[] { "CreateSinkholeAbility", "MagicMissileAbility" };
+        new[] { "CreateSinkholeAbility", "MagicMissileAbility", "SoundOfFifthAbility", "AllowEscapeAbility" };
 
     public static bool TryGiveAbility(string id, Player target, float? cooldownOverride, int? maxUsesOverride)
     {
@@ -27,6 +27,17 @@ public static class AbilityParseHelper
             case "magicmissileability":
             case "magicmissile":
                 return GiveAbilityWithOptionalParams<MagicMissileAbility>(
+                    target,
+                    cooldownOverride,
+                    maxUsesOverride);
+            case "soundoffifthability":
+                return GiveAbilityWithOptionalParams<SoundOfFifthAbility>(
+                    target,
+                    cooldownOverride,
+                    maxUsesOverride);
+            
+            case "allowescapeability":
+                return GiveAbilityWithOptionalParams<AllowEscapeAbility>(
                     target,
                     cooldownOverride,
                     maxUsesOverride);

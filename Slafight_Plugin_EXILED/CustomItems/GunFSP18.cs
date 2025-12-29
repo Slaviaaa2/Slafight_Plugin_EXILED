@@ -1,14 +1,16 @@
 using System.Collections.Generic;
+using AdvancedMERTools;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.API.Structs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.Handlers;
-using InventorySystem.Items.FlamingoTapePlayer;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
@@ -18,40 +20,28 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.KeycardCustomMetalCase)]
-public class KeycardSecurityChief : CustomKeycard
+[CustomItem(ItemType.GunE11SR)]
+public class GunFSP18 : CustomWeapon
 {
-    public override uint Id { get; set; } = 1100;
-    public override string Name { get; set; } = "警備長キーカード";
-    public override string Description { get; set; } = "警備隊を指揮したりする警備長が持つキーカード。";
+    public override uint Id { get; set; } = 2000;
+    public override string Name { get; set; } = "FSP-12";
+    public override string Description { get; set; } = "";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.KeycardCustomMetalCase;
+    public override ItemType Type { get; set; } = ItemType.GunFSP9;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-    public override string KeycardLabel { get; set; } = "警備主任キーカード";
-    [YamlIgnore]
-    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
-    public override string KeycardName { get; set; } = "Chf. Security";
-    [YamlIgnore]
-    public override Color32? TintColor { get; set; } = new Color32(68,68,68,255);
-    [YamlIgnore]
-    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
-    public override KeycardPermissions Permissions { get; set; } =
-        KeycardPermissions.ContainmentLevelOne |
-        KeycardPermissions.ArmoryLevelOne |
-        KeycardPermissions.ArmoryLevelTwo |
-        KeycardPermissions.Intercom |
-        KeycardPermissions.Checkpoints |
-        KeycardPermissions.ExitGates;
-
-    public override byte Rank { get; set; } = 1;
-    public override string SerialNumber { get; set; } = "";
+    public override float Damage { get; set; } = 30f;
+    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
+    public override byte ClipSize { get; set; } = 62;
 
     public Color glowColor = Color.gray;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
+        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
+        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         
@@ -60,16 +50,34 @@ public class KeycardSecurityChief : CustomKeycard
 
     protected override void UnsubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
+        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
     }
 
-    //private void PickMessage(PickingUpItemEventArgs ev)
-    //{
-    //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
-    //}
+    private void LimitPatch(PickingUpItemEventArgs ev)
+    {
+        if (Check(ev.Pickup))
+        {
+            ev.Player.SetAmmoLimit(AmmoType.Nato9,200);
+            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
+            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
+        }
+    }
+
+    private void LimitDestroy(DroppingItemEventArgs ev)
+    {
+        if (Check(ev.Item))
+        {
+            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
+            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
+            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
+        }
+    }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {

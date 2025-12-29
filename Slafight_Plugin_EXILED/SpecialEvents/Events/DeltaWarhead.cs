@@ -78,7 +78,7 @@ public class DeltaWarhead
                         if (lockEvDoorTypes.Contains(door.Type))
                         {
                             Log.Debug("foreach catched: "+door.Type);
-                            door.Lock(DoorLockType.Warhead);
+                            door.Lock(DoorLockType.AdminCommand);
                         }
                     }
                     Log.Debug("Delta Passed Lock Elevator Foreach.");

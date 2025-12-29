@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
@@ -27,11 +30,11 @@ public static class AbilityManager
     public static bool TryGetLoadout(Player player, out AbilityLoadout loadout)
         => Loadouts.TryGetValue(player.Id, out loadout);
 
-    // ★ 現在選択中のアビリティ使用可能か
+    // 現在選択中のアビリティ使用可能か
     public static bool CanUseActiveAbility(Player player)
         => AbilityBase.CanUseSelectedAbility(player.Id);
 
-    // ★ スロット切り替え
+    // スロット切り替え
     public static bool SwitchToSlot(Player player, int slotIndex)
     {
         if (!TryGetLoadout(player, out var loadout))
@@ -45,7 +48,7 @@ public static class AbilityManager
         return true;
     }
 
-    // ★ 次スロットへ（CycleNextのラッパー）
+    // 次スロットへ
     public static bool NextSlot(Player player)
     {
         if (!TryGetLoadout(player, out var loadout))
@@ -56,16 +59,16 @@ public static class AbilityManager
         return true;
     }
 
-    // HUD更新ヘルパー
-    private static void UpdateAbilityHint(Player player, AbilityLoadout loadout)
+    // ★公開メソッド：HUD更新のみ
+    public static void UpdateAbilityHint(Player player, AbilityLoadout loadout)
     {
-        var sb = new System.Text.StringBuilder();
+        if (player == null || !player.IsConnected) return;
 
+        var sb = new StringBuilder();
         for (int i = 0; i < AbilityLoadout.MaxSlots; i++)
         {
             var ability = loadout.Slots[i];
-            if (ability == null)
-                continue;
+            if (ability == null) continue;
 
             string name = ability.GetType().Name;
             string marker = (i == loadout.ActiveIndex) ? "<color=#ffff00>▶</color>" : "　";
@@ -74,25 +77,30 @@ public static class AbilityManager
             sb.AppendLine($"{marker} {name} [{status}]");
         }
 
-        string text = sb.Length > 0 ? sb.ToString() : "<color=gray>アビリティ未設定</color>";
+        string text = sb.Length > 0 ? sb.ToString() : "アビリティ無し";
         
-        // Plugin.Singleton.PlayerHUD.HintSync があるならそれを使う
-        // なければ player.ShowHint
         try
         {
-            // Plugin.Singleton?.PlayerHUD?.HintSync(SyncType.PHUD_Specific, text, player);
-            player.ShowHint(text, 2f);
+            if (Plugin.Singleton?.PlayerHUD != null)
+            {
+                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, text, player);
+            }
+            else
+            {
+                string shortText = text.Length > 100 ? text.Substring(0, 100) + "..." : text;
+                player.ShowHint(shortText, 2f);
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            player.ShowHint(text, 2f);
+            Log.Warn($"[Ability] Hint failed for {player.Nickname}: {ex.Message}");
         }
     }
 
-    // プレイヤー全クリア（AbilityBaseも連動）
+    // プレイヤー全クリア
     public static void ClearPlayer(Player player)
     {
-        AbilityBase.RevokeAbility(player.Id);  // アビリティ状態も削除
+        AbilityBase.RevokeAbility(player.Id);
         Loadouts.Remove(player.Id);
     }
 
@@ -104,7 +112,7 @@ public static class AbilityManager
         Loadouts.Clear();
     }
 
-    // ★ スロットだけクリア（アビリティ状態は残す）
+    // スロットだけクリア
     public static void ClearSlots(Player player)
     {
         if (!TryGetLoadout(player, out var loadout))
@@ -116,7 +124,7 @@ public static class AbilityManager
         loadout.ActiveIndex = 0;
     }
 
-    // ===== イベント管理 =====
+    // イベント管理
     private static bool _initialized;
 
     internal static void RegisterEvents()
@@ -143,7 +151,6 @@ public static class AbilityManager
 
     private static void OnRoundStarted()
     {
-        // ラウンド開始時にクールダウンリセット
         foreach (var kvp in Loadouts)
         {
             var player = Player.Get(kvp.Key);
@@ -154,7 +161,7 @@ public static class AbilityManager
 
     private static void OnWaitingForPlayers()
     {
-        ClearAllLoadouts();  // 待機時に全クリア
+        ClearAllLoadouts();
     }
 
     private static void OnPlayerLeft(LeftEventArgs ev)
@@ -164,17 +171,16 @@ public static class AbilityManager
 
     private static void OnPlayerJoined(JoinedEventArgs ev)
     {
-        // 新規参加者に空Loadout作成
         GetOrCreateLoadout(ev.Player);
     }
 
-    // ★ デバッグ用：ロードアウト内容表示
+    // デバッグ用
     public static string GetLoadoutInfo(Player player)
     {
         if (!TryGetLoadout(player, out var loadout))
             return "No loadout";
 
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         sb.AppendLine($"Active: {loadout.ActiveIndex}");
         for (int i = 0; i < AbilityLoadout.MaxSlots; i++)
         {

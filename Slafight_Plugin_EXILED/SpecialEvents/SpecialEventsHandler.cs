@@ -137,6 +137,7 @@ public class SpecialEventsHandler
         Plugin.Singleton.EventHandler.WarheadLocked = false;
         Plugin.Singleton.EventHandler.SpecialWarhead = false;
         isFifthistsRaidActive = false;
+        SpawnSystem.Disable = false;
         EventPID++;
     }
     // Automatic Event Controls

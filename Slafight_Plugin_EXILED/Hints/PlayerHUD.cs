@@ -267,6 +267,11 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "職員達を上部階層へ避難させ、施設の秩序を守護せよ。";
                     break;
+                case CRoleTypeId.SecurityChief:
+                    SyncTextRole = "<color=#00b7eb>Security Chief</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "職員達を地上へ脱出させ、施設の秩序を守護せよ。";
+                    break;
                 // Class-D Personnel
                 case CRoleTypeId.Janitor:
                     SyncTextRole = "<color=#ee7600>Janitor</color>";

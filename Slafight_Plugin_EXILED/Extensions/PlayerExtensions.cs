@@ -192,6 +192,9 @@ public static class PlayerExtensions
             case CRoleTypeId.EvacuationGuard:
                 new EvacuationGuard().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.SecurityChief:
+                new SecurityChief().SpawnRole(player, roleSpawnFlags);
+                break;
             case CRoleTypeId.ZoneManager:
                 new ZoneManager().SpawnRole(player, roleSpawnFlags);
                 break;

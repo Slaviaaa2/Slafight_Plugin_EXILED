@@ -50,28 +50,19 @@ public class AbilityInputHandler
         }
         else if (keybind.SettingId == 4)
         {
-            loadout.CycleNext();
-            UpdateAbilityHint(player, loadout);
+            loadout.CycleNext();  // これだけでOK
+            // UpdateAbilityHint(player, loadout);  ← これを削除！
+            AbilityManager.UpdateAbilityHint(player, loadout);  // これに変更
         }
     }
 
     // HUD 更新（必要に応じて使う）
     private void UpdateAbilityHint(Player player, AbilityLoadout loadout)
     {
-        var sb = new StringBuilder();
-
-        for (int i = 0; i < AbilityLoadout.MaxSlots; i++)
-        {
-            var ability = loadout.Slots[i];
-            if (ability == null)
-                continue;
-
-            string name = ability.GetType().Name;
-            string marker = (i == loadout.ActiveIndex) ? "<color=#ffff00>▶</color>" : "　";
-            sb.AppendLine($"{marker} {name}");
-        }
-
-        string text = sb.Length > 0 ? sb.ToString() : string.Empty;
-        Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, text, player);
+        if (player == null || !player.IsConnected || player.Role == RoleTypeId.None)
+            return;
+    
+        // AbilityManager.UpdateAbilityHint に任せる
+        AbilityManager.NextSlot(player);  // こっちは既に安全
     }
 }

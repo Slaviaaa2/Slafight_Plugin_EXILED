@@ -76,7 +76,6 @@ public class EscapeHandler
         public RoleTypeId? Vanilla;   // 通常ロールに変身したいとき用
         public CRoleTypeId? Custom;   // カスタムロールに変身したいとき用
     }
-
     
     private EscapeTargetRole GetEscapeTarget(CTeam myTeam, CTeam cufferTeam)
     {
@@ -121,29 +120,72 @@ public class EscapeHandler
         };
     }
     
+    private EscapeTargetRole ApplyEventOverrides(
+        EscapeTargetRole baseTarget,
+        Player player)
+    {
+        var nowEvent = Plugin.Singleton.SpecialEventsHandler.nowEvent;
+
+        var myRole        = player.Role.Type;           // RoleTypeId
+        var myCustomRole  = player.GetCustomRole();     // CRoleTypeId
+        var cufferRole    = player.Cuffer?.Role.Type;
+        var cufferCustom  = player.Cuffer?.GetCustomRole();
+
+        switch (nowEvent)
+        {
+            case SpecialEventType.None:
+            default:
+                // イベントなし → 何もいじらず返す
+                return baseTarget;
+
+            case SpecialEventType.FifthistsRaid:
+            {
+                if (myCustomRole is CRoleTypeId.Scp3005)
+                    return new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistPriest };
+
+                break;
+            }
+
+            // 必要に応じて他イベントを追加
+        }
+
+        // 何も上書きしなかった場合はデフォルトの結果をそのまま返す
+        return baseTarget;
+    }
+
+    private EscapeTargetRole GetEscapeTarget(Player player)
+    {
+        var myTeam     = player.GetTeam();
+        var cufferTeam = player.Cuffer?.GetTeam() ?? CTeam.Null;
+
+        // デフォはチームベース
+        var baseTarget = GetEscapeTarget(myTeam, cufferTeam);
+
+        // SpecialEventType に応じてロール単位で上書き
+        return ApplyEventOverrides(baseTarget, player);
+    }
+    
     public void Escape(Player player)
     {
-        Log.Debug($"Escape Triggered. by: "+player.Nickname+$", CTeam: {player.GetTeam()}");
+        Log.Debug($"Escape Triggered. by: " + player.Nickname + $", CTeam: {player.GetTeam()}");
         
-        var myTeam     = player.GetTeam();
-        var cufferTeam = player.Cuffer.GetTeam();
+        // 修正前:
+        // var myTeam     = player.GetTeam();
+        // var cufferTeam = player.Cuffer.GetTeam();
+        // var target     = GetEscapeTarget(myTeam, cufferTeam);
 
-        var target = GetEscapeTarget(myTeam, cufferTeam);
+        // 修正後: Player 版をそのまま使う
+        var target = GetEscapeTarget(player);
 
-        // 何も指定されていないなら変身しない
         if (target.Vanilla is null && target.Custom is null)
             return;
 
         SaveItems(player);
 
         if (target.Custom is { } customRole)
-        {
             player.SetRole(customRole);
-        }
         else if (target.Vanilla is { } vanillaRole)
-        {
             player.SetRole(vanillaRole);
-        }
     }
 
     public void AddEscapeCoroutine()

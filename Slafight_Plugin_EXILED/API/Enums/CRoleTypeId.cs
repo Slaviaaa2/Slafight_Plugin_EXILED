@@ -26,5 +26,6 @@ public enum CRoleTypeId
     Scp999 = 17,
     Zombified = 18,
     Scp106 = 19,
-    Scp3114 = 20
+    Scp3114 = 20,
+    SecurityChief = 21
 }

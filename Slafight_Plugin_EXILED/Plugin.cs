@@ -35,9 +35,9 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,5);
+        public override Version Version => new Version(1,4,5,2);
         
-        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 1);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 2);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -61,6 +61,7 @@ namespace Slafight_Plugin_EXILED
         
         public OperationBlackout OperationBlackout { get; set; }
         public Sinkhole Sinkhole { get; set; }
+        public PDEx PDEx { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -83,6 +84,7 @@ namespace Slafight_Plugin_EXILED
             Scp914Changes = new();
             AbilityInputHandler = new();
             Sinkhole = new();
+            PDEx = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
             
