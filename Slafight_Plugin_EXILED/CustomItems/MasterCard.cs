@@ -1,84 +1,68 @@
 using System.Collections.Generic;
-using AdvancedMERTools;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
-using Exiled.API.Structs;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp914;
 using Exiled.Events.Handlers;
-using InventorySystem.Items.Armor;
+using InventorySystem.Items.FlamingoTapePlayer;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GunE11SR)]
-public class GunFSP18 : CustomWeapon
+[CustomItem(ItemType.KeycardCustomSite02)]
+public class MasterCard : CustomKeycard
 {
-    public override uint Id { get; set; } = 2000;
-    public override string Name { get; set; } = "FSP-18";
-    public override string Description { get; set; } = "";
+    public override uint Id { get; set; } = 2002;
+    public override string Name { get; set; } = "MasterCard";
+    public override string Description { get; set; } = "ただのMasterCard。何にも使えない";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunFSP9;
+    public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
+    public override string KeycardLabel { get; set; } = "MasterCard";
+    [YamlIgnore]
+    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
+    public override string KeycardName { get; set; } = "MasterCard";
+    [YamlIgnore]
+    public override Color32? TintColor { get; set; } = new Color32(0,56,170,255);
+    [YamlIgnore]
+    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
-    public override float Damage { get; set; } = 30f;
-    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 62;
+    public override KeycardPermissions Permissions { get; set; } =
+        KeycardPermissions.None;
 
-    public Color glowColor = Color.gray;
+    public override byte Rank { get; set; } = 1;
+    public override string SerialNumber { get; set; } = "1234567890";
+
+    public Color glowColor = Color.blue;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
-        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
-        
         base.SubscribeEvents();
     }
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
-        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
-        
         base.UnsubscribeEvents();
     }
 
-    private void LimitPatch(PickingUpItemEventArgs ev)
-    {
-        if (Check(ev.Pickup))
-        {
-            ev.Player.SetAmmoLimit(AmmoType.Nato9,200);
-            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
-            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
-            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
-            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
-        }
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

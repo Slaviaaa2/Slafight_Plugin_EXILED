@@ -8,6 +8,7 @@ using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UnityEngine;
+using OmegaWarhead = Slafight_Plugin_EXILED.MapExtensions.OmegaWarhead;
 
 namespace Slafight_Plugin_EXILED.Commands;
 
@@ -94,29 +95,6 @@ public class DevToolFunctionHandler
 
     public void PlayOmegaWarhead()
     {
-        foreach (Room rooms in Room.List)
-        {
-            rooms.Color = Color.blue;
-        }
-
-        foreach (Door door in Door.List)
-        {
-            if (door.Type != DoorType.ElevatorGateA && door.Type != DoorType.ElevatorGateB && door.Type != DoorType.ElevatorLczA && door.Type != DoorType.ElevatorLczB && door.Type != DoorType.ElevatorNuke && door.Type != DoorType.ElevatorScp049 && door.Type != DoorType.ElevatorServerRoom)
-            {
-                door.IsOpen = true;
-                door.Lock(DoorLockType.Warhead);
-            }
-        }
-        Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の決定により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
-        CreateAndPlayAudio("omega_v2.ogg","Exiled.API.Features.Cassie",Vector3.zero,true,null,false,999999999,0);
-        Timing.CallDelayed(Plugin.Singleton.Config.OwBoomTime, () =>
-        {
-            foreach (Player player in Player.List)
-            {
-                if (player == null) continue;
-                player.ExplodeEffect(ProjectileType.FragGrenade);
-                player.Kill("OMEGA WARHEADに爆破された");
-            }
-        });
+        OmegaWarhead.StartProtocol(Plugin.Singleton.SpecialEventsHandler.EventPID);
     }
 }

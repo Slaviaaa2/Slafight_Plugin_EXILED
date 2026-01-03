@@ -21,20 +21,20 @@ using YamlDotNet.Serialization;
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.GunE11SR)]
-public class GunFSP18 : CustomWeapon
+public class GunProject90 : CustomWeapon
 {
-    public override uint Id { get; set; } = 2000;
-    public override string Name { get; set; } = "FSP-18";
-    public override string Description { get; set; } = "";
+    public override uint Id { get; set; } = 2001;
+    public override string Name { get; set; } = "Project-90";
+    public override string Description { get; set; } = "昔ながらの、安定した撃ちどけ";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunFSP9;
+    public override ItemType Type { get; set; } = ItemType.GunCrossvec;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 30f;
+    public override float Damage { get; set; } = 36f;
     public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 62;
+    public override byte ClipSize { get; set; } = 42;
 
-    public Color glowColor = Color.gray;
+    public Color glowColor = Color.cyan;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

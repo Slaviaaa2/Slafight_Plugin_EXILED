@@ -8,9 +8,11 @@ using Exiled.API.Features.Doors;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Toys;
+using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Server;
 using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items.Pickups;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using MapGeneration;
@@ -22,6 +24,8 @@ using ProjectMER.Features.Objects;
 using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MapExtensions;
+using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 
 using Scp049Handler = Exiled.Events.Handlers.Scp049;
@@ -33,6 +37,7 @@ using WarheadHandler = Exiled.Events.Handlers.Warhead;
 using MapHandler = Exiled.Events.Handlers.Map;
 using PlayerHandler = Exiled.Events.Handlers.Player;
 using CassieHandler = Exiled.Events.Handlers.Cassie;
+using Light = Exiled.API.Features.Toys.Light;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -40,35 +45,39 @@ namespace Slafight_Plugin_EXILED
     {
         public CustomMap()
         {
-            
-            Exiled.Events.Handlers.Server.RoundStarted += SetDoorState;
-            Exiled.Events.Handlers.Server.RoundStarted += SetupMaps;
+            // RoundStarted は1つのハンドラに統合
+            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
             Exiled.Events.Handlers.Map.SpawningTeamVehicle += ChaosAnimation;
-
             LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
-
+            LabApi.Events.Handlers.PlayerEvents.InteractedDoor += DoorInteracted;
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned += GetSchems;
-
-            Exiled.Events.Handlers.Server.RoundStarted += HolidaySeasonMapLoader;
         }
+
         ~CustomMap()
         {
-            
-            Exiled.Events.Handlers.Server.RoundStarted -= SetDoorState;
-            Exiled.Events.Handlers.Server.RoundStarted -= SetupMaps;
+            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
             Exiled.Events.Handlers.Map.SpawningTeamVehicle -= ChaosAnimation;
-
             LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
-
+            LabApi.Events.Handlers.PlayerEvents.InteractedDoor -= DoorInteracted;
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= GetSchems;
+        }
 
-            Exiled.Events.Handlers.Server.RoundStarted -= HolidaySeasonMapLoader;
+        /// <summary>
+        /// RoundStarted 統合ハンドラ
+        /// </summary>
+        private void OnRoundStarted()
+        {
+            SetDoorState();
+            SetupMaps();
+            HolidaySeasonMapLoader();
         }
 
         public void SetDoorState()
         {
+            const float PositionTolerance = 0.75f;
             foreach (Door door in Door.List)
             {
+                if (door == null) continue;
                 if (door.Type == DoorType.SurfaceGate)
                 {
                     door.RequireAllPermissions = true;
@@ -78,6 +87,10 @@ namespace Slafight_Plugin_EXILED
                 else if (door.Type == DoorType.EscapeFinal)
                 {
                     door.Unlock();
+                }
+                else if (Vector3.Distance(door.Position, OWJoin) <= PositionTolerance)
+                {
+                    door.Lock(DoorLockType.AdminCommand);
                 }
             }
         }
@@ -95,65 +108,75 @@ namespace Slafight_Plugin_EXILED
         private SchematicObject FBButton;
         private static bool FemurBreaked = false;
         private Vector3 FBCP;
+        private Vector3 OWB;
+        private Vector3 OWJoin;
 
+        // APIs
         public static Vector3 PDExJoin;
         public static Vector3 PDExJoinKing;
+        public static bool _femurSetup => FemurSetup;
+        public static bool _femurBreaked => FemurBreaked;
         
         Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
 
         public void GetSchems(SchematicSpawnedEventArgs ev)
         {
-            if (ev.Schematic.Name == "Surface_CarStopper_Bar")
+            switch (ev.Schematic.Name)
             {
-                ChaosBar = ev.Schematic;
-                ChaosBarNormalPos = ev.Schematic.Position;
-            }
+                case "Surface_CarStopper_Bar":
+                    ChaosBar = ev.Schematic;
+                    ChaosBarNormalPos = ev.Schematic.Position;
+                    break;
 
-            if (ev.Schematic.Name == "FemurBreaker_JoinPoint")
-            {
-                FBJoin = ev.Schematic.Position;
-                ev.Schematic.Destroy();
-            }
+                case "FemurBreaker_JoinPoint":
+                    FBJoin = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
 
-            if (ev.Schematic.Name == "FemurBreaker_Door")
-            {
-                FBDoor = ev.Schematic;
-            }
+                case "FemurBreaker_Door":
+                    FBDoor = ev.Schematic;
+                    break;
 
-            if (ev.Schematic.Name == "FemurBreakerButton")
-            {
-                FBButton = ev.Schematic;
-            }
+                case "FemurBreakerButton":
+                    FBButton = ev.Schematic;
+                    break;
 
-            if (ev.Schematic.Name == "FemurBreaker_CapybaraPoint")
-            {
-                FBCP = ev.Schematic.Position;
-                ev.Schematic.Destroy();
-            }
+                case "FemurBreaker_CapybaraPoint":
+                    FBCP = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
 
-            if (ev.Schematic.Name == "PDEX_JoinPoint")
-            {
-                PDExJoin = ev.Schematic.Position;
-                ev.Schematic.Destroy();
-            }
+                case "PDEX_JoinPoint":
+                    PDExJoin = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
 
-            if (ev.Schematic.Name == "PDEX_JoinPointKing")
-            {
-                PDExJoinKing = ev.Schematic.Position;
-                ev.Schematic.Destroy();
+                case "PDEX_JoinPointKing":
+                    PDExJoinKing = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
+                case "OWB":
+                    OWB = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
+                case "OWJoin":
+                    OWJoin = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
             }
 
             FemurSetup = false;
             FemurBreaked = false;
             femuredPlayers.Clear();
         }
+
         public void ChaosAnimation(SpawningTeamVehicleEventArgs ev)
         {
             if (ev.Team.TargetFaction == Faction.FoundationEnemy)
             {
                 Timing.CallDelayed(2.25f, () =>
                 {
-                    Timing.RunCoroutine(PlayBarAnim(ChaosBar,22f));
+                    Timing.RunCoroutine(PlayBarAnim(ChaosBar, 22f));
                 });
             }
         }
@@ -161,16 +184,16 @@ namespace Slafight_Plugin_EXILED
         private IEnumerator<float> PlayBarAnim(SchematicObject schem, float waitTime)
         {
             // 上に 4 上げる
-            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos,new Vector3(0, 4f, 0), 0.8f));
+            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos, new Vector3(0, 4f, 0), 0.8f));
 
             // 待機
             yield return Timing.WaitForSeconds(waitTime);
 
             // 下に 4 下げる
-            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos+new Vector3(0f,4f,0f),new Vector3(0, -4f, 0), 1.5f));
+            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos + new Vector3(0f, 4f, 0f), new Vector3(0, -4f, 0), 1.5f));
         }
 
-        private IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos,Vector3 offset, float duration)
+        private IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos, Vector3 offset, float duration)
         {
             float elapsedTime = 0f;
             Vector3 startPos = startpos;
@@ -191,14 +214,17 @@ namespace Slafight_Plugin_EXILED
         
         private void InteractionButton(PlayerSearchedToyEventArgs ev)
         {
-            const float PositionTolerance = 0.15f;
+            var specialEventsHandler = Plugin.Singleton.SpecialEventsHandler;
+            const float PositionTolerance = 0.75f;
+            
+            //Log.Debug($"Interacted: {ev.Interactable.Position}, OWB: {OWB}, Distance: {Vector3.Distance(ev.Interactable.Position, OWB)}");
     
             if (Vector3.Distance(ev.Interactable.Position, new Vector3(-17.25f, 291.60f, -36.89f)) <= PositionTolerance)
             {
                 Timing.RunCoroutine(PlayBarAnim(ChaosBar, 3f));
             }
 
-            if (Vector3.Distance(ev.Interactable.Position, FBButton.Position) <= PositionTolerance)  // ) を追加
+            if (Vector3.Distance(ev.Interactable.Position, FBButton.Position) <= PositionTolerance)
             {
                 if (FemurSetup && !FemurBreaked)
                 {
@@ -228,6 +254,48 @@ namespace Slafight_Plugin_EXILED
                     ev.Player.SendHint("準備が完了していないか、既に実行されています。");
                 }
             }
+
+            if (Vector3.Distance(ev.Interactable.Position, OWB) <= PositionTolerance)
+            {
+                if (!SpecialEventsHandler.IsWarheadable() || OmegaWarhead.IsWarheadStarted)
+                {
+                    ev.Player.SendHint("何らかの要因で実行できませんでした");
+                    return;
+                }
+                //Log.Debug($"OMEGA SWITCH: ACTIVATED\nlocalPID: {specialEventsHandler.EventPID}");
+                OmegaWarhead.StartProtocol(specialEventsHandler.EventPID);
+            }
+        }
+
+        private void DoorInteracted(PlayerInteractedDoorEventArgs ev)
+        {
+            const float PositionTolerance = 0.75f;
+            //Log.Debug($"DoorInteracted in: {ev.Door.Position}, OWJoin: {OWJoin}, Distance: {Vector3.Distance(ev.Door.Position, OWJoin)}");
+            if (Vector3.Distance(ev.Door.Position, OWJoin) <= PositionTolerance)
+            {
+                var castPlayer = Player.Get(ev.Player.NetworkId);
+                var allowOpen = false;
+                if (castPlayer != null)
+                {
+                    foreach (var item in castPlayer.Items.ToList())
+                    {
+                        CustomItem.TryGet(item, out var customItem);
+                        if (customItem is { Id: 2005 })
+                        {
+                            allowOpen = true;
+                        }
+                    }
+
+                    if (allowOpen)
+                    {
+                        ev.Door.IsOpened = !ev.Door.IsOpened;
+                    }
+                    else
+                    {
+                        ev.Player.SendHint("専用のアクセスパスが必要そうだ・・・");
+                    }
+                }
+            }
         }
 
         private IEnumerator<float> FemurBreaker()
@@ -237,13 +305,13 @@ namespace Slafight_Plugin_EXILED
                 if (Round.IsLobby) yield break;
                 foreach (var player in Player.List)
                 {
-                    if (Vector3.Distance(player.Position,FBJoin) <= 0.5f && player.GetTeam() != CTeam.SCPs)
+                    if (Vector3.Distance(player.Position,FBJoin) <= 0.625f && player.GetTeam() != CTeam.SCPs)
                     {
-                        player.ClearInventory();
+                        player.Handcuff();
                         player.Position = FBCP;
                         femuredPlayers.Add(player);
                         FemurSetup = true;
-                        Timing.RunCoroutine(Anim(FBDoor, FBDoor.Position, new Vector3(0f,-2f,0f),0.8f));
+                        Timing.RunCoroutine(Anim(FBDoor, FBDoor.Position, new Vector3(0f,-2.5f,0f),0.65f));
                         yield break;
                     }
                 }

@@ -56,70 +56,79 @@ public class PlayerHUD
             YCoordinate = 1050
         };
         display.AddHint(ServerInfo);
+        if (!Round.IsLobby)
+        {
+            PlayerHUDSetup(ev.Player);
+        }
+    }
+
+    private void PlayerHUDSetup(Player player)
+    {
+        int XCordinate = -350;
+        PlayerUI ui = PlayerUI.Get(player);
+        PlayerDisplay display = PlayerDisplay.Get(player);
+        Hint PlayerHUD_Role = new Hint
+        {
+            Id = "PlayerHUD_Role",
+            Text = "Role: " + player.CustomInfo,
+            Alignment = HintAlignment.Left,
+            SyncSpeed = HintSyncSpeed.Fastest,
+            FontSize = 24,
+            XCoordinate = XCordinate,
+            YCoordinate = 860
+        };
+        Hint PlayerHUD_Objective = new Hint
+        {
+            Id = "PlayerHUD_Objective",
+            Text = "Objective: " + "Undefined",
+            Alignment = HintAlignment.Left,
+            YCoordinate = 915,
+            XCoordinate = XCordinate,
+            SyncSpeed = HintSyncSpeed.Fastest,
+            FontSize = 30
+        };
+        Hint PlayerHUD_Team = new Hint
+        {
+            Id = "PlayerHUD_Team",
+            Text = "Team: " + "Undefined",
+            Alignment = HintAlignment.Left,
+            YCoordinate = 885,
+            XCoordinate = XCordinate,
+            SyncSpeed = HintSyncSpeed.Fastest,
+            FontSize = 24
+        };
+        Hint PlayerHUD_Event = new Hint
+        {
+            Id = "PlayerHUD_Event",
+            Text = "[Event]\n" + "<size=28>Undefined</size>",
+            Alignment = HintAlignment.Left,
+            SyncSpeed = HintSyncSpeed.Fast,
+            FontSize = 26,
+            XCoordinate = XCordinate,
+            YCoordinate = 120
+        };
+        Hint PlayerHUD_Specific = new Hint()
+        {
+            Id = "PlayerHUD_Specific",
+            Text = "",
+            Alignment = HintAlignment.Left,
+            SyncSpeed = HintSyncSpeed.Fastest,
+            FontSize = 24,
+            XCoordinate = XCordinate + 350,
+            YCoordinate = 885
+        };
+        display.AddHint(PlayerHUD_Role);
+        display.AddHint(PlayerHUD_Objective);
+        display.AddHint(PlayerHUD_Team);
+        display.AddHint(PlayerHUD_Event);
+        display.AddHint(PlayerHUD_Specific);
     }
 
     public void PlayerHUDMain()
     {
-        int XCordinate = -350;
         foreach (Player player in Player.List)
         {
-            PlayerUI ui = PlayerUI.Get(player);
-            PlayerDisplay display = PlayerDisplay.Get(player);
-            Hint PlayerHUD_Role = new Hint
-            {
-                Id = "PlayerHUD_Role",
-                Text = "Role: " + player.CustomInfo,
-                Alignment = HintAlignment.Left,
-                SyncSpeed = HintSyncSpeed.Fastest,
-                FontSize = 24,
-                XCoordinate = XCordinate,
-                YCoordinate = 860
-            };
-            Hint PlayerHUD_Objective = new Hint
-            {
-                Id = "PlayerHUD_Objective",
-                Text = "Objective: " + "Undefined",
-                Alignment = HintAlignment.Left,
-                YCoordinate = 915,
-                XCoordinate = XCordinate,
-                SyncSpeed = HintSyncSpeed.Fastest,
-                FontSize = 30
-            };
-            Hint PlayerHUD_Team = new Hint
-            {
-                Id = "PlayerHUD_Team",
-                Text = "Team: " + "Undefined",
-                Alignment = HintAlignment.Left,
-                YCoordinate = 885,
-                XCoordinate = XCordinate,
-                SyncSpeed = HintSyncSpeed.Fastest,
-                FontSize = 24
-            };
-            Hint PlayerHUD_Event = new Hint
-            {
-                Id = "PlayerHUD_Event",
-                Text = "[Event]\n" + "<size=28>Undefined</size>",
-                Alignment = HintAlignment.Left,
-                SyncSpeed = HintSyncSpeed.Fast,
-                FontSize = 26,
-                XCoordinate = XCordinate,
-                YCoordinate = 120
-            };
-            Hint PlayerHUD_Specific = new Hint()
-            {
-                Id = "PlayerHUD_Specific",
-                Text = "",
-                Alignment = HintAlignment.Left,
-                SyncSpeed = HintSyncSpeed.Fastest,
-                FontSize = 24,
-                XCoordinate = XCordinate + 350,
-                YCoordinate = 885
-            };
-            display.AddHint(PlayerHUD_Role);
-            display.AddHint(PlayerHUD_Objective);
-            display.AddHint(PlayerHUD_Team);
-            display.AddHint(PlayerHUD_Event);
-            display.AddHint(PlayerHUD_Specific);
+            PlayerHUDSetup(player);
         }
     }
 

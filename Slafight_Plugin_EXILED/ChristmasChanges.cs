@@ -61,14 +61,7 @@ public class ChristmasChanges
             {
                 foreach (Item item in player.Items.ToList())
                 {
-                    if (item.IsUpgradable())
-                    {
-                        item.UpgradeItem();
-                    }
-                    else
-                    {
-                        player.EnableEffect(EffectType.Scp207);
-                    }
+                    player.EnableEffect(EffectType.Scp207);
                     break;
                 }
             }

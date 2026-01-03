@@ -138,6 +138,7 @@ public class SpecialEventsHandler
         Plugin.Singleton.EventHandler.SpecialWarhead = false;
         isFifthistsRaidActive = false;
         SpawnSystem.Disable = false;
+        MapExtensions.OmegaWarhead.IsWarheadStarted = false;
         EventPID++;
     }
     // Automatic Event Controls
@@ -415,21 +416,23 @@ public class SpecialEventsHandler
         });
     }
     
-    public static void OverrideRoleName(Player player, string CustomInfo, string DisplayName, string RoleName, string Color)
+    // APIs
+    public static bool IsWarheadable()
     {
-        // Custom Role Name Area
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        // Hide Things
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        player.InfoArea &= ~PlayerInfoArea.Nickname;
-        
-        if (CustomInfo is null || CustomInfo.Length < 1)
+        switch (Plugin.Singleton.SpecialEventsHandler.nowEvent)
         {
-            player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"<color={Color}>{DisplayName}\n{player.UniqueRole}</color>";
-        }
-        else
-        {
-            player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"<color={Color}>{CustomInfo}\n{DisplayName}\n{player.UniqueRole}</color>";
+            case SpecialEventType.OmegaWarhead:
+                return false;
+            case SpecialEventType.DeltaWarhead:
+                return false;
+            case SpecialEventType.NuclearAttack:
+                return false;
+            case SpecialEventType.OperationBlackout:
+                return false;
+            case SpecialEventType.Scp1509BattleField:
+                return false;
+            default:
+                return true;
         }
     }
 }

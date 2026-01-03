@@ -29,31 +29,35 @@ namespace Slafight_Plugin_EXILED
         [Description("")]
         public float DwBoomTime { get; set; } = 100f;
 
-        [Description("")] public HIDTurret _HIDTurret { get; set; } = new();
-        [Description("")] public KeycardFifthist _KeycardFifthist { get; set; } = new();
-        [Description("")] public KeycardFifthistPriest _KeycardFifthistPriest { get; set; } = new();
-        [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new();
-        [Description("")] public GunGoCRailgun _GunGoCRailgun { get; set; } = new();
-        [Description("")] public GunN7CR _GunN7CR { get; set; } = new();
-        [Description("")] public GunFSP18 _GunFSP18 { get; set; } = new();
-        [Description("")] public ArmorVip _ArmorVip { get; set; } = new();
-        [Description("")] public MagicMissile _MagicMissile { get; set; } = new();
-        [Description("")] public DummyRoad _DummyRoad { get; set; } = new();
-        [Description("")] public FakeGrenade _FakeGrenade { get; set; } = new();
-        [Description("")] public KeycardSecurityChief _KeycardSecurityChief { get; set; } = new();
-        [Description("")] public KeycardConscripts _KeycardConscripts { get; set; } = new();
-        [Description("")] public Scp1425 _Scp1425 { get; set; } = new();
+        [Description("")] public HIDTurret _HIDTurret { get; set; } = new(); // 1
+        [Description("")] public KeycardFifthist _KeycardFifthist { get; set; } = new(); // 5
+        [Description("")] public KeycardFifthistPriest _KeycardFifthistPriest { get; set; } = new(); // 6
+        [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new(); // 10
+        [Description("")] public GunGoCRailgun _GunGoCRailgun { get; set; } = new(); // 50
+        [Description("")] public GunN7CR _GunN7CR { get; set; } = new(); // 11
+        [Description("")] public GunFSP18 _GunFSP18 { get; set; } = new(); // 2000
+        [Description("")] public ArmorVip _ArmorVip { get; set; } = new(); // 12
+        [Description("")] public MagicMissile _MagicMissile { get; set; } = new(); // 666
+        [Description("")] public DummyRoad _DummyRoad { get; set; } = new(); // 1000
+        [Description("")] public FakeGrenade _FakeGrenade { get; set; } = new(); // 700
+        [Description("")] public KeycardSecurityChief _KeycardSecurityChief { get; set; } = new(); // 1100
+        [Description("")] public KeycardConscripts _KeycardConscripts { get; set; } = new(); // 1101
+        [Description("")] public Scp1425 _Scp1425 { get; set; } = new(); // 1102
+        [Description("")] public MasterCard _MasterCard { get; set; } = new(); // 2002
+        [Description("")] public PlayingCard _PlayingCard { get; set; } = new(); // 2003
+        [Description("")] public Quarter _Quarter { get; set; } = new(); // 2004
+        [Description("")] public OmegaWarheadAccess _OmegaWarheadAccess { get; set; } = new(); // 2005
 
-        [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new();
-        [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new();
-        [Description("")] public KeycardOld_Guard _KeycardOld_Guard { get; set; } = new();
-        [Description("")] public KeycardOld_Scientist _KeycardOld_Scientist { get; set; } = new();
-        [Description("")] public KeycardOld_ResearchSupervisor _KeycardOld_ResearchSupervisor { get; set; } = new();
-        [Description("")] public KeycardOld_ZoneManager _KeycardOld_ZoneManager { get; set; } = new();
-        [Description("")] public KeycardOld_FacilityManager _KeycardOld_FacilityManager { get; set; } = new();
-        [Description("")] public KeycardOld_Cadet _KeycardOld_Cadet { get; set; } = new();
-        [Description("")] public KeycardOld_Lieutenant _KeycardOld_Lieutenant { get; set; } = new();
-        [Description("")] public KeycardOld_Commander _KeycardOld_Commander { get; set; } = new();
-        [Description("")] public KeycardOld_O5 _KeycardOld_O5 { get; set; } = new();
+        [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
+        [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101
+        [Description("")] public KeycardOld_Guard _KeycardOld_Guard { get; set; } = new(); // 103
+        [Description("")] public KeycardOld_Scientist _KeycardOld_Scientist { get; set; } = new(); // 102
+        [Description("")] public KeycardOld_ResearchSupervisor _KeycardOld_ResearchSupervisor { get; set; } = new(); // 107
+        [Description("")] public KeycardOld_ZoneManager _KeycardOld_ZoneManager { get; set; } = new(); // 108
+        [Description("")] public KeycardOld_FacilityManager _KeycardOld_FacilityManager { get; set; } = new(); // 109
+        [Description("")] public KeycardOld_Cadet _KeycardOld_Cadet { get; set; } = new(); // 104
+        [Description("")] public KeycardOld_Lieutenant _KeycardOld_Lieutenant { get; set; } = new(); // 105
+        [Description("")] public KeycardOld_Commander _KeycardOld_Commander { get; set; } = new(); // 106
+        [Description("")] public KeycardOld_O5 _KeycardOld_O5 { get; set; } = new(); // 110
     }
 }

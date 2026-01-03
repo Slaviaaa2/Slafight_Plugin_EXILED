@@ -35,7 +35,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,5,2);
+        public override Version Version => new Version(1,4,6);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 2);
 
@@ -53,7 +53,6 @@ namespace Slafight_Plugin_EXILED
         public RPNameSetter RolePlayNameSetter { get; set; }
         public FirstRolesHandler FirstRolesHandler { get; set; }
         public ChristmasChanges ChristmasChanges { get; set; }
-        public Scp914Changes Scp914Changes { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
@@ -81,7 +80,6 @@ namespace Slafight_Plugin_EXILED
             RolePlayNameSetter = new();
             FirstRolesHandler = new();
             ChristmasChanges = new();
-            Scp914Changes = new();
             AbilityInputHandler = new();
             Sinkhole = new();
             PDEx = new();
