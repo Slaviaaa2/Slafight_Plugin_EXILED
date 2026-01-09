@@ -43,11 +43,42 @@ namespace Slafight_Plugin_EXILED
 {
     public class CustomMap : CustomEventsHandler
     {
+        // 位置判定のトレラントは定数に
+        private const float PositionTolerance = 0.75f;
+        private const float FemurJoinRadius = 0.625f;
+
+        // 状態
+        private SchematicObject ChaosBar;
+        private Vector3 ChaosBarNormalPos;
+        private Vector3 FBJoin;
+        private SchematicObject FBDoor;
+        private static bool FemurSetup;
+        private SchematicObject FBButton;
+        private static bool FemurBreaked;
+        private Vector3 FBCP;
+        private Vector3 OWB;
+        private Vector3 OWJoin;
+        private Vector3 STS;
+        private Vector3 STC;
+        private Vector3 STE;
+
+        private readonly List<Player> femuredPlayers = new();
+        private CoroutineHandle femurCoroutine;
+        private CoroutineHandle trainCoroutine;
+
+        // APIs
+        public static Vector3 PDExJoin;
+        public static Vector3 PDExJoinKing;
+        public static bool _femurSetup => FemurSetup;
+        public static bool _femurBreaked => FemurBreaked;
+
+        private readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio
+            = EventHandler.CreateAndPlayAudio;
+
         public CustomMap()
         {
-            // RoundStarted は1つのハンドラに統合
-            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
-            Exiled.Events.Handlers.Map.SpawningTeamVehicle += ChaosAnimation;
+            ServerHandler.RoundStarted += OnRoundStarted;
+            MapHandler.SpawningTeamVehicle += ChaosAnimation;
             LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
             LabApi.Events.Handlers.PlayerEvents.InteractedDoor += DoorInteracted;
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned += GetSchems;
@@ -55,16 +86,17 @@ namespace Slafight_Plugin_EXILED
 
         ~CustomMap()
         {
-            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
-            Exiled.Events.Handlers.Map.SpawningTeamVehicle -= ChaosAnimation;
+            ServerHandler.RoundStarted -= OnRoundStarted;
+            MapHandler.SpawningTeamVehicle -= ChaosAnimation;
             LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
             LabApi.Events.Handlers.PlayerEvents.InteractedDoor -= DoorInteracted;
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= GetSchems;
+
+            if (femurCoroutine.IsRunning)
+                Timing.KillCoroutines(femurCoroutine);
         }
 
-        /// <summary>
-        /// RoundStarted 統合ハンドラ
-        /// </summary>
+        /// <summary>RoundStarted 統合ハンドラ</summary>
         private void OnRoundStarted()
         {
             SetDoorState();
@@ -74,50 +106,60 @@ namespace Slafight_Plugin_EXILED
 
         public void SetDoorState()
         {
-            const float PositionTolerance = 0.75f;
+            // 位置判定のため、事前にOWJoinが有効かチェック
+            bool hasOwJoin = OWJoin != default;
+
             foreach (Door door in Door.List)
             {
-                if (door == null) continue;
-                if (door.Type == DoorType.SurfaceGate)
+                if (door is null)
+                    continue;
+
+                switch (door.Type)
                 {
-                    door.RequireAllPermissions = true;
-                    door.RequiredPermissions
-                        = DoorPermissionFlags.ExitGates;
-                }
-                else if (door.Type == DoorType.EscapeFinal)
-                {
-                    door.Unlock();
-                }
-                else if (Vector3.Distance(door.Position, OWJoin) <= PositionTolerance)
-                {
-                    door.Lock(DoorLockType.AdminCommand);
+                    case DoorType.SurfaceGate:
+                        door.RequireAllPermissions = true;
+                        door.RequiredPermissions = DoorPermissionFlags.ExitGates;
+                        break;
+
+                    case DoorType.EscapeFinal:
+                        door.Unlock();
+                        break;
+
+                    default:
+                        if (hasOwJoin)
+                        {
+                            // ここだけ位置判定を行う
+                            if (Vector3.SqrMagnitude(door.Position - OWJoin) <= PositionTolerance * PositionTolerance)
+                                door.Lock(DoorLockType.AdminCommand);
+                        }
+                        break;
                 }
             }
         }
 
         private void SetupMaps()
         {
-            Timing.RunCoroutine(FemurBreaker());
+            // 既存Coroutineが走っていたら止める
+            if (femurCoroutine.IsRunning)
+                Timing.KillCoroutines(femurCoroutine);
+
+            // FBJoinがセットされている時だけ開始
+            if (FBJoin != default && FBCP != default)
+                femurCoroutine = Timing.RunCoroutine(FemurBreaker());
+            
+            // SCP-021-JP
+            if (STS != default && STC != default && STE != default)
+            {
+                Timing.CallDelayed(25f, () =>
+                {
+                    trainCoroutine = Timing.RunCoroutine(TrainComing.SpawnTrainAndAnim(STS, STC, STE));
+                });
+            }
+            else
+            {
+                Log.Error("Train Points not successfully spawned.");
+            }
         }
-
-        private SchematicObject ChaosBar = null;
-        private Vector3 ChaosBarNormalPos;
-        private Vector3 FBJoin;
-        private SchematicObject FBDoor;
-        private static bool FemurSetup = false;
-        private SchematicObject FBButton;
-        private static bool FemurBreaked = false;
-        private Vector3 FBCP;
-        private Vector3 OWB;
-        private Vector3 OWJoin;
-
-        // APIs
-        public static Vector3 PDExJoin;
-        public static Vector3 PDExJoinKing;
-        public static bool _femurSetup => FemurSetup;
-        public static bool _femurBreaked => FemurBreaked;
-        
-        Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
 
         public void GetSchems(SchematicSpawnedEventArgs ev)
         {
@@ -155,16 +197,34 @@ namespace Slafight_Plugin_EXILED
                     PDExJoinKing = ev.Schematic.Position;
                     ev.Schematic.Destroy();
                     break;
+
                 case "OWB":
                     OWB = ev.Schematic.Position;
                     ev.Schematic.Destroy();
                     break;
+
                 case "OWJoin":
                     OWJoin = ev.Schematic.Position;
                     ev.Schematic.Destroy();
                     break;
+                
+                case "ST_S":
+                    STS = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
+                
+                case "ST_C":
+                    STC = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
+                
+                case "ST_E":
+                    STE = ev.Schematic.Position;
+                    ev.Schematic.Destroy();
+                    break;
             }
 
+            // ラウンド毎に状態リセット
             FemurSetup = false;
             FemurBreaked = false;
             femuredPlayers.Clear();
@@ -172,17 +232,20 @@ namespace Slafight_Plugin_EXILED
 
         public void ChaosAnimation(SpawningTeamVehicleEventArgs ev)
         {
-            if (ev.Team.TargetFaction == Faction.FoundationEnemy)
+            if (ev.Team.TargetFaction != Faction.FoundationEnemy || ChaosBar is null)
+                return;
+
+            Timing.CallDelayed(2.25f, () =>
             {
-                Timing.CallDelayed(2.25f, () =>
-                {
-                    Timing.RunCoroutine(PlayBarAnim(ChaosBar, 22f));
-                });
-            }
+                Timing.RunCoroutine(PlayBarAnim(ChaosBar, 22f));
+            });
         }
 
         private IEnumerator<float> PlayBarAnim(SchematicObject schem, float waitTime)
         {
+            if (schem is null)
+                yield break;
+
             // 上に 4 上げる
             yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos, new Vector3(0, 4f, 0), 0.8f));
 
@@ -190,11 +253,15 @@ namespace Slafight_Plugin_EXILED
             yield return Timing.WaitForSeconds(waitTime);
 
             // 下に 4 下げる
-            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos + new Vector3(0f, 4f, 0f), new Vector3(0, -4f, 0), 1.5f));
+            yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos + new Vector3(0f, 4f, 0f),
+                new Vector3(0, -4f, 0), 1.5f));
         }
 
         private IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos, Vector3 offset, float duration)
         {
+            if (schem is null || duration <= 0f)
+                yield break;
+
             float elapsedTime = 0f;
             Vector3 startPos = startpos;
             Vector3 endPos = startPos + offset;
@@ -210,43 +277,61 @@ namespace Slafight_Plugin_EXILED
             schem.transform.position = endPos;
         }
 
-        private List<Player> femuredPlayers = new();
-        
         private void InteractionButton(PlayerSearchedToyEventArgs ev)
         {
             var specialEventsHandler = Plugin.Singleton.SpecialEventsHandler;
-            const float PositionTolerance = 0.75f;
-            
-            //Log.Debug($"Interacted: {ev.Interactable.Position}, OWB: {OWB}, Distance: {Vector3.Distance(ev.Interactable.Position, OWB)}");
-    
-            if (Vector3.Distance(ev.Interactable.Position, new Vector3(-17.25f, 291.60f, -36.89f)) <= PositionTolerance)
+
+            var pos = ev.Interactable.Position;
+
+            // ChaosBarボタン（固定座標）
+            if (ChaosBar != null &&
+                Vector3.SqrMagnitude(pos - new Vector3(-17.25f, 291.60f, -36.89f)) <= PositionTolerance * PositionTolerance)
             {
                 Timing.RunCoroutine(PlayBarAnim(ChaosBar, 3f));
             }
 
-            if (Vector3.Distance(ev.Interactable.Position, FBButton.Position) <= PositionTolerance)
+            // Femurボタン
+            if (FBButton != null &&
+                Vector3.SqrMagnitude(pos - FBButton.Position) <= PositionTolerance * PositionTolerance)
             {
                 if (FemurSetup && !FemurBreaked)
                 {
                     FemurBreaked = true;
+
+                    // femuredPlayersは固定サイズ小なのでforeachでOK
                     foreach (var fP in femuredPlayers.ToList())
                     {
+                        if (fP is null || !fP.IsConnected)
+                            continue;
+
                         fP.Kill("Femur Breakerの犠牲となった");
                     }
-                    foreach (var _player in Player.List)
+
+                    // 106処理はLINQでフィルタ→単ループ
+                    var scp106s = Player.List
+                        .Where(p =>
+                            p != null &&
+                            (p.GetCustomRole() == CRoleTypeId.Scp106 ||
+                             (p.GetCustomRole() == CRoleTypeId.None && p.Role.Type == RoleTypeId.Scp106)))
+                        .ToList();
+
+                    foreach (var scp in scp106s)
                     {
-                        if (_player.GetCustomRole() == CRoleTypeId.Scp106 || (_player.GetCustomRole() == CRoleTypeId.None && _player.Role.Type == RoleTypeId.Scp106))
+                        var local = scp;
+                        Timing.CallDelayed(28f, () =>
                         {
-                            Timing.CallDelayed(28f, () =>
-                            {
-                                _player.Kill("Femur Breakerによって再収容された");
-                            });
-                        }
+                            if (local != null && local.IsConnected)
+                                local.Kill("Femur Breakerによって再収容された");
+                        });
                     }
-                    CreateAndPlayAudio("FemurBreaker.ogg","FemurBreaker",Vector3.zero,true,null,false,999999999,0);
+
+                    CreateAndPlayAudio("FemurBreaker.ogg", "FemurBreaker", Vector3.zero, true, null, false, 999999999, 0);
+
                     Timing.CallDelayed(28f, () =>
                     {
-                        Exiled.API.Features.Cassie.MessageTranslated("SCP 1 0 6 recontained successfully by femur breaker","<color=red>SCP-106</color>のFEMUR BREAKERによる再収容に成功しました。");
+                        Exiled.API.Features.Cassie.MessageTranslated(
+                            "SCP 1 0 6 recontained successfully by femur breaker",
+                            "<color=red>SCP-106</color>のFEMUR BREAKERによる再収容に成功しました。");
                     });
                 }
                 else
@@ -255,90 +340,101 @@ namespace Slafight_Plugin_EXILED
                 }
             }
 
-            if (Vector3.Distance(ev.Interactable.Position, OWB) <= PositionTolerance)
+            // OMEGA WARHEAD ボタン
+            if (OWB != default &&
+                Vector3.SqrMagnitude(pos - OWB) <= PositionTolerance * PositionTolerance)
             {
                 if (!SpecialEventsHandler.IsWarheadable() || OmegaWarhead.IsWarheadStarted)
                 {
                     ev.Player.SendHint("何らかの要因で実行できませんでした");
                     return;
                 }
-                //Log.Debug($"OMEGA SWITCH: ACTIVATED\nlocalPID: {specialEventsHandler.EventPID}");
+
                 OmegaWarhead.StartProtocol(specialEventsHandler.EventPID);
             }
         }
 
         private void DoorInteracted(PlayerInteractedDoorEventArgs ev)
         {
-            const float PositionTolerance = 0.75f;
-            //Log.Debug($"DoorInteracted in: {ev.Door.Position}, OWJoin: {OWJoin}, Distance: {Vector3.Distance(ev.Door.Position, OWJoin)}");
-            if (Vector3.Distance(ev.Door.Position, OWJoin) <= PositionTolerance)
-            {
-                var castPlayer = Player.Get(ev.Player.NetworkId);
-                var allowOpen = false;
-                if (castPlayer != null)
-                {
-                    foreach (var item in castPlayer.Items.ToList())
-                    {
-                        CustomItem.TryGet(item, out var customItem);
-                        if (customItem is { Id: 2005 })
-                        {
-                            allowOpen = true;
-                        }
-                    }
+            if (OWJoin == default)
+                return;
 
-                    if (allowOpen)
-                    {
-                        ev.Door.IsOpened = !ev.Door.IsOpened;
-                    }
-                    else
-                    {
-                        ev.Player.SendHint("専用のアクセスパスが必要そうだ・・・");
-                    }
-                }
+            // OWJoinに一致するドアだけ特別処理
+            if (Vector3.SqrMagnitude(ev.Door.Position - OWJoin) > PositionTolerance * PositionTolerance)
+                return;
+
+            var castPlayer = Player.Get(ev.Player.NetworkId);
+            if (castPlayer == null)
+                return;
+
+            // LINQで目的のカードを一度だけ取得
+            bool allowOpen = castPlayer.Items.Any(item =>
+                CustomItem.TryGet(item, out var customItem) &&
+                customItem is { Id: 2005 });
+
+            if (allowOpen)
+            {
+                ev.Door.IsOpened = !ev.Door.IsOpened;
+            }
+            else
+            {
+                ev.Player.SendHint("専用のアクセスパスが必要そうだ・・・");
             }
         }
 
+        /// <summary>
+        /// FemurBreaker用の「近くにいる1人だけ」検出コルーチン（LINQ風）
+        /// </summary>
         private IEnumerator<float> FemurBreaker()
         {
-            for (;;)
+            // Lobby中は回さない
+            while (!Round.IsLobby && !Round.IsEnded)
             {
-                if (Round.IsLobby) yield break;
-                foreach (var player in Player.List)
+                // SCP以外でJoinPointに近いプレイヤーをLINQで1人だけ取る
+                var target = Player.List
+                    .Where(p =>
+                        p != null &&
+                        p.IsConnected &&
+                        p.GetTeam() != CTeam.SCPs &&
+                        Vector3.SqrMagnitude(p.Position - FBJoin) <= FemurJoinRadius * FemurJoinRadius)
+                    .FirstOrDefault();
+
+                if (target != null)
                 {
-                    if (Vector3.Distance(player.Position,FBJoin) <= 0.625f && player.GetTeam() != CTeam.SCPs)
-                    {
-                        player.Handcuff();
-                        player.Position = FBCP;
-                        femuredPlayers.Add(player);
-                        FemurSetup = true;
-                        Timing.RunCoroutine(Anim(FBDoor, FBDoor.Position, new Vector3(0f,-2.5f,0f),0.65f));
-                        yield break;
-                    }
+                    target.Handcuff();
+                    target.Position = FBCP;
+                    femuredPlayers.Add(target);
+                    FemurSetup = true;
+
+                    if (FBDoor != null)
+                        Timing.RunCoroutine(Anim(FBDoor, FBDoor.Position, new Vector3(0f, -2.5f, 0f), 0.65f));
+
+                    // 1人捕まえたら終了（常時監視しない）
+                    yield break;
                 }
+
+                // 0.5秒間隔ならGCもそこまで問題にならないが、
+                // 必要ならLINQをやめてforループにするとさらに軽くなる。[web:44][web:45]
                 yield return Timing.WaitForSeconds(0.5f);
             }
         }
-        
+
         ///////////////////////////
         /// SEASONABLE CONTENTS ///
         ///////////////////////////
         public void HolidaySeasonMapLoader()
         {
-            // 0=Normal,
-            // 1=Halloween,
-            // 2=Christmas,
-            // over=not available
-            if (Plugin.Singleton.Config.Season == 0)
+            // 0=Normal, 1=Halloween, 2=Christmas, over=not available
+            switch (Plugin.Singleton.Config.Season)
             {
-                return;
-            }
-            else if (Plugin.Singleton.Config.Season == 1)
-            {
-                MapUtils.LoadMap("Holiday_HalloweenMap");
-            }
-            else if (Plugin.Singleton.Config.Season == 2)
-            {
-                MapUtils.LoadMap("Holiday_ChristmasMap");
+                case 0:
+                    return;
+                case 1:
+                    MapUtils.LoadMap("Holiday_HalloweenMap");
+                    break;
+                case 2:
+                    MapUtils.LoadMap("Holiday_ChristmasMap");
+                    break;
             }
         }
     }

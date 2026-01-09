@@ -18,6 +18,7 @@ using PlayerRoles.PlayableScps.HumeShield;
 using PlayerStatsSystem;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
@@ -64,6 +65,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             Timing.CallDelayed(10f, () =>
             {
                 Timing.RunCoroutine(FifthistCoroutine());
+                Timing.RunCoroutine(NewAICoroutine());
                 if (Plugin.Singleton.Config.Season == 2)
                     Timing.RunCoroutine(SnowmanCoroutine());
             });
@@ -132,6 +134,90 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 yield return Timing.WaitForSeconds(1f);
             }
         }
+        
+        private IEnumerator<float> NewAICoroutine()
+        {
+            for (;;)
+            {
+                if (Round.IsLobby)
+                    yield break;
+
+                int scpCount = 0;
+                bool only079 = true;
+
+                // CTeamごとのカウント
+                int foundationCount = 0;  // FoundationForces + Scientists + Guards をまとめて「財団側」として扱うならここ
+                int classDCount = 0;
+                int chaosCount = 0;
+                int otherCount = 0;       // Fifthists, GoC, UIU, SerpentsHand など
+
+                List<Player> scps = new();
+                List<Player> scp079s = new();
+
+                foreach (Player player in Player.List)
+                {
+                    if (player == null || !player.IsAlive)
+                        continue;
+
+                    var team = player.GetTeam();  // CTeam
+                    var roleType = player.Role.Type;
+
+                    if (team == CTeam.SCPs)
+                    {
+                        scpCount++;
+                        scps.Add(player);
+
+                        if (roleType == RoleTypeId.Scp079)
+                            scp079s.Add(player);
+                        else
+                            only079 = false;
+                    }
+                    else if (team == CTeam.FoundationForces || team == CTeam.Scientists || team == CTeam.Guards)
+                    {
+                        foundationCount++;
+                    }
+                    else if (team == CTeam.ClassD)
+                    {
+                        classDCount++;
+                    }
+                    else if (team == CTeam.ChaosInsurgency)
+                    {
+                        chaosCount++;
+                    }
+                    else
+                    {
+                        otherCount++;
+                    }
+                }
+
+                // 「SCP陣営がSCP-079のみ」
+                bool scpSideIsOnly079 = scpCount > 0 && only079 && scp079s.Count == scpCount;
+
+                // 「SCP以外のCTeamが一つだけ」
+                int nonScpTeamsAlive = 0;
+                if (foundationCount > 0) nonScpTeamsAlive++;
+                if (classDCount > 0)     nonScpTeamsAlive++;
+                if (chaosCount > 0)      nonScpTeamsAlive++;
+                if (otherCount > 0)      nonScpTeamsAlive++;
+
+                bool onlyOneNonScpTeam = nonScpTeamsAlive == 1;
+
+                if (scpSideIsOnly079 && onlyOneNonScpTeam)
+                {
+                    // ここで079をkill
+                    foreach (var p in scp079s)
+                    {
+                        // 好きなダメージ種別でOK
+                        p.Kill("Terminated by C.A.S.S.I.E.","SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.");
+                    }
+
+                    // 条件一度満たしたらこのコルーチンは終了
+                    yield break;
+                }
+
+                yield return Timing.WaitForSeconds(1f);
+            }
+}
         
         List<CRoleTypeId> uniques = new()
         {
@@ -254,6 +340,35 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             light.Range = 10f;
             light.Intensity = 1.25f;
             light.Color = Color.magenta;
+            
+            Timing.RunCoroutine(Scp3005Coroutine(player));
+        }
+        
+        private IEnumerator<float> Scp3005Coroutine(Player player)
+        {
+            for (;;)
+            {
+                if (player.GetCustomRole() != CRoleTypeId.FifthistPriest)
+                    yield break;
+
+                foreach (Player target in Player.List)
+                {
+                    if (target == null || target == player || !target.IsAlive)
+                        continue;
+
+                    if (target.GetTeam() == CTeam.Fifthists)
+                        continue;
+
+                    float distance = Vector3.Distance(player.Position, target.Position);
+                    if (distance <= 2.75f)
+                    {
+                        target.Hurt(25f, "<color=#ff00fa>第五的</color>な力による影響");
+                        player.ShowHitMarker();
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(1.5f);
+            }
         }
 
         public void SpawnChaosCommando(Player player, RoleSpawnFlags roleSpawnFlags)

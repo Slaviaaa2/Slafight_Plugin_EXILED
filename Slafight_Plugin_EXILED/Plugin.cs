@@ -16,6 +16,7 @@ using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
 using HarmonyLib;
+using MEC;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
@@ -30,7 +31,10 @@ namespace Slafight_Plugin_EXILED
     public class Plugin : Plugin<Config>
     {
         public static Plugin Singleton { get; set; } = null!;
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(10) // デフォルトより短く/長く調整
+        };
         // Plugin Info
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
@@ -157,6 +161,11 @@ namespace Slafight_Plugin_EXILED
                 string json = JsonSerializer.Serialize(data);
                 using var content = new StringContent(json, Encoding.UTF8, "application/json");
                 await httpClient.PostAsync("http://localhost:5000/playercount", content);
+            }
+            catch (TaskCanceledException tce)
+            {
+                // 一時的なタイムアウトとして扱う
+                Log.Debug($"SendPlayerCountAsync timeout: {tce.Message}");
             }
             catch (Exception ex)
             {

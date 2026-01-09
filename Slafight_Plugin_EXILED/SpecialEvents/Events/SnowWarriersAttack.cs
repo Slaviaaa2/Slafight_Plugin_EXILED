@@ -9,6 +9,7 @@ using MEC;
 using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -52,15 +53,10 @@ public class SnowWarriersAttack
         DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
         
         if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-        int i=0;
-        foreach (Player player in Player.List)
+        var snowTargets = StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f);
+        foreach (var player in snowTargets)
         {
-            if (player.Role.Team != Team.SCPs)
-            {
-                Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player,RoleSpawnFlags.All);
-                i++;
-            }
-            if (i >= Math.Truncate(Player.List.Count/3f)) break;
+            Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, RoleSpawnFlags.All);
         }
 
         Timing.CallDelayed(8f, () =>

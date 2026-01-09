@@ -41,7 +41,8 @@ public class Scp682Role : CRole
 
         player.MaxHealth = 999;
         player.Health = player.MaxHealth;
-        player.MaxHumeShield = 10000;
+        player.MaxHumeShield = 2000;
+        player.HumeShieldRegenerationMultiplier = 55f;
         player.ClearInventory();
 
         // 先に Dictionary を初期化

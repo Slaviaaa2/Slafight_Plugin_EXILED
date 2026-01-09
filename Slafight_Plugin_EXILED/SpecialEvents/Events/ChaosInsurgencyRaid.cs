@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
@@ -9,6 +10,7 @@ using MEC;
 using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -51,16 +53,13 @@ public class ChaosInsurgencyRaid
         DecontaminationController.DeconBroadcastDeconMessage = "除染は取り消されました";
         
         if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
-        int i=0;
-        foreach (Player player in Player.List)
+        
+        var chaosTargets = StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f);
+        foreach (var player in chaosTargets)
         {
-            if (player.Role.Team != Team.SCPs)
-            {
-                Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player,RoleSpawnFlags.All);
-                i++;
-            }
-            if (i >= Math.Truncate(Player.List.Count/3f)) break;
+            Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player, RoleSpawnFlags.All);
         }
+        
         //Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2","警告、不明な部隊がGate Aで検出されました。確認を",true);
         Timing.CallDelayed(8f, () =>
         {

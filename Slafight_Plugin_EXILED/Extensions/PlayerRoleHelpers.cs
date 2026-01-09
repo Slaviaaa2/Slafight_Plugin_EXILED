@@ -38,6 +38,7 @@ public static class PlayerRoleHelpers
         // Scientists
         { "ZoneManager",      CRoleTypeId.ZoneManager },
         { "FacilityManager",  CRoleTypeId.FacilityManager },
+        { "Engineer",         CRoleTypeId.Engineer},
 
         // Facility Guards
         { "EvacuationGuard",  CRoleTypeId.EvacuationGuard },
@@ -161,6 +162,8 @@ public static class PlayerRoleHelpers
                 case CRoleTypeId.ZoneManager:
                     return CTeam.Scientists;
                 case CRoleTypeId.FacilityManager:
+                    return CTeam.Scientists;
+                case CRoleTypeId.Engineer:
                     return CTeam.Scientists;
                 // Other Threads
                 case CRoleTypeId.SnowWarrier:

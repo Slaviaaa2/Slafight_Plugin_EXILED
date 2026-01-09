@@ -139,6 +139,7 @@ public class SpecialEventsHandler
         isFifthistsRaidActive = false;
         SpawnSystem.Disable = false;
         MapExtensions.OmegaWarhead.IsWarheadStarted = false;
+        OperationBlackout.isOperation = false;
         EventPID++;
     }
     // Automatic Event Controls

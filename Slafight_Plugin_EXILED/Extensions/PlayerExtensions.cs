@@ -171,11 +171,20 @@ public static class PlayerExtensions
             case CRoleTypeId.Scp106:
                 new Scp106Role().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.Scp682:
+                new Scp682Role().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.Scp999:
+                new Scp999Role().SpawnRole(player, roleSpawnFlags);
+                break;
             case CRoleTypeId.FifthistRescure:
                 Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FifthistPriest:
                 Plugin.Singleton.CustomRolesHandler.SpawnF_Priest(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.FifthistConvert:
+                new FifthistConvert().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ChaosCommando:
                 Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player, roleSpawnFlags);
@@ -201,20 +210,14 @@ public static class PlayerExtensions
             case CRoleTypeId.FacilityManager:
                 new FacilityManager().SpawnRole(player, roleSpawnFlags);
                 break;
-            case CRoleTypeId.FifthistConvert:
-                new FifthistConvert().SpawnRole(player, roleSpawnFlags);
+            case CRoleTypeId.Engineer:
+                new Engineer().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Janitor:
                 new Janitor().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.SnowWarrier:
                 Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, roleSpawnFlags);
-                break;
-            case CRoleTypeId.Scp682:
-                new Scp682Role().SpawnRole(player, roleSpawnFlags);
-                break;
-            case CRoleTypeId.Scp999:
-                new Scp999Role().SpawnRole(player, roleSpawnFlags);
                 break;
         }
     }

@@ -39,17 +39,29 @@ public class OperationBlackout
         Exiled.Events.Handlers.Scp079.Recontaining -= DisableRecontainFunnies;
     }
 
-    private int globalEventPID = -1;
+    public static bool isOperation = false;
+    private int eventPID = 0;
     Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
+
+    private bool cancel(int eventPID)
+    {
+        if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID)
+        {
+            isOperation = false;
+            return true;
+        }
+
+        return false;
+    }
     
     public void Event()
     {
         var EventHandler = Plugin.Singleton.EventHandler;
         var SpecialEventHandler = Plugin.Singleton.SpecialEventsHandler;
-        int eventPID = SpecialEventHandler.EventPID;
-        globalEventPID = eventPID;
+        eventPID = SpecialEventHandler.EventPID;
+        isOperation = true;
         
-        if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (cancel(eventPID)) return;
 
         SpawnSystem.Disable = true; // Disable All Respawning.
 
@@ -144,7 +156,7 @@ public class OperationBlackout
     int generatedCount = 0;
     public void OnGenerated(GeneratorActivatingEventArgs ev)
     {
-        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (cancel(eventPID)) return;
         generatedCount++;
         if (generatedCount == 3)
         {
@@ -161,7 +173,7 @@ public class OperationBlackout
                     "全ての軽度収容区画の非常用発電機が起動され、重度収容区画とのエレベーターが再起動しました。",true);
                 Timing.CallDelayed(15f, () =>
                 {
-                    if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                    if (cancel(eventPID)) return;
                     Exiled.API.Features.Cassie.MessageTranslated("Warning, The Facility O 2 Supply Systems power down effect Detected. Please evacuation to the Upper Facility Zone.",
                         "警告、施設の酸素供給システムにて<color=red>停電による影響</color>が検出されました。出来るだけ早く施設の上部区画へ避難してください。",true);
                 });
@@ -182,16 +194,16 @@ public class OperationBlackout
                     "全ての重度収容区画の非常用発電機が起動され、エントランスゾーンのドアシステムが全て復帰しました。非常電源を用いてゲートのエレベーターを再起動しています・・・",true);
                 Timing.CallDelayed(60f, () =>
                 {
-                    if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                    if (cancel(eventPID)) return;
                     Exiled.API.Features.Cassie.MessageTranslated("Emergency Attention to the All personnel, Emergency Electric Power is Locked by Unknown Forces. and Facility O 2 is very very bad. Please evacuation to the Shelter or . .g1",
                         "全職員に緊急通達。非常用電源が何者かの影響によりロックされました。更に、現在の施設内酸素は<color=red>非常に悪く、危険</color>です。シェルター等に避難し、少しでも...(電力が切れる音)",true);
                     Timing.CallDelayed(15f, () =>
                     {
-                        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                        if (cancel(eventPID)) return;
                         CreateAndPlayAudio("oxygen.ogg","Cassie",Vector3.zero,true,null,false,999999999,0);
                         Timing.CallDelayed(232f, () =>
                         {
-                            if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+                            if (cancel(eventPID)) return;
                             foreach (Player player in Player.List)
                             {
                                 player.EnableEffect(EffectType.Asphyxiated, 255);
@@ -209,16 +221,17 @@ public class OperationBlackout
 
     public void DisableRecontainFunnies(RecontainingEventArgs ev)
     {
-        if (globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
+        if (cancel(eventPID)) return;
+        Log.Debug("Canceling Recontain SCP-079");
         ev.IsAllowed = false;
-        ev.Player.ShowHint("<size=26>電力が無いようだ・・・</size>");
+        ev.Player?.ShowHint("<size=26>電力が無いようだ・・・</size>");
     }
 
     private IEnumerator<float> Coroutine()
     {
         for (;;)
         {
-            if (Round.IsLobby || globalEventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) yield break;
+            if (Round.IsLobby || cancel(eventPID)) yield break;
             foreach (Player player in Player.List)
             {
                 player.EnableEffect(EffectType.Asphyxiated, 255);

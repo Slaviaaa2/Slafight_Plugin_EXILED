@@ -62,4 +62,10 @@ public static class PlayerAbilityExtensions
 
         loadout.CycleNext();
     }
+
+    public static void ShowAbilityHint(this Player player)
+    {
+        if (!AbilityManager.TryGetLoadout(player, out var loadout))
+            return;
+    }
 }

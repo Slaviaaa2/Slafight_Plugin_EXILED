@@ -186,6 +186,7 @@
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\Guards\SecurityChief.cs" />
+        <Compile Include="CustomRoles\Scientist\Engineer.cs" />
         <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
@@ -195,11 +196,13 @@
         <Compile Include="Extensions\PlayerCustomItemExtensions.cs" />
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
+        <Compile Include="Extensions\StaticUtils.cs" />
         <Compile Include="FirstRolesHandler.cs" />
         <Compile Include="MapExtensions\MapFlags.cs" />
         <Compile Include="MapExtensions\OmegaWarhead.cs" />
         <Compile Include="MapExtensions\PDEx.cs" />
         <Compile Include="MapExtensions\Sinkhole.cs" />
+        <Compile Include="MapExtensions\TrainComing.cs" />
         <Compile Include="RPNameSetter.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
