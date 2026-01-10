@@ -18,6 +18,7 @@ using System.Text.Json;
 using HarmonyLib;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.MapExtensions;
@@ -65,6 +66,7 @@ namespace Slafight_Plugin_EXILED
         public OperationBlackout OperationBlackout { get; set; }
         public Sinkhole Sinkhole { get; set; }
         public PDEx PDEx { get; set; }
+        public Engineer EngineerRole { get; private set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -89,6 +91,9 @@ namespace Slafight_Plugin_EXILED
             PDEx = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
+
+            EngineerRole = new Engineer();
+            EngineerRole.RegisterEvents();
             
             CRole.RegisterAllEvents();
             AbilityBase.RegisterEvents();
@@ -122,6 +127,8 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
             
             LabApiHandler = null;
+            
+            EngineerRole.UnregisterEvents();
             
             CRole.UnregisterAllEvents();
             AbilityBase.UnregisterEvents();

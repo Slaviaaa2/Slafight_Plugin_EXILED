@@ -20,21 +20,21 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GunE11SR)]
-public class GunN7CR : CustomWeapon
+[CustomItem(ItemType.GunFRMG0)]
+public class GunN7Weltkrieg : CustomWeapon
 {
-    public override uint Id { get; set; } = 11;
-    public override string Name { get; set; } = "MTF-N7-CR";
-    public override string Description { get; set; } = "Nu-7 Commanderが使用する銃。";
-    public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunE11SR;
+    public override uint Id { get; set; } = 2011;
+    public override string Name { get; set; } = "Nu7 Weltkrieg級軽機関銃";
+    public override string Description { get; set; } = "Nu-7 Marshalが使用するとても強い軽機関銃。威厳を感じさせる";
+    public override float Weight { get; set; } = 5f;
+    public override ItemType Type { get; set; } = ItemType.GunFRMG0;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
+    public override float Damage { get; set; } = 100f;
+    public override Vector3 Scale { get; set; } = new (1.15f,1.3f,1.25f);
     public override byte ClipSize { get; set; } = 100;
 
-    public Color glowColor = Color.cyan;
+    public Color glowColor = new Color(30f, 30f, 30f);
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
@@ -51,26 +51,6 @@ public class GunN7CR : CustomWeapon
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
-    }
-
-    private void LimitPatch(PickingUpItemEventArgs ev)
-    {
-        if (Check(ev.Pickup))
-        {
-            ev.Player.SetAmmoLimit(AmmoType.Nato9,200);
-            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
-            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
-            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
-            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
-        }
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)
@@ -106,7 +86,7 @@ public class GunN7CR : CustomWeapon
             light.Color = glowColor;
 
             light.Intensity = 0.7f;
-            light.Range = 5f;
+            light.Range = 8f;
             light.ShadowType = LightShadows.None;
 
             light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);

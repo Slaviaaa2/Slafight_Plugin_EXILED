@@ -20,21 +20,21 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GunE11SR)]
-public class GunN7CR : CustomWeapon
+[CustomItem(ItemType.GunLogicer)]
+public class GunSuperLogicer : CustomWeapon
 {
-    public override uint Id { get; set; } = 11;
-    public override string Name { get; set; } = "MTF-N7-CR";
-    public override string Description { get; set; } = "Nu-7 Commanderが使用する銃。";
+    public override uint Id { get; set; } = 2006;
+    public override string Name { get; set; } = "Logicer SUPER";
+    public override string Description { get; set; } = "最新式のLogicer。SUPERに強化されている。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunE11SR;
+    public override ItemType Type { get; set; } = ItemType.GunLogicer;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 100;
+    public override float Damage { get; set; } = 50f;
+    public override Vector3 Scale { get; set; } = new (1.08f,1f,1.35f);
+    public override byte ClipSize { get; set; } = 255;
 
-    public Color glowColor = Color.cyan;
+    public Color glowColor = Color.yellow;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
@@ -47,6 +47,7 @@ public class GunN7CR : CustomWeapon
 
     protected override void UnsubscribeEvents()
     {
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         

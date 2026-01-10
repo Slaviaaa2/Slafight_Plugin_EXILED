@@ -29,11 +29,14 @@ public static class PlayerRoleHelpers
 
         // Chaos Insurgency
         { "CI_Commando",  CRoleTypeId.ChaosCommando },
+        { "ChaosSignal",  CRoleTypeId.ChaosSignal },
 
         // Foundation Forces
         { "NtfAide",      CRoleTypeId.NtfLieutenant },
+        { "NtfGeneral",   CRoleTypeId.NtfGeneral },
         { "HdInfantry",   CRoleTypeId.HdInfantry },
         { "HdCommander",  CRoleTypeId.HdCommander },
+        { "HdMarshal",    CRoleTypeId.HdMarshal },
 
         // Scientists
         { "ZoneManager",      CRoleTypeId.ZoneManager },
@@ -141,14 +144,20 @@ public static class PlayerRoleHelpers
                 case CRoleTypeId.FifthistConvert:
                     return CTeam.Fifthists;
                 // Chaos Insurgency
-                case  CRoleTypeId.ChaosCommando:
+                case CRoleTypeId.ChaosCommando:
+                    return CTeam.ChaosInsurgency;
+                case CRoleTypeId.ChaosSignal:
                     return CTeam.ChaosInsurgency;
                 // Foundation Forces
                 case CRoleTypeId.NtfLieutenant:
                     return CTeam.FoundationForces;
+                case CRoleTypeId.NtfGeneral:
+                    return CTeam.FoundationForces;
                 case CRoleTypeId.HdInfantry:
                     return CTeam.FoundationForces;
                 case CRoleTypeId.HdCommander:
+                    return CTeam.FoundationForces;
+                case CRoleTypeId.HdMarshal:
                     return CTeam.FoundationForces;
                 // Guards
                 case CRoleTypeId.EvacuationGuard:

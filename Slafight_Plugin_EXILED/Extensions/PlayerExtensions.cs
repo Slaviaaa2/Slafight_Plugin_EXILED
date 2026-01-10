@@ -5,7 +5,9 @@ using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
+using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 namespace Slafight_Plugin_EXILED.Extensions;
@@ -187,16 +189,25 @@ public static class PlayerExtensions
                 new FifthistConvert().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ChaosCommando:
-                Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player, roleSpawnFlags);
+                new ChaosCommando().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.ChaosSignal:
+                new ChaosSignal().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.NtfLieutenant:
                 new NtfAide().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.NtfGeneral:
+                new NtfGeneral().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.HdInfantry:
                 new HdInfantry().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.HdCommander:
                 new HdCommander().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.HdMarshal:
+                new HdMarshal().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.EvacuationGuard:
                 new EvacuationGuard().SpawnRole(player, roleSpawnFlags);
@@ -211,7 +222,7 @@ public static class PlayerExtensions
                 new FacilityManager().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Engineer:
-                new Engineer().SpawnRole(player, roleSpawnFlags);
+                Plugin.Singleton.EngineerRole.SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Janitor:
                 new Janitor().SpawnRole(player, roleSpawnFlags);

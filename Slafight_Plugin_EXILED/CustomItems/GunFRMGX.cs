@@ -20,21 +20,21 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GunE11SR)]
-public class GunN7CR : CustomWeapon
+[CustomItem(ItemType.GunFRMG0)]
+public class GunFRMGX : CustomWeapon
 {
-    public override uint Id { get; set; } = 11;
-    public override string Name { get; set; } = "MTF-N7-CR";
-    public override string Description { get; set; } = "Nu-7 Commanderが使用する銃。";
+    public override uint Id { get; set; } = 2007;
+    public override string Name { get; set; } = "FRMG-X";
+    public override string Description { get; set; } = "財団の無理を押し通して購入された最新式のFRMG-0。全体的に強化されている。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunE11SR;
+    public override ItemType Type { get; set; } = ItemType.GunFRMG0;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 100;
+    public override float Damage { get; set; } = 65f;
+    public override Vector3 Scale { get; set; } = new (1.08f,1f,1.35f);
+    public override byte ClipSize { get; set; } = 150;
 
-    public Color glowColor = Color.cyan;
+    public Color glowColor = Color.blue;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
@@ -47,30 +47,11 @@ public class GunN7CR : CustomWeapon
 
     protected override void UnsubscribeEvents()
     {
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
-    }
-
-    private void LimitPatch(PickingUpItemEventArgs ev)
-    {
-        if (Check(ev.Pickup))
-        {
-            ev.Player.SetAmmoLimit(AmmoType.Nato9,200);
-            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
-            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
-            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
-            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
-        }
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)

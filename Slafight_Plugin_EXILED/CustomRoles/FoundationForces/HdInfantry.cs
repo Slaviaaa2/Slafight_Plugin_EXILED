@@ -14,7 +14,7 @@ public class HdInfantry : CRole
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.NtfPrivate);
         player.UniqueRole = "HdInfantry";
-        player.MaxHealth = 100;
+        player.MaxHealth = 110;
         player.Health = player.MaxHealth;
         player.ClearInventory();
         Log.Debug("Giving Items to HdInfantry");

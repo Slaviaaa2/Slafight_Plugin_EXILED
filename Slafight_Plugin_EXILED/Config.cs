@@ -47,6 +47,13 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public PlayingCard _PlayingCard { get; set; } = new(); // 2003
         [Description("")] public Quarter _Quarter { get; set; } = new(); // 2004
         [Description("")] public OmegaWarheadAccess _OmegaWarheadAccess { get; set; } = new(); // 2005
+        [Description("")] public GunSuperLogicer _GunSuperLogicer { get; set; } = new(); // 2006
+        [Description("")] public GunFRMGX _GunFRMGX { get; set; } = new(); // 2007
+        [Description("")] public SerumD _SerumD { get; set; } = new(); // 2008
+        [Description("")] public AdvancedMedkit _AdvancedMedkit { get; set; } = new(); // 2009
+        [Description("")] public SerumC _SerumC { get; set; } = new(); // 2010
+        [Description("")] public GunN7Weltkrieg _GunN7Weltkrieg { get; set; } = new(); // 2011
+        [Description("")] public SNAV300 _SNAV300 { get; set; } = new(); // 2012
 
         [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
         [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101

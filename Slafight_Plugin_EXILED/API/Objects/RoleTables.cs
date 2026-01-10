@@ -25,7 +25,8 @@ public static class RoleTables
     {
         RoleTypeId.Scientist,
         CRoleTypeId.ZoneManager,
-        CRoleTypeId.FacilityManager
+        CRoleTypeId.FacilityManager,
+        CRoleTypeId.Engineer
     };
 
     public static readonly List<object> GuardRoles = new()

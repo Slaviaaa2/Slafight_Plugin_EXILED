@@ -396,8 +396,7 @@ namespace Slafight_Plugin_EXILED
 
             });
         }
-
-
+        
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
             foreach (Player player in Player.List)

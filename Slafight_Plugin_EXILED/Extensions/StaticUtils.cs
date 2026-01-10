@@ -1,8 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups;
+using Exiled.CustomItems.API.Features;
 using Slafight_Plugin_EXILED.API.Enums;
+using UnityEngine;
+using Random = System.Random;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 
@@ -57,5 +64,72 @@ public static class StaticUtils
             (list[i], list[pos]) = (list[pos], list[i]);
         }
         return list.Take(count);
+    }
+    
+    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
+    {
+        var list = source.ToList();
+        int n = list.Count;
+        for (int i = 0; i < n - 1; i++)
+        {
+            int j = UnityEngine.Random.Range(i, n);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+        return list;
+    }
+    
+    // Give Or Drop
+    extension(Player player)
+    {
+        public void GiveOrDrop(ItemType itemType)
+        {
+            if (player.IsInventoryFull)
+            {
+                Pickup.CreateAndSpawn(itemType, player.Position + Vector3.up * 0.5f);
+            }
+            else
+            {
+                player.AddItem(itemType);
+            }
+        }
+
+        public void GiveOrDrop(uint customId)
+        {
+            if (player.IsInventoryFull)
+            {
+                CustomItem.TrySpawn(customId, player.Position + Vector3.up * 0.5f, out _);
+            }
+            else
+            {
+                player.TryAddCustomItem(customId);
+            }
+        }
+
+        public bool HasPermission(KeycardPermissions permissions, bool requireAll = false)
+        {
+            if (permissions == KeycardPermissions.None) return true;
+
+            foreach (var item in player.Items.ToList())
+            {
+                if (!item.IsKeycard || item is not Keycard keycard) continue;
+                if (requireAll)
+                {
+                    // 全権限必須: 全てのフラグがONかチェック
+                    if ((keycard.Permissions & permissions) == permissions)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    // いずれかOK: 共通フラグがあればtrue
+                    if (keycard.Permissions.HasFlagFast(permissions))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

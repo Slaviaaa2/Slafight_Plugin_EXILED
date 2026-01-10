@@ -157,11 +157,13 @@
         <Compile Include="Abilities\MagicMissileAbility.cs" />
         <Compile Include="Abilities\SoundOfFifthAbility.cs" />
         <Compile Include="API\Enums\CTeam.cs" />
+        <Compile Include="API\Enums\TaskType.cs" />
         <Compile Include="API\Features\AbilityBase.cs" />
         <Compile Include="API\Features\AbilityInputHandler.cs" />
         <Compile Include="API\Features\AbilityLoadout.cs" />
         <Compile Include="API\Features\AbilityManager.cs" />
         <Compile Include="API\Features\AbilityParseHelper.cs" />
+        <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
@@ -172,9 +174,13 @@
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
+        <Compile Include="CustomItems\AdvancedMedkit.cs" />
         <Compile Include="CustomItems\FakeGrenade.cs" />
+        <Compile Include="CustomItems\GunFRMGX.cs" />
         <Compile Include="CustomItems\GunFSP18.cs" />
+        <Compile Include="CustomItems\GunN7Weltkrieg.cs" />
         <Compile Include="CustomItems\GunProject90.cs" />
+        <Compile Include="CustomItems\GunSuperLogicer.cs" />
         <Compile Include="CustomItems\KeycardConscripts.cs" />
         <Compile Include="CustomItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomItems\MasterCard.cs" />
@@ -182,8 +188,15 @@
         <Compile Include="CustomItems\Quarter.cs" />
         <Compile Include="CustomItems\Scp1425.cs" />
         <Compile Include="CustomItems\PlayingCard.cs" />
+        <Compile Include="CustomItems\SerumC.cs" />
+        <Compile Include="CustomItems\SerumD.cs" />
+        <Compile Include="CustomItems\SNAV300.cs" />
+        <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
+        <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
+        <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
+        <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\Guards\SecurityChief.cs" />
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />
@@ -279,7 +292,6 @@
       <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="CustomRoles\ChaosInsurgency\" />
       <Folder Include="Managers\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

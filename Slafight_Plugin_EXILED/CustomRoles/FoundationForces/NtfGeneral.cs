@@ -4,38 +4,39 @@ using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
-public class HdCommander : CRole
+public class NtfGeneral : CRole
 {
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfSergeant);
-        player.UniqueRole = "HdCommander";
-        player.MaxHealth = 125;
+        player.Role.Set(RoleTypeId.NtfCaptain);
+        player.UniqueRole = "NtfGeneral";
+        player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-        Log.Debug("Giving Items to HdCommander");
-        player.AddItem(ItemType.KeycardMTFOperative);
-        player.AddItem(ItemType.Adrenaline);
-        player.AddItem(ItemType.Medkit);
+        Log.Debug("Giving Items to NtfGeneral");
+        player.AddItem(ItemType.KeycardMTFCaptain);
+        player.TryAddCustomItem(2008);
+        player.TryAddCustomItem(2009);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
         CustomItem.TryGive(player, 12,false);
-        CustomItem.TryGive(player, 11, false);
+        CustomItem.TryGive(player, 2007, false);
             
-        player.AddAmmo(AmmoType.Nato556,200);
+        player.AddAmmo(AmmoType.Nato556,350);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
-        player.CustomInfo = "<color=#727472>Hammer Down Commander</color>";
+        player.CustomInfo = "Nine-tailed Fox General";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#252525>ハンマーダウン 指揮官</color>\nNu-7の歩兵たちを指揮し、制圧を進める。\n偉大なる我らが元帥の指示に従え！",10f);
+            player.ShowHint("<color=blue>九尾狐 司令官</color>\nEpsilon-11を率いる高位の司令官。\n隊長等と連携し、確実に施設に安定をもたらせ！",10f);
         });
     }
 }

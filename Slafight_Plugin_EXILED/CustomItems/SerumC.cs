@@ -1,44 +1,42 @@
 using System.Collections.Generic;
-using AdvancedMERTools;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
-using Exiled.API.Structs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.Handlers;
-using InventorySystem.Items.Armor;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GunE11SR)]
-public class GunN7CR : CustomWeapon
+[CustomItem(ItemType.Adrenaline)]
+public class SerumC : CustomItem
 {
-    public override uint Id { get; set; } = 11;
-    public override string Name { get; set; } = "MTF-N7-CR";
-    public override string Description { get; set; } = "Nu-7 Commanderが使用する銃。";
+    public override uint Id { get; set; } = 2010;
+    public override string Name { get; set; } = "Serum-C";
+    public override string Description { get; set; } = "Serum-Dを元に開発された上級のセラム。短時間、器用さと早さを大幅に向上させる";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GunE11SR;
-    public override SpawnProperties SpawnProperties { get; set; } = new();
+    public override ItemType Type { get; set; } = ItemType.Adrenaline;
 
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 100;
-
-    public Color glowColor = Color.cyan;
+    public Color glowColor = Color.green;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
+
+    public override SpawnProperties SpawnProperties { get; set; } = new();
 
     protected override void SubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.UsedItem += OnUsed;
+        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         
@@ -47,29 +45,20 @@ public class GunN7CR : CustomWeapon
 
     protected override void UnsubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.UsedItem -= OnUsed;
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
     }
-
-    private void LimitPatch(PickingUpItemEventArgs ev)
-    {
-        if (Check(ev.Pickup))
-        {
-            ev.Player.SetAmmoLimit(AmmoType.Nato9,200);
-            ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
-            ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
+    
+    private void OnUsed(UsedItemEventArgs ev)
     {
         if (Check(ev.Item))
         {
-            ev.Player.ResetAmmoLimit(AmmoType.Nato9);
-            ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
-            ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
+            ev.Player.EnableEffect(EffectType.Scp1853, 4, 30);
+            ev.Player.EnableEffect(EffectType.MovementBoost, 15, 30);
         }
     }
     

@@ -101,6 +101,14 @@ public class OperationBlackout
                 lift.TryStart(1,false);
             }
         }
+        foreach (var generator in Generator.List)
+        {
+            if (generator.Position.GetZone() == FacilityZone.LightContainment)
+            {
+                generator.KeycardPermissions = KeycardPermissions.Intercom;
+                Log.Debug($"[LczGenPermLog]{generator.KeycardPermissions}");
+            }
+        }
 
         Timing.CallDelayed(0.5f, () =>
         {

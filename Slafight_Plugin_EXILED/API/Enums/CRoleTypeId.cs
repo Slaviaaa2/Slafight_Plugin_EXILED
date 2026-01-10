@@ -28,5 +28,8 @@ public enum CRoleTypeId
     Scp106 = 19,
     Scp3114 = 20,
     SecurityChief = 21,
-    Engineer = 22
+    Engineer = 22,
+    HdMarshal = 23,
+    NtfGeneral = 24,
+    ChaosSignal = 25
 }

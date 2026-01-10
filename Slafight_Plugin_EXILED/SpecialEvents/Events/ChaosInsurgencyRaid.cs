@@ -57,7 +57,7 @@ public class ChaosInsurgencyRaid
         var chaosTargets = StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f);
         foreach (var player in chaosTargets)
         {
-            Plugin.Singleton.CustomRolesHandler.SpawnChaosCommando(player, RoleSpawnFlags.All);
+            player.SetRole(CRoleTypeId.ChaosCommando);
         }
         
         //Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2","警告、不明な部隊がGate Aで検出されました。確認を",true);

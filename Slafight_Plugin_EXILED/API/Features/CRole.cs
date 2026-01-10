@@ -24,10 +24,14 @@ public abstract class CRole
     
     static CRole()
     {
-        RoleTypes = typeof(CRole).Assembly.GetTypes()
+        var asm = typeof(CRole).Assembly;
+        RoleTypes = asm.GetTypes()
             .Where(t => t.IsSubclassOf(typeof(CRole)) && !t.IsAbstract)
+            .Where(t => t.GetCustomAttributes(typeof(CRoleAutoRegisterIgnoreAttribute), true).Length == 0)
             .ToList();
     }
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class CRoleAutoRegisterIgnoreAttribute : Attribute { }
     
     // 各子クラスがoverride（オプション）
     public virtual void RegisterEvents() { }
