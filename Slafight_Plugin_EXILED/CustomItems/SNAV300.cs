@@ -95,7 +95,7 @@ public class SNAV300 : CustomItem
     {
         if (!Check(ev.Item)) return;
         Radio radio = Item.Get<Radio>(ev.Item.Base);
-        if (radio == null) return;
+        if (radio == null || radio.BatteryLevel <= 0) return;
         ev.IsAllowed = false;
         switch (mode)
         {
@@ -112,6 +112,11 @@ public class SNAV300 : CustomItem
                 radio.BatteryLevel -= 40;
                 break;
         }
+        if (radio.BattereyLevel < 0)
+        {
+            radio.BatteryLevel = 0;
+            return;
+        } 
 
         List<Room> detected = [];
         Vector3 playerPos = ev.Player.Position;
