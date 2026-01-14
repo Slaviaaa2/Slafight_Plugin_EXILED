@@ -92,7 +92,7 @@ public class Engineer : CRole
 
         Timing.CallDelayed(0.1f, () =>
         {
-            player.ShowHint("<color=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
+            player.ShowHint("lor=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
 
             if (state.HudRoutine != default)
             {
@@ -134,7 +134,8 @@ public class Engineer : CRole
         else
             text = $"タスク：{st.Task}\nLv.{st.Level} EXP:{st.Exp}";
 
-        Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, text, player);
+        // ★ 修正: RoleSpecificTextProvider を使用
+        RoleSpecificTextProvider.Set(player, text);
     }
 
     private IEnumerator<float> HudLoop(Player player)
@@ -207,7 +208,7 @@ public class Engineer : CRole
             if (st.Exp < need || st.Level >= 5)
                 break;
 
-            st.Exp -= need;   // ★必要分だけ消費して超過分を残す
+            st.Exp -= need;
             st.Level++;
             OnLevelUp(player, st);
         }
@@ -255,8 +256,6 @@ public class Engineer : CRole
         }
     }
 
-    // ========= イベント =========
-
     private void OnDropping(DroppingItemEventArgs ev)
     {
         if (!ev.IsAllowed) return;
@@ -264,7 +263,8 @@ public class Engineer : CRole
         if (GetState(ev.Player) is { Level: < 5 })
         {
             if (ev.Item.Type == ItemType.KeycardResearchCoordinator ||
-                ev.Item.Type == ItemType.KeycardContainmentEngineer || ev.Item.Type == ItemType.KeycardFacilityManager ||
+                ev.Item.Type == ItemType.KeycardContainmentEngineer || 
+                ev.Item.Type == ItemType.KeycardFacilityManager ||
                 ev.Item.Type == ItemType.KeycardO5)
             {
                 ev.IsAllowed = false;

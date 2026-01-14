@@ -16,6 +16,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp966Role : CRole
 {
+    private static readonly Dictionary<Player, int> SpeedLevels = new();
+    
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguising += ExtendTime;
@@ -32,9 +34,7 @@ public class Scp966Role : CRole
         base.UnregisterEvents();
     }
     
-    private static readonly Dictionary<Player, int> SpeedLevels = new();
-    
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp3114);
@@ -45,19 +45,19 @@ public class Scp966Role : CRole
         SpeedLevels[player] = 0;
         player.ClearInventory();
 
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
-        player.CustomInfo = "<color=#C50000>SCP-966</color>";
+        player.CustomInfo = "lor=#C50000>SCP-966</color>";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
             
         Room SpawnRoom = Room.Get(RoomType.LczGlassBox);
         Log.Debug(SpawnRoom.Position);
-        Vector3 offset = new Vector3(0f,1.5f,0f);
+        Vector3 offset = new Vector3(0f, 1.5f, 0f);
         player.Position = SpawnRoom.Position + SpawnRoom.Rotation * offset;
         player.Rotation = SpawnRoom.Rotation;
+        
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-966</color>\n透明～！",10f);
+            player.ShowHint("lor=red>SCP-966</color>\n透明～！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));
     }
@@ -69,7 +69,8 @@ public class Scp966Role : CRole
             var speedLevel = SpeedLevels[player];
             if (player.GetCustomRole() != CRoleTypeId.Scp966)
             {
-                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,"",player);
+                // ★ 修正: RoleSpecificTextProvider を使用
+                RoleSpecificTextProvider.Set(player, "");
                 player.DisableEffect(EffectType.Invisible);
                 player.DisableEffect(EffectType.NightVision);
                 player.DisableEffect(EffectType.Slowness);
@@ -77,7 +78,7 @@ public class Scp966Role : CRole
                 yield break;
             }
 
-            if (UnityEngine.Random.Range(0,3)==0)
+            if (UnityEngine.Random.Range(0, 3) == 0)
             {
                 player.DisableEffect(EffectType.Invisible);
                 player.CurrentRoom.RoomLightController.ServerFlickerLights(0.5f);
@@ -86,18 +87,19 @@ public class Scp966Role : CRole
             {
                 player.EnableEffect(EffectType.Invisible);
             }
-            player.EnableEffect(EffectType.NightVision,255);
+            
+            player.EnableEffect(EffectType.NightVision, 255);
             if (speedLevel <= 0)
             {
-                player.EnableEffect(EffectType.Slowness,20);
+                player.EnableEffect(EffectType.Slowness, 20);
             }
             else if (speedLevel == 1)
             {
-                player.EnableEffect(EffectType.Slowness,10);
+                player.EnableEffect(EffectType.Slowness, 10);
             }
             else if (speedLevel == 2)
             {
-                player.EnableEffect(EffectType.Slowness,0);
+                player.EnableEffect(EffectType.Slowness, 0);
             }
             else if (speedLevel == 3)
             {
@@ -108,7 +110,10 @@ public class Scp966Role : CRole
                 player.EnableEffect(EffectType.MovementBoost, 20);
             }
             
-            Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific,("Speed Level: "+(Math.Abs(speedLevel+1))+"/5"),player);
+            // ★ 修正: RoleSpecificTextProvider を使用
+            RoleSpecificTextProvider.Set(player, 
+                "Speed Level: " + (Math.Abs(speedLevel + 1)) + "/5");
+            
             yield return Timing.WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
         }
     }
@@ -140,7 +145,9 @@ public class Scp966Role : CRole
         if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp966)
         {
             SpeedLevels.Remove(ev.Player);
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .","<color=red>SCP-966</color>の終了に成功しました。");
+            Exiled.API.Features.Cassie.MessageTranslated(
+                "SCP 9 6 6 Successfully Terminated .",
+                "lor=red>SCP-966</color>の終了に成功しました。");
         }
     }
 }

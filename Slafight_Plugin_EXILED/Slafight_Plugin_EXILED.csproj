@@ -159,6 +159,7 @@
         <Compile Include="API\Enums\CTeam.cs" />
         <Compile Include="API\Enums\TaskType.cs" />
         <Compile Include="API\Features\AbilityBase.cs" />
+        <Compile Include="API\Features\AbilityLocalisation.cs" />
         <Compile Include="API\Features\AbilityInputHandler.cs" />
         <Compile Include="API\Features\AbilityLoadout.cs" />
         <Compile Include="API\Features\AbilityManager.cs" />
@@ -168,6 +169,7 @@
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
         <Compile Include="API\Features\RoleParseHelper.cs" />
+        <Compile Include="API\Features\RoleSpecificTextProvider.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="ChristmasChanges.cs" />
         <Compile Include="Commands\DevTools\AbilityUniversal.cs" />

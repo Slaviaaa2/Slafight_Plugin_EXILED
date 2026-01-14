@@ -11,7 +11,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class RunEvent : ICommand
 {
     public string Command => "run";
-    public string[] Aliases { get; } = { "runsp","sprun","specialevent",".2" };
+    public string[] Aliases { get; } = { "runsp","sprun","specialevent",".run" };
     public string Description => "Immediately run a special event by SpecialEventType.";
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

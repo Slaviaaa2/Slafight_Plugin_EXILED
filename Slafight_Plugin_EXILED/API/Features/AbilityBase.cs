@@ -328,4 +328,26 @@ public abstract class AbilityBase
                 3f);
         }
     }
+    
+    // ===== 外部からのHUD用API =====
+    public static bool TryGetAbilityState(Player player, AbilityBase ability, 
+        out bool canUse, out float cooldownSecondsRemaining, out int usesLeft, out int maxUses)
+    {
+        canUse = false;
+        cooldownSecondsRemaining = 0f;
+        usesLeft = 0;
+        maxUses = -1;
+
+        if (ability == null || !playerStates.TryGetValue(player.Id, out var states) ||
+            !states.TryGetValue(ability.GetType(), out var state))
+            return false;
+
+        canUse = state.CanUse;
+        cooldownSecondsRemaining = state.CanUse ? 0f : state.CooldownSeconds;
+        maxUses = state.MaxUses;
+        usesLeft = (state.MaxUses < 0) ? -1 : (state.MaxUses - state.UsedCount);
+
+        return true;
+    }
+
 }

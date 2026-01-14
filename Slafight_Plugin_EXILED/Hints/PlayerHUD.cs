@@ -1,5 +1,6 @@
 
 #nullable enable
+using System;
 using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -9,6 +10,7 @@ using HintServiceMeow.UI.Utilities;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
@@ -16,6 +18,7 @@ namespace Slafight_Plugin_EXILED.Hints;
 
 public class PlayerHUD
 {
+    private CoroutineHandle _specificAbilityLoop;
     public PlayerHUD()
     {
         Exiled.Events.Handlers.Player.Verified += ServerInfoHint;
@@ -24,6 +27,9 @@ public class PlayerHUD
         Exiled.Events.Handlers.Server.RoundStarted += AllSyncHUD_;
         Exiled.Events.Handlers.Server.RestartingRound += DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += Spectate;
+        
+        // コンストラクタに追加
+        _specificAbilityLoop = Timing.RunCoroutine(SpecificAbilityHudLoop());
     }
 
     ~PlayerHUD()
@@ -34,8 +40,10 @@ public class PlayerHUD
         Exiled.Events.Handlers.Server.RoundStarted -= AllSyncHUD_;
         Exiled.Events.Handlers.Server.RestartingRound -= DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer -= Spectate;
+        
+        if (_specificAbilityLoop.IsRunning)
+            Timing.KillCoroutines(_specificAbilityLoop);
     }
-
     private string ServerInfo_Text;
     private string PHUD_Role_Text;
     private string PHUD_Objective_Text;
@@ -164,12 +172,14 @@ public class PlayerHUD
             PlayerDisplay display = PlayerDisplay.Get(player);
             display.GetHint("PlayerHUD_Event").Text = "[Event]\n" + "<size=28>"+PHUD_Event_Text+"</size>";
         }
+        /*
         else if (syncType == SyncType.PHUD_Specific)
         {
             PHUD_Specific_Text = hintText;
             PlayerDisplay display = PlayerDisplay.Get(player);
             display.GetHint("PlayerHUD_Specific").Text = PHUD_Specific_Text;
         }
+        */
     }
     
     string SyncTextRole = null;
@@ -442,4 +452,64 @@ public class PlayerHUD
             yield return Timing.WaitForSeconds(30);
         }
     }
+    
+    // Ability HUD を組み立て
+    private string BuildAbilityHud(Player player)
+    {
+        if (player.Role.Team == Team.Dead || !player.IsAlive)
+            return string.Empty;
+
+        if (!AbilityManager.TryGetLoadout(player, out var loadout))
+            return string.Empty;
+
+        var active = loadout.ActiveAbility;
+        if (active == null)
+            return string.Empty;
+
+        // ★ 新しい public メソッドを使用
+        if (!AbilityBase.TryGetAbilityState(player, active, 
+                out bool canUse, out float cdRemain, out int usesLeft, out int maxUses))
+            return string.Empty;
+
+        string abilityKey = active.GetType().Name;
+        string abilityName = AbilityLocalization.GetDisplayName(abilityKey, player);
+
+        string cdText = canUse ? "lor=green>READY</color>" :
+            $"color=yellow>{(int)cdRemain}s</color>";
+
+        string usesText = (maxUses < 0) ? "∞" : usesLeft.ToString();
+
+        return $"color=#ffcc00>[{abilityName}]</color> CD: {cdText} Uses: {usesText}";
+    }
+
+    // 毎秒更新ループ
+    private IEnumerator<float> SpecificAbilityHudLoop()
+    {
+        for (;;)
+        {
+            foreach (var player in Player.List)
+            {
+                if (player == null || !player.IsAlive) continue;
+
+                string roleSpecific = RoleSpecificTextProvider.GetFor(player);
+                string ability = BuildAbilityHud(player);
+
+                string combined;
+                if (!string.IsNullOrEmpty(roleSpecific) && !string.IsNullOrEmpty(ability))
+                    combined = roleSpecific + "\n" + ability;
+                else
+                    combined = !string.IsNullOrEmpty(roleSpecific) ? roleSpecific : ability;
+
+                if (!string.IsNullOrEmpty(combined))
+                {
+                    PHUD_Specific_Text = combined;
+                    var display = PlayerDisplay.Get(player);
+                    display.GetHint("PlayerHUD_Specific").Text = PHUD_Specific_Text;
+                }
+            }
+
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+
 }

@@ -13,7 +13,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp682Role : CRole
 {
-    // プレイヤーごとのspeedLevel管理
     private static readonly Dictionary<Player, float> SpeedLevels = new();
     
     public override void RegisterEvents()
@@ -36,28 +35,23 @@ public class Scp682Role : CRole
         player.Role.Set(RoleTypeId.Scp173);
         player.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
 
-        // UniqueRole はそのまま使用
         player.UniqueRole = "Scp682";
-
         player.MaxHealth = 999;
         player.Health = player.MaxHealth;
         player.MaxHumeShield = 2000;
         player.HumeShieldRegenerationMultiplier = 55f;
         player.ClearInventory();
 
-        // 先に Dictionary を初期化
         SpeedLevels[player] = 1f;
-
-        // 初期化後にスケール適用
         player.SetScale(new Vector3(0.7f, 0.65f, 1.2f));
 
-        player.CustomInfo = "<color=#C50000>SCP-682</color>";
+        player.CustomInfo = "lor=#C50000>SCP-682</color>";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
+            player.ShowHint("lor=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));
     }
@@ -66,10 +60,9 @@ public class Scp682Role : CRole
     {
         for (;;)
         {
-            // UniqueRole ではなく GetCustomRole() でチェック
             if (player.GetCustomRole() != CRoleTypeId.Scp682)
             {
-                SpeedLevels.Remove(player);  // クリーンアップ
+                SpeedLevels.Remove(player);
                 yield break;
             }
 
@@ -79,21 +72,20 @@ public class Scp682Role : CRole
             player.EnableEffect(EffectType.FocusedVision);
             player.EnableEffect(EffectType.NightVision, 255);
             
-            // プレイヤーごとのspeedLevel更新
             SpeedLevels[player] *= 1.001f;
             
-            Plugin.Singleton.PlayerHUD.HintSync(
-                SyncType.PHUD_Specific, 
-                "Awaken Status: " + SpeedLevels[player].ToString("F2"), 
-                player
+            // ★ 修正: RoleSpecificTextProvider を使用
+            RoleSpecificTextProvider.Set(
+                player,
+                "Awaken Status: " + SpeedLevels[player].ToString("F2")
             );
+            
             yield return Timing.WaitForSeconds(1f);
         }
     }
 
     private void Hurting(HurtingEventArgs ev)
     {
-        // UniqueRole ではなく GetCustomRole() で判定
         if (ev.Attacker != null &&
             ev.Attacker.GetCustomRole() == CRoleTypeId.Scp682 &&
             SpeedLevels.TryGetValue(ev.Attacker, out float level))
@@ -107,12 +99,14 @@ public class Scp682Role : CRole
     {
         if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp682)
         {
-            SpeedLevels.Remove(ev.Player);  // クリーンアップ
-            Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, "", ev.Player);
+            SpeedLevels.Remove(ev.Player);
+            // ★ 修正: クリア時も RoleSpecificTextProvider を使用
+            RoleSpecificTextProvider.Set(ev.Player, "");
+            
             Exiled.API.Features.Cassie.Clear();
             Exiled.API.Features.Cassie.MessageTranslated(
                 "SCP 6 8 2 Successfully Neutralized .",
-                "<color=red>SCP-682</color>の無力化に成功しました。"
+                "lor=red>SCP-682</color>の無力化に成功しました。"
             );
         }
     }
