@@ -171,8 +171,11 @@
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="ChristmasChanges.cs" />
         <Compile Include="Commands\DevTools\AbilityUniversal.cs" />
+        <Compile Include="Commands\DevTools\AddQueue.cs" />
+        <Compile Include="Commands\DevTools\GetQueue.cs" />
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
+        <Compile Include="Commands\DevTools\SpawnPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="CustomItems\AdvancedMedkit.cs" />
         <Compile Include="CustomItems\FakeGrenade.cs" />
@@ -191,6 +194,8 @@
         <Compile Include="CustomItems\SerumC.cs" />
         <Compile Include="CustomItems\SerumD.cs" />
         <Compile Include="CustomItems\SNAV300.cs" />
+        <Compile Include="CustomItems\SNAV310.cs" />
+        <Compile Include="CustomItems\SNAVUltimate.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
@@ -212,6 +217,7 @@
         <Compile Include="Extensions\StaticUtils.cs" />
         <Compile Include="FirstRolesHandler.cs" />
         <Compile Include="MapExtensions\MapFlags.cs" />
+        <Compile Include="MapExtensions\MapGuardHandler.cs" />
         <Compile Include="MapExtensions\OmegaWarhead.cs" />
         <Compile Include="MapExtensions\PDEx.cs" />
         <Compile Include="MapExtensions\Sinkhole.cs" />
@@ -276,6 +282,7 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ProximityChat\ActivateHandler.cs" />
         <Compile Include="ProximityChat\Handler.cs" />
+        <Compile Include="Scp1509Handler.cs" />
         <Compile Include="ServerSpecifics.cs" />
         <Compile Include="SpawnSystem.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />

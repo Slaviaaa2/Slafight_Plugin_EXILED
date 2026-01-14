@@ -34,7 +34,7 @@ public class GunN7Weltkrieg : CustomWeapon
     public override Vector3 Scale { get; set; } = new (1.15f,1.3f,1.25f);
     public override byte ClipSize { get; set; } = 100;
 
-    public Color glowColor = new Color(30f, 30f, 30f);
+    public Color glowColor = new Color(0.30f, 0.30f, 0.30f);
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
@@ -86,7 +86,7 @@ public class GunN7Weltkrieg : CustomWeapon
             light.Color = glowColor;
 
             light.Intensity = 0.7f;
-            light.Range = 8f;
+            light.Range = 5.5f;
             light.ShadowType = LightShadows.None;
 
             light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);

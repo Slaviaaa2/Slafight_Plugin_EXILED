@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -138,9 +139,17 @@ public class OperationBlackout
         {
             int i = 0;
             int spawnedCount = 0;
+            var rooms = Exiled.API.Features.Room.List.ToList();
+            foreach (var room in rooms.ToList())
+            {
+                if (room.Type == RoomType.Lcz173 || room.Zone != ZoneType.LightContainment)
+                {
+                    rooms.Remove(room);
+                }
+            }
             while (spawnedCount < 3) // 3個スポーンするまで繰り返す
             {
-                GameObject generatorObj = PrefabHelper.Spawn(PrefabType.GeneratorStructure, Room.Random(ZoneType.LightContainment).WorldPosition(new Vector3(0f,0.05f,0f)));
+                GameObject generatorObj = PrefabHelper.Spawn(PrefabType.GeneratorStructure, rooms.RandomItem().WorldPosition(new Vector3(0f,0.05f,0f)));
                 generatorObj.transform.eulerAngles += new Vector3(-90f,0f,0f);
                 foreach (Generator generator in Generator.List)
                 {

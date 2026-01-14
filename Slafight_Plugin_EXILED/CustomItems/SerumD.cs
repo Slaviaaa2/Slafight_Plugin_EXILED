@@ -24,7 +24,7 @@ public class SerumD : CustomItem
 {
     public override uint Id { get; set; } = 2008;
     public override string Name { get; set; } = "Serum-D";
-    public override string Description { get; set; } = "SCP-1853の性質を参考に開発された強化用セラム。短時間、器用さを大幅に向上させる";
+    public override string Description { get; set; } = "SCP-1853の性質を参考に開発された強化用セラム。\n短時間、器用さを大幅に向上させる";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Adrenaline;
 

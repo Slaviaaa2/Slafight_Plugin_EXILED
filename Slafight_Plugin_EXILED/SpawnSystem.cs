@@ -19,7 +19,7 @@ namespace Slafight_Plugin_EXILED;
 /// リスポーン波を完全制御する統合スポーンシステム。
 /// ・どの勢力を呼ぶか: WaveWeights
 /// ・何人対象にするか: SpawnRatios
-/// ・どのロールになるか: RoleTables (weight + guaranteed)
+/// ・どのロールになるか: RoleTables (maxCount + guaranteed)
 /// 全陣営 (NTF / HammerDown / Chaos / Fifthist / 新勢力) を1つの仕組みにまとめる。
 /// </summary>
 public class SpawnSystem
@@ -29,30 +29,18 @@ public class SpawnSystem
     // =====================
     public class SpawnConfig
     {
-        /// <summary>
-        /// FoundationStaff (MTF側) のウェーブ時、
-        /// どのSpawnTypeをどの重みで出すかを定義するテーブル。
-        /// 重みは相対値（合計に対する比率）で、0以下は無視。
-        /// </summary>
         public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; set; } = new()
         {
             { SpawnTypeId.MTF_NtfNormal, 80 },
             { SpawnTypeId.MTF_HDNormal,  20 },
         };
 
-        /// <summary>
-        /// FoundationEnemy (Chaos/Fifthist) 通常ウェーブ用の重みテーブル。
-        /// SCP-3005の有無でFifthist側の重みを書き換えて使う。
-        /// </summary>
         public Dictionary<SpawnTypeId, int> FoundationEnemyWaveWeights { get; set; } = new()
         {
             { SpawnTypeId.GOI_ChaosNormal,    100 },
-            { SpawnTypeId.GOI_FifthistNormal, 0   }, // 3005が居る時だけ有効化
+            { SpawnTypeId.GOI_FifthistNormal, 0   },
         };
 
-        /// <summary>
-        /// MiniWave用。必要に応じて別の比率を定義。
-        /// </summary>
         public Dictionary<SpawnTypeId, int> FoundationStaffMiniWaveWeights { get; set; } = new()
         {
             { SpawnTypeId.MTF_NtfBackup, 80 },
@@ -80,27 +68,27 @@ public class SpawnSystem
 
         /// <summary>
         /// 各SpawnTypeごとの「ロールテーブル」。
-        /// key: ロール, value: (weight, guaranteed)
+        /// key: ロール, value: (maxCount, guaranteed)
         /// guaranteed = true のロールは最低1人は必ず湧く（人数が足りる限り）。
-        /// weight は重み付き抽選用。合計1.0でなくてもOK。
+        /// maxCount はそのロールに割り当てる最大人数。
         /// </summary>
-        public Dictionary<SpawnTypeId, Dictionary<CRoleTypeId, (float weight, bool guaranteed)>> RoleTables
+        public Dictionary<SpawnTypeId, Dictionary<CRoleTypeId, (float maxCount, bool guaranteed)>> RoleTables
             { get; set; } = new()
         {
             // ----- Hammer Down -----
             {
                 SpawnTypeId.MTF_HDNormal, new()
                 {
-                    { CRoleTypeId.HdMarshal,  (0.125f, true)  }, // Marshal最低1人
-                    { CRoleTypeId.HdCommander, (0.25f,  false) },
-                    { CRoleTypeId.HdInfantry,   (0.625f, false) },
+                    { CRoleTypeId.HdMarshal,   (1f,   true)  },
+                    { CRoleTypeId.HdCommander, (2f,  false) },
+                    { CRoleTypeId.HdInfantry,  (99f, false) },
                 }
             },
             {
                 SpawnTypeId.MTF_HDBackup, new()
                 {
-                    { CRoleTypeId.HdCommander, (0.25f,  true) },
-                    { CRoleTypeId.HdInfantry,   (0.75f, false) },
+                    { CRoleTypeId.HdCommander, (1f,  true)  },
+                    { CRoleTypeId.HdInfantry,  (99f, false) },
                 }
             },
 
@@ -108,58 +96,54 @@ public class SpawnSystem
             {
                 SpawnTypeId.GOI_FifthistNormal, new()
                 {
-                    { CRoleTypeId.FifthistPriest,  (0.3f, true)  }, // Priest最低1人
-                    { CRoleTypeId.FifthistRescure, (0.5f, false) },
-                    { CRoleTypeId.FifthistConvert, (0.2f, false) }
+                    { CRoleTypeId.FifthistPriest,  (1f,  true)  },
+                    { CRoleTypeId.FifthistRescure, (3f,  false) },
+                    { CRoleTypeId.FifthistConvert, (99f, false) }
                 }
             },
             {
                 SpawnTypeId.GOI_FifthistBackup, new()
                 {
-                    { CRoleTypeId.FifthistRescure, (0.7f, false) },
-                    { CRoleTypeId.FifthistConvert, (0.3f, false) }
+                    { CRoleTypeId.FifthistRescure, (2f, false) },
+                    { CRoleTypeId.FifthistConvert, (99f, false) }
                 }
             },
 
-            // ----- Chaos (サブロール用) -----
+            // ----- Chaos (サブロール用, 人数制御) -----
             {
                 SpawnTypeId.GOI_ChaosNormal, new()
                 {
-                    { CRoleTypeId.ChaosCommando, (0.2f, false) },
-                    { CRoleTypeId.ChaosSignal,   (0.15f, false) }
+                    { CRoleTypeId.ChaosCommando, (2f, false) },
+                    { CRoleTypeId.ChaosSignal,   (1f, false) }
                 }
             },
             {
                 SpawnTypeId.GOI_ChaosBackup, new()
                 {
-                    { CRoleTypeId.ChaosSignal, (0.15f, false) },
+                    { CRoleTypeId.ChaosSignal, (1f, false) },
                 }
             },
 
-            // ----- NTF (サブロール用) -----
+            // ----- NTF (サブロール用, 人数制御) -----
             {
                 SpawnTypeId.MTF_NtfNormal, new()
                 {
-                    { CRoleTypeId.NtfGeneral,    (0.15f, false) },
-                    { CRoleTypeId.NtfLieutenant, (0.2f, false) },
+                    // ここを「何人まで出すか」で調整
+                    { CRoleTypeId.NtfGeneral,    (1f,  false) }, // 最大1人
+                    { CRoleTypeId.NtfLieutenant, (2f,  false) }, // 最大2人
                 }
             },
             {
                 SpawnTypeId.MTF_NtfBackup, new()
                 {
-                    { CRoleTypeId.NtfLieutenant, (0.2f, false) },
+                    { CRoleTypeId.NtfLieutenant, (1f,  false) },
                 }
             },
-
-            // 新勢力を追加するときはここに:
-            // { SpawnTypeId.GOI_NewForceNormal, new() { { CRoleTypeId.NewForceLeader, (0.1f, true) }, ... } }
         };
 
-        // 高脅威判定用
         public int ScpThresholdHigh    { get; set; } = 3;
         public int PlayerThresholdHigh { get; set; } = 6;
 
-        // SCP-3005が居る時のFifthist出現確率 (Weights方式と併用するなら片方に寄せる)
         public int S3005FifthistChance { get; set; } = 5;
 
         public bool HdUseNatoCallsign { get; set; } = true;
@@ -221,7 +205,6 @@ public class SpawnSystem
 
         if (highThreat)
         {
-            // 高脅威時はHD側の重みを増やす例
             if (ev.Wave.IsMiniWave)
             {
                 if (weights.ContainsKey(SpawnTypeId.MTF_HDBackup))
@@ -251,7 +234,6 @@ public class SpawnSystem
 
         if (has3005)
         {
-            // SCP-3005が居るときはFifthist有効化
             if (ev.Wave.IsMiniWave)
             {
                 weights[SpawnTypeId.GOI_FifthistBackup] = 40;
@@ -265,7 +247,6 @@ public class SpawnSystem
         }
         else
         {
-            // 3005なし → Chaosのみ
             if (ev.Wave.IsMiniWave)
             {
                 weights[SpawnTypeId.GOI_FifthistBackup] = 0;
@@ -294,28 +275,48 @@ public class SpawnSystem
 
         switch (spawnType)
         {
-            // ----- NTF：バニラwave + サブロール付与 -----
+            // ----- NTF：Spectatorからサブロールを先に湧かせる + バニラwave -----
             case SpawnTypeId.MTF_NtfNormal:
-                Respawn.ForceWave(SpawnableFaction.NtfWave);
-                Timing.CallDelayed(8f, () =>
+            {
+                // まずSpectatorからサブロール枠をスポーン
+                var specs = Player.List
+                    .Where(p => p.Role == RoleTypeId.Spectator)
+                    .ToList();
+
+                int maxSubRoles = Math.Max(1, specs.Count / 3); // 3人に1人くらい増援
+                AssignTeamRoles(
+                    SpawnTypeId.MTF_NtfNormal,
+                    playerFilter: p => p.Role == RoleTypeId.Spectator,
+                    fixedCount: maxSubRoles
+                );
+
+                // 少し待ってからバニラNTF wave
+                Timing.CallDelayed(1f, () =>
                 {
-                    AssignTeamRoles(
-                        SpawnTypeId.MTF_NtfNormal,
-                        playerFilter: p => p.Role == RoleTypeId.Spectator
-                    );
+                    Respawn.ForceWave(SpawnableFaction.NtfWave);
                 });
                 break;
+            }
 
             case SpawnTypeId.MTF_NtfBackup:
-                Respawn.ForceWave(SpawnableFaction.NtfMiniWave);
-                Timing.CallDelayed(8f, () =>
+            {
+                var specs = Player.List
+                    .Where(p => p.Role == RoleTypeId.Spectator)
+                    .ToList();
+
+                int maxSubRoles = Math.Max(1, specs.Count / 4);
+                AssignTeamRoles(
+                    SpawnTypeId.MTF_NtfBackup,
+                    playerFilter: p => p.Role == RoleTypeId.Spectator,
+                    fixedCount: maxSubRoles
+                );
+
+                Timing.CallDelayed(1f, () =>
                 {
-                    AssignTeamRoles(
-                        SpawnTypeId.MTF_NtfBackup,
-                        playerFilter: p => p.Role == RoleTypeId.Spectator
-                    );
+                    Respawn.ForceWave(SpawnableFaction.NtfMiniWave);
                 });
                 break;
+            }
 
             // ----- Hammer Down：Spectatorから完全自前スポーン -----
             case SpawnTypeId.MTF_HDNormal:
@@ -330,28 +331,46 @@ public class SpawnSystem
                     CassieHelper.AnnounceHdBackup();
                 break;
 
-            // ----- Chaos：バニラwave + サブロール付与 -----
+            // ----- Chaos：Spectatorからサブロールを先に湧かせる + バニラwave -----
             case SpawnTypeId.GOI_ChaosNormal:
-                Respawn.ForceWave(SpawnableFaction.ChaosWave);
-                Timing.CallDelayed(8f, () =>
+            {
+                var specs = Player.List
+                    .Where(p => p.Role == RoleTypeId.Spectator)
+                    .ToList();
+
+                int maxSubRoles = Math.Max(1, specs.Count / 3);
+                AssignTeamRoles(
+                    SpawnTypeId.GOI_ChaosNormal,
+                    playerFilter: p => p.Role == RoleTypeId.Spectator,
+                    fixedCount: maxSubRoles
+                );
+
+                Timing.CallDelayed(1f, () =>
                 {
-                    AssignTeamRoles(
-                        SpawnTypeId.GOI_ChaosNormal,
-                        playerFilter: p => p.Role == RoleTypeId.Spectator
-                    );
+                    Respawn.ForceWave(SpawnableFaction.ChaosWave);
                 });
                 break;
+            }
 
             case SpawnTypeId.GOI_ChaosBackup:
-                Respawn.ForceWave(SpawnableFaction.ChaosMiniWave);
-                Timing.CallDelayed(8f, () =>
+            {
+                var specs = Player.List
+                    .Where(p => p.Role == RoleTypeId.Spectator)
+                    .ToList();
+
+                int maxSubRoles = Math.Max(1, specs.Count / 4);
+                AssignTeamRoles(
+                    SpawnTypeId.GOI_ChaosBackup,
+                    playerFilter: p => p.Role == RoleTypeId.Spectator,
+                    fixedCount: maxSubRoles
+                );
+
+                Timing.CallDelayed(1f, () =>
                 {
-                    AssignTeamRoles(
-                        SpawnTypeId.GOI_ChaosBackup,
-                        playerFilter: p => p.Role == RoleTypeId.Spectator
-                    );
+                    Respawn.ForceWave(SpawnableFaction.ChaosMiniWave);
                 });
                 break;
+            }
 
             // ----- Fifthist：Spectatorから完全自前スポーン -----
             case SpawnTypeId.GOI_FifthistNormal:
@@ -360,17 +379,10 @@ public class SpawnSystem
                     spawnType,
                     playerFilter: p => p.Role == RoleTypeId.Spectator
                 );
-                // 何人Fifthistになったか数えてアナウンス
                 int count = Player.List.Count(p =>
                     p.GetCustomRole() is CRoleTypeId.FifthistPriest or CRoleTypeId.FifthistRescure);
                 CassieHelper.AnnounceFifthist(count);
                 break;
-
-            // 新勢力を追加する場合も:
-            // case SpawnTypeId.GOI_NewForceNormal:
-            //     AssignTeamRoles(SpawnTypeId.GOI_NewForceNormal, p => p.Role == RoleTypeId.Spectator);
-            //     CassieHelper.AnnounceNewForce(...);
-            //     break;
         }
 
         Timing.CallDelayed(0.02f, () => isDefaultWave = true);
@@ -381,7 +393,8 @@ public class SpawnSystem
     /// spawnTypeに対応するRoleTableを取得し、
     /// playerFilterで絞り込んだプレイヤーから
     /// ・guaranteed=trueロールを最低1人ずつ確湧き
-    /// ・残り枠をweightによる重み付き抽選で埋める
+    /// ・各ロール毎に maxCount まで人数制限をかけたスロットを作成
+    /// ・スロットをシャッフルして targetCount 人に割り当て
     /// </summary>
     private void AssignTeamRoles(
         SpawnTypeId spawnType,
@@ -400,7 +413,6 @@ public class SpawnSystem
         if (candidates.Count == 0)
             return;
 
-        // 対象人数決定（fixedCount優先、なければSpawnRatiosから計算）
         int targetCount;
         if (fixedCount.HasValue)
         {
@@ -417,44 +429,45 @@ public class SpawnSystem
                 targetCount = candidates.Count;
         }
 
-        // guaranteedロールを最低1人ずつ付与
-        var guaranteedRoles = table
-            .Where(kvp => kvp.Value.guaranteed)
-            .Select(kvp => kvp.Key)
-            .ToList();
+        var slots = new List<CRoleTypeId>();
 
-        int index = 0;
-
-        foreach (var role in guaranteedRoles)
+        foreach (var kvp in table)
         {
-            if (index >= targetCount)
-                break;
+            var role = kvp.Key;
+            var (maxCount, guaranteed) = kvp.Value;
+            int max = (int)maxCount;
+            if (max <= 0) continue;
 
-            var player = candidates[index];
-            player.SetRole(role, RoleSpawnFlags.All);
-            index++;
+            if (guaranteed && slots.Count < targetCount)
+            {
+                slots.Add(role);
+                max--;
+            }
+
+            for (int i = 0; i < max && slots.Count < targetCount; i++)
+                slots.Add(role);
         }
 
-        if (index >= targetCount)
-            return;
-
-        // 残り枠に weight 抽選
-        var weightTable = table
-            .Where(kvp => kvp.Value.weight > 0f)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.weight);
-
-        for (; index < targetCount; index++)
+        if (slots.Count < targetCount && table.Count > 0)
         {
-            var player = candidates[index];
-            var picked = PickWeightedRole(weightTable);
-            if (picked != null)
-                player.SetRole(picked.Value, RoleSpawnFlags.All);
+            var filler = table
+                .OrderByDescending(kvp => kvp.Value.maxCount)
+                .First().Key;
+
+            while (slots.Count < targetCount)
+                slots.Add(filler);
+        }
+
+        slots = slots.Shuffle().ToList();
+        int assignCount = Math.Min(targetCount, Math.Min(slots.Count, candidates.Count));
+
+        for (int i = 0; i < assignCount; i++)
+        {
+            var player = candidates[i];
+            var role   = slots[i];
+            player.SetRole(role, RoleSpawnFlags.All);
         }
     }
-
-    // =====================
-    //  重み付き抽選系
-    // =====================
 
     private SpawnTypeId? PickWeightedSpawnType(Dictionary<SpawnTypeId, int> weights)
     {
@@ -463,7 +476,7 @@ public class SpawnSystem
             return null;
 
         int total = valid.Sum(kvp => kvp.Value);
-        int roll  = Random.Range(0, total); // int版はmax排他 [web:42]
+        int roll  = Random.Range(0, total); // int版はmax排他 [web:48]
 
         int cum = 0;
         foreach (var kvp in valid)
@@ -475,33 +488,6 @@ public class SpawnSystem
 
         return valid.First().Key;
     }
-
-    private CRoleTypeId? PickWeightedRole(Dictionary<CRoleTypeId, float> chances)
-    {
-        var valid = chances.Where(kvp => kvp.Value > 0f).ToList();
-        if (!valid.Any())
-            return null;
-
-        float total = valid.Sum(kvp => kvp.Value);
-        if (total <= 0f)
-            return null;
-
-        float rand = Random.Range(0f, total); // float版はmax含む [web:42]
-        float cum  = 0f;
-
-        foreach (var kvp in valid)
-        {
-            cum += kvp.Value;
-            if (rand <= cum)
-                return kvp.Key;
-        }
-
-        return valid.First().Key;
-    }
-
-    // =====================
-    //  NATOコールサイン & Cassie
-    // =====================
 
     private string GenerateNatoCallsign()
     {
@@ -566,7 +552,7 @@ public static class EnumerableExtensions
         int n = list.Count;
         for (int i = 0; i < n - 1; i++)
         {
-            int j = Random.Range(i, n);
+            int j = Random.Range(i, n); // int版はmax排他 [web:48]
             (list[i], list[j]) = (list[j], list[i]);
         }
         return list;

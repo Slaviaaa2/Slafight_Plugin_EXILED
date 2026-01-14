@@ -24,7 +24,7 @@ public class SerumC : CustomItem
 {
     public override uint Id { get; set; } = 2010;
     public override string Name { get; set; } = "Serum-C";
-    public override string Description { get; set; } = "Serum-Dを元に開発された上級のセラム。短時間、器用さと早さを大幅に向上させる";
+    public override string Description { get; set; } = "Serum-Dを元に開発された上級のセラム。\n短時間、器用さと早さを大幅に向上させる";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Adrenaline;
 

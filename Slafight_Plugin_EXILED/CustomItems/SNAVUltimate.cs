@@ -27,15 +27,15 @@ using Item = Exiled.API.Features.Items.Item;
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.Radio)]
-public class SNAV300 : CustomItem
+public class SNAVUltimate : CustomItem
 {
-    public override uint Id { get; set; } = 2012;
-    public override string Name { get; set; } = "S-Nav 300";
-    public override string Description { get; set; } = "近くのユニークな部屋について調べられる。\n投げて使用可能";
+    public override uint Id { get; set; } = 2014;
+    public override string Name { get; set; } = "S-Nav Ultimate";
+    public override string Description { get; set; } = "SCP-914によって改良されたS-Nav。\n電池不要かつマップが大幅に拡張されており、SCPの情報も得られる。\nより多くの、近くのユニークな部屋について調べられる。\n投げて使用可能";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Radio;
 
-    public Color glowColor = Color.green;
+    public Color glowColor = new (0f, 1.80f, 0.40f);
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();
@@ -59,7 +59,7 @@ public class SNAV300 : CustomItem
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
     }
-
+    
     protected override void OnUpgrading(UpgradingEventArgs ev)
     {
         if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
@@ -84,17 +84,32 @@ public class SNAV300 : CustomItem
     private List<RoomType> uniques = new()
     {
         RoomType.Lcz914,
+        RoomType.Lcz330,
+        RoomType.LczGlassBox,
+        RoomType.LczArmory,
+        RoomType.LczCheckpointA,
+        RoomType.LczCheckpointB,
         RoomType.Hcz127,
         RoomType.HczCrossRoomWater,
         RoomType.HczHid,
         RoomType.HczNuke,
+        RoomType.HczTestRoom,
+        RoomType.Hcz049,
+        RoomType.Hcz106,
+        RoomType.HczElevatorA,
+        RoomType.HczElevatorB,
+        RoomType.HczEzCheckpointA,
+        RoomType.HczEzCheckpointB,
+        RoomType.HczTesla,
         RoomType.EzIntercom,
+        RoomType.EzDownstairsPcs,
+        RoomType.EzPcs,
+        RoomType.EzSmallrooms,
         RoomType.EzGateA,
         RoomType.EzGateB
     };
     private void ChangeMode(ChangingRadioPresetEventArgs ev)
     {
-        if (ev.Radio.BatteryLevel < 10) return;
         if (!Check(ev.Item)) return;
         mode = ev.NewValue;
         switch (ev.NewValue)
@@ -118,54 +133,58 @@ public class SNAV300 : CustomItem
     {
         if (!ev.IsThrown) return;
         if (!Check(ev.Item)) return;
-    
+
         Radio radio = Item.Get<Radio>(ev.Item.Base);
         if (radio == null) return;
 
         ev.IsAllowed = false;
+        Vector3 playerPos = ev.Player.Position;
 
-        float consumption = mode switch
+        // 部屋検知
+        List<Room> detectedRooms = GetDetectedRooms(playerPos, mode);
+
+        // SCP検知
+        List<Exiled.API.Features.Player> detectedScps = GetDetectedScps(playerPos, mode);
+
+        string roomsText = detectedRooms.Any()
+            ? string.Join("\n", detectedRooms.Select(r =>
+                $"{r.Type}: {Vector3.Distance(playerPos, r.Position):F0}m"))
+            : "なし";
+
+        string scpsText = detectedScps.Any()
+            ? string.Join("\n", detectedScps.Select(p =>
+                $"{p.Nickname} ({p.Role.Type}): {Vector3.Distance(playerPos, p.Position):F0}m"))
+            : "なし";
+
+        string hint =
+            $"[{mode}]検知された部屋：\n{roomsText}\n\n" +
+            $"検知されたSCP：\n{scpsText}";
+
+        ev.Player.ShowHint(hint, 10f);
+    }
+    
+    private List<Exiled.API.Features.Player> GetDetectedScps(Vector3 playerPos, RadioRange currentMode)
+    {
+        float range = currentMode switch
         {
-            RadioRange.Short => 10f,
-            RadioRange.Medium => 20f,
-            RadioRange.Long => 30f,
-            RadioRange.Ultra => 40f,
-            _ => 40f
+            RadioRange.Short  => 30f,
+            RadioRange.Medium => 60f,
+            RadioRange.Long   => 80f,
+            RadioRange.Ultra  => 100f,
+            _ => 0f
         };
 
-        if (radio.BatteryLevel < consumption)
-        {
-            ev.Player.ShowHint("バッテリー不足！", 3f);
-            ev.IsAllowed = false;
-            return;
-        }
+        if (range <= 0f)
+            return new List<Exiled.API.Features.Player>();
 
-        radio.BatteryLevel -= (byte)consumption;
-    
-        Vector3 playerPos = ev.Player.Position;
-        List<Room> detected = [];
-        foreach (var room in Room.List)
-        {
-            if (room == null || !uniques.Contains(room.Type)) continue;
-            float distance = Vector3.Distance(playerPos, room.Position);
-            switch (mode)
-            {
-                case RadioRange.Short when distance <= 30f:
-                case RadioRange.Medium when distance <= 60f:
-                case RadioRange.Long when distance <= 80f:
-                case RadioRange.Ultra when distance <= 100f:
-                    detected.Add(room);
-                    break;
-            }
-        }
-        detected.Sort((a, b) => Vector3.Distance(playerPos, a.Position).CompareTo(Vector3.Distance(playerPos, b.Position)));
-
-        string hint = detected.Any()
-            ? $"[{mode}]見つかった部屋：\n" + string.Join("\n", detected.Select(r => $"{r.Type}: {Vector3.Distance(playerPos, r.Position):F0}m"))
-            : "検知された部屋なし";
-        ev.Player.ShowHint(hint, 10f);
-
-        ev.IsAllowed = false;
+        return Exiled.API.Features.Player.List
+            .Where(p =>
+                p != null &&
+                p.IsAlive &&
+                p.GetTeam() == CTeam.SCPs &&
+                Vector3.Distance(playerPos, p.Position) <= range)
+            .OrderBy(p => Vector3.Distance(playerPos, p.Position))
+            .ToList();
     }
 
     // 新規追加：検知メソッド（元のforeachを関数化）

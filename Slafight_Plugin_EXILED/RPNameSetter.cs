@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Exiled.API.Features;
 using UserSettings.ServerSpecific;
 
@@ -15,6 +16,8 @@ public class RPNameSetter
         ServerSpecificSettingsSync.ServerOnSettingValueReceived -= OnSettingValueReceived;
     }
 
+    public static Dictionary<Player, string> Passcodes = new();
+    
     public static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
     {
         var textSettings = @base as SSPlaintextSetting;
@@ -38,6 +41,15 @@ public class RPNameSetter
                 {
                     player.CustomName = $"{realName}";
                 }
+            }
+        }
+        else if (textSettings.SettingId == 5)
+        {
+            var player = Player.Get(hub);
+            if (player != null)
+            {
+                Log.Debug("passcode updated");
+                Passcodes[player] = textSettings.SyncInputText;
             }
         }
     }

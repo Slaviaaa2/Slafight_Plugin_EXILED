@@ -27,15 +27,15 @@ using Item = Exiled.API.Features.Items.Item;
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.Radio)]
-public class SNAV300 : CustomItem
+public class SNAV310 : CustomItem
 {
-    public override uint Id { get; set; } = 2012;
-    public override string Name { get; set; } = "S-Nav 300";
-    public override string Description { get; set; } = "近くのユニークな部屋について調べられる。\n投げて使用可能";
+    public override uint Id { get; set; } = 2013;
+    public override string Name { get; set; } = "S-Nav 310 Navigator";
+    public override string Description { get; set; } = "S-Nav 300が改良され、電池不要かつマップが拡張されている。\n様々な近くのユニークな部屋について調べられる。\n投げて使用可能";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Radio;
 
-    public Color glowColor = Color.green;
+    public Color glowColor = new (0f, 1.80f, 0.40f);
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();
@@ -59,7 +59,7 @@ public class SNAV300 : CustomItem
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
     }
-
+    
     protected override void OnUpgrading(UpgradingEventArgs ev)
     {
         if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
@@ -84,17 +84,19 @@ public class SNAV300 : CustomItem
     private List<RoomType> uniques = new()
     {
         RoomType.Lcz914,
+        RoomType.Lcz330,
+        RoomType.LczGlassBox,
         RoomType.Hcz127,
         RoomType.HczCrossRoomWater,
         RoomType.HczHid,
         RoomType.HczNuke,
+        RoomType.HczTestRoom,
         RoomType.EzIntercom,
         RoomType.EzGateA,
         RoomType.EzGateB
     };
     private void ChangeMode(ChangingRadioPresetEventArgs ev)
     {
-        if (ev.Radio.BatteryLevel < 10) return;
         if (!Check(ev.Item)) return;
         mode = ev.NewValue;
         switch (ev.NewValue)
@@ -123,25 +125,6 @@ public class SNAV300 : CustomItem
         if (radio == null) return;
 
         ev.IsAllowed = false;
-
-        float consumption = mode switch
-        {
-            RadioRange.Short => 10f,
-            RadioRange.Medium => 20f,
-            RadioRange.Long => 30f,
-            RadioRange.Ultra => 40f,
-            _ => 40f
-        };
-
-        if (radio.BatteryLevel < consumption)
-        {
-            ev.Player.ShowHint("バッテリー不足！", 3f);
-            ev.IsAllowed = false;
-            return;
-        }
-
-        radio.BatteryLevel -= (byte)consumption;
-    
         Vector3 playerPos = ev.Player.Position;
         List<Room> detected = [];
         foreach (var room in Room.List)
@@ -164,8 +147,6 @@ public class SNAV300 : CustomItem
             ? $"[{mode}]見つかった部屋：\n" + string.Join("\n", detected.Select(r => $"{r.Type}: {Vector3.Distance(playerPos, r.Position):F0}m"))
             : "検知された部屋なし";
         ev.Player.ShowHint(hint, 10f);
-
-        ev.IsAllowed = false;
     }
 
     // 新規追加：検知メソッド（元のforeachを関数化）

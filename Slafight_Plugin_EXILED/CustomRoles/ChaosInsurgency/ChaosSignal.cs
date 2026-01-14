@@ -33,16 +33,17 @@ public class ChaosSignal : CRole
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         
-        player.SetCategoryLimit(ItemCategory.Radio, 2);
-        
         player.ClearInventory();
         Log.Debug("Giving Items to ChaosCommando");
+        player.SetCategoryLimit(ItemCategory.Radio, 2);
         player.AddItem(ItemType.KeycardChaosInsurgency);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Painkillers);
         player.AddItem(ItemType.ArmorCombat);
-        player.AddItem(ItemType.Radio);
+        player.AddItem(ItemType.GunAK);
         player.TryAddCustomItem(2012);
+        
+        player.AddAmmo(AmmoType.Nato762, 150);
             
         player.SetCustomInfo("Chaos Insurgency Signal");
         Timing.CallDelayed(0.05f, () =>

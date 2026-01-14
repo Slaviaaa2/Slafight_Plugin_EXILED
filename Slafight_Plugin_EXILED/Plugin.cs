@@ -67,6 +67,8 @@ namespace Slafight_Plugin_EXILED
         public Sinkhole Sinkhole { get; set; }
         public PDEx PDEx { get; set; }
         public Engineer EngineerRole { get; private set; }
+        public MapGuardHandler MapGuardHandler { get; set; }
+        public Scp1509Handler Scp1509Handler { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -89,6 +91,8 @@ namespace Slafight_Plugin_EXILED
             AbilityInputHandler = new();
             Sinkhole = new();
             PDEx = new();
+            MapGuardHandler = new();
+            Scp1509Handler = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
 

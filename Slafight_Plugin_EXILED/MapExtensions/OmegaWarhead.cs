@@ -22,12 +22,14 @@ public static class OmegaWarhead
     {
         if (IsWarheadStarted) return;
         warheadPID = pid;
+        if (Warhead.IsInProgress) Warhead.Stop();
         Plugin.Singleton.EventHandler.DeadmanDisable = true;
+        Plugin.Singleton.EventHandler.WarheadLocked = true;
         //Log.Debug($"OW: Starting OMEGA WARHEAD Protocol. local:{pid}, global:{SpecialEventsHandler.EventPID}");
         if (pid != SpecialEventsHandler.EventPID) return;
         Timing.CallDelayed(triggerTime, () =>
         {
-            if (pid != SpecialEventsHandler.EventPID) return;
+            if (pid != SpecialEventsHandler.EventPID || Warhead.IsInProgress) return;
             IsWarheadStarted = true;
             foreach (Room rooms in Room.List)
             {
@@ -38,6 +40,7 @@ public static class OmegaWarhead
                 if (door.Type != DoorType.ElevatorGateA && door.Type != DoorType.ElevatorGateB && door.Type != DoorType.ElevatorLczA && door.Type != DoorType.ElevatorLczB && door.Type != DoorType.ElevatorNuke && door.Type != DoorType.ElevatorScp049 && door.Type != DoorType.ElevatorServerRoom)
                 {
                     door.IsOpen = true;
+                    door.PlaySound(DoorBeepType.InteractionAllowed);
                     door.Lock(DoorLockType.Warhead);
                 }
             }

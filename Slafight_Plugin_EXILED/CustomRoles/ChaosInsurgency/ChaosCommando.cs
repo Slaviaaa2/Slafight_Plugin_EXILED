@@ -41,6 +41,8 @@ public class ChaosCommando : CRole
         player.TryAddCustomItem(2009);
         player.TryAddCustomItem(10);
         player.TryAddCustomItem(2006);
+        
+        player.AddAmmo(AmmoType.Nato762, 350);
             
         player.SetCustomInfo("Chaos Insurgency Commando");
         Timing.CallDelayed(0.05f, () =>

@@ -4,6 +4,7 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Warhead;
@@ -41,6 +42,8 @@ public class Engineer : CRole
         Exiled.Events.Handlers.Player.InteractingDoor += OnInteractedDoor;
         Exiled.Events.Handlers.Player.IntercomSpeaking += OnIntercom;
         Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
+        Exiled.Events.Handlers.Player.DroppingItem += OnDropping;
+        Exiled.Events.Handlers.Player.UnlockingGenerator += OnInteractingGenerator;
         base.RegisterEvents();
     }
 
@@ -53,6 +56,8 @@ public class Engineer : CRole
         Exiled.Events.Handlers.Player.InteractingDoor -= OnInteractedDoor;
         Exiled.Events.Handlers.Player.IntercomSpeaking -= OnIntercom;
         Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;
+        Exiled.Events.Handlers.Player.DroppingItem -= OnDropping;
+        Exiled.Events.Handlers.Player.UnlockingGenerator -= OnInteractingGenerator;
         base.UnregisterEvents();
     }
 
@@ -87,7 +92,7 @@ public class Engineer : CRole
 
         Timing.CallDelayed(0.1f, () =>
         {
-            player.ShowHint("<color=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。", 8f);
+            player.ShowHint("<color=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
 
             if (state.HudRoutine != default)
             {
@@ -252,6 +257,28 @@ public class Engineer : CRole
 
     // ========= イベント =========
 
+    private void OnDropping(DroppingItemEventArgs ev)
+    {
+        if (!ev.IsAllowed) return;
+        if (ev.Player.GetCustomRole() != CRoleTypeId.Engineer) return;
+        if (GetState(ev.Player) is { Level: < 5 })
+        {
+            if (ev.Item.Type == ItemType.KeycardResearchCoordinator ||
+                ev.Item.Type == ItemType.KeycardContainmentEngineer || ev.Item.Type == ItemType.KeycardFacilityManager ||
+                ev.Item.Type == ItemType.KeycardO5)
+            {
+                ev.IsAllowed = false;
+            }
+            else if (CustomItem.TryGet(ev.Item, out var item))
+            {
+                if (item.Id == 2005)
+                {
+                    ev.IsAllowed = false;
+                }
+            }
+        }
+    }
+
     private void OnPickingUp(PickingUpItemEventArgs ev)
     {
         if (!ev.IsAllowed) return;
@@ -300,6 +327,14 @@ public class Engineer : CRole
 
         if (st.Task == TaskType.GeneratorTask)
             AddExp(p, 30);
+    }
+
+    private void OnInteractingGenerator(UnlockingGeneratorEventArgs ev)
+    {
+        if (ev.Player.GetCustomRole() != CRoleTypeId.Engineer) return;
+        ev.IsAllowed = true;
+        ev.Generator.State = GeneratorState.Unlocked;
+        ev.Generator.IsUnlocked = true;
     }
 
     private void OnLeverChanging(ChangingLeverStatusEventArgs ev)

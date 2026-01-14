@@ -62,6 +62,26 @@ public class PlayingCard : CustomKeycard
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
     }
+    
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
+        {
+            CustomItem.TrySpawn(2012, ev.OutputPosition, out _);
+        }
+        else if (ev.KnobSetting == Scp914KnobSetting.Fine)
+        {
+            CustomItem.TrySpawn(2013, ev.OutputPosition, out _);
+        }
+        else if (ev.KnobSetting == Scp914KnobSetting.VeryFine)
+        {
+            CustomItem.TrySpawn(2014, ev.OutputPosition, out _);
+        }
+
+        ev.IsAllowed = false;
+        ev.Item.DestroySelf();
+        base.OnUpgrading(ev);
+    }
 
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {

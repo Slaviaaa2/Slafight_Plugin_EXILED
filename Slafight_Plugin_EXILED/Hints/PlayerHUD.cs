@@ -243,9 +243,19 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                     SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
                     break;
+                case CRoleTypeId.ChaosSignal:
+                    SyncTextRole = "<color=#228b22>Chaos Insurgency Signal</color>";
+                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    break;
                 // The Foundation Forces
                 case CRoleTypeId.NtfLieutenant:
                     SyncTextRole = "<color=#00b7eb>MTF E-11: Lieutenant</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
+                case CRoleTypeId.NtfGeneral:
+                    SyncTextRole = "<color=blue>MTF E-11: General</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
@@ -259,6 +269,11 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
+                case CRoleTypeId.HdMarshal:
+                    SyncTextRole = "<color=#151515>MTF Nu-7: Marshal</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
                 // Scientists
                 case CRoleTypeId.ZoneManager:
                     SyncTextRole = "<color=#00ffff>Zone Manager</color>";
@@ -269,6 +284,11 @@ public class PlayerHUD
                     SyncTextRole = "<color=#dc143c>Facility Manager</color>";
                     SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
                     SyncTextObjective = "施設から脱出せよ";
+                    break;
+                case CRoleTypeId.Engineer:
+                    SyncTextRole = "<color=#faff86>Engineer</color>";
+                    SyncTextTeam = "<color=#faff86>Neutral - Side Foundation</color>";
+                    SyncTextObjective = "様々なタスクをこなし、最強の弾頭を起動せよ！";
                     break;
                 // Facility Guards
                 case CRoleTypeId.EvacuationGuard:
