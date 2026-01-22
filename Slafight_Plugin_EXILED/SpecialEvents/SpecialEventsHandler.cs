@@ -44,7 +44,7 @@ public class SpecialEventsHandler
     // Setup & Utils
     public string localizedEventName = String.Empty;
     public string eventNeedTriggers = String.Empty;
-    public List<SpecialEventType> EventQueue = new List<SpecialEventType>() { };
+    public readonly List<SpecialEventType> EventQueue = new List<SpecialEventType>() { };
     public List<SpecialEventType> HappenedEvents = new List<SpecialEventType>() { };
     public int EventPID = 1;
     public bool isFifthistsRaidActive = false;
@@ -230,7 +230,7 @@ public class SpecialEventsHandler
             }
             if (Player.List.Count >= 0)
             {
-                allowedEvents.Add(SpecialEventType.DeltaWarhead);
+                //allowedEvents.Add(SpecialEventType.DeltaWarhead);
             }
             if (Player.List.Count >= 4)
             {
@@ -265,7 +265,7 @@ public class SpecialEventsHandler
         if (Plugin.Singleton.Config.EventAllowed)
         {
             SelectedEvent = SpecialEventType.None;
-            if (Random.Range(1,3) == 1)
+            if (Random.Range(0,3) == 0)
             {
                 // SpecialEventTypeの1番はNoneの為除外
                 var EventTypes = Enum.GetValues(typeof(SpecialEventType));
@@ -300,17 +300,17 @@ public class SpecialEventsHandler
         }
         else if (nowEvent == SpecialEventType.OmegaWarhead)
         {
-            localizedEventName = "OmegaWarhead";
+            localizedEventName = "OMEGA WARHEAD";
             eventNeedTriggers = "無し";
         }
         else if (nowEvent == SpecialEventType.DeltaWarhead)
         {
-            localizedEventName = "DeltaWarhead";
+            localizedEventName = "DELTA WARHEAD";
             eventNeedTriggers = "無し";
         }
         else if (nowEvent == SpecialEventType.Scp096CryFuck)
         {
-            localizedEventName = "Scp096CryFuck";
+            localizedEventName = "ENDLESS CRY";
             eventNeedTriggers = "4人以上のプレイヤー";
         }
         else if (nowEvent == SpecialEventType.Scp1509BattleField)
@@ -320,7 +320,7 @@ public class SpecialEventsHandler
         }
         else if (nowEvent == SpecialEventType.FifthistsRaid)
         {
-            localizedEventName = "FifthistsRaid";
+            localizedEventName = "Fifthists Raid";
             eventNeedTriggers = "4人以上のプレイヤー";
         }
         else if (nowEvent == SpecialEventType.NuclearAttack)

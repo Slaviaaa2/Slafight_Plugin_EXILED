@@ -30,12 +30,12 @@ public class FirstRolesHandler
         Exiled.Events.Handlers.Server.RoundStarted -= RoundUnlocker;
     }
 
-    public void RoundLocker()
+    private void RoundLocker()
     {
         Round.IsLocked = true;
     }
 
-    public void CancelRoundStartedRole(ChangingRoleEventArgs ev)
+    private void CancelRoundStartedRole(ChangingRoleEventArgs ev)
     {
         if (ev.Reason == SpawnReason.RoundStart)
         {
@@ -82,17 +82,20 @@ public class FirstRolesHandler
     {
         RoleLimitManager.ClearAll();
 
-        var nowEvent = Plugin.Singleton.SpecialEventsHandler.EventQueue[0];
-        if (nowEvent == SpecialEventType.None)
-        {
-            RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager, 2);
-            RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager, 1);
-            RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard, 1);
-            RoleLimitManager.SetLimit(CRoleTypeId.SecurityChief, 1);
+        // Limits
+        RoleLimitManager.SetLimit(CRoleTypeId.Janitor, 3);
             
-            RoleLimitManager.SetLimit(CRoleTypeId.Scp682, 1);
-        }
+        RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager, 2);
+        RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager, 1);
+        RoleLimitManager.SetLimit(CRoleTypeId.ObjectObserver, 1);
+            
+        RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard, 1);
+        RoleLimitManager.SetLimit(CRoleTypeId.SecurityChief, 1);
+        RoleLimitManager.SetLimit(CRoleTypeId.ChamberGuard, 1);
+            
+        RoleLimitManager.SetLimit(CRoleTypeId.Scp682, 1);
 
+        // Logs
         Log.Debug("[FirstRoles] _LimitChecker called");
     }
 
@@ -111,7 +114,7 @@ public class FirstRolesHandler
             return;
         }
 
-        var shuffledPlayers = players.OrderBy(_ => UnityEngine.Random.value).ToList();
+        var shuffledPlayers = players.OrderBy(_ => Random.value).ToList();
 
         // ===== 1) SCP人数（5人に1人、最低1人） =====
         int scpCount = Mathf.Max(1, playerCount / 5);

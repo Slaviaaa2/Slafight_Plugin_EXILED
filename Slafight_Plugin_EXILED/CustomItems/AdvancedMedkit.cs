@@ -19,7 +19,7 @@ public class AdvancedMedkit : CustomItem
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Medkit;
 
-    private readonly Color _glowColor = Color.yellow;
+    private readonly Color _glowColor = Color.green;
     private readonly Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> _activeLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();

@@ -8,8 +8,8 @@ public static class AbilityLocalization
     {
         ["CreateSinkholeAbility"] = "シンクホール",
         ["MagicMissileAbility"] = "マジックミサイル",
-        ["AllowEscapeAbility"] = "腐植からの解放",
-        ["SoundOfFifthAbility"] = "第五の音",
+        ["AllowEscapeAbility"] = "腐蝕からの解放",
+        ["SoundOfFifthAbility"] = "第五からの音",
     };
 
     public static string GetDisplayName(string key, Exiled.API.Features.Player player)

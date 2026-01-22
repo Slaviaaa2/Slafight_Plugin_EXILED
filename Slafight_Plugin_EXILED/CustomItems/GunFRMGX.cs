@@ -15,6 +15,7 @@ using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -32,9 +33,9 @@ public class GunFRMGX : CustomWeapon
 
     public override float Damage { get; set; } = 65f;
     public override Vector3 Scale { get; set; } = new (1.08f,1f,1.35f);
-    public override byte ClipSize { get; set; } = 150;
+    public override byte ClipSize { get; set; } = 130;
 
-    public Color glowColor = Color.blue;
+    public Color glowColor = CustomColor.NinetailedBlue.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

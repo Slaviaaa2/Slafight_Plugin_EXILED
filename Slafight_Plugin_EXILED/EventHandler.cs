@@ -50,10 +50,12 @@ using PlayerRoles.FirstPersonControl;
 using PlayerRoles.PlayableScps.Scp096;
 using ProjectMER.Events.Arguments;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Subtitles;
 using UnityEngine;
 using CassieHandler = Exiled.Events.Handlers.Cassie;
+using Debug = System.Diagnostics.Debug;
 using ElevatorDoor = Exiled.API.Features.Doors.ElevatorDoor;
 using Log = Exiled.API.Features.Log;
 using Player = Exiled.API.Features.Player;
@@ -144,73 +146,39 @@ namespace Slafight_Plugin_EXILED
         private bool GateDoorLocked = false;
         public bool IsScpAutoSpawnLocked = false;
         // - System Flags - //
-        public bool PluginLoaded = false;
+        private bool _pluginLoaded = false;
 
-        public List<string> Tips = new List<string>()
-        {
-            "次のメジャーアプデv1.5.xでは第五が全面的に見直される予定だよ！",
-            "「正常性は記録装置の夢だ。人間性は、そのバグとして残る。」 - DELTA COMMAND",
-            " 「人間性など不確実性の残滓。再起動で正常性を永遠に。」 - O5-1",
-            "Nu-7の元帥はいつ実装されるのだろうか・・・？その答えを得るべく、我々は(以下略",
-            "ゲームサーバー公開ツールの有料プランの更新が来年なせいで回線がカスだよ！助けて！",
-            "すらびあさんのバグ発生力は頭逝かれてます！",
-            "第五第五第五第五第五第五",
-            "実は何処かに隠し要素があるらしい...?",
-            "隠し要素の場所にはいずれのアプデで追加される要素と関係があるとか...?",
-            "Tipsっていいよね！！！！",
-            "「サーバーが落ちた？落ちたのは希望だ、まだだ。」 - AI",
-            "「SCPたちはバグじゃない、仕様という名の恐怖だ。」 - AI",
-            "「デバッグは終わらない。SCPも、同じく。」 - AI",
-            "皆もっと遊んでくれーーーーーー！！！",
-            "Hello, World!\\n",
-            "SCP-CN-2000はいいぞ",
-            "Build -> Test -> Fail -> AI Suggestion -> Fix -> ...loop",
-            "サイレントリアルタイムアップデートが行われる鯖なんて唯一無二ではないか？",
-            "君もC#を覚えて開発に携わらないか？なあ、楽しいぞ？",
-            "Exiledは実はLabApiプラグインである。その為LabApiのコードも動くのである。",
-            "しかし、誰も来なかった。",
-            "カピバラ様を崇めよ()",
-            "「ロール抽選はAI任せ。でもバグらせるのは君次第だ。」 - AI",
-            "「ZoneManagerは2人しかいない。見つけたら大事に扱おう、できれば。」 - AI",
-            "「カスタムロールは全部ベース職の上に乗っている。\n中身を覗くときはUniqueRoleを忘れずに。」 - AI",
-            "「5人に1人がSCP？安心しろ、人間側も3人に1人おかしい。」 - AI",
-            "「/spawnはデバッグ用。ロールバランスを壊したら、\nログとにらめっこする覚悟を。」 - AI",
-            "「今日のラウンドが安定していたら、\nそれはコードじゃなくて運が良かっただけかもしれない。」 - AI",
-            "AIに鯖乗っ取られるんじゃないかってぐらい貢献させてて怖くなってくる今日この頃"
-        };
-
-        public void OnPluginLoad()
+        private void OnPluginLoad()
         {
             Log.Info("OnPluginLoad is successfully called!");
-            if (!PluginLoaded)
+            if (!_pluginLoaded)
             {
 
-                PluginLoaded = true;
+                _pluginLoaded = true;
             }
         }
-        
-        public void OnVerified(VerifiedEventArgs ev)
+
+        private void OnVerified(VerifiedEventArgs ev)
         {
             ev.Player.Broadcast(6,"\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>",Broadcast.BroadcastFlags.Normal,true);
             Timing.CallDelayed(0.05f, () =>
             {
-                int tipsRandom = Random.Range(0,Tips.Count);
-                string tips = Tips[tipsRandom];
+                string tips = Tips.GetRandomTip();
                 ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                     $"\n\n<size=28>Tips: {tips}</size>"
                                     ),5555f);
             });
         }
 
-        public void OnLeft(LeftEventArgs ev)
+        private void OnLeft(LeftEventArgs ev)
         {
-            if (ev.Player.Role.Team != Team.SCPs)
+            if (ev.Player.GetTeam() != CTeam.SCPs)
                 return;
 
             if (Round.ElapsedTime.TotalSeconds > 179)
                 return;
 
-            int scpAlive = Player.List.Count(p => p.IsAlive && p.Role.Team == Team.SCPs);
+            int scpAlive = Player.List.Count(p => p.IsAlive && p.GetTeam() == CTeam.SCPs);
             if (scpAlive >= 1)
                 return;
 
@@ -218,24 +186,16 @@ namespace Slafight_Plugin_EXILED
             if (candidate == null)
                 return;
 
-            // 元プレイヤーのカスタムロールを取得
-            var custom = ev.Player.GetCustomRole();
+            var roleInfo = ev.Player.GetRoleInfo();
 
-            // SCP用のCRoleTypeIdだけを補充対象にする
-            bool isScpCustom = custom is CRoleTypeId.Scp3005
-                    or CRoleTypeId.Scp966
-                    or CRoleTypeId.Scp096Anger
-                ;
-
-            if (custom == null || custom == CRoleTypeId.None || !isScpCustom)
+            if (roleInfo.Custom == CRoleTypeId.None)
             {
-                // 通常SCPロールで補充
-                candidate.SetRole(ev.Player.Role);
+                candidate.SetRole(roleInfo.Vanilla);
             }
             else
             {
-                // SCPカスタムロールで補充
-                candidate.SetRole(custom);
+                Debug.Assert(roleInfo.Custom != null, "roleInfo.Custom != null");
+                candidate.SetRole((CRoleTypeId)roleInfo.Custom);
             }
 
             candidate.ShowHint("※SCPプレイヤーが切断したため代わりにスポーンしました");
@@ -249,8 +209,7 @@ namespace Slafight_Plugin_EXILED
                 {
                     foreach (Player player in Player.List)
                     {
-                        int tipsRandom = Random.Range(0,Tips.Count);
-                        string tips = Tips[tipsRandom];
+                        string tips = Tips.GetRandomTip();
                         player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
                                             $"\n\n<size=28>Tips: {tips}</size>"
                             ),5555f);
@@ -491,133 +450,6 @@ namespace Slafight_Plugin_EXILED
             AudioClipStorage.LoadClip(Path.Combine(Plugin.Singleton.Config.AudioReferences, fileName), fileName);
 
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
-        }
-
-        public void SkeletonRagdoll()
-        {
-            return;
-            // IT'S ALL DEPRECATED. GOOD BYE FUNNY BOYS.
-            Timing.CallDelayed(1, () =>
-            {
-                    Player ev = null;
-                    foreach (Player player in Player.List)
-                    {
-                        if (player.Role == RoleTypeId.Scp3114)
-                        {
-                            ev = player;
-                            break;
-                        }
-                    }
-                    //ev.Player.Rotation = Quaternion.Euler(0,-62f,0f);
-                    Vector3 s_chamber = Vector3.zero;
-                    Vector3 s_root = Vector3.zero;
-                    Vector3 s_scientist_spawn = Vector3.zero;
-                    Vector3 s_classd_spawn = Vector3.zero;
-                    Vector3 s_fg_spawn = Vector3.zero;
-                    Vector3 s_ntf_spawn = Vector3.zero;
-                    Vector3 s_chaos_spawn = Vector3.zero;
-
-                    Vector3 s_root_scientist = Vector3.zero;
-                    Vector3 s_root_classd = Vector3.zero;
-                    Quaternion s_root_rotation = Quaternion.identity;
-                    s_chamber = Room.Get(RoomType.Lcz173).Position + new Vector3(-3f, 12f, -2f);
-                    Log.Debug("S_Chamber Pos: " + s_chamber.x + "," + s_chamber.y + "," + s_chamber.z);
-                    s_root = ev.Position;
-                    Log.Debug("x:" + ev.Position.x + "y:" + ev.Position.y + "z:" + ev.Position.z);
-                    foreach (Ragdoll ragdoll in Ragdoll.List)
-                    {
-                        if (ragdoll.Room.Type == RoomType.Lcz173 && ragdoll.Role == RoleTypeId.Scientist)
-                        {
-                            s_root_scientist = ragdoll.Position;
-                            s_root_rotation = ragdoll.Rotation;
-                            Log.Debug("ragdoll scientist get");
-                            Log.Debug("Scientist Pos:"+s_root_scientist.x+","+s_root_scientist.y+","+s_root_scientist.z+"\nRot:"+s_root_rotation.x+","+s_root_rotation.y+","+s_root_rotation.z+","+s_root_rotation.w);
-                            ragdoll.Destroy();
-                        }
-
-                        if (ragdoll.Room.Type == RoomType.Lcz173 && ragdoll.Role == RoleTypeId.ClassD)
-                        {
-                            s_root_classd = ragdoll.Position;
-                            Log.Debug("ragdoll class-d get");
-                            ragdoll.Destroy();
-                        }
-                    }
-                    Vector3 s_changed_value = s_root_scientist - s_root_classd;
-                    s_root_scientist += new Vector3(0f,0.002f,0f);
-                    Log.Debug("S_CHANGED_VALUE - x:" + s_changed_value.x + "y:" + s_changed_value.y + "z:" + s_changed_value.z);
-                    s_scientist_spawn = s_root_scientist;
-                    s_classd_spawn = s_root_scientist - s_changed_value;
-                    s_fg_spawn = s_root_scientist - s_changed_value * 2;
-                    s_ntf_spawn = s_root_scientist - s_changed_value * 3;
-                    s_chaos_spawn = s_root_scientist - s_changed_value * 4;
-                    Ragdoll skeletonRagdoll_Scientist = Ragdoll.CreateAndSpawn(RoleTypeId.Scientist, "Scientist Ragdoll", "For You :)", s_scientist_spawn, s_root_rotation);
-                    //skeletonRagdoll_Scientist.Rotation = Quaternion.Euler(0f,45f,0f);
-                    Log.Debug("scientist ragdoll:\n" + skeletonRagdoll_Scientist.Position.x + "," + skeletonRagdoll_Scientist.Position.y + "," + skeletonRagdoll_Scientist.Position.z);
-                    
-                    Ragdoll skeletonRagdoll_ClassD = Ragdoll.CreateAndSpawn(RoleTypeId.ClassD, "ClassD Ragdoll", "For You :)", s_classd_spawn, s_root_rotation);
-                    //skeletonRagdoll_ClassD.Rotation = Quaternion.Euler(0f,45f,0f);
-                    Log.Debug("classd ragdoll:\n" + skeletonRagdoll_ClassD.Position.x + "," + skeletonRagdoll_ClassD.Position.y + "," + skeletonRagdoll_ClassD.Position.z);
-                    
-                    Ragdoll skeletonRagdoll_FG = Ragdoll.CreateAndSpawn(RoleTypeId.FacilityGuard, "FacilityGuard Ragdoll", "For You :)", s_fg_spawn, s_root_rotation);
-                    //skeletonRagdoll_FG.Rotation = Quaternion.Euler(0f,45f,0f);
-                    Log.Debug("fg ragdoll:\n" + skeletonRagdoll_FG.Position.x + "," + skeletonRagdoll_FG.Position.y + "," + skeletonRagdoll_FG.Position.z);
-                    
-                    Ragdoll skeletonRagdoll_NTF = Ragdoll.CreateAndSpawn(RoleTypeId.NtfPrivate, "NTF-Private Ragdoll", "For You :)", s_ntf_spawn, s_root_rotation);
-                    //skeletonRagdoll_NTF.Rotation = Quaternion.Euler(0f,45f,0f);
-                    Log.Debug("ntf ragdoll:\n" + skeletonRagdoll_NTF.Position.x + "," + skeletonRagdoll_NTF.Position.y + "," + skeletonRagdoll_NTF.Position.z);
-                    
-                    Ragdoll skeletonRagdoll_Chaos = Ragdoll.CreateAndSpawn(RoleTypeId.ChaosRifleman, "NTF-Rifleman Ragdoll", "For You :)", s_chaos_spawn, s_root_rotation);
-                    //skeletonRagdoll_NTF.Rotation = Quaternion.Euler(0f,45f,0f);
-                    Log.Debug("chaos ragdoll:\n" + skeletonRagdoll_Chaos.Position.x + "," + skeletonRagdoll_Chaos.Position.y + "," + skeletonRagdoll_Chaos.Position.z);
-                    
-                    // in 173 Chamber Funnies
-                    Vector3 s_root_door = Vector3.zero;
-                    Vector3 s_root_skeleton = Vector3.zero;
-                    s_root_scientist += new Vector3(0f, 0.004f, 0f);
-                    s_root_door = Door.Get(DoorType.Scp173Gate).Position;
-                    foreach (Player player in Player.List)
-                    {
-                        if (player.Role == RoleTypeId.Scp3114)
-                        {
-                            s_root_skeleton = player.Position;
-                            break;
-                        }
-                    }
-                    Vector3 funnyPosModifier = s_root_door * 1.0092f - s_root_skeleton;
-                    Vector3 FunnyPos = s_root_door + funnyPosModifier;//s_root_scientist - s_changed_value * 20 + Vector3.forward * 30 - Vector3.left * 13;
-                    Quaternion FunnyQua = s_root_rotation;
-                    List<RoleTypeId> roles = new List<RoleTypeId>() { RoleTypeId.ClassD,RoleTypeId.Scientist,RoleTypeId.FacilityGuard,RoleTypeId.NtfPrivate,RoleTypeId.ChaosRifleman };
-                    for (int i = 0; i < 30; i++)
-                    {
-                        string funnyname = "FunnyBoy - No." + i;
-                        Ragdoll funnyRagdoll = Ragdoll.CreateAndSpawn(roles.GetRandomValue(),funnyname,"LoL", FunnyPos, FunnyQua);
-                        //funnyRagdoll.Position += new Vector3(0,2f,0f);
-                        //funnyRagdoll.Position += -Vector3.forward * 3;
-                        if (i == 29)
-                        {
-                            /*foreach (Player player in Player.List)
-                            {
-                                if (player.Role == RoleTypeId.Scp3114)
-                                {
-                                    player.Position = FunnyPos;
-                                    player.Rotation = FunnyQua;
-                                    //player.Position += new Vector3(0f,2f,-0f);
-                                    //funnyRagdoll.Position += -Vector3.forward * 3;
-                                    break;
-                                }
-                            }*/
-                        }
-                    }
-
-                    foreach (Door door in Door.List)
-                    {
-                        if (door.Type == DoorType.Scp173Gate)
-                        {
-                            door.IsOpen = true;
-                        }
-                    }
-                    //x:23y:112.4z:100
-            });
         }
 
         public void AlphaWarheadLock(StartingEventArgs ev)

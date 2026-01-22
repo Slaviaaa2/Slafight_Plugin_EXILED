@@ -72,22 +72,23 @@ public static class AbilityManager
 
             string name = ability.GetType().Name;
             string marker = (i == loadout.ActiveIndex) ? "<color=#ffff00>▶</color>" : "　";
-            string status = AbilityBase.CanUseNow(player.Id, ability.GetType()) ? 
+            string status = AbilityBase.CanUseNow(player.Id, ability.GetType()) ?
                 "<color=green>OK</color>" : "<color=red>CD</color>";
             sb.AppendLine($"{marker} {name} [{status}]");
         }
 
         string text = sb.Length > 0 ? sb.ToString() : "アビリティ無し";
-        
+
         try
         {
             if (Plugin.Singleton?.PlayerHUD != null)
             {
-                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, text, player);
+                // ★ ここを PHUD_Ability に変更
+                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Ability, text, player);
             }
             else
             {
-                string shortText = text.Length > 100 ? text.Substring(0, 100) + "..." : text;
+                string shortText = text.Length > 100 ? text[..100] + "..." : text;
                 player.ShowHint(shortText, 2f);
             }
         }

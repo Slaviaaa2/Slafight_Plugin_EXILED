@@ -6,27 +6,105 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Server;
 using MEC;
 using PlayerRoles;
-using Respawning;
 using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
-using Subtitles;
 using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED;
 
-/// <summary>
-/// リスポーン波を完全制御する統合スポーンシステム。
-/// ・どの勢力を呼ぶか: WaveWeights
-/// ・何人対象にするか: SpawnRatios
-/// ・どのロールになるか: RoleTables (maxCount + guaranteed)
-/// 全陣営 (NTF / HammerDown / Chaos / Fifthist / 新勢力) を1つの仕組みにまとめる。
-/// </summary>
 public class SpawnSystem
 {
     // =====================
+    //  汎用
+    // =====================
+
+    public enum SpawnRoleKind
+    {
+        Vanilla,
+        Custom,
+    }
+
+    public readonly record struct SpawnRoleKey
+    {
+        public SpawnRoleKind Kind { get; }
+        public RoleTypeId Vanilla { get; }
+        public CRoleTypeId Custom { get; }
+
+        public SpawnRoleKey(RoleTypeId vanilla)
+        {
+            Kind = SpawnRoleKind.Vanilla;
+            Vanilla = vanilla;
+            Custom = CRoleTypeId.None;
+        }
+
+        public SpawnRoleKey(CRoleTypeId custom)
+        {
+            Kind = SpawnRoleKind.Custom;
+            Custom = custom;
+            Vanilla = RoleTypeId.None;
+        }
+    }
+
+    // =====================
+    //  内部イベント定義
+    // =====================
+
+    public class SpawningEventArgs : EventArgs
+    {
+        public SpawnTypeId SpawnType { get; }
+        public bool IsMiniWave { get; }
+        public Faction Faction { get; }
+
+        // Cassie用: NATO_A / NATO_B ...
+        public string CassieCallsign { get; }
+
+        // 表示用: ALPHA-05 など
+        public string DisplayCallsign { get; }
+
+        // Waveの湧き人数（旧fifthistCountを統一）
+        public int SpawnCount { get; }
+
+        public SpawningEventArgs(
+            SpawnTypeId spawnType,
+            bool isMiniWave,
+            Faction faction,
+            string cassieCallsign = "",
+            string displayCallsign = "",
+            int spawnCount = 0)
+        {
+            SpawnType = spawnType;
+            IsMiniWave = isMiniWave;
+            Faction = faction;
+            CassieCallsign = cassieCallsign;
+            DisplayCallsign = displayCallsign;
+            SpawnCount = spawnCount;
+        }
+    }
+
+    public static event EventHandler<SpawningEventArgs> Spawning;
+
+    private static void OnSpawning(
+        SpawnTypeId spawnType,
+        bool isMiniWave,
+        Faction faction,
+        string cassieCallsign = "",
+        string displayCallsign = "",
+        int spawnCount = 0)
+    {
+        Spawning?.Invoke(null, new SpawningEventArgs(
+            spawnType,
+            isMiniWave,
+            faction,
+            cassieCallsign,
+            displayCallsign,
+            spawnCount));
+    }
+
+    // =====================
     //  Config 定義
     // =====================
+
     public class SpawnConfig
     {
         public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; set; } = new()
@@ -53,90 +131,91 @@ public class SpawnSystem
             { SpawnTypeId.GOI_FifthistBackup, 0   },
         };
 
-        /// <summary>
-        /// 各SpawnTypeごとの「何人対象にするか」の比率。
-        /// ratio = 1.0 → 対象プレイヤー全員。
-        /// ratio = 0.5 → 対象プレイヤーの半分。
-        /// </summary>
         public Dictionary<SpawnTypeId, float> SpawnRatios { get; set; } = new()
         {
+            { SpawnTypeId.MTF_NtfNormal,      1.0f },
+            { SpawnTypeId.MTF_NtfBackup,      1.0f },
             { SpawnTypeId.MTF_HDNormal,       1.0f },
             { SpawnTypeId.MTF_HDBackup,       0.5f },
+            { SpawnTypeId.GOI_ChaosNormal,    1.0f },
+            { SpawnTypeId.GOI_ChaosBackup,    1.0f },
             { SpawnTypeId.GOI_FifthistNormal, 0.25f },
             { SpawnTypeId.GOI_FifthistBackup, 1f / 6f },
         };
 
-        /// <summary>
-        /// 各SpawnTypeごとの「ロールテーブル」。
-        /// key: ロール, value: (maxCount, guaranteed)
-        /// guaranteed = true のロールは最低1人は必ず湧く（人数が足りる限り）。
-        /// maxCount はそのロールに割り当てる最大人数。
-        /// </summary>
-        public Dictionary<SpawnTypeId, Dictionary<CRoleTypeId, (float maxCount, bool guaranteed)>> RoleTables
-            { get; set; } = new()
+        public Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> RoleTables
+        { get; set; } = new()
         {
-            // ----- Hammer Down -----
-            {
-                SpawnTypeId.MTF_HDNormal, new()
-                {
-                    { CRoleTypeId.HdMarshal,   (1f,   true)  },
-                    { CRoleTypeId.HdCommander, (2f,  false) },
-                    { CRoleTypeId.HdInfantry,  (99f, false) },
-                }
-            },
-            {
-                SpawnTypeId.MTF_HDBackup, new()
-                {
-                    { CRoleTypeId.HdCommander, (1f,  true)  },
-                    { CRoleTypeId.HdInfantry,  (99f, false) },
-                }
-            },
-
-            // ----- Fifthist -----
-            {
-                SpawnTypeId.GOI_FifthistNormal, new()
-                {
-                    { CRoleTypeId.FifthistPriest,  (1f,  true)  },
-                    { CRoleTypeId.FifthistRescure, (3f,  false) },
-                    { CRoleTypeId.FifthistConvert, (99f, false) }
-                }
-            },
-            {
-                SpawnTypeId.GOI_FifthistBackup, new()
-                {
-                    { CRoleTypeId.FifthistRescure, (2f, false) },
-                    { CRoleTypeId.FifthistConvert, (99f, false) }
-                }
-            },
-
-            // ----- Chaos (サブロール用, 人数制御) -----
-            {
-                SpawnTypeId.GOI_ChaosNormal, new()
-                {
-                    { CRoleTypeId.ChaosCommando, (2f, false) },
-                    { CRoleTypeId.ChaosSignal,   (1f, false) }
-                }
-            },
-            {
-                SpawnTypeId.GOI_ChaosBackup, new()
-                {
-                    { CRoleTypeId.ChaosSignal, (1f, false) },
-                }
-            },
-
-            // ----- NTF (サブロール用, 人数制御) -----
+            // NTF
             {
                 SpawnTypeId.MTF_NtfNormal, new()
                 {
-                    // ここを「何人まで出すか」で調整
-                    { CRoleTypeId.NtfGeneral,    (1f,  false) }, // 最大1人
-                    { CRoleTypeId.NtfLieutenant, (2f,  false) }, // 最大2人
+                    { new SpawnRoleKey(CRoleTypeId.NtfGeneral),    (1f,  false)  },
+                    { new SpawnRoleKey(RoleTypeId.NtfCaptain),     (1f,  true)   },
+                    { new SpawnRoleKey(CRoleTypeId.NtfLieutenant), (2f,  false)  },
+                    { new SpawnRoleKey(RoleTypeId.NtfSergeant),    (2f,  false)  },
+                    { new SpawnRoleKey(RoleTypeId.NtfPrivate),     (99f, true)   },
                 }
             },
             {
                 SpawnTypeId.MTF_NtfBackup, new()
                 {
-                    { CRoleTypeId.NtfLieutenant, (1f,  false) },
+                    { new SpawnRoleKey(RoleTypeId.NtfSergeant), (1f,  true) },
+                    { new SpawnRoleKey(RoleTypeId.NtfPrivate),  (99f, true) },
+                }
+            },
+
+            // Hammer Down
+            {
+                SpawnTypeId.MTF_HDNormal, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.HdMarshal),   (1f,  true)  },
+                    { new SpawnRoleKey(CRoleTypeId.HdCommander), (2f,  false) },
+                    { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false) },
+                }
+            },
+            {
+                SpawnTypeId.MTF_HDBackup, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.HdCommander), (1f,  true)  },
+                    { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false) },
+                }
+            },
+
+            // Chaos
+            {
+                SpawnTypeId.GOI_ChaosNormal, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.ChaosCommando), (2f,  false) },
+                    { new SpawnRoleKey(RoleTypeId.ChaosRepressor), (2f,  false) },
+                    { new SpawnRoleKey(CRoleTypeId.ChaosSignal),   (2f,  false) },
+                    { new SpawnRoleKey(RoleTypeId.ChaosMarauder),  (2f,  false) },
+                    { new SpawnRoleKey(RoleTypeId.ChaosRifleman),  (99f, false) },
+                }
+            },
+            {
+                SpawnTypeId.GOI_ChaosBackup, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.ChaosSignal),  (1f,  true)  },
+                    { new SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f,  false) },
+                    { new SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) },
+                }
+            },
+
+            // Fifthist
+            {
+                SpawnTypeId.GOI_FifthistNormal, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.FifthistPriest),  (1f,  true)  },
+                    { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (3f,  false) },
+                    { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
+                }
+            },
+            {
+                SpawnTypeId.GOI_FifthistBackup, new()
+                {
+                    { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (2f,  false) },
+                    { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
                 }
             },
         };
@@ -145,13 +224,13 @@ public class SpawnSystem
         public int PlayerThresholdHigh { get; set; } = 6;
 
         public int S3005FifthistChance { get; set; } = 5;
-
-        public bool HdUseNatoCallsign { get; set; } = true;
+        public bool NatoCallsign       { get; set; } = true;
     }
 
     public static SpawnConfig Config { get; } = new();
 
     private bool isDefaultWave = true;
+
     public static bool Disable = false;
 
     public SpawnSystem()
@@ -165,7 +244,7 @@ public class SpawnSystem
     }
 
     // =====================
-    //  RespawningTeam ハンドラ
+    //  RespawningTeam
     // =====================
 
     public void SpawnHandler(RespawningTeamEventArgs ev)
@@ -181,17 +260,20 @@ public class SpawnSystem
 
         ev.IsAllowed = false;
 
+        SpawnTypeId? decided = null;
+
         if (ev.NextKnownTeam == Faction.FoundationStaff)
-        {
-            HandleFoundationStaffWave(ev);
-        }
+            decided = DecideFoundationStaffType(ev);
         else if (ev.NextKnownTeam == Faction.FoundationEnemy)
-        {
-            HandleFoundationEnemyWave(ev);
-        }
+            decided = DecideFoundationEnemyType(ev);
+
+        if (decided is null)
+            return;
+
+        SummonForces(decided.Value, ev.Wave.IsMiniWave);
     }
 
-    private void HandleFoundationStaffWave(RespawningTeamEventArgs ev)
+    private SpawnTypeId? DecideFoundationStaffType(RespawningTeamEventArgs ev)
     {
         int scpCount = Player.List.Count(p => p.Role.Team == Team.SCPs);
         bool highThreat = Player.Count >= Config.PlayerThresholdHigh ||
@@ -217,12 +299,10 @@ public class SpawnSystem
             }
         }
 
-        var picked = PickWeightedSpawnType(weights);
-        if (picked != null)
-            SummonForces(picked.Value, ev.Wave.IsMiniWave);
+        return PickWeightedSpawnType(weights);
     }
 
-    private void HandleFoundationEnemyWave(RespawningTeamEventArgs ev)
+    private SpawnTypeId? DecideFoundationEnemyType(RespawningTeamEventArgs ev)
     {
         bool has3005 = Player.List.Any(p => p.GetCustomRole() == CRoleTypeId.Scp3005);
 
@@ -259,148 +339,72 @@ public class SpawnSystem
             }
         }
 
-        var picked = PickWeightedSpawnType(weights);
-        if (picked != null)
-            SummonForces(picked.Value, ev.Wave.IsMiniWave);
+        return PickWeightedSpawnType(weights);
     }
 
     // =====================
-    //  SummonForces & 共通割り当て
+    //  SummonForces
     // =====================
 
     public void SummonForces(SpawnTypeId spawnType, bool isMiniWave)
     {
         isDefaultWave = false;
-        string callsign = Config.HdUseNatoCallsign ? GenerateNatoCallsign() : string.Empty;
 
-        switch (spawnType)
+        string cassieCallsign  = string.Empty;
+        string displayCallsign = string.Empty;
+        int spawnCount = 0; // 今回その勢力として湧かせる人数
+
+        // 先に対象 Spectator を確定させておく
+        var specs = Player.List
+            .Where(p =>
+                p.Role == RoleTypeId.Spectator &&
+                p.GetCustomRole() == CRoleTypeId.None)
+            .ToList();
+
+        spawnCount = specs.Count;
+
+        // HD 用コールサイン生成
+        if (Config.NatoCallsign)
         {
-            // ----- NTF：Spectatorからサブロールを先に湧かせる + バニラwave -----
-            case SpawnTypeId.MTF_NtfNormal:
-            {
-                // まずSpectatorからサブロール枠をスポーン
-                var specs = Player.List
-                    .Where(p => p.Role == RoleTypeId.Spectator)
-                    .ToList();
-
-                int maxSubRoles = Math.Max(1, specs.Count / 3); // 3人に1人くらい増援
-                AssignTeamRoles(
-                    SpawnTypeId.MTF_NtfNormal,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator,
-                    fixedCount: maxSubRoles
-                );
-
-                // 少し待ってからバニラNTF wave
-                Timing.CallDelayed(1f, () =>
-                {
-                    Respawn.ForceWave(SpawnableFaction.NtfWave);
-                });
-                break;
-            }
-
-            case SpawnTypeId.MTF_NtfBackup:
-            {
-                var specs = Player.List
-                    .Where(p => p.Role == RoleTypeId.Spectator)
-                    .ToList();
-
-                int maxSubRoles = Math.Max(1, specs.Count / 4);
-                AssignTeamRoles(
-                    SpawnTypeId.MTF_NtfBackup,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator,
-                    fixedCount: maxSubRoles
-                );
-
-                Timing.CallDelayed(1f, () =>
-                {
-                    Respawn.ForceWave(SpawnableFaction.NtfMiniWave);
-                });
-                break;
-            }
-
-            // ----- Hammer Down：Spectatorから完全自前スポーン -----
-            case SpawnTypeId.MTF_HDNormal:
-            case SpawnTypeId.MTF_HDBackup:
-                AssignTeamRoles(
-                    spawnType,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator
-                );
-                if (spawnType == SpawnTypeId.MTF_HDNormal)
-                    CassieHelper.AnnounceHdArrival(callsign);
-                else
-                    CassieHelper.AnnounceHdBackup();
-                break;
-
-            // ----- Chaos：Spectatorからサブロールを先に湧かせる + バニラwave -----
-            case SpawnTypeId.GOI_ChaosNormal:
-            {
-                var specs = Player.List
-                    .Where(p => p.Role == RoleTypeId.Spectator)
-                    .ToList();
-
-                int maxSubRoles = Math.Max(1, specs.Count / 3);
-                AssignTeamRoles(
-                    SpawnTypeId.GOI_ChaosNormal,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator,
-                    fixedCount: maxSubRoles
-                );
-
-                Timing.CallDelayed(1f, () =>
-                {
-                    Respawn.ForceWave(SpawnableFaction.ChaosWave);
-                });
-                break;
-            }
-
-            case SpawnTypeId.GOI_ChaosBackup:
-            {
-                var specs = Player.List
-                    .Where(p => p.Role == RoleTypeId.Spectator)
-                    .ToList();
-
-                int maxSubRoles = Math.Max(1, specs.Count / 4);
-                AssignTeamRoles(
-                    SpawnTypeId.GOI_ChaosBackup,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator,
-                    fixedCount: maxSubRoles
-                );
-
-                Timing.CallDelayed(1f, () =>
-                {
-                    Respawn.ForceWave(SpawnableFaction.ChaosMiniWave);
-                });
-                break;
-            }
-
-            // ----- Fifthist：Spectatorから完全自前スポーン -----
-            case SpawnTypeId.GOI_FifthistNormal:
-            case SpawnTypeId.GOI_FifthistBackup:
-                AssignTeamRoles(
-                    spawnType,
-                    playerFilter: p => p.Role == RoleTypeId.Spectator
-                );
-                int count = Player.List.Count(p =>
-                    p.GetCustomRole() is CRoleTypeId.FifthistPriest or CRoleTypeId.FifthistRescure);
-                CassieHelper.AnnounceFifthist(count);
-                break;
+            var nato = GenerateNatoCallsignFull();
+            cassieCallsign  = nato.cassie;
+            displayCallsign = nato.display;
         }
+
+        // Spectator から対象ロールを割り当て（候補は specs に固定）
+        AssignTeamRoles(
+            spawnType,
+            playerFilter: p => specs.Contains(p),
+            fixedCount: null);
+
+        // Faction 判定
+        Faction faction = spawnType switch
+        {
+            SpawnTypeId.MTF_NtfNormal or SpawnTypeId.MTF_NtfBackup
+                or SpawnTypeId.MTF_HDNormal or SpawnTypeId.MTF_HDBackup
+                => Faction.FoundationStaff,
+
+            SpawnTypeId.GOI_ChaosNormal or SpawnTypeId.GOI_ChaosBackup
+                or SpawnTypeId.GOI_FifthistNormal or SpawnTypeId.GOI_FifthistBackup
+                => Faction.FoundationEnemy,
+
+            _ => Faction.Unclassified
+        };
+
+        // spawnCount を今回 wave の人数として渡す
+        OnSpawning(spawnType, isMiniWave, faction, cassieCallsign, displayCallsign, spawnCount);
 
         Timing.CallDelayed(0.02f, () => isDefaultWave = true);
     }
 
-    /// <summary>
-    /// 汎用ロール割り当て:
-    /// spawnTypeに対応するRoleTableを取得し、
-    /// playerFilterで絞り込んだプレイヤーから
-    /// ・guaranteed=trueロールを最低1人ずつ確湧き
-    /// ・各ロール毎に maxCount まで人数制限をかけたスロットを作成
-    /// ・スロットをシャッフルして targetCount 人に割り当て
-    /// </summary>
+    // =====================
+    //  汎用ロール割り当て
+    // =====================
+
     private void AssignTeamRoles(
         SpawnTypeId spawnType,
         Func<Player, bool> playerFilter,
-        int? fixedCount = null
-    )
+        int? fixedCount = null)
     {
         if (!Config.RoleTables.TryGetValue(spawnType, out var table) || table.Count == 0)
             return;
@@ -420,32 +424,30 @@ public class SpawnSystem
         }
         else
         {
-            float ratio = 1.0f;
-            if (Config.SpawnRatios.TryGetValue(spawnType, out var r))
-                ratio = r;
+            var ratio = Config.SpawnRatios.GetValueOrDefault(spawnType, 1.0f);
 
             targetCount = (int)Math.Truncate(candidates.Count * ratio);
             if (targetCount <= 0)
                 targetCount = candidates.Count;
         }
 
-        var slots = new List<CRoleTypeId>();
+        var slots = new List<SpawnRoleKey>();
 
         foreach (var kvp in table)
         {
-            var role = kvp.Key;
+            var roleKey = kvp.Key;
             var (maxCount, guaranteed) = kvp.Value;
             int max = (int)maxCount;
             if (max <= 0) continue;
 
             if (guaranteed && slots.Count < targetCount)
             {
-                slots.Add(role);
+                slots.Add(roleKey);
                 max--;
             }
 
             for (int i = 0; i < max && slots.Count < targetCount; i++)
-                slots.Add(role);
+                slots.Add(roleKey);
         }
 
         if (slots.Count < targetCount && table.Count > 0)
@@ -464,8 +466,18 @@ public class SpawnSystem
         for (int i = 0; i < assignCount; i++)
         {
             var player = candidates[i];
-            var role   = slots[i];
-            player.SetRole(role, RoleSpawnFlags.All);
+            var key    = slots[i];
+
+            switch (key.Kind)
+            {
+                case SpawnRoleKind.Vanilla:
+                    player.SetRole(key.Vanilla);
+                    break;
+
+                case SpawnRoleKind.Custom:
+                    player.SetRole(key.Custom);
+                    break;
+            }
         }
     }
 
@@ -476,7 +488,7 @@ public class SpawnSystem
             return null;
 
         int total = valid.Sum(kvp => kvp.Value);
-        int roll  = Random.Range(0, total); // int版はmax排他 [web:48]
+        int roll  = Random.Range(0, total);
 
         int cum = 0;
         foreach (var kvp in valid)
@@ -489,7 +501,8 @@ public class SpawnSystem
         return valid.First().Key;
     }
 
-    private string GenerateNatoCallsign()
+    // Cassie用(NATO_Aなど)と表示用(ALPHA-05)を両方返す
+    private (string cassie, string display) GenerateNatoCallsignFull()
     {
         List<string> NatoForce = new()
         {
@@ -508,51 +521,21 @@ public class SpawnSystem
         string natoForce  = NatoForce.RandomItem();
         string natoForceL = NatoForceL[NatoForce.IndexOf(natoForce)];
         int natoForceNum  = Random.Range(1, 20);
-        return $"{natoForceL}-{natoForceNum:00}";
-    }
-}
 
-public static class CassieHelper
-{
-    public static void AnnounceHdArrival(string callsign)
-    {
-        Exiled.API.Features.Cassie.MessageTranslated(
-            $"MtfUnit Nu 7 Designated {callsign} HasEntered AllRemaining This Forces Work Epsilon 11 Task and operated by O5 Command . for Big Containment Breachs .",
-            $"<b><color=#353535>機動部隊Nu-7 \"下される鉄槌 - ハンマーダウン\"-{callsign}</color></b>が施設に到着しました。残存する全職員は、機動部隊が目的地に到着するまで、標準避難プロトコルに従って行動してください。" +
-            $"<split>本部隊は<color=#5bc5ff>Epsilon-11 \"九尾狐\"</color>の任務の代替として大規模な収容違反の対応の為O5評議会に招集されました。",
-            true);
-    }
-
-    public static void AnnounceHdBackup()
-    {
-        Exiled.API.Features.Cassie.MessageTranslated(
-            "Her man down Backup unit has entered the facility .",
-            "<b><color=#353535>下される鉄槌 - ハンマーダウンの予備部隊</color></b>が施設に到着しました。",
-            true);
-    }
-
-    public static void AnnounceFifthist(int count)
-    {
-        Exiled.API.Features.Cassie.MessageTranslated(
-            $"Attention All personnel . Detected {count} $pitch_1.05 5 5 5 $pitch_1 Forces in Gate B .",
-            $"全職員に通達。Gate Bに{count}人の第五主義者が検出されました。",
-            true);
+        // cassie: NATO_A / display: ALPHA-05
+        return (natoForce, $"{natoForceL}-{natoForceNum:00}");
     }
 }
 
 public static class EnumerableExtensions
 {
-    /// <summary>
-    /// IEnumerableをFisher-Yates方式でシャッフルする簡易拡張。
-    /// Player.Listなどに対して .Shuffle().ToList() でランダム順序を取得できる。
-    /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
         var list = source.ToList();
         int n = list.Count;
         for (int i = 0; i < n - 1; i++)
         {
-            int j = Random.Range(i, n); // int版はmax排他 [web:48]
+            int j = Random.Range(i, n);
             (list[i], list[j]) = (list[j], list[i]);
         }
         return list;

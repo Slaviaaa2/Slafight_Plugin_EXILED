@@ -31,5 +31,7 @@ public enum CRoleTypeId
     Engineer = 22,
     HdMarshal = 23,
     NtfGeneral = 24,
-    ChaosSignal = 25
+    ChaosSignal = 25,
+    ChamberGuard = 26,
+    ObjectObserver = 27
 }

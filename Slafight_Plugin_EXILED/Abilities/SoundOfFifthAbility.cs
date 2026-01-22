@@ -10,7 +10,9 @@ using Mirror;
 using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using UserSettings.ServerSpecific;
 
@@ -40,9 +42,16 @@ public class SoundOfFifthAbility : AbilityBase
             if (_player == null || player == null) continue;
             if (_player != player)
             {
-                if (Vector3.Distance(_player.Position, player.Position) <= 20f)
+                if (Vector3.Distance(_player.Position, player.Position) <= 5f)
                 {
-                    _player.Explode(ProjectileType.Flashbang,player);
+                    if (_player.GetTeam() != CTeam.Fifthists)
+                    {
+                        _player.Explode(ProjectileType.Flashbang,player);
+                    }
+                    else
+                    {
+                        _player.EnableEffect(EffectType.Invigorated, 5f);
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@ public class FakeGrenade : CustomGrenade
     public override bool ExplodeOnCollision { get; set; } = true;
     public override float FuseTime { get; set; } = 0.5f;
 
-    public Color glowColor = Color.magenta;
+    public Color glowColor = Color.green;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

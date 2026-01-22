@@ -28,7 +28,7 @@ public class SerumD : CustomItem
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Adrenaline;
 
-    public Color glowColor = Color.yellow;
+    public Color glowColor = Color.cyan;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();

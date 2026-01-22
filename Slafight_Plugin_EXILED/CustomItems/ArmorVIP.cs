@@ -15,6 +15,7 @@ using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -34,7 +35,7 @@ public class ArmorVip : CustomArmor
     public override int HelmetEfficacy { get; set; } = 100;
     public override float StaminaUseMultiplier { get; set; } = 0.2f;
 
-    public Color glowColor = Color.magenta;
+    public Color glowColor = CustomColor.Purple.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
@@ -67,11 +68,6 @@ public class ArmorVip : CustomArmor
             ev.Player.SetAmmoLimit(AmmoType.Nato556,400);
             ev.Player.SetCategoryLimit(ItemCategory.Firearm,3);
             ev.Player.SetCategoryLimit(ItemCategory.Grenade,3);
-
-            ev.Player.CustomHumeShieldStat.MaxValue = 50;
-            ev.Player.CustomHumeShieldStat.CurValue = 50;
-            ev.Player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
-            ev.Player.CustomHumeShieldStat.Update();
         }
     }
 
@@ -83,9 +79,6 @@ public class ArmorVip : CustomArmor
             ev.Player.ResetAmmoLimit(AmmoType.Nato556);
             ev.Player.ResetCategoryLimit(ItemCategory.Firearm);
             ev.Player.ResetCategoryLimit(ItemCategory.Grenade);
-
-            ev.Player.CustomHumeShieldStat.MaxValue = 0f;
-            ev.Player.HumeShieldRegenerationMultiplier = 0f;
         }
     }
     

@@ -45,13 +45,11 @@ public class Scp682Role : CRole
         SpeedLevels[player] = 1f;
         player.SetScale(new Vector3(0.7f, 0.65f, 1.2f));
 
-        player.CustomInfo = "lor=#C50000>SCP-682</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
+        player.SetCustomInfo("SCP-682");
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("lor=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
+            player.ShowHint("<color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));
     }
@@ -63,6 +61,7 @@ public class Scp682Role : CRole
             if (player.GetCustomRole() != CRoleTypeId.Scp682)
             {
                 SpeedLevels.Remove(player);
+                RoleSpecificTextProvider.Clear(player);
                 yield break;
             }
 
@@ -101,12 +100,12 @@ public class Scp682Role : CRole
         {
             SpeedLevels.Remove(ev.Player);
             // ★ 修正: クリア時も RoleSpecificTextProvider を使用
-            RoleSpecificTextProvider.Set(ev.Player, "");
+            RoleSpecificTextProvider.Clear(ev.Player);
             
             Exiled.API.Features.Cassie.Clear();
             Exiled.API.Features.Cassie.MessageTranslated(
                 "SCP 6 8 2 Successfully Neutralized .",
-                "lor=red>SCP-682</color>の無力化に成功しました。"
+                "<color=red>SCP-682</color>の無力化に成功しました。"
             );
         }
     }

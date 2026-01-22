@@ -32,7 +32,7 @@ namespace Slafight_Plugin_EXILED
     public class Plugin : Plugin<Config>
     {
         public static Plugin Singleton { get; set; } = null!;
-        private static readonly HttpClient httpClient = new HttpClient
+        private static readonly HttpClient HttpClient = new()
         {
             Timeout = TimeSpan.FromSeconds(10) // デフォルトより短く/長く調整
         };
@@ -40,9 +40,9 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,4,6);
+        public override Version Version => new Version(1,5,0,2);
         
-        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 2);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 5);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -60,6 +60,7 @@ namespace Slafight_Plugin_EXILED
         public ChristmasChanges ChristmasChanges { get; set; }
         
         public SpawnSystem SpawnSystem { get; set; }
+        public SpawningHandler SpawningHandler { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
         public AbilityInputHandler AbilityInputHandler { get; set; }
         
@@ -69,6 +70,7 @@ namespace Slafight_Plugin_EXILED
         public Engineer EngineerRole { get; private set; }
         public MapGuardHandler MapGuardHandler { get; set; }
         public Scp1509Handler Scp1509Handler { get; set; }
+        public Scp012_033 Scp012_033 { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -93,6 +95,7 @@ namespace Slafight_Plugin_EXILED
             PDEx = new();
             MapGuardHandler = new();
             Scp1509Handler = new();
+            Scp012_033 = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
 
@@ -106,6 +109,7 @@ namespace Slafight_Plugin_EXILED
             CustomItem.RegisterItems(skipReflection: false, overrideClass: Config);
             
             SpawnSystem = new();
+            SpawningHandler = new();
 
             var Settings = ServerSpecifics.Settings();
             var a = Settings.ToList();
@@ -171,7 +175,7 @@ namespace Slafight_Plugin_EXILED
 
                 string json = JsonSerializer.Serialize(data);
                 using var content = new StringContent(json, Encoding.UTF8, "application/json");
-                await httpClient.PostAsync("http://localhost:5000/playercount", content);
+                await HttpClient.PostAsync("http://localhost:5000/playercount", content);
             }
             catch (TaskCanceledException tce)
             {

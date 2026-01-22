@@ -30,7 +30,7 @@ namespace Slafight_Plugin_EXILED.ProximityChat
 
         protected override void ExecuteAbility(Player player)
         {
-            Vector3 startPos = player.Position;
+            Vector3 startPos = player.Position + new Vector3(0f, 0.5f, 0f);
             try
             {
                 var schem = ObjectSpawner.SpawnSchematic("SCP3005", startPos, player.CameraTransform.forward);
@@ -49,7 +49,7 @@ namespace Slafight_Plugin_EXILED.ProximityChat
             Vector3 startPos = schem.transform.position;
 
             Vector3 cameraForward = pushPlayer.CameraTransform.forward.normalized;
-            Vector3 endPos = startPos + cameraForward * 5f;
+            Vector3 endPos = startPos + cameraForward * 5f + new Vector3(0f, 0.15f, 0f);
 
             while (elapsedTime < totalDuration)
             {

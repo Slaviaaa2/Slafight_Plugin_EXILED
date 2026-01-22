@@ -32,9 +32,9 @@ public class GunFSP18 : CustomWeapon
 
     public override float Damage { get; set; } = 30f;
     public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 62;
+    public override byte ClipSize { get; set; } = 42;
 
-    public Color glowColor = Color.gray;
+    public Color glowColor = Color.white;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

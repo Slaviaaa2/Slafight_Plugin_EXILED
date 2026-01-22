@@ -40,7 +40,7 @@ public class OmegaWarhead
                 if (eventPID != Plugin.Singleton.SpecialEventsHandler.EventPID) return;
                 Exiled.API.Features.Cassie.MessageTranslated("New Status for Containment Breach by O5 Command : Using OMEGA WARHEAD","O5による収容違反対応ステータス更新：<color=blue>OMEGA WARHEAD</color>を用いた対応",true,true);
                 Exiled.API.Features.Cassie.MessageTranslated("New Status Accepted .","新ステータス：承認",false,false);
-                MapExtensions.OmegaWarhead.StartProtocol(eventPID,500f);
+                MapExtensions.OmegaWarhead.StartProtocol(eventPID,555f);
             });
         });
     }

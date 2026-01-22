@@ -35,7 +35,7 @@ public class SNAV310 : CustomItem
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.Radio;
 
-    public Color glowColor = new (0f, 1.80f, 0.40f);
+    public Color glowColor = Color.cyan;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();

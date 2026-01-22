@@ -47,7 +47,7 @@ public class KeycardSecurityChief : CustomKeycard
     public override byte Rank { get; set; } = 1;
     public override string SerialNumber { get; set; } = "";
 
-    public Color glowColor = Color.gray;
+    public Color glowColor = Color.green;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

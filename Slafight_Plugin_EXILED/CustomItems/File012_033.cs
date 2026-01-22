@@ -1,62 +1,60 @@
-using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp914;
 using Exiled.Events.Handlers;
+using InventorySystem.Items.FlamingoTapePlayer;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
-using PlayerRoles;
 using PlayerStatsSystem;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using YamlDotNet.Serialization;
-using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
+using Item = Exiled.API.Features.Items.Item;
 using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.KeycardCustomTaskForce)]
-public class DummyRoad : CustomKeycard
+[CustomItem(ItemType.KeycardCustomSite02)]
+public class File012_033 : CustomKeycard
 {
-    public override uint Id { get; set; } = 1000;
-    public override string Name { get; set; } = "Dummy Road Spawner";
-    public override string Description { get; set; } = "What the Fuck?";
+    public override uint Id { get; set; } = 2015;
+    public override string Name { get; set; } = "File-012-R033";
+    public override string Description { get; set; } = "";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.KeycardCustomTaskForce;
+    public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-    public override string KeycardLabel { get; set; } = "Dummy Road Spawn Device";
+    public override string KeycardLabel { get; set; } = "File-012-R033";
     [YamlIgnore]
-    public override Color32? KeycardLabelColor { get; set; } = new Color32(0,0,0,255);
-    public override string KeycardName { get; set; } = "Dummy Lord";
+    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
+    public override string KeycardName { get; set; } = "Dr. Redheart";
     [YamlIgnore]
     public override Color32? TintColor { get; set; } = new Color32(0,0,0,255);
     [YamlIgnore]
-    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(255,255,255,255);
+    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
     public override KeycardPermissions Permissions { get; set; } =
         KeycardPermissions.None;
 
     public override byte Rank { get; set; } = 1;
-    public override string SerialNumber { get; set; } = "555555555555";
+    public override string SerialNumber { get; set; } = "";
 
-    public Color glowColor = Color.black;
+    public Color glowColor = Color.white;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
-
-        Exiled.Events.Handlers.Player.DroppingItem += StartMagicMissile;
-        
         base.SubscribeEvents();
     }
 
@@ -64,55 +62,17 @@ public class DummyRoad : CustomKeycard
     {
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
-
-        Exiled.Events.Handlers.Player.DroppingItem -= StartMagicMissile;
-        
         base.UnsubscribeEvents();
     }
 
-    private void StartMagicMissile(DroppingItemEventArgs ev)
+    protected override void OnPickingUp(PickingUpItemEventArgs ev)
     {
-        if (Check(ev.Item))
-        {
-            ev.IsAllowed = false;
-            ev.Item.Destroy();
-            Vector3 startPos = ev.Player.Position;
-            SchematicObject schematicObject;
-            try
-            {
-                schematicObject = ObjectSpawner.SpawnSchematic("SCP3005",startPos,ev.Player.CameraTransform.forward);
-                Timing.RunCoroutine(MissileCoroutine(schematicObject,ev.Player));
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Stupid Null Error.");
-                schematicObject = null;
-                return;
-            }
-        }
+        ev.IsAllowed = false;
+        ev.Player.ShowHint("<size=15>文書012-補遺033\n20■■年■月■日の定期調査にて、SCP-012がSCP-033と思われる力に侵食されてしまっていることが判明した。\n以前までは何事も無かったのに、急激にマゼンタ色を発し始め\n周囲にSCP-012影響ではなく、SCP-033影響を与えてしまっている。\n実に由々しき事態だ。\nこれについて、私は本件についての大規模な調査及び対処を、強く求める。\n- Dr. Redheart</size>");
+        
+        base.OnPickingUp(ev);
     }
 
-    private IEnumerator<float> MissileCoroutine(SchematicObject schem, Player pushPlayer)
-    {
-        float elapsedTime = 0f;
-        float totalDuration = 0.5f;
-        Vector3 startPos = schem.transform.position;
-        // カメラの完全な方向（Y成分そのまま）で発射
-        Vector3 cameraForward = pushPlayer.CameraTransform.forward.normalized;
-        Vector3 endPos = startPos + cameraForward * 10f;  // 上・下どちらもOK
-        int i = 0;
-        while (elapsedTime < totalDuration)
-        {
-            Npc npc = Npc.Spawn("DummyRoad No. "+i,RoleTypeId.ClassD,schem.transform.position);
-            i++;
-            elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / totalDuration;
-            schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
-            yield return 0f;
-        }
-        schem.Destroy();
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

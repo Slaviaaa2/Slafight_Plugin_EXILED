@@ -92,7 +92,7 @@ public class Engineer : CRole
 
         Timing.CallDelayed(0.1f, () =>
         {
-            player.ShowHint("lor=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
+            player.ShowHint("<color=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
 
             if (state.HudRoutine != default)
             {
@@ -123,6 +123,7 @@ public class Engineer : CRole
             }
         }
 
+        RoleSpecificTextProvider.Clear(player);
         _states.Remove(player.Id);
     }
 

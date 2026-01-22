@@ -15,6 +15,7 @@ using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -30,11 +31,11 @@ public class GunN7Weltkrieg : CustomWeapon
     public override ItemType Type { get; set; } = ItemType.GunFRMG0;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 100f;
+    public override float Damage { get; set; } = 80f;
     public override Vector3 Scale { get; set; } = new (1.15f,1.3f,1.25f);
     public override byte ClipSize { get; set; } = 100;
 
-    public Color glowColor = new Color(0.30f, 0.30f, 0.30f);
+    public Color glowColor = CustomColor.Gold.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

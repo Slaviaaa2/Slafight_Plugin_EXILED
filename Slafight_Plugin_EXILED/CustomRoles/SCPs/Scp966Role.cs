@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
@@ -39,15 +40,13 @@ public class Scp966Role : CRole
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp3114);
         player.UniqueRole = "Scp966";
-        player.MaxHealth = 1400;
+        player.MaxHealth = 1500;
         player.Health = player.MaxHealth;
-        player.MaxHumeShield = 500;
+        player.MaxHumeShield = 100;
         SpeedLevels[player] = 0;
         player.ClearInventory();
 
-        player.CustomInfo = "lor=#C50000>SCP-966</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
+        player.SetCustomInfo("SCP-966");
             
         Room SpawnRoom = Room.Get(RoomType.LczGlassBox);
         Log.Debug(SpawnRoom.Position);
@@ -57,7 +56,7 @@ public class Scp966Role : CRole
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("lor=red>SCP-966</color>\n透明～！", 10f);
+            player.ShowHint("<color=red>SCP-966</color>\n透明～！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));
     }
@@ -70,7 +69,7 @@ public class Scp966Role : CRole
             if (player.GetCustomRole() != CRoleTypeId.Scp966)
             {
                 // ★ 修正: RoleSpecificTextProvider を使用
-                RoleSpecificTextProvider.Set(player, "");
+                RoleSpecificTextProvider.Clear(player);
                 player.DisableEffect(EffectType.Invisible);
                 player.DisableEffect(EffectType.NightVision);
                 player.DisableEffect(EffectType.Slowness);
@@ -91,30 +90,30 @@ public class Scp966Role : CRole
             player.EnableEffect(EffectType.NightVision, 255);
             if (speedLevel <= 0)
             {
-                player.EnableEffect(EffectType.Slowness, 20);
+                player.EnableEffect(EffectType.Slowness, 30);
             }
             else if (speedLevel == 1)
             {
-                player.EnableEffect(EffectType.Slowness, 10);
+                player.EnableEffect(EffectType.Slowness, 20);
             }
             else if (speedLevel == 2)
             {
-                player.EnableEffect(EffectType.Slowness, 0);
+                player.EnableEffect(EffectType.Slowness, 10);
             }
             else if (speedLevel == 3)
             {
-                player.EnableEffect(EffectType.MovementBoost, 10);
+                player.EnableEffect(EffectType.MovementBoost, 0);
             }
             else if (speedLevel >= 4)
             {
-                player.EnableEffect(EffectType.MovementBoost, 20);
+                player.EnableEffect(EffectType.MovementBoost, 10);
             }
             
             // ★ 修正: RoleSpecificTextProvider を使用
             RoleSpecificTextProvider.Set(player, 
                 "Speed Level: " + (Math.Abs(speedLevel + 1)) + "/5");
             
-            yield return Timing.WaitForSeconds(UnityEngine.Random.Range(0.5f, 1.5f));
+            yield return Timing.WaitForSeconds(UnityEngine.Random.Range(1.5f, 3f));
         }
     }
 
@@ -136,7 +135,12 @@ public class Scp966Role : CRole
     {
         if (ev.Attacker?.GetCustomRole() == CRoleTypeId.Scp966)
         {
-            ev.Amount = 15f;
+            ev.Amount = 10f;
+        }
+        else if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp966)
+        {
+            if (!ev.Player?.GetEffect(EffectType.Invisible)) return;
+            ev.Attacker?.ShowHitMarker();
         }
     }
 
@@ -145,9 +149,10 @@ public class Scp966Role : CRole
         if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp966)
         {
             SpeedLevels.Remove(ev.Player);
+            RoleSpecificTextProvider.Clear(ev.Player);
             Exiled.API.Features.Cassie.MessageTranslated(
                 "SCP 9 6 6 Successfully Terminated .",
-                "lor=red>SCP-966</color>の終了に成功しました。");
+                "<color=red>SCP-966</color>の終了に成功しました。");
         }
     }
 }

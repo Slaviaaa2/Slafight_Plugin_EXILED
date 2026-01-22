@@ -56,6 +56,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public SNAV300 _SNAV300 { get; set; } = new(); // 2012
         [Description("")] public SNAV310 _SNAV310 { get; set; } = new(); // 2013
         [Description("")] public SNAVUltimate _SnavUltimate { get; set; } = new(); // 2014
+        [Description("")] public File012_033 _File012_033 { get; set; } = new(); // 2015
 
         [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
         [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101

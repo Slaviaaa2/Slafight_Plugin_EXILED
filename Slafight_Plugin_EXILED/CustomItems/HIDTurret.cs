@@ -10,13 +10,16 @@ using Exiled.Events.Handlers;
 using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.MicroHID)]
-public class HIDTurret : CustomItem
+public class HIDTurret : CustomWeapon
 {
     public override uint Id { get; set; } = 1;
     public override string Name { get; set; } = "H.I.D. Turret";
@@ -24,7 +27,7 @@ public class HIDTurret : CustomItem
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.MicroHID;
 
-    public Color glowColor = Color.yellow;
+    public Color glowColor = CustomColor.Purple.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();
@@ -49,11 +52,6 @@ public class HIDTurret : CustomItem
         base.UnsubscribeEvents();
     }
 
-    //private void PickMessage(PickingUpItemEventArgs ev)
-    //{
-    //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
-    //}
-
     private void disRight(ChangingMicroHIDStateEventArgs ev)
     {
         if (!Check(ev.Item)) { return; }
@@ -72,7 +70,26 @@ public class HIDTurret : CustomItem
             ev.IsAllowed = false;
         }
     }
-    
+
+    protected override void OnHurting(HurtingEventArgs ev)
+    {
+        if (ev.Player == null) return;
+        var info = ev.Player.GetRoleInfo();
+        if (info.Vanilla == RoleTypeId.Scp106 && (info.Custom == CRoleTypeId.None || info.Custom == CRoleTypeId.Scp106))
+        {
+            ev.Amount = 80f;
+        }
+        else if (ev.Player?.GetTeam() == CTeam.SCPs)
+        {
+            ev.Amount = 25f;
+        }
+        else
+        {
+            ev.IsAllowed = false;
+        }
+        base.OnHurting(ev);
+    }
+
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

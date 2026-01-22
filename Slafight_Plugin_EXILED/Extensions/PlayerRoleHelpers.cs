@@ -42,9 +42,12 @@ public static class PlayerRoleHelpers
         { "ZoneManager",      CRoleTypeId.ZoneManager },
         { "FacilityManager",  CRoleTypeId.FacilityManager },
         { "Engineer",         CRoleTypeId.Engineer},
+        { "ObjectObserver",   CRoleTypeId.ObjectObserver },
 
         // Facility Guards
         { "EvacuationGuard",  CRoleTypeId.EvacuationGuard },
+        { "SecurityChief",    CRoleTypeId.SecurityChief },
+        { "ChamberGuard",     CRoleTypeId.ChamberGuard },
 
         // Class-D
         { "Janitor",      CRoleTypeId.Janitor },
@@ -62,9 +65,7 @@ public static class PlayerRoleHelpers
         if (string.IsNullOrEmpty(player.UniqueRole))
             return CRoleTypeId.None;
 
-        return UniqueToCustomMap.TryGetValue(player.UniqueRole, out var cr)
-            ? cr
-            : CRoleTypeId.None;
+        return UniqueToCustomMap.GetValueOrDefault(player.UniqueRole, CRoleTypeId.None);
     }
 
     /// <summary>
@@ -76,110 +77,117 @@ public static class PlayerRoleHelpers
         public CRoleTypeId? Custom;
     }
 
-    public static PlayerRoleInfo GetRoleInfo(this Player player)
+    extension(Player player)
     {
-        return new PlayerRoleInfo
+        public PlayerRoleInfo GetRoleInfo()
         {
-            Vanilla = player.Role.Type,
-            Custom  = player.GetCustomRole()
-        };
-    }
+            return new PlayerRoleInfo
+            {
+                Vanilla = player.Role.Type,
+                Custom  = player.GetCustomRole()
+            };
+        }
 
-    /// <summary>
-    /// 現在のプレイヤーのカスタムチーム(CTeam)を取得する。
-    /// 対応するCRoleTypeIdが無ければCTeam.Othersになる。
-    /// </summary>
-    public static CTeam GetTeam(this Player player)
-    {
-        if (player == null) return CTeam.Null;
-        var role = player.GetRoleInfo();
-        if (role.Custom == CRoleTypeId.None)
+        /// <summary>
+        /// 現在のプレイヤーのカスタムチーム(CTeam)を取得する。
+        /// 対応するCRoleTypeIdが無ければCTeam.Othersになる。
+        /// </summary>
+        public CTeam GetTeam()
         {
-            var defaultTeams = player.Role.Team;
-            switch (defaultTeams)
+            if (player == null) return CTeam.Null;
+            var role = player.GetRoleInfo();
+            if (role.Custom == CRoleTypeId.None)
             {
-                case Team.SCPs:
-                    return CTeam.SCPs;
-                case Team.FoundationForces:
-                    return CTeam.FoundationForces;
-                case Team.ChaosInsurgency:
-                    return CTeam.ChaosInsurgency;
-                case Team.Scientists:
-                    return CTeam.Scientists;
-                case Team.ClassD:
-                    return CTeam.ClassD;
-                case Team.Dead:
-                    return CTeam.Others;
-                case Team.OtherAlive:
-                    return CTeam.Others;
+                var defaultTeams = player.Role.Team;
+                switch (defaultTeams)
+                {
+                    case Team.SCPs:
+                        return CTeam.SCPs;
+                    case Team.FoundationForces:
+                        return CTeam.FoundationForces;
+                    case Team.ChaosInsurgency:
+                        return CTeam.ChaosInsurgency;
+                    case Team.Scientists:
+                        return CTeam.Scientists;
+                    case Team.ClassD:
+                        return CTeam.ClassD;
+                    case Team.Dead:
+                        return CTeam.Others;
+                    case Team.OtherAlive:
+                        return CTeam.Others;
+                }
             }
-        }
-        else
-        {
-            switch (role.Custom)
+            else
             {
-                // None
-                case CRoleTypeId.None:
-                    return CTeam.Others;
-                // SCPs
-                case CRoleTypeId.Scp096Anger:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp3005:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp966:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp682:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp999:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp106:
-                    return CTeam.SCPs;
-                case CRoleTypeId.Scp3114:
-                    return CTeam.SCPs;
-                // Fifthists
-                case CRoleTypeId.FifthistRescure:
-                    return CTeam.Fifthists;
-                case CRoleTypeId.FifthistPriest:
-                    return CTeam.Fifthists;
-                case CRoleTypeId.FifthistConvert:
-                    return CTeam.Fifthists;
-                // Chaos Insurgency
-                case CRoleTypeId.ChaosCommando:
-                    return CTeam.ChaosInsurgency;
-                case CRoleTypeId.ChaosSignal:
-                    return CTeam.ChaosInsurgency;
-                // Foundation Forces
-                case CRoleTypeId.NtfLieutenant:
-                    return CTeam.FoundationForces;
-                case CRoleTypeId.NtfGeneral:
-                    return CTeam.FoundationForces;
-                case CRoleTypeId.HdInfantry:
-                    return CTeam.FoundationForces;
-                case CRoleTypeId.HdCommander:
-                    return CTeam.FoundationForces;
-                case CRoleTypeId.HdMarshal:
-                    return CTeam.FoundationForces;
-                // Guards
-                case CRoleTypeId.EvacuationGuard:
-                    return CTeam.Guards;
-                case CRoleTypeId.SecurityChief:
-                    return CTeam.Guards;
-                // Class-D Personnel
-                case CRoleTypeId.Janitor:
-                    return CTeam.ClassD;
-                // Scientists
-                case CRoleTypeId.ZoneManager:
-                    return CTeam.Scientists;
-                case CRoleTypeId.FacilityManager:
-                    return CTeam.Scientists;
-                case CRoleTypeId.Engineer:
-                    return CTeam.Scientists;
-                // Other Threads
-                case CRoleTypeId.SnowWarrier:
-                    return CTeam.Others;
+                switch (role.Custom)
+                {
+                    // None
+                    case CRoleTypeId.None:
+                        return CTeam.Others;
+                    // SCPs
+                    case CRoleTypeId.Scp096Anger:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp3005:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp966:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp682:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp999:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp106:
+                        return CTeam.SCPs;
+                    case CRoleTypeId.Scp3114:
+                        return CTeam.SCPs;
+                    // Fifthists
+                    case CRoleTypeId.FifthistRescure:
+                        return CTeam.Fifthists;
+                    case CRoleTypeId.FifthistPriest:
+                        return CTeam.Fifthists;
+                    case CRoleTypeId.FifthistConvert:
+                        return CTeam.Fifthists;
+                    // Chaos Insurgency
+                    case CRoleTypeId.ChaosCommando:
+                        return CTeam.ChaosInsurgency;
+                    case CRoleTypeId.ChaosSignal:
+                        return CTeam.ChaosInsurgency;
+                    // Foundation Forces
+                    case CRoleTypeId.NtfLieutenant:
+                        return CTeam.FoundationForces;
+                    case CRoleTypeId.NtfGeneral:
+                        return CTeam.FoundationForces;
+                    case CRoleTypeId.HdInfantry:
+                        return CTeam.FoundationForces;
+                    case CRoleTypeId.HdCommander:
+                        return CTeam.FoundationForces;
+                    case CRoleTypeId.HdMarshal:
+                        return CTeam.FoundationForces;
+                    // Guards
+                    case CRoleTypeId.EvacuationGuard:
+                        return CTeam.Guards;
+                    case CRoleTypeId.SecurityChief:
+                        return CTeam.Guards;
+                    case CRoleTypeId.ChamberGuard:
+                        return CTeam.Guards;
+                    // Class-D Personnel
+                    case CRoleTypeId.Janitor:
+                        return CTeam.ClassD;
+                    // Scientists
+                    case CRoleTypeId.ZoneManager:
+                        return CTeam.Scientists;
+                    case CRoleTypeId.FacilityManager:
+                        return CTeam.Scientists;
+                    case CRoleTypeId.Engineer:
+                        return CTeam.Scientists;
+                    case CRoleTypeId.ObjectObserver:
+                        return CTeam.Scientists;
+                    // Other Threads
+                    case CRoleTypeId.SnowWarrier:
+                        return CTeam.Others;
+                }
             }
+            // Fail Safe
+            return CTeam.Others;
         }
-        // Fail Safe
-        return CTeam.Others;
     }
 }

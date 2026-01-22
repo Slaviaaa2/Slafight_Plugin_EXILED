@@ -94,7 +94,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     if (player == null || !player.IsAlive)
                         continue;
 
-                    if (!fifthistRoles.Contains(player.UniqueRole))
+                    if (!fifthistRoles.Contains(player.UniqueRole) && player.GetCustomRole() != CRoleTypeId.Scp999)
                         nonFifthists++;
                     else
                         fifthists++;
@@ -122,7 +122,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     if (player == null || !player.IsAlive)
                         continue;
 
-                    if (player.UniqueRole != "SnowWarrier")
+                    if (player.UniqueRole != "SnowWarrier" && player.GetCustomRole() != CRoleTypeId.Scp999)
                         nonSnow++;
                     else
                         snow++;
@@ -356,7 +356,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     if (target == null || target == player || !target.IsAlive)
                         continue;
 
-                    if (target.GetTeam() == CTeam.Fifthists)
+                    if (target.GetTeam() == CTeam.Fifthists || target.GetCustomRole() == CRoleTypeId.Scp3005)
                         continue;
 
                     float distance = Vector3.Distance(player.Position, target.Position);
@@ -485,6 +485,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 {
                     if (Plugin.Singleton?.PlayerHUD != null && player != null && player.IsConnected)
                         Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, string.Empty, player);
+                    RoleSpecificTextProvider.Clear(player);
                 }
                 catch
                 {

@@ -33,7 +33,7 @@ public class ArmorInfantry : CustomArmor
     public override int HelmetEfficacy { get; set; } = 85;
     public override float StaminaUseMultiplier { get; set; } = 0.15f;
 
-    public Color glowColor = Color.magenta;
+    public Color glowColor = Color.cyan;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()

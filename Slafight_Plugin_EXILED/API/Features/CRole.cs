@@ -5,11 +5,14 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Roles;
+using Exiled.Events.EventArgs.Player;
 using InventorySystem;
+using JetBrains.Annotations;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Commands.Utility;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.API.Features;
@@ -133,5 +136,22 @@ public abstract class CRole
                 }
             });
         }
+    }
+
+    /// <summary>
+    /// 一部機能を使用するための変数。別に使わなくても作れる。
+    /// </summary>
+    protected virtual CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.None;
+
+    /// <summary>
+    /// PlayerがCRoleTypeIdかどうかを判定します。なお、この機能はCRoleTypeIdをoverrideしていなければ使用できません。
+    /// </summary>
+    /// <param name="player">対象プレイヤー。nullの場合とCRoleTypeIdを持たぬ場合にfalseをreturn。</param>
+    /// <returns></returns>
+    protected bool Check([CanBeNull] Player player)
+    {
+        if (player == null) return false;
+        if (player.GetCustomRole() == CRoleTypeId) return true;
+        return false;
     }
 }

@@ -9,6 +9,7 @@ using LightContainmentZoneDecontamination;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -55,7 +56,8 @@ public class FifthistsRaid
         Timing.CallDelayed(8f, () =>
         {
             //Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false,true);
-            Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel. Detected {i} Fifthist Forces in Gate B .",$"全職員に通達。Gate Bに{i}人の第五主義者が検出されました。",false);
+            CreateAndPlayAudio("_w_fifthists.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
+            CassieHelper.AnnounceFifthist(i);
         });
     }
 }

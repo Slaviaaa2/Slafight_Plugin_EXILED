@@ -59,6 +59,7 @@ namespace Slafight_Plugin_EXILED
         private Vector3 STS;
         private Vector3 STC;
         private Vector3 STE;
+        public static SchematicObject Scp012_t;
 
         private readonly Dictionary<Vector3, DoorConfig> specialDoors = new();
 
@@ -108,6 +109,23 @@ namespace Slafight_Plugin_EXILED
             SetDoorState();
             SetupMaps();
             HolidaySeasonMapLoader();
+            TeleportClassD();
+        }
+
+        private void TeleportClassD()
+        {
+            Timing.CallDelayed(0.8f, () =>
+            {
+                foreach (var player in Player.List.ToList())
+                {
+                    if (player == null) continue;
+                    var info = player.GetRoleInfo();
+                    if (info is { Vanilla: RoleTypeId.ClassD, Custom: CRoleTypeId.None })
+                    {
+                        player.Position = new Vector3(20f, 263f, -155f);
+                    }
+                }
+            });
         }
 
         private void SetupSpecialDoors()
@@ -236,6 +254,9 @@ namespace Slafight_Plugin_EXILED
                 case "ST_E":
                     STE = ev.Schematic.Position;
                     ev.Schematic.Destroy();
+                    break;
+                case "Scp012_ThetaPrimed":
+                    Scp012_t = ev.Schematic;
                     break;
             }
 

@@ -76,15 +76,15 @@ namespace Slafight_Plugin_EXILED
                 int count = 0;
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
-                    if (player.UniqueRole != "SCP-3005")
+                    if (player.GetCustomRole() != CRoleTypeId.Scp3005)
                         continue;
 
                     count++;
                     if (!_activatedAntiMemeProtocolInPast)
                     {
                         Exiled.API.Features.Cassie.MessageTranslated(
-                            "By order of Facility Manager Control Room , Anti me mu Protocol Activated .",
-                            "<color=#ff0087>施設管理者制御室</color>からの命令により、<color=#ff00fa>アンチミームプロトコロル</color>が有効化されました。エージェントによりミーム性物体の非活性化が開始されます。",
+                            "By order of Facility Manager Control Room , $pitch_.85 Anti- $pitch_1 Me mu Protocol Activated .",
+                            "<color=#ff0087>施設管理者制御室</color>からの命令により、<color=#ff00fa>アンチミームプロトコロル</color>が有効化されました。エージェントにより反ミーム性物体の非活性化が開始されます。",
                             true,
                             false);
                         _activatedAntiMemeProtocolInPast = true;
@@ -92,7 +92,7 @@ namespace Slafight_Plugin_EXILED
                     else
                     {
                         Exiled.API.Features.Cassie.MessageTranslated(
-                            "Anti me mu Protocol Resumed .",
+                            "$pitch_.85 Anti- $pitch_1 Me mu Protocol Resumed .",
                             "<color=#ff00fa>アンチミームプロトコル</color>が再開されました。",
                             false,
                             false);
@@ -109,17 +109,17 @@ namespace Slafight_Plugin_EXILED
             {
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
-                    if (player.UniqueRole == "SCP-3005")
+                    if (player.GetCustomRole() == CRoleTypeId.Scp3005)
                     {
                         player.DisableEffect(EffectType.Poisoned);
                         player.DisableEffect(EffectType.Decontaminating);
                     }
                 }
 
-                foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
+                foreach (Exiled.API.Features.Player _ in Exiled.API.Features.Player.List)
                 {
                     Exiled.API.Features.Cassie.MessageTranslated(
-                        "Anti me mu Protocol Stopped .",
+                        "$pitch_.85 Anti- $pitch_1 Me mu Protocol Stopped .",
                         "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",
                         false,
                         false);
@@ -136,37 +136,51 @@ namespace Slafight_Plugin_EXILED
             Timing.CallDelayed(1.05f, () =>
             {
                 CustomItem.TrySpawn(1, new Vector3(134.94f, 300.65f, -65f), out Pickup _);
+                CustomItem.TrySpawn(2015, new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
             });
         }
 
         public void PickupSetupBySchemPoint(SchematicSpawnedEventArgs ev)
         {
-            if (ev.Schematic.Name == "CISR_GoCRailgun")
+            Vector3 pos;
+            switch (ev.Schematic.Name)
             {
-                Vector3 pos = ev.Schematic.gameObject.transform.position;
-                ev.Schematic.Destroy();
-                CustomItem.TrySpawn(50, pos, out Pickup _);
-            }
-            else if (ev.Schematic.Name == "CISR_OldPrivateCard")
-            {
-                Vector3 pos = ev.Schematic.gameObject.transform.position;
-                ev.Schematic.Destroy();
-                if (CustomItem.TrySpawn(104, pos, out Pickup pickup))
-                    pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-            }
-            else if (ev.Schematic.Name == "CISR_OldCECard")
-            {
-                Vector3 pos = ev.Schematic.gameObject.transform.position;
-                ev.Schematic.Destroy();
-                if (CustomItem.TrySpawn(100, pos, out Pickup pickup))
-                    pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-            }
-            else if (ev.Schematic.Name == "CISR_Scp1425")
-            {
-                Vector3 pos = ev.Schematic.gameObject.transform.position;
-                ev.Schematic.Destroy();
-                if (CustomItem.TrySpawn(1102, pos, out Pickup pickup))
-                    pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                case "CISR_GoCRailgun":
+                {
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    CustomItem.TrySpawn(50, pos, out Pickup _);
+                    break;
+                }
+                case "CISR_OldPrivateCard":
+                {
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    if (CustomItem.TrySpawn(104, pos, out Pickup pickup))
+                        pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                    break;
+                }
+                case "CISR_OldCECard":
+                {
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    if (CustomItem.TrySpawn(100, pos, out Pickup pickup))
+                        pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                    break;
+                }
+                case "CISR_Scp1425":
+                {
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    if (CustomItem.TrySpawn(1102, pos, out Pickup pickup))
+                        pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                    break;
+                }
+                case "CISR_SNAV300":
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    if (CustomItem.TrySpawn(2012, pos, out Pickup _)) ;
+                    break;
             }
         }
 

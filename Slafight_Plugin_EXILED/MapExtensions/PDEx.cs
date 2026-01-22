@@ -34,13 +34,13 @@ public class PDEx
 
     private void JoinPDEx(FailingEscapePocketDimensionEventArgs ev)
     {
-        if (Random.Range(0,5) == 0)
+        if (Random.Range(0,3) == 0)
         {
             int i = 0;
-            foreach (var _player in Player.List)
+            foreach (var player in Player.List)
             {
-                if (_player == null) continue;
-                if (_player.GetCustomRole() == CRoleTypeId.Scp106 || (_player.GetCustomRole() == CRoleTypeId.None && _player.Role.Type == RoleTypeId.Scp106))
+                if (player == null) continue;
+                if (player.GetCustomRole() == CRoleTypeId.Scp106 || (player.GetCustomRole() == CRoleTypeId.None && player.Role.Type == RoleTypeId.Scp106))
                 {
                     i++;
                 }
@@ -54,6 +54,10 @@ public class PDEx
             {
                 PDExPlayers.Add(ev.Player);
             }
+            else
+            {
+                return;
+            }
             foreach (var player in Player.List)
             {
                 if (player == null) continue;
@@ -61,7 +65,7 @@ public class PDEx
                 {
                     player.Position = CustomMap.PDExJoinKing;
                     player.AddAbility(new AllowEscapeAbility(player));
-                    player.ShowHint("アビリティ「AllowEscapeAbility」が付与されました。\n人間を釈放したくなったら使ってください\nまた、近接チャットも一時的に利用可能です！");
+                    player.ShowHint("アビリティ「腐蝕からの解放」が付与されました。\n人間を釈放したくなったら使ってください\nまた、近接チャットも一時的に利用可能です！");
                     Handler.CanUsePlayers.Add(player);
                 }
             }

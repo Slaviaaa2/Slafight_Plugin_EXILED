@@ -58,7 +58,7 @@ public static class PlayerExtensions
                 player.SetRole(CRoleTypeId.Scp3114);
                 break;
 
-            // ==== 人間ロール ====
+            // ==== Neutrals ====
             case RoleTypeId.ClassD:
                 player.Role.Set(RoleTypeId.ClassD, roleSpawnFlags);
                 break;
@@ -158,6 +158,7 @@ public static class PlayerExtensions
             case CRoleTypeId.None:
                 player.UniqueRole = null;
                 break;
+            // ==== SCP ====
             case CRoleTypeId.Scp096Anger:
                 new Scp096Anger().SpawnRole(player, roleSpawnFlags);
                 break;
@@ -179,6 +180,7 @@ public static class PlayerExtensions
             case CRoleTypeId.Scp999:
                 new Scp999Role().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Fifthists ====
             case CRoleTypeId.FifthistRescure:
                 Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player, roleSpawnFlags);
                 break;
@@ -188,18 +190,21 @@ public static class PlayerExtensions
             case CRoleTypeId.FifthistConvert:
                 new FifthistConvert().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Chaos ====
             case CRoleTypeId.ChaosCommando:
                 new ChaosCommando().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ChaosSignal:
                 new ChaosSignal().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== NTF ====
             case CRoleTypeId.NtfLieutenant:
                 new NtfAide().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.NtfGeneral:
                 new NtfGeneral().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Hammer Down ====
             case CRoleTypeId.HdInfantry:
                 new HdInfantry().SpawnRole(player, roleSpawnFlags);
                 break;
@@ -209,12 +214,17 @@ public static class PlayerExtensions
             case CRoleTypeId.HdMarshal:
                 new HdMarshal().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Guards ====
             case CRoleTypeId.EvacuationGuard:
                 new EvacuationGuard().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.SecurityChief:
                 new SecurityChief().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.ChamberGuard:
+                new ChamberGuard().SpawnRole(player, roleSpawnFlags);
+                break;
+            // ==== Scientists ====
             case CRoleTypeId.ZoneManager:
                 new ZoneManager().SpawnRole(player, roleSpawnFlags);
                 break;
@@ -224,9 +234,15 @@ public static class PlayerExtensions
             case CRoleTypeId.Engineer:
                 Plugin.Singleton.EngineerRole.SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.ObjectObserver:
+                new ObjectObserver().SpawnRole(player, roleSpawnFlags);
+                break;
+            // ==== Class-D ====
             case CRoleTypeId.Janitor:
                 new Janitor().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Flamingos ===
+            // ==== Others ===
             case CRoleTypeId.SnowWarrier:
                 Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, roleSpawnFlags);
                 break;

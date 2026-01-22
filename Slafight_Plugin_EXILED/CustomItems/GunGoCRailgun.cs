@@ -19,6 +19,7 @@ using InventorySystem.Items.MicroHID.Modules;
 using MEC;
 using Mirror;
 using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using YamlDotNet.Serialization;
 using Firearm = Exiled.API.Features.Items.Firearm;
@@ -41,7 +42,7 @@ public class GunGoCRailgun : CustomWeapon
     public override Vector3 Scale { get; set; } = new (1.15f,1f,1.15f);
     public override byte ClipSize { get; set; } = 1;
 
-    public Color glowColor = Color.magenta;
+    public Color glowColor = CustomColor.Gold.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
