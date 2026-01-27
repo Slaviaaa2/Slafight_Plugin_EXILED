@@ -22,5 +22,5 @@ SCP Secret Laboratory/LabAPI/plugins/[ポート番号]/
 ## BGMについて
 Omega WarheadやDelta Warhead等のイベントの際、BGMが何もしていないと流れません。その為、Configにて音楽ファイルのフォルダパスを指定し、`omega.ogg`,`delta.ogg`などのファイル名でBGMをフォルダ内に入れる必要があります。<br>
 # Config(設定)
-ファイルの場所： `C:\Users\[ユーザー名]\AppData\Rooming\EXILED\Configs\Plugins\Slafight_Plugin_EXILED\[サーバーポート].yml`
+ファイルの場所： `%AppData%\EXILED\Configs\Plugins\Slafight_Plugin_EXILED\[サーバーポート].yml`
 # その他質問等ありましたらXのプロフから連絡してください。
