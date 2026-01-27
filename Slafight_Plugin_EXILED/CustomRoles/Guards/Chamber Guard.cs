@@ -4,6 +4,7 @@ using Exiled.API.Features.Doors;
 using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -12,11 +13,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class ChamberGuard : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChamberGuard;
+    protected override CTeam Team { get; set; } = CTeam.Guards;
+    protected override string UniqueRoleKey { get; set; } = "ChamberGuard";
+
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.FacilityGuard);
-        player.UniqueRole = "ChamberGuard";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();

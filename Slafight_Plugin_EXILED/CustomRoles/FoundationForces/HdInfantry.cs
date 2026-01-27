@@ -3,17 +3,22 @@ using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class HdInfantry : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.HdInfantry;
+    protected override CTeam Team { get; set; } = CTeam.FoundationForces;
+    protected override string UniqueRoleKey { get; set; } = "HdInfantry";
+
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.NtfPrivate);
-        player.UniqueRole = "HdInfantry";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 110;
         player.Health = player.MaxHealth;
         player.ClearInventory();

@@ -56,7 +56,7 @@ public class SnowWarriersAttack
         var snowTargets = StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f);
         foreach (var player in snowTargets)
         {
-            Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, RoleSpawnFlags.All);
+            player.SetRole(CRoleTypeId.SnowWarrier);
         }
 
         Timing.CallDelayed(8f, () =>

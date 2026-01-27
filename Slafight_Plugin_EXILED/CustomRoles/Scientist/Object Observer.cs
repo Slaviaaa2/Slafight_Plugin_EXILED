@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -11,11 +12,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class ObjectObserver : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ObjectObserver;
+    protected override CTeam Team { get; set; } = CTeam.Scientists;
+    protected override string UniqueRoleKey { get; set; } = "ObjectObserver";
+
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scientist);
-        player.UniqueRole = "ObjectObserver";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();

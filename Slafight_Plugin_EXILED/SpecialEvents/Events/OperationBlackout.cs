@@ -126,6 +126,7 @@ public class OperationBlackout
                 }
             }
 
+            CreateAndPlayAudio("Blackout.ogg","Facility",Vector3.zero,true,null,false,999999999,0);
             Exiled.API.Features.Cassie.Clear();
             Exiled.API.Features.Cassie.MessageTranslated(
                 "Attention, All personnel. Facility electric systems is malfunctioning . please manual charge up the all generators.",
@@ -140,9 +141,17 @@ public class OperationBlackout
             int i = 0;
             int spawnedCount = 0;
             var rooms = Exiled.API.Features.Room.List.ToList();
+            var denyRooms = new List<RoomType>()
+            {
+                RoomType.Lcz173,
+                RoomType.LczArmory,
+                RoomType.LczCheckpointA,
+                RoomType.LczCheckpointB,
+                RoomType.LczClassDSpawn
+            };
             foreach (var room in rooms.ToList())
             {
-                if (room.Type == RoomType.Lcz173 || room.Zone != ZoneType.LightContainment)
+                if (denyRooms.Contains(room.Type) || room.Zone != ZoneType.LightContainment)
                 {
                     rooms.Remove(room);
                 }

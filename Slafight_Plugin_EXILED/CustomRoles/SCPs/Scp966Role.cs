@@ -4,6 +4,8 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
+using Exiled.Events.EventArgs.Cassie;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using HintServiceMeow.Core.Utilities;
 using MEC;
@@ -17,12 +19,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp966Role : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp966;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp966";
+
     private static readonly Dictionary<Player, int> SpeedLevels = new();
     
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguising += ExtendTime;
-        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.Hurting += Hurting;
         base.RegisterEvents();
     }
@@ -30,7 +35,6 @@ public class Scp966Role : CRole
     public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguising -= ExtendTime;
-        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.Hurting -= Hurting;
         base.UnregisterEvents();
     }
@@ -39,7 +43,7 @@ public class Scp966Role : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp3114);
-        player.UniqueRole = "Scp966";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 1500;
         player.Health = player.MaxHealth;
         player.MaxHumeShield = 100;
@@ -144,15 +148,15 @@ public class Scp966Role : CRole
         }
     }
 
-    private void DiedCassie(DyingEventArgs ev)
+    protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
+        string localizedString = null)
     {
-        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp966)
-        {
-            SpeedLevels.Remove(ev.Player);
-            RoleSpecificTextProvider.Clear(ev.Player);
-            Exiled.API.Features.Cassie.MessageTranslated(
-                "SCP 9 6 6 Successfully Terminated .",
-                "<color=red>SCP-966</color>の終了に成功しました。");
-        }
+        base.OnDyingCassie(ev, true, "SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。");
+    }
+
+    protected override void OnDying(DyingEventArgs ev)
+    {
+        SpeedLevels.Remove(ev.Player);
+        base.OnDying(ev);
     }
 }

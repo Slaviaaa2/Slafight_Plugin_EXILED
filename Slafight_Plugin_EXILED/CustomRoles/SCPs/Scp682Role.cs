@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
@@ -13,18 +14,20 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp682Role : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp682;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp682";
+    
     private static readonly Dictionary<Player, float> SpeedLevels = new();
     
     public override void RegisterEvents()
     {
-        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         Exiled.Events.Handlers.Player.Hurting += Hurting;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
-        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         Exiled.Events.Handlers.Player.Hurting -= Hurting;
         base.UnregisterEvents();
     }
@@ -35,7 +38,7 @@ public class Scp682Role : CRole
         player.Role.Set(RoleTypeId.Scp173);
         player.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
 
-        player.UniqueRole = "Scp682";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 999;
         player.Health = player.MaxHealth;
         player.MaxHumeShield = 2000;
@@ -93,20 +96,16 @@ public class Scp682Role : CRole
             SpeedLevels[ev.Attacker] = level + ev.Amount / 10000;
         }
     }
-    
-    private void DiedCassie(DyingEventArgs ev)
+
+    protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
+        string localizedString = null)
     {
-        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp682)
-        {
-            SpeedLevels.Remove(ev.Player);
-            // ★ 修正: クリア時も RoleSpecificTextProvider を使用
-            RoleSpecificTextProvider.Clear(ev.Player);
-            
-            Exiled.API.Features.Cassie.Clear();
-            Exiled.API.Features.Cassie.MessageTranslated(
-                "SCP 6 8 2 Successfully Neutralized .",
-                "<color=red>SCP-682</color>の無力化に成功しました。"
-            );
-        }
+        base.OnDyingCassie(ev, true, "SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。");
+    }
+
+    protected override void OnDying(DyingEventArgs ev)
+    {
+        SpeedLevels.Remove(ev.Player);
+        base.OnDying(ev);
     }
 }

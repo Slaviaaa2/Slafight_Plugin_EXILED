@@ -8,6 +8,7 @@ using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp096;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -16,6 +17,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp096Anger : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp096Anger;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp096_Anger";
+
     private static readonly Dictionary<Player, Vector3> ShyGuyPositions = new();
     
     public override void RegisterEvents()
@@ -34,9 +39,10 @@ public class Scp096Anger : CRole
         base.UnregisterEvents();
     }
 
-    private void OnDying(DyingEventArgs ev)
+    protected override void OnDying(DyingEventArgs ev)
     {
         ShyGuyPositions.Remove(ev.Player);
+        base.OnDying(ev);
     }
 
     private void StartAnger(Player player)
@@ -83,7 +89,7 @@ public class Scp096Anger : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp096);
-        player.UniqueRole = "Scp096_Anger";
+        player.UniqueRole = UniqueRoleKey;
         player.SetCustomInfo("SCP-096: ANGER");
         player.MaxArtificialHealth = 1000;
         player.MaxHealth = 5000;

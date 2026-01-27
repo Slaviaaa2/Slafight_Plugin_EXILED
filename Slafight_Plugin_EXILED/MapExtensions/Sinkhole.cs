@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -23,6 +24,7 @@ public class Sinkhole
     
     private List<Vector3> Sinkholes = new List<Vector3>();
     private List<Player> JoiningPlayers = new List<Player>();
+    Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
     
     private void RoundStartHole()
     {
@@ -63,6 +65,7 @@ public class Sinkhole
                     
                         if (!JoiningPlayers.Contains(player))
                         {
+                            CreateAndPlayAudio("SinkholeFall.ogg","Sinkhole",player.Position,true,null,false,10,0);
                             JoiningPlayers.Add(player);
                             player.IsGodModeEnabled = true;
                             Timing.RunCoroutine(PocketJoinAnim(player, sinkhole));

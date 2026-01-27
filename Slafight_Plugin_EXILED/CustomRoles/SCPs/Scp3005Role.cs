@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
@@ -15,10 +16,13 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
 {
     public class Scp3005Role : CRole
     {
+        protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3005;
+        protected override CTeam Team { get; set; } = CTeam.SCPs;
+        protected override string UniqueRoleKey { get; set; } = "SCP-3005";
+
         public override void RegisterEvents()
         {
             Exiled.Events.Handlers.Player.Hurting += OnHurting;
-            Exiled.Events.Handlers.Player.Dying += DiedCassie;
             Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
             base.RegisterEvents();
         }
@@ -26,7 +30,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
         public override void UnregisterEvents()
         {
             Exiled.Events.Handlers.Player.Hurting -= OnHurting;
-            Exiled.Events.Handlers.Player.Dying -= DiedCassie;
             Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
             base.UnregisterEvents();
         }
@@ -69,17 +72,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
             }
         }
 
-        private void DiedCassie(DyingEventArgs ev)
+        protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
+            string localizedString = null)
         {
-            if (ev.Player?.GetCustomRole() != CRoleTypeId.Scp3005)
-                return;
-
-            Exiled.API.Features.Cassie.Clear();
-            Exiled.API.Features.Cassie.MessageTranslated(
-                "SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.",
-                "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました",
-                true,
-                false);
+            base.OnDyingCassie(ev, true, "SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました");
         }
 
         private void CencellRagdoll(SpawningRagdollEventArgs ev)

@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
@@ -10,11 +11,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class ZoneManager : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ZoneManager;
+    protected override CTeam Team { get; set; } = CTeam.Scientists;
+    protected override string UniqueRoleKey { get; set; } = "ZoneManager";
+
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scientist);
-        player.UniqueRole = "ZoneManager";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();

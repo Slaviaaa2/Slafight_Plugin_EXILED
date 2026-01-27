@@ -15,18 +15,18 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp999Role : CRole
 {
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp999;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp999";
 
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
-        Exiled.Events.Handlers.Player.Dying += DiedCassie;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
-        Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         base.UnregisterEvents();
     }
 
@@ -34,7 +34,7 @@ public class Scp999Role : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Tutorial,RoleSpawnFlags.All);
-        player.UniqueRole = "Scp999";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 99999;
         player.Health = player.MaxHealth;
         player.ClearInventory();
@@ -59,14 +59,12 @@ public class Scp999Role : CRole
         if (Check(ev.Player))
             ev.IsAllowed = false;
     }
-    
-    private void DiedCassie(DyingEventArgs ev)
+
+    protected override void OnDying(DyingEventArgs ev)
     {
-        if (Check(ev.Player))
-        {
-            Exiled.API.Features.Cassie.MessageTranslated(
-                "SCP 9 9 9 Successfully Terminated .",
-                "<color=red>SCP-999</color>の終了に成功しました。");
-        }
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "SCP 9 9 9 Successfully Terminated .",
+            "<color=red>SCP-999</color>の終了に成功しました。");
+        base.OnDying(ev);
     }
 }

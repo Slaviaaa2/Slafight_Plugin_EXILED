@@ -13,6 +13,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosSignal : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosSignal;
+    protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
+    protected override string UniqueRoleKey { get; set; } = "ChaosSignal";
+
     public override void RegisterEvents()
     {
         //Exiled.Events.Handlers.Player.Dying += OnDying;
@@ -29,7 +33,7 @@ public class ChaosSignal : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.ChaosRifleman);
-        player.UniqueRole = "ChaosSignal";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         

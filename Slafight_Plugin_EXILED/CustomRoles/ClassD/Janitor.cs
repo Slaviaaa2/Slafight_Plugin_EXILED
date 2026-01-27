@@ -4,6 +4,7 @@ using Exiled.API.Features.Doors;
 using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
@@ -11,11 +12,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class Janitor : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Janitor;
+    protected override CTeam Team { get; set; } = CTeam.ClassD;
+    protected override string UniqueRoleKey { get; set; } = "Janitor";
+
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags)
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.ClassD);
-        player.UniqueRole = "Janitor";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();

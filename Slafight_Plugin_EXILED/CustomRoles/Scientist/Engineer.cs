@@ -22,6 +22,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 [CRoleAutoRegisterIgnore]
 public class Engineer : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Engineer;
+    protected override CTeam Team { get; set; } = CTeam.Scientists;
+    protected override string UniqueRoleKey { get; set; } = "Engineer";
+
     private class EngineerState
     {
         public TaskType Task = TaskType.None;
@@ -68,7 +72,7 @@ public class Engineer : CRole
         player.Role.Set(RoleTypeId.Scientist);
         base.SpawnRole(player, flags);
 
-        player.UniqueRole = "Engineer";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;
 

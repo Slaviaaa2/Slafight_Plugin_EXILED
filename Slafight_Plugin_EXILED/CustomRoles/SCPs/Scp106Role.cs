@@ -20,6 +20,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp106Role : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp106;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp106";
+
     public override void RegisterEvents()
     {
         base.RegisterEvents();
@@ -34,7 +38,7 @@ public class Scp106Role : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp106);
-        player.UniqueRole = "Scp106";
+        player.UniqueRole = UniqueRoleKey;
         //player.MaxHealth = 1400;
         //player.Health = player.MaxHealth;
         //player.MaxHumeShield = 500;

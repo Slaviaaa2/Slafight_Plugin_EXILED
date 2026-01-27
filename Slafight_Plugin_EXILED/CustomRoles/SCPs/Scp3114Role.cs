@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
@@ -10,6 +11,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp3114Role : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3114;
+    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override string UniqueRoleKey { get; set; } = "Scp3114";
+
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Scp3114.Disguised += ExtendTime;
@@ -26,7 +31,7 @@ public class Scp3114Role : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.Scp3114);
-        player.UniqueRole = "Scp3114";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 3114;
         player.Health = player.MaxHealth;
         player.ClearInventory();

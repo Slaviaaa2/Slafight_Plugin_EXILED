@@ -13,6 +13,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosCommando : CRole
 {
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosCommando;
+    protected override CTeam Team { get; set; }  = CTeam.ChaosInsurgency;
+    protected override string UniqueRoleKey { get; set; } = "CI_Commando";
+
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Dying += OnDying;
@@ -29,7 +33,7 @@ public class ChaosCommando : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.ChaosRepressor);
-        player.UniqueRole = "CI_Commando";
+        player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 150;
         player.Health = player.MaxHealth;
         

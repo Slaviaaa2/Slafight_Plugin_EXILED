@@ -6,7 +6,9 @@ using Exiled.CustomRoles.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
+using Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
+using Slafight_Plugin_EXILED.CustomRoles.Others;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
@@ -182,10 +184,10 @@ public static class PlayerExtensions
                 break;
             // ==== Fifthists ====
             case CRoleTypeId.FifthistRescure:
-                Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player, roleSpawnFlags);
+                new FifthistRescure().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FifthistPriest:
-                Plugin.Singleton.CustomRolesHandler.SpawnF_Priest(player, roleSpawnFlags);
+                new FifthistPriest().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.FifthistConvert:
                 new FifthistConvert().SpawnRole(player, roleSpawnFlags);
@@ -244,7 +246,7 @@ public static class PlayerExtensions
             // ==== Flamingos ===
             // ==== Others ===
             case CRoleTypeId.SnowWarrier:
-                Plugin.Singleton.CustomRolesHandler.SpawnSnowWarrier(player, roleSpawnFlags);
+                new SnowWarrier().SpawnRole(player, roleSpawnFlags);
                 break;
         }
     }

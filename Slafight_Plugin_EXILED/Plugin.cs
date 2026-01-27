@@ -40,9 +40,9 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,5,0,2);
+        public override Version Version => new Version(1,5,0,3);
         
-        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 5);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -71,6 +71,7 @@ namespace Slafight_Plugin_EXILED
         public MapGuardHandler MapGuardHandler { get; set; }
         public Scp1509Handler Scp1509Handler { get; set; }
         public Scp012_033 Scp012_033 { get; set; }
+        public TerminalRiftLabHandler TerminalRiftLabHandler { get; set; }
         // Enable & Disable
         public override void OnEnabled()
         {
@@ -98,6 +99,10 @@ namespace Slafight_Plugin_EXILED
             Scp012_033 = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
             CustomHandlersManager.RegisterEventsHandler(CustomMap);
+
+            TerminalRiftLabHandler = new();
+            CustomHandlersManager.RegisterEventsHandler(TerminalRiftLabHandler);
+            TerminalRift.Register();
 
             EngineerRole = new Engineer();
             EngineerRole.RegisterEvents();
@@ -134,7 +139,8 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
             
-            LabApiHandler = null;
+            CustomHandlersManager.UnregisterEventsHandler(TerminalRiftLabHandler);
+            TerminalRift.Unregister();
             
             EngineerRole.UnregisterEvents();
             

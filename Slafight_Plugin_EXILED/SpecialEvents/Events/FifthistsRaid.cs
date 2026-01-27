@@ -33,7 +33,7 @@ public class FifthistsRaid
         {
             if (player.Role.Team != Team.SCPs)
             {
-                Plugin.Singleton.CustomRolesHandler.SpawnFifthist(player,RoleSpawnFlags.All);
+                player.SetRole(CRoleTypeId.FifthistRescure);
                 i++;
             }
             if (i >= Math.Truncate(Player.List.Count/4f)) break;
