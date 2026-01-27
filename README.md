@@ -1,6 +1,6 @@
 # バージョン情報等
 プラグイン:`v1.4.5.2`
-EXILED>=`v9.12.2`
+EXILED>=`v9.12.6`
 # 概要
 SCP: Secret LaboratoryのEXILEDフレームワークで動作するプラグインです。<br>
 完全に自鯖用に作成しているため、コードの読みやすさ等は全く考慮されていません。<br>
@@ -17,6 +17,7 @@ dependencies/
 
 SCP Secret Laboratory/LabAPI/plugins/[ポート番号]/
 - ProjectMER
+- MEROptimizer
 - AdvancedMERtools<br>
 ## BGMについて
 Omega WarheadやDelta Warhead等のイベントの際、BGMが何もしていないと流れません。その為、Configにて音楽ファイルのフォルダパスを指定し、`omega.ogg`,`delta.ogg`などのファイル名でBGMをフォルダ内に入れる必要があります。<br>
