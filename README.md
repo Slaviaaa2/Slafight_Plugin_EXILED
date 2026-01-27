@@ -21,6 +21,9 @@ SCP Secret Laboratory/LabAPI/plugins/[ポート番号]/
 - AdvancedMERtools<br>
 ## BGMについて
 Omega WarheadやDelta Warhead等のイベントの際、BGMが何もしていないと流れません。その為、Configにて音楽ファイルのフォルダパスを指定し、`omega.ogg`,`delta.ogg`などのファイル名でBGMをフォルダ内に入れる必要があります。<br>
+## カスタムマップ・モデルについて
+SCP-3005やPocked Dimension EX等に用いられるモデルは、SCP Secret Laboratory/LabAPI/configs/ProjectMER/Maps及びSchematicsにて、配置やモデル等のデータを突っ込まなければ使えません。<br>
+近いうちにCC BY-SA 3.0で配布予定ですのでしばしお待ちください。（一応エラーが出るだけで動かないことはないはず）
 # Config(設定)
 ファイルの場所： `%AppData%\EXILED\Configs\Plugins\Slafight_Plugin_EXILED\[サーバーポート].yml`
 # その他質問等ありましたらXのプロフから連絡してください。
