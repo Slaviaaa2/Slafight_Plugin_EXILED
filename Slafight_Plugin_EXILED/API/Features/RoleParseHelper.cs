@@ -4,6 +4,8 @@ using System.Linq;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 
+namespace Slafight_Plugin_EXILED.API.Features;
+
 public static class RoleParseHelper
 {
     private static readonly Dictionary<string, string> Aliases = new(StringComparer.OrdinalIgnoreCase)

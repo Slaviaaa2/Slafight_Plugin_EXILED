@@ -1,29 +1,15 @@
-using System;
 using System.Collections.Generic;
-using CustomPlayerEffects;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.CustomStats;
-using Exiled.API.Features.DamageHandlers;
-using Exiled.API.Features.Items;
-using Exiled.API.Features.Roles;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Server;
-using InventorySystem;
-using InventorySystem.Items.Firearms.Modules.Scp127;
 using MEC;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.HumeShield;
-using PlayerStatsSystem;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
-using Light = Exiled.API.Features.Toys.Light;
-using Object = UnityEngine.Object;
 
 namespace Slafight_Plugin_EXILED.CustomRoles
 {
@@ -31,8 +17,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles
     {
         private CoroutineHandle _fifthistHandle;
         private CoroutineHandle _snowHandle;
-        private CoroutineHandle _aiHandle;
         private CoroutineHandle _roundLockerHandle;
+
+        // 特殊勝利でラウンドを終わらせている最中か
+        public bool IsSpecialWinEnding { get; set; }
 
         public CustomRolesHandler()
         {
@@ -62,30 +50,34 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             KillAllCoroutines();
         }
 
+        // ===== 共通リセット =====
+
         private void KillAllCoroutines()
         {
             if (_fifthistHandle.IsRunning)
                 Timing.KillCoroutines(_fifthistHandle);
             if (_snowHandle.IsRunning)
                 Timing.KillCoroutines(_snowHandle);
-            if (_aiHandle.IsRunning)
-                Timing.KillCoroutines(_aiHandle);
             if (_roundLockerHandle.IsRunning)
                 Timing.KillCoroutines(_roundLockerHandle);
         }
 
         public void ResetAbilities()
         {
+            IsSpecialWinEnding = false;
             AbilityResetUtil.ResetAllAbilities();
             KillAllCoroutines();
         }
 
         public void AbilityResetInRoundRestarting()
         {
+            IsSpecialWinEnding = false;
             AbilityManager.Loadouts.Clear();
             AbilityBase.RevokeAllPlayers();
             KillAllCoroutines();
         }
+
+        // ===== ラウンド開始: 勝利コルーチン登録 =====
 
         public void RoundCoroutine()
         {
@@ -95,153 +87,30 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     return;
 
                 KillAllCoroutines();
+                IsSpecialWinEnding = false;
 
-                _fifthistHandle = Timing.RunCoroutine(FifthistCoroutine());
-                _aiHandle = Timing.RunCoroutine(NewAICoroutine());
-
-                if (Plugin.Singleton.Config.Season == 2)
-                    _snowHandle = Timing.RunCoroutine(SnowmanCoroutine());
+                _fifthistHandle = Timing.RunCoroutine(FifthistWinCoroutine());
+                _snowHandle     = Timing.RunCoroutine(SnowWarrierWinCoroutine());
+                _roundLockerHandle = Timing.RunCoroutine(RoundLocker());
             });
         }
 
-        private IEnumerator<float> FifthistCoroutine()
-        {
-            List<string> fifthistRoles = new()
-            {
-                "FIFTHIST",
-                "SCP-3005",
-                "F_Priest",
-                "FifthistConvert"
-            };
+        // ===== 特殊勝利コルーチン =====
 
-            for (;;)
-            {
-                if (!Round.IsStarted || Round.IsLobby)
-                    yield break;
-
-                int nonFifthists = 0;
-                int fifthists = 0;
-
-                foreach (Player player in Player.List)
-                {
-                    if (player == null || !player.IsAlive)
-                        continue;
-
-                    if (!fifthistRoles.Contains(player.UniqueRole) &&
-                        player.GetCustomRole() != CRoleTypeId.Scp999)
-                        nonFifthists++;
-                    else
-                        fifthists++;
-                }
-
-                if (nonFifthists == 0 && fifthists != 0)
-                    EndRound(Team.SCPs, "FIFTHIST_WIN");
-
-                yield return Timing.WaitForSeconds(1f);
-            }
-        }
-
-        private IEnumerator<float> SnowmanCoroutine()
+        // Fifthist 勝利: Fifthists + SCP-999 + 観戦/チュートリアルだけ
+        private IEnumerator<float> FifthistWinCoroutine()
         {
             for (;;)
             {
                 if (!Round.IsStarted || Round.IsLobby)
                     yield break;
 
-                int nonSnow = 0;
-                int snow = 0;
+                var players = Player.List.ToList();
 
-                foreach (Player player in Player.List)
+                if (players.IsOnlyTeam(CTeam.Fifthists))
                 {
-                    if (player == null || !player.IsAlive)
-                        continue;
-
-                    if (player.UniqueRole != "SnowWarrier" &&
-                        player.GetCustomRole() != CRoleTypeId.Scp999)
-                        nonSnow++;
-                    else
-                        snow++;
-                }
-
-                if (nonSnow == 0 && snow != 0)
-                    EndRound(Team.ChaosInsurgency, "SW_WIN");
-
-                yield return Timing.WaitForSeconds(1f);
-            }
-        }
-
-        private IEnumerator<float> NewAICoroutine()
-        {
-            for (;;)
-            {
-                if (!Round.IsStarted || Round.IsLobby)
-                    yield break;
-
-                int scpCount = 0;
-                bool only079 = true;
-
-                int foundationCount = 0;
-                int classDCount = 0;
-                int chaosCount = 0;
-                int otherCount = 0;
-
-                List<Player> scps = new();
-                List<Player> scp079s = new();
-
-                foreach (Player player in Player.List)
-                {
-                    if (player == null || !player.IsAlive)
-                        continue;
-
-                    var team = player.GetTeam();
-                    var roleType = player.Role.Type;
-
-                    if (team == CTeam.SCPs)
-                    {
-                        scpCount++;
-                        scps.Add(player);
-
-                        if (roleType == RoleTypeId.Scp079)
-                            scp079s.Add(player);
-                        else
-                            only079 = false;
-                    }
-                    else if (team == CTeam.FoundationForces || team == CTeam.Scientists || team == CTeam.Guards)
-                    {
-                        foundationCount++;
-                    }
-                    else if (team == CTeam.ClassD)
-                    {
-                        classDCount++;
-                    }
-                    else if (team == CTeam.ChaosInsurgency)
-                    {
-                        chaosCount++;
-                    }
-                    else
-                    {
-                        otherCount++;
-                    }
-                }
-
-                bool scpSideIsOnly079 = scpCount > 0 && only079 && scp079s.Count == scpCount;
-
-                int nonScpTeamsAlive = 0;
-                if (foundationCount > 0) nonScpTeamsAlive++;
-                if (classDCount > 0)     nonScpTeamsAlive++;
-                if (chaosCount > 0)      nonScpTeamsAlive++;
-                if (otherCount > 0)      nonScpTeamsAlive++;
-
-                bool onlyOneNonScpTeam = nonScpTeamsAlive == 1;
-
-                if (scpSideIsOnly079 && onlyOneNonScpTeam)
-                {
-                    foreach (var p in scp079s)
-                    {
-                        p.Kill("Terminated by C.A.S.S.I.E.",
-                            "SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.");
-                    }
-
+                    Round.IsLocked = false;
+                    CTeam.Fifthists.EndRound();
                     yield break;
                 }
 
@@ -249,7 +118,28 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             }
         }
 
-        // ===== 勝利条件用ユニークロール =====
+        // SnowWarrier 勝利: SnowWarrier + SCP-999 + 観戦/チュートリアルだけ
+        private IEnumerator<float> SnowWarrierWinCoroutine()
+        {
+            for (;;)
+            {
+                if (!Round.IsStarted || Round.IsLobby)
+                    yield break;
+
+                var players = Player.List.ToList();
+
+                if (players.IsOnlyTeam(CTeam.Others, "snow"))
+                {
+                    Round.IsLocked = false;
+                    CTeam.Others.EndRound("SW_WIN");
+                    yield break;
+                }
+
+                yield return Timing.WaitForSeconds(1f);
+            }
+        }
+
+        // ===== 通常用 RoundLock =====
 
         private readonly List<CRoleTypeId> uniques = new()
         {
@@ -259,17 +149,28 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             CRoleTypeId.SnowWarrier
         };
 
-        public void CancelEnd(EndingRoundEventArgs ev)
+        private bool HasUniqueRoleAlive()
         {
-            int count = 0;
-
-            foreach (Player player in Player.List)
+            foreach (var player in Player.List)
             {
+                if (player == null || !player.IsAlive)
+                    continue;
+
                 if (uniques.Contains(player.GetCustomRole()))
-                    count++;
+                    return true;
             }
 
-            if (count == 0)
+            return false;
+        }
+
+        // バニラの EndingRound を延命するためのロック
+        public void CancelEnd(EndingRoundEventArgs ev)
+        {
+            // 特殊勝利中は EndingRound に一切干渉しない
+            if (IsSpecialWinEnding)
+                return;
+
+            if (!HasUniqueRoleAlive())
                 return;
 
             ev.IsAllowed = false;
@@ -285,9 +186,15 @@ namespace Slafight_Plugin_EXILED.CustomRoles
         {
             for (;;)
             {
-                int count = 0;
+                // 特殊勝利で終わる流れに入っているならロック解除して終わる
+                if (IsSpecialWinEnding)
+                {
+                    Round.IsLocked = false;
+                    yield break;
+                }
 
-                foreach (Player player in Player.List)
+                int count = 0;
+                foreach (var player in Player.List)
                 {
                     if (uniques.Contains(player.GetCustomRole()))
                         count++;
@@ -301,45 +208,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles
 
                 yield return Timing.WaitForSeconds(1f);
             }
-        }
-
-        // ===== Spawn 系（CI_Commando だけ残す） =====
-
-        public void SpawnChaosCommando(Player player, RoleSpawnFlags roleSpawnFlags)
-        {
-            player.Role.Set(RoleTypeId.ChaosRepressor);
-            int maxHealth = 100;
-
-            player.UniqueRole = "CI_Commando";
-            player.CustomInfo = "Chaos Insurgency Commando";
-            player.InfoArea |= PlayerInfoArea.Nickname;
-            player.InfoArea &= ~PlayerInfoArea.Role;
-            player.MaxHealth = maxHealth;
-            player.Health = maxHealth;
-
-            player.CustomHumeShieldStat.MaxValue = 25;
-            player.CustomHumeShieldStat.CurValue = 25;
-            player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 1.05f;
-
-            player.ShowHint(
-                "<color=#228b22>カオス コマンド―</color>\nサイトに対する略奪を円滑にするために迅速な制圧を実行する実力者\nインサージェンシーによってヒュームシールド改造をされている。",
-                10);
-
-            Room spawnRoom = Room.Get(RoomType.Surface);
-            Vector3 offset = new(0f, 0f, 0f);
-            // player.Position = new Vector3(124f,289f,21f);
-
-            player.ClearInventory();
-            Log.Debug("Giving Items to CI_Commando");
-            player.AddItem(ItemType.GunLogicer);
-            player.AddItem(ItemType.ArmorHeavy);
-            player.AddItem(ItemType.KeycardChaosInsurgency);
-            player.AddItem(ItemType.Medkit);
-            player.AddItem(ItemType.Medkit);
-            player.AddItem(ItemType.Adrenaline);
-            player.AddItem(ItemType.GrenadeHE);
-
-            player.AddAmmo(AmmoType.Nato762, 800);
         }
 
         // ===== その他イベント =====
@@ -388,44 +256,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 {
                 }
             });
-        }
-
-        public void EndRound(Team winnerTeam = Team.SCPs, string specificReason = null)
-        {
-            if (winnerTeam == Team.SCPs && specificReason == null)
-            {
-                Round.KillsByScp = 999;
-                Round.EndRound(true);
-            }
-            else if (winnerTeam == Team.SCPs && specificReason == "FIFTHIST_WIN")
-            {
-                Round.KillsByScp = 555;
-                foreach (Player player in Player.List)
-                    player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>", 8f);
-
-                Timing.CallDelayed(1f, () => { Round.Restart(false); });
-            }
-            else if ((winnerTeam == Team.ChaosInsurgency || winnerTeam == Team.ClassD) && specificReason == null)
-            {
-                Round.EscapedDClasses = 999;
-                Round.EndRound(true);
-            }
-            else if (winnerTeam == Team.ChaosInsurgency && specificReason == "SW_WIN")
-            {
-                foreach (Player player in Player.List)
-                    player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>", 8f);
-
-                Timing.CallDelayed(1f, () => { Round.Restart(false); });
-            }
-            else if (winnerTeam == Team.FoundationForces || winnerTeam == Team.Scientists)
-            {
-                Round.EscapedScientists = 999;
-                Round.EndRound(true);
-            }
-            else
-            {
-                Round.EndRound(true);
-            }
         }
     }
 }

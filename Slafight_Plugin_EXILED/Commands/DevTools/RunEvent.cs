@@ -44,7 +44,7 @@ public class RunEvent : ICommand
         var seh = Plugin.Singleton.SpecialEventsHandler;
         seh.RunEvent(eventType);
 
-        response = $"Special event forced and started: {seh.localizedEventName} ({eventType})";
+        response = $"Special event forced and started: {seh.LocalizedEventName} ({eventType})";
         return true;
     }
 }

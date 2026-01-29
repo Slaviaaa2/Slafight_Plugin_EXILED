@@ -11,7 +11,8 @@ public enum SpecialEventType
     /// <summary>OMEGA! BOOM!!!</summary>
     OmegaWarhead = 1,
     /// <summary>DELTA CHAOS</summary>
-    DeltaWarhead = 2,
+    [Obsolete("このイベントは面白みがなかったので、FacilityTerminationイベントに置き換えられました。")]
+    OldDeltaWarhead = 2,
     /// <summary>CRYYYYYYYYYYY</summary>
     Scp096CryFuck = 3,
     /// <summary>BattleField 4</summary>
@@ -25,5 +26,7 @@ public enum SpecialEventType
     /// <summary>It's very tired</summary>
     OperationBlackout = 8,
     /// <summary>MEGABALL ATTACK YEAHHHH</summary>
-    SnowWarriersAttack = 9
+    SnowWarriersAttack = 9,
+    /// <summary>DELTA 2.0</summary>
+    FacilityTermination = 10
 }

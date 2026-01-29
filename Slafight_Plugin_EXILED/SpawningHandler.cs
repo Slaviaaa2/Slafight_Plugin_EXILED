@@ -24,7 +24,7 @@ public class SpawningHandler
         {
             case SpawnTypeId.MTF_NtfNormal:
                 CreateAndPlayAudio("_w_ntf.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
-                CassieHelper.AnnounceNtfArrival(ev.CassieCallsign, ev.DisplayCallsign);
+                CassieHelper.AnnounceNtfArrival();
                 break;
             case SpawnTypeId.MTF_NtfBackup:
                 CreateAndPlayAudio("_w_ntf.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
@@ -32,7 +32,7 @@ public class SpawningHandler
                 break;
             case SpawnTypeId.MTF_HDNormal:
                 CreateAndPlayAudio("_w_hd.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
-                CassieHelper.AnnounceHdArrival(ev.CassieCallsign, ev.DisplayCallsign);
+                CassieHelper.AnnounceHdArrival();
                 break;
             case SpawnTypeId.MTF_HDBackup:
                 CreateAndPlayAudio("_w_hd.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);

@@ -33,5 +33,13 @@ public enum CRoleTypeId
     NtfGeneral = 24,
     ChaosSignal = 25,
     ChamberGuard = 26,
-    ObjectObserver = 27
+    ObjectObserver = 27,
+    Scp173 = 28,
+    Sculpture = 29,
+    GoCSquadLeader = 30,
+    GoCDeputy = 31,
+    GoCMedic = 32,
+    GoCThaumaturgist = 33,
+    GoCCommunications = 34,
+    GoCOperative = 35
 }

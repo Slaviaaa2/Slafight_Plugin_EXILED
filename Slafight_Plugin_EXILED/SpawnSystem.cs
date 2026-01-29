@@ -16,7 +16,7 @@ namespace Slafight_Plugin_EXILED;
 public class SpawnSystem
 {
     // =====================
-    //  汎用
+    //  種別
     // =====================
 
     public enum SpawnRoleKind
@@ -46,8 +46,15 @@ public class SpawnSystem
         }
     }
 
+    public enum SpawnOverrideMode
+    {
+        None,       // 通常
+        NextWave,   // 次のRespawningTeamを上書き
+        Immediate,  // 即時Summon
+    }
+
     // =====================
-    //  内部イベント定義
+    //  内部イベント
     // =====================
 
     public class SpawningEventArgs : EventArgs
@@ -62,13 +69,17 @@ public class SpawnSystem
         // 表示用: ALPHA-05 など
         public string DisplayCallsign { get; }
 
-        // Waveの湧き人数（旧fifthistCountを統一）
+        // Waveの湧き人数
         public int SpawnCount { get; }
+
+        // どのコンテキストで湧いたか（"Default" / "EventX"）
+        public string ContextName { get; }
 
         public SpawningEventArgs(
             SpawnTypeId spawnType,
             bool isMiniWave,
             Faction faction,
+            string contextName,
             string cassieCallsign = "",
             string displayCallsign = "",
             int spawnCount = 0)
@@ -76,6 +87,7 @@ public class SpawnSystem
             SpawnType = spawnType;
             IsMiniWave = isMiniWave;
             Faction = faction;
+            ContextName = contextName;
             CassieCallsign = cassieCallsign;
             DisplayCallsign = displayCallsign;
             SpawnCount = spawnCount;
@@ -88,6 +100,7 @@ public class SpawnSystem
         SpawnTypeId spawnType,
         bool isMiniWave,
         Faction faction,
+        string contextName,
         string cassieCallsign = "",
         string displayCallsign = "",
         int spawnCount = 0)
@@ -96,17 +109,19 @@ public class SpawnSystem
             spawnType,
             isMiniWave,
             faction,
+            contextName,
             cassieCallsign,
             displayCallsign,
             spawnCount));
     }
 
     // =====================
-    //  Config 定義
+    //  Config + Context
     // =====================
 
     public class SpawnConfig
     {
+        // 元の「通常時」テーブル
         public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; set; } = new()
         {
             { SpawnTypeId.MTF_NtfNormal, 80 },
@@ -169,9 +184,9 @@ public class SpawnSystem
             {
                 SpawnTypeId.MTF_HDNormal, new()
                 {
-                    { new SpawnRoleKey(CRoleTypeId.HdMarshal),   (1f,  true)  },
-                    { new SpawnRoleKey(CRoleTypeId.HdCommander), (2f,  false) },
-                    { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false) },
+                    { new SpawnRoleKey(CRoleTypeId.HdMarshal),   (1f,  false)  },
+                    { new SpawnRoleKey(CRoleTypeId.HdCommander), (2f,  true)   },
+                    { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false)  },
                 }
             },
             {
@@ -186,7 +201,7 @@ public class SpawnSystem
             {
                 SpawnTypeId.GOI_ChaosNormal, new()
                 {
-                    { new SpawnRoleKey(CRoleTypeId.ChaosCommando), (2f,  false) },
+                    { new SpawnRoleKey(CRoleTypeId.ChaosCommando), (1f,  false) },
                     { new SpawnRoleKey(RoleTypeId.ChaosRepressor), (2f,  false) },
                     { new SpawnRoleKey(CRoleTypeId.ChaosSignal),   (2f,  false) },
                     { new SpawnRoleKey(RoleTypeId.ChaosMarauder),  (2f,  false) },
@@ -227,14 +242,70 @@ public class SpawnSystem
         public bool NatoCallsign       { get; set; } = true;
     }
 
+    // コンテキスト：通常 / イベント時にテーブルを差し替える用
+    public class SpawnContext
+    {
+        public string Name { get; }
+        public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; }
+        public Dictionary<SpawnTypeId, int> FoundationEnemyWaveWeights { get; }
+        public Dictionary<SpawnTypeId, int> FoundationStaffMiniWaveWeights { get; }
+        public Dictionary<SpawnTypeId, int> FoundationEnemyMiniWaveWeights { get; }
+        public Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> RoleTables { get; }
+
+        public SpawnContext(
+            string name,
+            Dictionary<SpawnTypeId, int> staffWeights,
+            Dictionary<SpawnTypeId, int> enemyWeights,
+            Dictionary<SpawnTypeId, int> staffMiniWeights,
+            Dictionary<SpawnTypeId, int> enemyMiniWeights,
+            Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> roles)
+        {
+            Name = name;
+            FoundationStaffWaveWeights = staffWeights;
+            FoundationEnemyWaveWeights = enemyWeights;
+            FoundationStaffMiniWaveWeights = staffMiniWeights;
+            FoundationEnemyMiniWaveWeights = enemyMiniWeights;
+            RoleTables = roles;
+        }
+    }
+
     public static SpawnConfig Config { get; } = new();
 
-    private bool isDefaultWave = true;
+    // Context一覧と現在有効なContext
+    public static Dictionary<string, SpawnContext> SpawnContexts { get; } = new();
+    public static string ActiveContextName { get; private set; } = "Default";
+    public static SpawnContext ActiveContext => SpawnContexts[ActiveContextName];
 
+    // =====================
+    //  状態フラグ
+    // =====================
+
+    private bool isDefaultWave = true;
     public static bool Disable = false;
+
+    public static SpawnOverrideMode OverrideMode { get; private set; } = SpawnOverrideMode.None;
+    public static SpawnTypeId? PendingOverrideType { get; private set; }
+    public static bool PendingMiniWave { get; private set; }
+
+    // =====================
+    //  コンストラクタ
+    // =====================
 
     public SpawnSystem()
     {
+        // Context初期化（必要ならここにイベント用コンテキストを追加）
+        if (!SpawnContexts.ContainsKey("Default"))
+        {
+            SpawnContexts["Default"] = new SpawnContext(
+                "Default",
+                Config.FoundationStaffWaveWeights,
+                Config.FoundationEnemyWaveWeights,
+                Config.FoundationStaffMiniWaveWeights,
+                Config.FoundationEnemyMiniWaveWeights,
+                Config.RoleTables
+            );
+        }
+
         Exiled.Events.Handlers.Server.RespawningTeam += SpawnHandler;
     }
 
@@ -242,6 +313,55 @@ public class SpawnSystem
     {
         Exiled.Events.Handlers.Server.RespawningTeam -= SpawnHandler;
     }
+
+    // =====================
+    //  外部からの切り替えAPI
+    // =====================
+
+    // Context切り替え（通常 / イベント）
+    public static void SwitchSpawnContext(string contextName)
+    {
+        if (!SpawnContexts.ContainsKey(contextName))
+        {
+            Log.Warn($"SpawnSystem: Unknown context '{contextName}'");
+            return;
+        }
+
+        ActiveContextName = contextName;
+        Log.Info($"SpawnSystem: Active context switched to '{contextName}'");
+    }
+
+    // コンテキスト追加用（イベント開始時に独自テーブルを登録したい場合など）
+    public static void RegisterSpawnContext(SpawnContext context)
+    {
+        SpawnContexts[context.Name] = context;
+        Log.Info($"SpawnSystem: Context '{context.Name}' registered");
+    }
+
+    // 次のリスポーン波を強制的に特定のSpawnTypeにする
+    public static void ReplaceNextSpawn(SpawnTypeId spawnType, bool isMiniWave = false)
+    {
+        OverrideMode = SpawnOverrideMode.NextWave;
+        PendingOverrideType = spawnType;
+        PendingMiniWave = isMiniWave;
+        Log.Info($"SpawnSystem: Next spawn overridden to {spawnType} (Mini:{isMiniWave})");
+    }
+
+    // 即時に特殊SpawnTypeを湧かせる（Spectatorから）
+    public static void ForceSpawnNow(SpawnTypeId spawnType, bool isMiniWave = false)
+    {
+        Log.Info($"SpawnSystem: ForceSpawnNow {spawnType} (Mini:{isMiniWave})");
+        Instance?.SummonForces(spawnType, isMiniWave);
+    }
+
+    private static void ResetOverride()
+    {
+        OverrideMode = SpawnOverrideMode.None;
+        PendingOverrideType = null;
+    }
+
+    // SpawnSystemインスタンスを外から参照したい場合用（必要ならプラグイン本体でセット）
+    public static SpawnSystem Instance { get; set; }
 
     // =====================
     //  RespawningTeam
@@ -252,6 +372,15 @@ public class SpawnSystem
         if (Disable)
         {
             ev.IsAllowed = false;
+            return;
+        }
+
+        // オーバーライド（NextWave）が設定されていたらそれを優先
+        if (OverrideMode == SpawnOverrideMode.NextWave && PendingOverrideType.HasValue)
+        {
+            ev.IsAllowed = false;
+            SummonForces(PendingOverrideType.Value, PendingMiniWave);
+            ResetOverride();
             return;
         }
 
@@ -279,10 +408,12 @@ public class SpawnSystem
         bool highThreat = Player.Count >= Config.PlayerThresholdHigh ||
                           scpCount      >= Config.ScpThresholdHigh;
 
+        var ctx = ActiveContext;
+
         var weights = new Dictionary<SpawnTypeId, int>(
             ev.Wave.IsMiniWave
-                ? Config.FoundationStaffMiniWaveWeights
-                : Config.FoundationStaffWaveWeights
+                ? ctx.FoundationStaffMiniWaveWeights
+                : ctx.FoundationStaffWaveWeights
         );
 
         if (highThreat)
@@ -306,10 +437,12 @@ public class SpawnSystem
     {
         bool has3005 = Player.List.Any(p => p.GetCustomRole() == CRoleTypeId.Scp3005);
 
+        var ctx = ActiveContext;
+
         var weights = new Dictionary<SpawnTypeId, int>(
             ev.Wave.IsMiniWave
-                ? Config.FoundationEnemyMiniWaveWeights
-                : Config.FoundationEnemyWaveWeights
+                ? ctx.FoundationEnemyMiniWaveWeights
+                : ctx.FoundationEnemyWaveWeights
         );
 
         if (has3005)
@@ -352,18 +485,15 @@ public class SpawnSystem
 
         string cassieCallsign  = string.Empty;
         string displayCallsign = string.Empty;
-        int spawnCount = 0; // 今回その勢力として湧かせる人数
 
-        // 先に対象 Spectator を確定させておく
         var specs = Player.List
             .Where(p =>
                 p.Role == RoleTypeId.Spectator &&
                 p.GetCustomRole() == CRoleTypeId.None)
             .ToList();
 
-        spawnCount = specs.Count;
+        int spawnCount = specs.Count;
 
-        // HD 用コールサイン生成
         if (Config.NatoCallsign)
         {
             var nato = GenerateNatoCallsignFull();
@@ -371,13 +501,11 @@ public class SpawnSystem
             displayCallsign = nato.display;
         }
 
-        // Spectator から対象ロールを割り当て（候補は specs に固定）
         AssignTeamRoles(
             spawnType,
             playerFilter: p => specs.Contains(p),
             fixedCount: null);
 
-        // Faction 判定
         Faction faction = spawnType switch
         {
             SpawnTypeId.MTF_NtfNormal or SpawnTypeId.MTF_NtfBackup
@@ -391,8 +519,7 @@ public class SpawnSystem
             _ => Faction.Unclassified
         };
 
-        // spawnCount を今回 wave の人数として渡す
-        OnSpawning(spawnType, isMiniWave, faction, cassieCallsign, displayCallsign, spawnCount);
+        OnSpawning(spawnType, isMiniWave, faction, ActiveContextName, cassieCallsign, displayCallsign, spawnCount);
 
         Timing.CallDelayed(0.02f, () => isDefaultWave = true);
     }
@@ -406,7 +533,9 @@ public class SpawnSystem
         Func<Player, bool> playerFilter,
         int? fixedCount = null)
     {
-        if (!Config.RoleTables.TryGetValue(spawnType, out var table) || table.Count == 0)
+        var ctx = ActiveContext;
+
+        if (!ctx.RoleTables.TryGetValue(spawnType, out var table) || table.Count == 0)
             return;
 
         var candidates = Player.List
@@ -522,10 +651,13 @@ public class SpawnSystem
         string natoForceL = NatoForceL[NatoForce.IndexOf(natoForce)];
         int natoForceNum  = Random.Range(1, 20);
 
-        // cassie: NATO_A / display: ALPHA-05
         return (natoForce, $"{natoForceL}-{natoForceNum:00}");
     }
 }
+
+// =====================
+//  Shuffle拡張
+// =====================
 
 public static class EnumerableExtensions
 {

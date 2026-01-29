@@ -8,6 +8,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 using Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
+using Slafight_Plugin_EXILED.CustomRoles.GoC;
 using Slafight_Plugin_EXILED.CustomRoles.Others;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -25,9 +26,7 @@ public static class PlayerExtensions
         {
             // ==== SCP ====
             case RoleTypeId.Scp173:
-                player.Role.Set(RoleTypeId.Scp173, roleSpawnFlags);
-                player.Position = EventHandler.Scp173SpawnPoint;
-                player.EnableEffect(EffectType.Slowness, 95, 60f);
+                player.SetRole(CRoleTypeId.Scp173);
                 break;
 
             case RoleTypeId.Scp049:
@@ -43,7 +42,6 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp106:
-                // Cast to SetRole(Custom)
                 player.SetRole(CRoleTypeId.Scp106);
                 break;
 
@@ -182,6 +180,9 @@ public static class PlayerExtensions
             case CRoleTypeId.Scp999:
                 new Scp999Role().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.Scp173:
+                new Scp173Role().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Fifthists ====
             case CRoleTypeId.FifthistRescure:
                 new FifthistRescure().SpawnRole(player, roleSpawnFlags);
@@ -243,10 +244,33 @@ public static class PlayerExtensions
             case CRoleTypeId.Janitor:
                 new Janitor().SpawnRole(player, roleSpawnFlags);
                 break;
-            // ==== Flamingos ===
-            // ==== Others ===
+            // ==== Flamingos ====
+            // ==== Others ====
             case CRoleTypeId.SnowWarrier:
                 new SnowWarrier().SpawnRole(player, roleSpawnFlags);
+                break;
+            // ==== Specials ====
+            case CRoleTypeId.Sculpture:
+                new Sculpture().SpawnRole(player, roleSpawnFlags);
+                break;
+            // ==== GoC ====
+            case CRoleTypeId.GoCSquadLeader:
+                new GoCSquadLeader().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCDeputy:
+                new GoCDeputy().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCMedic:
+                new GoCMedic().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCThaumaturgist:
+                new GoCThaumaturgist().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCCommunications:
+                new GoCCommunications().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCOperative:
+                new GoCOperative().SpawnRole(player, roleSpawnFlags);
                 break;
         }
     }

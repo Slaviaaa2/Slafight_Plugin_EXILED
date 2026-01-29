@@ -139,7 +139,7 @@ public class EscapeHandler
         EscapeTargetRole baseTarget,
         Player player)
     {
-        var nowEvent = Plugin.Singleton.SpecialEventsHandler.nowEvent;
+        var nowEvent = Plugin.Singleton.SpecialEventsHandler.NowEvent;
 
         var myRole       = player.Role.Type;          // RoleTypeId
         var myCustomRole = player.GetCustomRole();    // CRoleTypeId

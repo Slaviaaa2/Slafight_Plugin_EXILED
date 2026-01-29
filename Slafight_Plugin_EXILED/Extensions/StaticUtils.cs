@@ -52,32 +52,35 @@ public static class StaticUtils
     }
 
     // 【内部拡張: 外部非公開】
-    private static IEnumerable<T> ShuffleTake<T>(this IEnumerable<T> source, int count)
+    extension<T>(IEnumerable<T> source)
     {
-        var list = source.ToList();
-        int n = list.Count;
-        if (count >= n) return list;
+        private IEnumerable<T> ShuffleTake(int count)
+        {
+            var list = source.ToList();
+            int n = list.Count;
+            if (count >= n) return list;
 
-        for (int i = 0; i < count; i++)
-        {
-            int pos = _random.Next(i, n);
-            (list[i], list[pos]) = (list[pos], list[i]);
+            for (int i = 0; i < count; i++)
+            {
+                int pos = _random.Next(i, n);
+                (list[i], list[pos]) = (list[pos], list[i]);
+            }
+            return list.Take(count);
         }
-        return list.Take(count);
-    }
-    
-    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
-    {
-        var list = source.ToList();
-        int n = list.Count;
-        for (int i = 0; i < n - 1; i++)
+
+        public IEnumerable<T> Shuffle()
         {
-            int j = UnityEngine.Random.Range(i, n);
-            (list[i], list[j]) = (list[j], list[i]);
+            var list = source.ToList();
+            int n = list.Count;
+            for (int i = 0; i < n - 1; i++)
+            {
+                int j = UnityEngine.Random.Range(i, n);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+            return list;
         }
-        return list;
     }
-    
+
     // Give Or Drop
     extension(Player player)
     {
@@ -130,6 +133,43 @@ public static class StaticUtils
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Playerを中心とした四角形範囲(XZ平面)のランダム位置をY固定で取得
+        /// </summary>
+        /// <param name="halfSize">半径サイズ (例: 5f → ±5m四方)</param>
+        /// <param name="fixedY">固定Y座標 (デフォルト: player.Position.y)</param>
+        /// <returns>ランダムVector3</returns>
+        public Vector3 GetRandomSquarePosition(float halfSize, float fixedY = float.NaN)
+        {
+            Vector3 center = player.Position;
+            float y = float.IsNaN(fixedY) ? center.y : fixedY;
+        
+            float randomX = UnityEngine.Random.Range(center.x - halfSize, center.x + halfSize);
+            float randomZ = UnityEngine.Random.Range(center.z - halfSize, center.z + halfSize);
+        
+            return new Vector3(randomX, y, randomZ);
+        }
+
+        public bool IsFifthist()
+        {
+            return player.GetTeam() == CTeam.Fifthists || player.GetCustomRole() == CRoleTypeId.Scp3005;
+        }
+
+        public bool IsHumanitist()
+        {
+            return player.GetTeam() != CTeam.FoundationForces;
+        }
+    }
+
+    extension(Item item)
+    {
+        public bool IsCustomItem(out CustomItem customItem)
+        {
+            var result = CustomItem.TryGet(item, out var ci);
+            customItem = ci;
+            return result;
         }
     }
 }

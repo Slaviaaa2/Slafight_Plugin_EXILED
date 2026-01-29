@@ -11,6 +11,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.SpecialEvents;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
 namespace Slafight_Plugin_EXILED.Hints;
@@ -29,7 +30,7 @@ public class PlayerHUD
         Exiled.Events.Handlers.Server.RestartingRound += DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += Spectate;
 
-        _specificAbilityLoop = Timing.RunCoroutine(SpecificAbilityHudLoop());
+        _specificAbilityLoop = Timing.RunCoroutine(SpecificInfoHudLoop());
         _abilityHudLoop = Timing.RunCoroutine(AbilityHudLoop());
     }
 
@@ -193,15 +194,15 @@ public class PlayerHUD
         }
     }
 
-    string SyncTextRole = null;
-    string SyncTextTeam = null;
-    string SyncTextObjective = null;
-    string SyncTextEvent = null;
+    string? SyncTextRole = null;
+    string? SyncTextTeam = null;
+    string? SyncTextObjective = null;
+    string? SyncTextEvent = null;
 
     private void ApplyRoleInfo(Player sourcePlayer, Player targetForHint)
     {
         var custom = sourcePlayer.GetCustomRole();
-        Log.Debug($"[HUD] {sourcePlayer.Nickname} UniqueRole={sourcePlayer.UniqueRole}, Custom={custom}, Vanilla={sourcePlayer.Role.Type}");
+        //Log.Debug($"[HUD] {sourcePlayer.Nickname} UniqueRole={sourcePlayer.UniqueRole}, Custom={custom}, Vanilla={sourcePlayer.Role.Type}");
         if (sourcePlayer.GetCustomRole() != CRoleTypeId.None)
         {
             switch (sourcePlayer.GetCustomRole())
@@ -236,6 +237,11 @@ public class PlayerHUD
                     SyncTextRole = "<color=#c50000>SCP-106</color>";
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "自身の欲求に従い、財団職員共を弄べ！";
+                    break;
+                case CRoleTypeId.Scp999:
+                    SyncTextRole = "<color=#ff1493>SCP-999</color>";
+                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                    SyncTextObjective = "可愛いペットとして施設を歩き回れ！　※勝敗に影響しません。良い感じに遊んでね！";
                     break;
                 // Fifthists
                 case CRoleTypeId.Scp3005:
@@ -344,17 +350,33 @@ public class PlayerHUD
                     SyncTextTeam = "<b><color=#ffffff>SNOW WARRIER's DIVISION</color></b>";
                     SyncTextObjective = "全施設にクリスマスと雪玉の正義を執行しろ";
                     break;
+                // Special Roles
+                case CRoleTypeId.Sculpture:
+                    SyncTextRole = "<color=#00b7eb>Sculpture</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "財団に従い、人類を根絶させよ。";
+                    break;
                 default:
                     ApplyTeamFallback(sourcePlayer);
                     break;
+            }
+            if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.FacilityTermination && sourcePlayer.GetTeam() == CTeam.FoundationForces)
+            {
+                SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                SyncTextObjective = "財団に従い、人類を根絶させよ。";
             }
         }
         else
         {
             ApplyTeamFallback(sourcePlayer);
+            if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.FacilityTermination && sourcePlayer.GetTeam() == CTeam.FoundationForces)
+            {
+                SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                SyncTextObjective = "財団に従い、人類を根絶させよ。";
+            }
         }
 
-        SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.localizedEventName;
+        SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.LocalizedEventName;
         HintSync(SyncType.PHUD_Role, SyncTextRole, targetForHint);
         HintSync(SyncType.PHUD_Objective, SyncTextObjective, targetForHint);
         HintSync(SyncType.PHUD_Team, SyncTextTeam, targetForHint);
@@ -403,7 +425,7 @@ public class PlayerHUD
         }
     }
 
-    public void SyncTexts(Player _player = null, Player spectatetarget = null)
+    public void SyncTexts(Player? _player = null, Player spectatetarget = null)
     {
         SyncTextRole = null;
         SyncTextTeam = null;
@@ -430,7 +452,7 @@ public class PlayerHUD
         }
         else
         {
-            Log.Debug("Called SyncTexts it's not proper procedure.");
+            //Log.Debug("Called SyncTexts it's not proper procedure.");
         }
     }
 
@@ -502,7 +524,7 @@ public class PlayerHUD
     }
 
     // ロール固有テキストのループ（PHUD_Specific）
-    private IEnumerator<float> SpecificAbilityHudLoop()
+    private IEnumerator<float> SpecificInfoHudLoop()
     {
         yield return Timing.WaitForSeconds(1f);
 
@@ -541,7 +563,7 @@ public class PlayerHUD
     // Ability 用 HUD ループ（PHUD_Ability）
     private IEnumerator<float> AbilityHudLoop()
     {
-        yield return Timing.WaitForSeconds(1f);
+        yield return Timing.WaitForSeconds(0.5f);
 
         for (;;)
         {
@@ -555,7 +577,7 @@ public class PlayerHUD
 
                 if (abilityHint == null)
                 {
-                    Log.Debug($"[HUD] PlayerHUD_Ability missing for {player.Nickname}, recreating...");
+                    //Log.Debug($"[HUD] PlayerHUD_Ability missing for {player.Nickname}, recreating...");
                     PlayerHUDSetup(player);
                     abilityHint = display.GetHint("PlayerHUD_Ability");
                     if (abilityHint == null)
@@ -568,7 +590,7 @@ public class PlayerHUD
                 abilityHint.Text = PHUD_Ability_Text;
             }
 
-            yield return Timing.WaitForSeconds(1f);
+            yield return Timing.WaitForSeconds(0.5f);
         }
     }
 }

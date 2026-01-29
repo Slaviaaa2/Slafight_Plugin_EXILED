@@ -10,14 +10,14 @@ public static class AbilityLocalization
         ["MagicMissileAbility"] = "マジックミサイル",
         ["AllowEscapeAbility"] = "腐蝕からの解放",
         ["SoundOfFifthAbility"] = "第五からの音",
+        ["TeleportRandomAbility"] = "メインヴィラン",
+        ["PlaceTantrumAbility"] = "汚物作戦"
     };
 
     public static string GetDisplayName(string key, Exiled.API.Features.Player player)
     {
-        if (JaNames.TryGetValue(key, out var name))
-            return name;
-        
-        // フォールバック
-        return key.Replace("Ability", string.Empty);
+        return JaNames.TryGetValue(key, out var name) ? name :
+            // フォールバック
+            key.Replace("Ability", string.Empty);
     }
 }

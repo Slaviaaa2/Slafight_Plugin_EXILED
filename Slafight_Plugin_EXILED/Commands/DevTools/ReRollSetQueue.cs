@@ -22,7 +22,7 @@ public class ReRollSetQueue : ICommand
 
         Plugin.Singleton.SpecialEventsHandler.SetQueueRandomEvent();
 
-        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.localizedEventName);
+        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.LocalizedEventName);
         return true;
     }
 }

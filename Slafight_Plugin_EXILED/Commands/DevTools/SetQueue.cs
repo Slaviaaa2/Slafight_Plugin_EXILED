@@ -43,7 +43,7 @@ public class SetQueue : ICommand
         var seh = Plugin.Singleton.SpecialEventsHandler;
         seh.SetQueueEvent(eventType);
 
-        response = $"Next special event set to: {seh.localizedEventName} ({eventType})";
+        response = $"Next special event set to: {seh.LocalizedEventName} ({eventType})";
         return true;
     }
 }

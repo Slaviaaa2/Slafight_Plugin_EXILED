@@ -40,7 +40,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,5,0,3);
+        public override Version Version => new Version(1,5,0,4);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
 
@@ -63,8 +63,6 @@ namespace Slafight_Plugin_EXILED
         public SpawningHandler SpawningHandler { get; set; }
         public EscapeHandler EscapeHandler { get; set; }
         public AbilityInputHandler AbilityInputHandler { get; set; }
-        
-        public OperationBlackout OperationBlackout { get; set; }
         public Sinkhole Sinkhole { get; set; }
         public PDEx PDEx { get; set; }
         public Engineer EngineerRole { get; private set; }
@@ -85,7 +83,6 @@ namespace Slafight_Plugin_EXILED
             PlayerHUD = new();
             EscapeHandler = new();
             CandyChanges = new();
-            OperationBlackout = new();
             ProximityChat.Handler.RegisterEvents();
             ProximityChatActiveHandler = new();
             RolePlayNameSetter = new();

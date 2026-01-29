@@ -1,0 +1,170 @@
+using System;
+using System.Collections.Generic;
+using Exiled.API.Enums;
+using Exiled.API.Extensions;
+using Exiled.API.Features;
+using Exiled.API.Features.Doors;
+using LightContainmentZoneDecontamination;
+using MEC;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features; // SpecialEvent 基底
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+
+namespace Slafight_Plugin_EXILED.SpecialEvents.Events
+{
+    public class DeltaWarheadEvent : SpecialEvent
+    {
+        // ===== メタ情報 =====
+        public override SpecialEventType EventType => SpecialEventType.OldDeltaWarhead;
+        public override int MinPlayersRequired => 0;
+        public override string LocalizedName => "DELTA WARHEAD";
+        public override string TriggerRequirement => "無し";
+
+        public override bool IsReadyToExecute()
+        {
+            return false;
+        }
+
+        // ===== ショートカット =====
+        private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+
+        private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
+            EventHandler.CreateAndPlayAudio;
+
+        // ===== 実行本体 =====
+        protected override void OnExecute(int eventPid)
+        {
+            if (CancelIfOutdated())
+                return;
+
+            // Warhead 関連フラグ
+            EventHandler.SpecialWarhead = true;
+            EventHandler.WarheadLocked = true;
+            EventHandler.DeadmanDisable = true;
+            // EventHandler.DeconCancellFlag = true; // 使うならここで
+
+            if (CancelIfOutdated())
+                return;
+
+            // 8 秒後: 危険な SCiP 収容違反検知
+            Timing.CallDelayed(8f, () =>
+            {
+                if (CancelIfOutdated()) return;
+
+                Exiled.API.Features.Cassie.MessageTranslated(
+                    "Detected Danger SCPs Containment Breach in The Heavy Containment Zone. Thinking approaches...",
+                    "危険なSCiPの収容違反が中層で確認されました。対応策を考案します・・・",
+                    true);
+
+                // 60 秒後: DELTA システム準備
+                Timing.CallDelayed(60f, () =>
+                {
+                    if (CancelIfOutdated()) return;
+
+                    Exiled.API.Features.Cassie.MessageTranslated(
+                        "My Approaches confirmed by O5 Command, Setup Delta System...",
+                        "対応策がO5評議会に承認されました。<color=green>DELTAシステム</color>を準備しています・・・",
+                        true);
+
+                    // 180 秒後: DELTA WARHEAD シーケンス開始アナウンス
+                    Timing.CallDelayed(180f, () =>
+                    {
+                        if (CancelIfOutdated()) return;
+
+                        float boomTime = Plugin.Singleton.Config.DwBoomTime;
+
+                        Exiled.API.Features.Cassie.MessageTranslated(
+                            $"By Order of O5 Command . Delta Warhead Sequence Activated . Heavy Containment Zone Detonated in T MINUS {boomTime} Seconds.",
+                            $"O5評議会の決定により、<color=green>DELTA WARHEAD</color>シーケンスが開始されました。重度収容区画を{boomTime}秒後に爆破します。",
+                            true);
+
+                        // HCZ を緑色に
+                        foreach (Room room in Room.List)
+                        {
+                            if (room.Zone == ZoneType.HeavyContainment)
+                                room.Color = Color.green;
+                        }
+
+                        // DELTA 用 BGM
+                        CreateAndPlayAudio("delta.ogg", "Exiled.API.Features.Cassie", Vector3.zero, true, null, false, 999999999f, 0f);
+
+                        // DwBoomTime 後に実際の爆破処理
+                        Timing.CallDelayed(boomTime, () =>
+                        {
+                            if (CancelIfOutdated()) return;
+
+                            Log.Debug("Delta Passed EventPID Checker");
+
+                            // LCZ エレベーター停止
+                            List<ElevatorType> lockEvTypes = new()
+                            {
+                                ElevatorType.LczA,
+                                ElevatorType.LczB
+                            };
+
+                            foreach (Lift lift in Lift.List)
+                            {
+                                Log.Debug("sendforeach:" + lift.Type);
+                                if (lockEvTypes.Contains(lift.Type))
+                                {
+                                    Log.Debug("foreach catched: " + lift.Type);
+                                    lift.TryStart(0, true);
+                                }
+                            }
+
+                            Log.Debug("Delta Passed TryStart Elevator Foreach.");
+
+                            // チェックポイント / LCZ エレベーターをロック
+                            List<DoorType> lockEvDoorTypes = new()
+                            {
+                                DoorType.CheckpointGateA,
+                                DoorType.CheckpointGateB,
+                                DoorType.ElevatorLczA,
+                                DoorType.ElevatorLczB
+                            };
+
+                            foreach (Door door in Door.List)
+                            {
+                                Log.Debug("lockforeach:" + door.Type);
+
+                                if (door.Type == DoorType.CheckpointGateA ||
+                                    door.Type == DoorType.CheckpointGateB)
+                                {
+                                    door.IsOpen = false;
+                                }
+
+                                if (lockEvDoorTypes.Contains(door.Type))
+                                {
+                                    Log.Debug("foreach catched: " + door.Type);
+                                    door.Lock(DoorLockType.AdminCommand);
+                                }
+                            }
+
+                            Log.Debug("Delta Passed Lock Elevator Foreach.");
+
+                            // HCZ / EZ にいるプレイヤーを爆破
+                            foreach (Player player in Player.List)
+                            {
+                                Log.Debug("playerforeach:" + player.Zone);
+
+                                if (player.Zone == ZoneType.Entrance ||
+                                    player.Zone == ZoneType.HeavyContainment)
+                                {
+                                    player.ExplodeEffect(ProjectileType.FragGrenade);
+                                    player.Kill("DELTA WARHEADに爆破された");
+                                }
+                            }
+
+                            Log.Debug("Delta Passed Kill Player Foreach");
+                        });
+                    });
+                });
+            });
+        }
+
+        public override void RegisterEvents() { }
+        public override void UnregisterEvents() { }
+    }
+}

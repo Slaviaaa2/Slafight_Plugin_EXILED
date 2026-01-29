@@ -22,7 +22,7 @@ public class ReRollSpecial : ICommand
 
         Plugin.Singleton.SpecialEventsHandler.RunRandomEvent();
 
-        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.localizedEventName);
+        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.LocalizedEventName);
         return true;
     }
 }

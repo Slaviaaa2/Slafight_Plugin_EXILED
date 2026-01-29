@@ -35,11 +35,6 @@ public class Scp3114Role : CRole
         player.MaxHealth = 3114;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-
-        //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
-        player.CustomInfo = "<color=#C50000>SCP-3114</color>";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
             
         Room SpawnRoom = Room.Get(RoomType.Hcz127);
         Log.Debug(SpawnRoom.Position);

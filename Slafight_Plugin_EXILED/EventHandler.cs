@@ -86,11 +86,9 @@ namespace Slafight_Plugin_EXILED
             MapHandler.Decontaminating += DeconCancell;
             
             PlayerHandler.ChangingRole += OnChangingRole;
-            PlayerHandler.ChangingRole += StatusManager;
             PlayerHandler.Hurting += OnTouchedEnemy;
             PlayerHandler.FlippingCoin += PositionGet;
             PlayerHandler.InteractingDoor += DoorGet;
-            PlayerHandler.Shot += CreateRagdoll;
 
             WarheadHandler.Starting += AlphaWarheadLock;
             //WarheadHandler.Starting += OmegaWarheadEvent;
@@ -111,11 +109,9 @@ namespace Slafight_Plugin_EXILED
             MapHandler.Decontaminating -= DeconCancell;
             
             PlayerHandler.ChangingRole -= OnChangingRole;
-            PlayerHandler.ChangingRole -= StatusManager;
             PlayerHandler.Hurting -= OnTouchedEnemy;
             PlayerHandler.FlippingCoin -= PositionGet;
             PlayerHandler.InteractingDoor -= DoorGet;
-            PlayerHandler.Shot -= CreateRagdoll;
             
             WarheadHandler.Starting -= AlphaWarheadLock;
             //WarheadHandler.Starting -= OmegaWarheadEvent;
@@ -164,7 +160,7 @@ namespace Slafight_Plugin_EXILED
             Timing.CallDelayed(0.05f, () =>
             {
                 string tips = Tips.GetRandomTip();
-                ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                ev.Player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.LocalizedEventName+"</size>"+
                                     $"\n\n<size=28>Tips: {tips}</size>"
                                     ),5555f);
             });
@@ -210,7 +206,7 @@ namespace Slafight_Plugin_EXILED
                     foreach (Player player in Player.List)
                     {
                         string tips = Tips.GetRandomTip();
-                        player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.localizedEventName+"</size>"+
+                        player?.ShowHint(("\n\n\n\n\n\n\n<size=32>次のイベント："+Plugin.Singleton.SpecialEventsHandler.LocalizedEventName+"</size>"+
                                             $"\n\n<size=28>Tips: {tips}</size>"
                             ),5555f);
                     }
@@ -273,9 +269,15 @@ namespace Slafight_Plugin_EXILED
 
             Timing.CallDelayed(1f, () =>
             {
-                if (Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.OperationBlackout && Plugin.Singleton.SpecialEventsHandler.nowEvent != SpecialEventType.Scp1509BattleField)
+                List<SpecialEventType> notallowed =
+                [
+                    SpecialEventType.OperationBlackout,
+                    SpecialEventType.Scp1509BattleField,
+                    SpecialEventType.FacilityTermination
+                ];
+                if (!notallowed.Contains(Plugin.Singleton.SpecialEventsHandler.NowEvent))
                 {
-                    if (Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.OmegaWarhead)
+                    if (Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.OmegaWarhead)
                     {
                         Exiled.API.Features.Cassie.MessageTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
                             "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。",true);
@@ -420,11 +422,6 @@ namespace Slafight_Plugin_EXILED
             CryFuckSpawned = false;
         }
         
-        public IEnumerator<float> Coroutine(float delay)
-        {
-            yield return Timing.WaitForSeconds(delay);
-        }
-        
         public static void CreateAndPlayAudio(string fileName, string audioPlayerName, Vector3 position, bool destroyOnEnd = false, Transform parent = null, bool isSpatial = false, float maxDistance = 5, float minDistance = 5)
         {
             
@@ -452,7 +449,7 @@ namespace Slafight_Plugin_EXILED
             audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
         }
 
-        public void AlphaWarheadLock(StartingEventArgs ev)
+        private void AlphaWarheadLock(StartingEventArgs ev)
         {
             if (cfg.WarheadLockAllowed)
             {
@@ -477,7 +474,7 @@ namespace Slafight_Plugin_EXILED
             }
         }
 
-        public void DeadmanCancell(DeadmanSwitchInitiatingEventArgs ev)
+        private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs ev)
         {
             if (DeadmanDisable)
             {
@@ -485,7 +482,7 @@ namespace Slafight_Plugin_EXILED
             }
         }
 
-        public void DeconCancell(DecontaminatingEventArgs ev)
+        private void DeconCancell(DecontaminatingEventArgs ev)
         {
             if (DeconCancellFlag)
             {
@@ -494,45 +491,57 @@ namespace Slafight_Plugin_EXILED
             }
         }
 
-        public void PositionGet(FlippingCoinEventArgs ev)
-        {
+        private void PositionGet(FlippingCoinEventArgs ev)
+        { 
             Vector3 playerPosition = ev.Player.Position;
             if (ev.Player.UniqueRole == "Debug")
             {
                 if (ev.Player.CurrentRoom != null)
                 {
-                    ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z + "\nRoom: " + ev.Player.CurrentRoom.Type,5);
-                    Log.Debug("Position Get: "+"X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
-                    Log.Debug(" Room: " + ev.Player.CurrentRoom.Type);
-                }
-                else if (ev.Player.CurrentRoom == null)
-                {
-                    ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z /*+ "\nRoom: " + ev.Player.CurrentRoom.Type*/,5);
-                    Log.Debug("Position Get: "+"X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
-                    //Log.Debug(" Room: " + ev.Player.CurrentRoom.Type);
+                    Room currentRoom = ev.Player.CurrentRoom;
+                    Vector3 localPos = currentRoom.Rotation * (playerPosition - currentRoom.Position);
+                    Vector3 localRot = currentRoom.Rotation.eulerAngles;
+
+                    ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z + 
+                                       "\nRoom: " + currentRoom.Type +
+                                       "\nLocal: " + localPos.x + "," + localPos.y + "," + localPos.z +
+                                       "\nRot: " + currentRoom.Rotation.eulerAngles.x + "," + currentRoom.Rotation.eulerAngles.y + "," + currentRoom.Rotation.eulerAngles.z, 5);
+            
+                    Log.Debug("Position Get: " + "X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
+                    Log.Debug(" Room: " + currentRoom.Type);
+                    Log.Debug(" LocalPos: X:" + localPos.x + " Y:" + localPos.y + " Z:" + localPos.z);
+                    Log.Debug(" RoomRot: X:" + localRot.x + " Y:" + localRot.y + " Z:" + localRot.z);
                 }
                 else
                 {
-                    ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z /*+ "\nRoom: " + ev.Player.CurrentRoom.Type*/,5);
-                    Log.Debug("Position Get: "+"X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
-                    //Log.Debug(" Room: " + ev.Player.CurrentRoom.Type);
+                    ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z, 5);
+                    Log.Debug("Position Get: " + "X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
                 }
             }
         }
 
-        public void DoorGet(InteractingDoorEventArgs ev)
+        private void DoorGet(InteractingDoorEventArgs ev)
         {
             if (ev.Player.UniqueRole == "Debug")
             {
-                ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + ev.Door.Room.Type,5);
+                Room doorRoom = ev.Door.Room;
+                Vector3 doorLocalPos = doorRoom.Rotation * (ev.Player.Position - doorRoom.Position);
+                Vector3 doorLocalRot = doorRoom.Rotation.eulerAngles;
+
+                ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + doorRoom.Type +
+                                   "\nLocal: " + doorLocalPos.x + "," + doorLocalPos.y + "," + doorLocalPos.z +
+                                   "\nRot: " + doorLocalRot.x + "," + doorLocalRot.y + "," + doorLocalRot.z, 5);
+        
                 Log.Debug("Door Get: " + ev.Door.Type);
-                Log.Debug(" Name & Room: " + ev.Door.Name + ", " + ev.Door.Room.Type);
+                Log.Debug(" Name & Room: " + ev.Door.Name + ", " + doorRoom.Type);
+                Log.Debug(" LocalPos: X:" + doorLocalPos.x + " Y:" + doorLocalPos.y + " Z:" + doorLocalPos.z);
+                Log.Debug(" RoomRot: X:" + doorLocalRot.x + " Y:" + doorLocalRot.y + " Z:" + doorLocalRot.z);
             }
             else
             {
                 if (ev.Door.Type == DoorType.GateA || ev.Door.Type == DoorType.GateB)
                 {
-                    if (ev.Door.IsLocked && Plugin.Singleton.SpecialEventsHandler.nowEvent == SpecialEventType.None)
+                    if (ev.Door.IsLocked && Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.None)
                     {
                         ev.Player.ShowHint("収容違反への対応として暫くロックされているようだ・・・");
                     }
@@ -540,12 +549,16 @@ namespace Slafight_Plugin_EXILED
             }
         }
 
-        public void CreateRagdoll(ShotEventArgs ev)
+        private void LockedStopSystem(StoppingEventArgs ev)
         {
-            
+            if (WarheadLocked)
+            {
+                ev.IsAllowed = false;
+                ev.Player.ShowHint("Warheadの操作は現在ロックされています",3);
+            }
         }
 
-        public void LockedStopSystem(StoppingEventArgs ev)
+        private void LockedStartSystem(StartingEventArgs ev)
         {
             if (WarheadLocked)
             {
@@ -553,110 +566,13 @@ namespace Slafight_Plugin_EXILED
                 ev.Player.ShowHint("Warheadの操作は現在ロックされています",3);
             }
         }
-        public void LockedStartSystem(StartingEventArgs ev)
+
+        private void OnTouchedEnemy(Exiled.Events.EventArgs.Player.HurtingEventArgs ev)
         {
-            if (WarheadLocked)
-            {
-                ev.IsAllowed = false;
-                ev.Player.ShowHint("Warheadの操作は現在ロックされています",3);
-            }
-        }
-        
-        public void OnTouchedEnemy(Exiled.Events.EventArgs.Player.HurtingEventArgs ev)
-        {
-            if (ev.Attacker != null && ev.Attacker.UniqueRole == "Scp096_Anger")
+            if (ev.Attacker != null && ev.Attacker.GetCustomRole() == CRoleTypeId.Scp096Anger)
             {
                 ev.Amount = 999999;
                 ev.Attacker.ArtificialHealth += 25;
-            }
-        }
-
-        public void StatusManager(ChangingRoleEventArgs ev)
-        {
-            var GetPlayerTeam = RoleExtensions.GetTeam(ev.NewRole);
-            if (ev.NewRole == RoleTypeId.ClassD)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scientist)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.FacilityGuard)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.NtfPrivate)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.NtfSergeant)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.NtfSpecialist)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.NtfCaptain)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.ChaosConscript)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.ChaosRifleman)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.ChaosMarauder)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.ChaosRepressor)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp049)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp0492)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp079)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp096)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp106)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp173)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp939)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Scp3114)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.Tutorial)
-            {
-                
-            }
-            else if (ev.NewRole == RoleTypeId.CustomRole)
-            {
-                
             }
         }
     }
