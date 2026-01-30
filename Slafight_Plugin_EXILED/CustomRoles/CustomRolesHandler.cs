@@ -102,7 +102,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
         {
             for (;;)
             {
-                if (!Round.IsStarted || Round.IsLobby)
+                if (!Round.IsStarted || Round.IsLobby || IsSpecialWinEnding)
                     yield break;
 
                 var players = Player.List.ToList();
@@ -123,7 +123,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
         {
             for (;;)
             {
-                if (!Round.IsStarted || Round.IsLobby)
+                if (!Round.IsStarted || Round.IsLobby || IsSpecialWinEnding)
                     yield break;
 
                 var players = Player.List.ToList();
@@ -190,6 +190,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 if (IsSpecialWinEnding)
                 {
                     Round.IsLocked = false;
+                    Round.Restart(false);
                     yield break;
                 }
 

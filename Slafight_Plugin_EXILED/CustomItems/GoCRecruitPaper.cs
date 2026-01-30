@@ -28,7 +28,7 @@ public class GoCRecruitPaper : CustomItem
     public override float Weight { get; set; } = 1.05f;
     public override ItemType Type { get; set; } = ItemType.Medkit;
 
-    public Color glowColor = new Color(0f, 0f, 200f);
+    public Color glowColor = new Color(0f, 0f, 200f/255f);
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();

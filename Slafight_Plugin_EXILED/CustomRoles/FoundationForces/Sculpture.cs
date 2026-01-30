@@ -1,6 +1,7 @@
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp173;
 using MEC;
@@ -24,6 +25,7 @@ public class Sculpture : CRole
         Exiled.Events.Handlers.Scp173.Blinking += OnBlinking;
         Exiled.Events.Handlers.Scp173.AddingObserver += OnObserving;
         Exiled.Events.Handlers.Player.Hurting += OnNecking;
+        Exiled.Events.Handlers.Map.AnnouncingScpTermination += OnDying;
         base.RegisterEvents();
     }
 
@@ -32,6 +34,7 @@ public class Sculpture : CRole
         Exiled.Events.Handlers.Scp173.Blinking -= OnBlinking;
         Exiled.Events.Handlers.Scp173.AddingObserver -= OnObserving;
         Exiled.Events.Handlers.Player.Hurting -= OnNecking;
+        Exiled.Events.Handlers.Map.AnnouncingScpTermination -= OnDying;
         base.UnregisterEvents();
     }
     
@@ -47,7 +50,7 @@ public class Sculpture : CRole
         player.HumeShield = player.MaxHumeShield;
         player.SetScale(new Vector3(0.8f, 1f, 0.8f));
         player.ClearInventory();
-        player.SetCustomInfo("<color=#00b7eb>Sculpture</color>");
+        player.SetCustomInfo("<color=#00B7EB>Sculpture</color>");
 
         player.EnableEffect(EffectType.Slowness, 20);
         
@@ -69,7 +72,7 @@ public class Sculpture : CRole
     private void OnObserving(AddingObserverEventArgs ev)
     {
         if (!Check(ev.Player)) return;
-        if (ev.Observer.GetTeam() == CTeam.FoundationForces)
+        if (ev.Observer.GetTeam() == CTeam.FoundationForces || ev.Observer.GetTeam() == CTeam.Guards)
         {
             ev.IsAllowed = false;
             return;
@@ -87,5 +90,11 @@ public class Sculpture : CRole
             ev.Player.Hurt(ev.Attacker, 35f, DamageType.Scp173);
             ev.Attacker.ShowHitMarker();
         }
+    }
+
+    private void OnDying(AnnouncingScpTerminationEventArgs ev)
+    {
+        if (!Check(ev.Player)) return;
+        ev.IsAllowed = false;
     }
 }

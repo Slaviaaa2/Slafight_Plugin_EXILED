@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
@@ -10,6 +12,20 @@ using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents
 {
+    public static class LinqExtensions
+    {
+        // List<T> 用「直近 n 件を取る」互換メソッド
+        public static IEnumerable<T> TakeLastCompat<T>(this IList<T> source, int count)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (count <= 0) yield break;
+
+            int start = Math.Max(0, source.Count - count);
+            for (int i = start; i < source.Count; i++)
+                yield return source[i];
+        }
+    }
+
     public class SpecialEventsHandler
     {
         public static SpecialEventsHandler Instance { get; private set; }
@@ -63,7 +79,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
             var removed = EventQueue[index];
             EventQueue.RemoveAt(index);
-            HappenedEvents.Add(removed);
+            HappenedEvents.Add(removed); // スキップも「起こった扱い」にするならここで記録
             EventPID++;
             EventLocSet();
             Log.Info($"SEH: Skipped event: {removed}");
@@ -85,16 +101,13 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
         public void RunRandomEvent()
         {
-            // 1/3 の確率でイベント、それ以外は何も起こさない（＝None扱い）
             float chance = 1f / 3f;
             if (Random.value > chance)
             {
-                // ハズレ: None として扱う（何も実行しない）
                 Log.Info("SEH: RunRandomEvent rolled None (no event executed).");
                 return;
             }
 
-            // 当たり: 実際にランダムイベントを選んで実行
             SelectRandom();
             if (SelectedEvent == SpecialEventType.None)
             {
@@ -122,13 +135,11 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             Log.Info($"SEH: Queue set to: {eventType}");
         }
 
-        // 位置0を書き換える「リロール」用
         public void SetQueueRandomEvent()
         {
             float chance = 1f / 3f;
             if (Random.value > chance)
             {
-                // ハズレ: Queue[0] を None にする
                 if (EventQueue.Count == 0)
                     EventQueue.Add(SpecialEventType.None);
                 else
@@ -139,7 +150,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
                 return;
             }
 
-            // 当たり: 普通にランダムイベントを選んでQueue[0]に入れる
             SelectRandom();
             if (SelectedEvent == SpecialEventType.None)
             {
@@ -156,14 +166,13 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             Log.Info($"SEH: Queue[0] rerolled to: {SelectedEvent}");
         }
 
-        // 1つ目の「次」にランダムを追加する旧仕様寄せメソッド
         public void InsertQueueRandomEventAfterFirst()
         {
             float chance = 1f / 3f;
             if (Random.value > chance)
             {
                 Log.Info("SEH: InsertQueueRandomEventAfterFirst rolled None (no insert).");
-                return; // ハズレ → 何も挿し込まない
+                return;
             }
 
             SelectRandom();
@@ -193,7 +202,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
                 return;
             }
 
-            // ここは純粋に「候補からランダム1個」を選ぶだけ
             SelectedEvent = allowedEvents[Random.Range(0, allowedEvents.Count)];
         }
 
@@ -231,11 +239,19 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             InitStats();
             specialEvent.Execute(EventPID);
             Log.Info($"SEH: Executed {eventType}: {specialEvent.LocalizedName}");
+
+            // ★ 実行済みイベントを履歴に追加（直近5回チェック用）
+            HappenedEvents.Add(eventType);
+
+            // 必要に応じてキューを進める
+            if (EventQueue.Count > 0)
+                EventQueue.RemoveAt(0);
+
+            EventLocSet();
         }
 
         public void InitStats()
         {
-            // 各イベントが独自に管理するよう変更
             EventPID++;
         }
 
@@ -313,70 +329,24 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         //  互換用 Obsolete ラッパー
         // ================================
 
-        /// <summary>
-        /// 旧: イベントをキューの末尾に追加するメソッド。
-        /// 例: SEH.Add(SpecialEventType.Xxx);
-        /// </summary>
         [Obsolete("Use AddEvent(SpecialEventType eventType) instead.")]
-        public void Add(SpecialEventType eventType)
-        {
-            AddEvent(eventType);
-        }
+        public void Add(SpecialEventType eventType) => AddEvent(eventType);
 
-        /// <summary>
-        /// 旧: 先頭イベントをスキップするメソッド。
-        /// 例: SEH.Skip();
-        /// </summary>
         [Obsolete("Use SkipEvent(int index = 0) instead.")]
-        public void Skip()
-        {
-            SkipEvent();
-        }
+        public void Skip() => SkipEvent();
 
-        /// <summary>
-        /// 旧: 指定イベントを即座に実行するメソッド。
-        /// 例: SEH.ForceRun(SpecialEventType.Xxx);
-        /// </summary>
         [Obsolete("Use RunEvent(SpecialEventType eventType) instead.")]
-        public void ForceRun(SpecialEventType eventType)
-        {
-            RunEvent(eventType);
-        }
+        public void ForceRun(SpecialEventType eventType) => RunEvent(eventType);
 
-        /// <summary>
-        /// 旧: ランダムイベントを即座に実行するメソッド。
-        /// 例: SEH.ForceRunRandom();
-        /// </summary>
         [Obsolete("Use RunRandomEvent() instead.")]
-        public void ForceRunRandom()
-        {
-            RunRandomEvent();
-        }
+        public void ForceRunRandom() => RunRandomEvent();
 
-        /// <summary>
-        /// 旧: 次に起きるイベントを強制的に指定するメソッド。
-        /// 例: SEH.ForceNext(SpecialEventType.Xxx);
-        /// </summary>
         [Obsolete("Use SetQueueEvent(SpecialEventType eventType) instead.")]
-        public void ForceNext(SpecialEventType eventType)
-        {
-            SetQueueEvent(eventType);
-        }
+        public void ForceNext(SpecialEventType eventType) => SetQueueEvent(eventType);
 
-        /// <summary>
-        /// 旧: キューにランダムイベントを追加するメソッド。
-        /// 例: SEH.QueueRandom();
-        /// </summary>
         [Obsolete("Use SetQueueRandomEvent() instead.")]
-        public void QueueRandom()
-        {
-            SetQueueRandomEvent();
-        }
+        public void QueueRandom() => SetQueueRandomEvent();
 
-        /// <summary>
-        /// 旧: 「指定イベントを即実行（キュー書き換え + コントローラ呼び）」なラッパー。
-        /// どの名前で呼んでいたか分からない場合の保険用。
-        /// </summary>
         [Obsolete("Use SetQueueEvent(...) and SpecialEventsController() instead.")]
         public void LegacyRun(SpecialEventType eventType)
         {

@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
-using Exiled.Events.EventArgs.Scp1509;
 using Exiled.Events.EventArgs.Scp914;
 using Exiled.Events.Handlers;
 using InventorySystem.Items.MicroHID.Modules;
@@ -19,27 +19,27 @@ using Scp914;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
+using Item = Exiled.API.Features.Items.Item;
+using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.SCP1509)]
-public class Scp148 : CustomItem
+[CustomItem(ItemType.Jailbird)]
+public class CaneOfTheStars : CustomItem
 {
-    public override uint Id { get; set; } = 2018;
-    public override string Name { get; set; } = "SCP-148";
-    public override string Description { get; set; } = "プロメテウス研究所製の精神遮断合金剣。\nSCP特効ダメージ+75%、テレパシー完全防御。\n質量増加で効果増幅放出のリスク注意。";
+    public override uint Id { get; set; } = 2020;
+    public override string Name { get; set; } = "Cane of the Stars";
+    public override string Description { get; set; } = "第五教会の案内人が持つ杖。\n殴った対象の脳内に第五主義思想を直接流し込み、\n強制的に第五主義者に改宗させる能力を持つ";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.SCP1509;
+    public override ItemType Type { get; set; } = ItemType.Jailbird;
 
-    public Color glowColor = Color.white;
+    public Color glowColor = Color.magenta;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Scp1509.Resurrecting += OnResurrecting;
-        Exiled.Events.Handlers.Player.Hurting += OnHurting;
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         base.SubscribeEvents();
@@ -47,29 +47,29 @@ public class Scp148 : CustomItem
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Scp1509.Resurrecting -= OnResurrecting;
-        Exiled.Events.Handlers.Player.Hurting -= OnHurting;
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
     }
 
-    private void OnHurting(HurtingEventArgs ev)
+    protected override void OnAcquired(Player player, Item item, bool displayMessage)
     {
-        if (ev.Attacker == null) return;
-        if (!Check(ev.Attacker)) return;
-        if (!ev.Player.IsHuman)
+        if (item is Jailbird jailbird)
         {
-            ev.Amount *= 1.75f;
+            jailbird.ChargeDamage = 555f;
+            jailbird.MeleeDamage = 55f;
+        }
+        base.OnAcquired(player, item, displayMessage);
+    }
+
+    private void OnDying(DyingEventArgs ev)
+    {
+        if (!Check(ev.Attacker))
+        {
+            
         }
     }
 
-    private void OnResurrecting(ResurrectingEventArgs ev)
-    {
-        if (!Check(ev.Item)) return;
-        ev.IsAllowed = false;
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

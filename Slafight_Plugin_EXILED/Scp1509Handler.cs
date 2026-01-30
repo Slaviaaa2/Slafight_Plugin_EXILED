@@ -51,7 +51,7 @@ public class Scp1509Handler
             {
                 if (ev.Player == null) return;
                 var state = ev.Player.GetRoleInfo();
-                if (state.Custom != null) player?.SetRole((CRoleTypeId)state.Custom, RoleSpawnFlags.None);
+                if (state.Custom != CRoleTypeId.None) player?.SetRole((CRoleTypeId)state.Custom, RoleSpawnFlags.None);
                 else player?.SetRole(state.Vanilla, RoleSpawnFlags.None);
             }
         });

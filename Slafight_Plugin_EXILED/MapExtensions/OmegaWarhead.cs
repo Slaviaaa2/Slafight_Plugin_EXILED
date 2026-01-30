@@ -49,10 +49,10 @@ public static class OmegaWarhead
             Timing.CallDelayed(Plugin.Singleton.Config.OwBoomTime, () =>
             {
                 if (pid != SpecialEventsHandler.EventPID) return;
+                AlphaWarheadController.Singleton.RpcShake(false);
                 foreach (Player player in Player.List)
                 {
                     if (player == null) continue;
-                    player.ExplodeEffect(ProjectileType.FragGrenade);
                     player.Kill("OMEGA WARHEADに爆破された");
                 }
             });

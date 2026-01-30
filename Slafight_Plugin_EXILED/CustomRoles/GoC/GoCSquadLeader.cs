@@ -23,7 +23,6 @@ public class GoCSquadLeader : CRole
         player.MaxHealth = 110;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-        player.TryAddCustomItem(2016);
         player.AddItem(ItemType.GunFRMG0);
         player.AddItem(ItemType.KeycardMTFCaptain);
         player.TryAddCustomItem(2008);

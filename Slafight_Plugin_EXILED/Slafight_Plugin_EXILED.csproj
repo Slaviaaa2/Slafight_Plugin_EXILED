@@ -188,6 +188,7 @@
         <Compile Include="Commands\DevTools\SpawnPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="CustomItems\AdvancedMedkit.cs" />
+        <Compile Include="CustomItems\CaneOfTheStars.cs" />
         <Compile Include="CustomItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\File012_033.cs" />
         <Compile Include="CustomItems\FlashBangE.cs" />

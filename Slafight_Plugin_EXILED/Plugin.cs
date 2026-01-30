@@ -40,7 +40,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,5,0,4);
+        public override Version Version => new Version(1,6,0,0);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
 

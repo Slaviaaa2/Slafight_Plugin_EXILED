@@ -154,12 +154,14 @@ public static class StaticUtils
 
         public bool IsFifthist()
         {
+            if (player == null) return false;
             return player.GetTeam() == CTeam.Fifthists || player.GetCustomRole() == CRoleTypeId.Scp3005;
         }
 
         public bool IsHumanitist()
         {
-            return player.GetTeam() != CTeam.FoundationForces;
+            if (player == null) return false;
+            return player.GetTeam() != CTeam.FoundationForces && player.GetTeam() != CTeam.Guards;
         }
     }
 

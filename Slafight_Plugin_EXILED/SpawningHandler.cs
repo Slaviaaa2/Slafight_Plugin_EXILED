@@ -49,6 +49,20 @@ public class SpawningHandler
                 CreateAndPlayAudio("_w_fifthists.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
                 CassieHelper.AnnounceFifthist(ev.SpawnCount);
                 break;
+            case SpawnTypeId.GOI_GoCNormal:
+            case SpawnTypeId.GOI_GoCBackup:    
+                CreateAndPlayAudio("_w_ungoc.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
+                CassieHelper.AnnounceGoCEnter(ev.SpawnCount);
+                break;
+            
+            case SpawnTypeId.MTF_LastOperationNormal:
+                CreateAndPlayAudio("_w_lo.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
+                CassieHelper.AnnounceLastOperationArrival();
+                break;
+            case SpawnTypeId.MTF_LastOperationBackup:
+                CreateAndPlayAudio("_w_lo.ogg","WaveTheme",Vector3.zero,true,null,false,999999999,0);
+                CassieHelper.AnnounceLastOperationBackup();
+                break;
         }
     }
 }
