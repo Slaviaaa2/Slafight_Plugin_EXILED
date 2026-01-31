@@ -243,10 +243,8 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
             InitStats();
 
-            // ★ 追加: 実行前にセット
+            // ラウンド中ずっとこのイベント扱いにしたいのでここでセット
             CurrentEvent = eventType;
-
-            // ★ 追加: HUD に即反映
             EventLocSet();
 
             specialEvent.Execute(EventPID);
@@ -257,9 +255,10 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             if (EventQueue.Count > 0)
                 EventQueue.RemoveAt(0);
 
-            // ★ 追加: 実行終了でクリア
-            CurrentEvent = SpecialEventType.None;
+            // ★ ここでは CurrentEvent を None に戻さない
+            // CurrentEvent = SpecialEventType.None;  ← 消す
 
+            // キューの次を HUD に出したいならこのまま / 出したくないなら消してもいい
             EventLocSet();
         }
 
@@ -277,6 +276,10 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         public void RoundRestartSkipEvent()
         {
             EventPID++;
+
+            // ★ ここでイベントをリセット
+            CurrentEvent = SpecialEventType.None;
+
             if (EventQueue.Count <= 1)
                 return;
 
@@ -308,7 +311,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         {
             SpecialEventType type;
 
-            // ★ 変更: CurrentEvent 優先
             if (CurrentEvent != SpecialEventType.None)
                 type = CurrentEvent;
             else if (EventQueue.Count == 0)

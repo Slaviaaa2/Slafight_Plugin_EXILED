@@ -25,7 +25,6 @@ public class Sculpture : CRole
         Exiled.Events.Handlers.Scp173.Blinking += OnBlinking;
         Exiled.Events.Handlers.Scp173.AddingObserver += OnObserving;
         Exiled.Events.Handlers.Player.Hurting += OnNecking;
-        Exiled.Events.Handlers.Map.AnnouncingScpTermination += OnDying;
         base.RegisterEvents();
     }
 
@@ -34,7 +33,6 @@ public class Sculpture : CRole
         Exiled.Events.Handlers.Scp173.Blinking -= OnBlinking;
         Exiled.Events.Handlers.Scp173.AddingObserver -= OnObserving;
         Exiled.Events.Handlers.Player.Hurting -= OnNecking;
-        Exiled.Events.Handlers.Map.AnnouncingScpTermination -= OnDying;
         base.UnregisterEvents();
     }
     
@@ -92,9 +90,10 @@ public class Sculpture : CRole
         }
     }
 
-    private void OnDying(AnnouncingScpTerminationEventArgs ev)
+    protected override void OnDying(DyingEventArgs ev)
     {
-        if (!Check(ev.Player)) return;
-        ev.IsAllowed = false;
+        Exiled.API.Features.Cassie.Clear();
+        Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。");
+        base.OnDying(ev);
     }
 }

@@ -26,7 +26,6 @@ public class GoCOperative : CRole
         player.AddItem(ItemType.GunCrossvec);
         player.AddItem(ItemType.GunShotgun);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem(2014);
         player.AddItem(ItemType.Medkit);
         player.TryAddCustomItem(2019);
         player.AddItem(ItemType.Radio);

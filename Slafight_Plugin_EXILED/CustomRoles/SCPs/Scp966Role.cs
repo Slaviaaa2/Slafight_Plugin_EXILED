@@ -148,14 +148,10 @@ public class Scp966Role : CRole
         }
     }
 
-    protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
-        string localizedString = null)
-    {
-        base.OnDyingCassie(ev, true, "SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。");
-    }
-
     protected override void OnDying(DyingEventArgs ev)
     {
+        Exiled.API.Features.Cassie.Clear();
+        Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。");
         SpeedLevels.Remove(ev.Player);
         base.OnDying(ev);
     }

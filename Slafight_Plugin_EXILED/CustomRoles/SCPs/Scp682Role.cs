@@ -96,16 +96,11 @@ public class Scp682Role : CRole
             SpeedLevels[ev.Attacker] = level + ev.Amount / 10000;
         }
     }
-
-    protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
-        string localizedString = null)
-    {
-        base.OnDyingCassie(ev, true, "SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。");
-    }
-
     protected override void OnDying(DyingEventArgs ev)
     {
         SpeedLevels.Remove(ev.Player);
+        Exiled.API.Features.Cassie.Clear();
+        Exiled.API.Features.Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。");
         base.OnDying(ev);
     }
 }
