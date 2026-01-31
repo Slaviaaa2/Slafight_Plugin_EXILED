@@ -46,7 +46,12 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         public readonly List<SpecialEventType> EventQueue = new();
         public readonly List<SpecialEventType> HappenedEvents = new();
         public int EventPID = 1;
-        public SpecialEventType NowEvent => EventQueue.FirstOrDefault();
+        // 既存のプロパティの直下に追加
+        public SpecialEventType CurrentEvent { get; private set; } = SpecialEventType.None;
+
+        // NowEvent の定義を変更（1行）
+        public SpecialEventType NowEvent => CurrentEvent;  // ← EventQueue.FirstOrDefault() から変更
+
         public bool IsFifthistsRaidActive { get; set; }
 
         // ==== イベント操作（新実装） ====
@@ -237,15 +242,23 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             }
 
             InitStats();
+
+            // ★ 追加: 実行前にセット
+            CurrentEvent = eventType;
+
+            // ★ 追加: HUD に即反映
+            EventLocSet();
+
             specialEvent.Execute(EventPID);
             Log.Info($"SEH: Executed {eventType}: {specialEvent.LocalizedName}");
 
-            // ★ 実行済みイベントを履歴に追加（直近5回チェック用）
             HappenedEvents.Add(eventType);
 
-            // 必要に応じてキューを進める
             if (EventQueue.Count > 0)
                 EventQueue.RemoveAt(0);
+
+            // ★ 追加: 実行終了でクリア
+            CurrentEvent = SpecialEventType.None;
 
             EventLocSet();
         }
@@ -293,17 +306,24 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
         public void EventLocSet()
         {
-            if (EventQueue.Count == 0)
+            SpecialEventType type;
+
+            // ★ 変更: CurrentEvent 優先
+            if (CurrentEvent != SpecialEventType.None)
+                type = CurrentEvent;
+            else if (EventQueue.Count == 0)
             {
                 LocalizedEventName = "無し";
                 EventNeedTriggers = "無し";
+                Plugin.Singleton.EventHandler.SyncSpecialEvent();
+                return;
             }
             else
-            {
-                var ev = SpecialEvent.GetEvent(EventQueue[0]);
-                LocalizedEventName = ev?.LocalizedName ?? "無し";
-                EventNeedTriggers = ev?.TriggerRequirement ?? "無し";
-            }
+                type = EventQueue[0];
+
+            var ev = SpecialEvent.GetEvent(type);
+            LocalizedEventName = ev?.LocalizedName ?? "無し";
+            EventNeedTriggers = ev?.TriggerRequirement ?? "無し";
 
             Plugin.Singleton.EventHandler.SyncSpecialEvent();
         }
@@ -311,7 +331,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         // ==== API ====
         public static bool IsWarheadable()
         {
-            var nowEvent = Instance?.NowEvent ?? SpecialEventType.None;
+            var nowEvent = Instance?.NowEvent ?? SpecialEventType.None;  // ← これで CurrentEvent になる
             return nowEvent switch
             {
                 SpecialEventType.OmegaWarhead or
