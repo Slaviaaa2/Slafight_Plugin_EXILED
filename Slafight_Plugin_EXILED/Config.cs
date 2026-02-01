@@ -61,6 +61,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public FlashBangE _FlashBangE { get; set; } = new(); // 2017
         [Description("")] public Scp148 _Scp148 { get; set; } = new(); // 2018
         [Description("")] public GoCRecruitPaper _GoCRecruitPaper { get; set; } = new(); // 2019
+        [Description("")] public CaneOfTheStars _CaneOfTheStars { get; set; } = new(); // 2020
 
         [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
         [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101

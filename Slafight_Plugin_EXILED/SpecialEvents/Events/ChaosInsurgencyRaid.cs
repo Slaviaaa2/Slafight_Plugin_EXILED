@@ -86,19 +86,15 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             {
                 if (CancelIfOutdated()) return;
 
-                Exiled.API.Features.Cassie.MessageTranslated(
-                    "Danger . Chaos Insurgency Forces detected on the surface .",
-                    "警告、地上にカオス・インサージェンシー部隊が確認されました。",
-                    true);
+                Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
+                    $"警告、不明な部隊がGate Aで検出されました。確認を",true);
 
                 Timing.CallDelayed(12f, () =>
                 {
                     if (CancelIfOutdated()) return;
 
-                    Exiled.API.Features.Cassie.MessageTranslated(
-                        "$pitch_.8 Successfully hacked Foundations Cassie System and uploaded New Insurgency Cassie System . Cassie is now under delta command",
-                        "<color=#00b7eb>財団のCassieシステム</color>の<color=red>ハッキング</color>に成功。新たな<color=#228b22>インサージェンシー Cassieシステム</color>をアップロード。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の支配下にある。",
-                        false);
+                    Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command",
+                        $"<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",false);
 
                     Timing.CallDelayed(45f, () =>
                     {
@@ -111,9 +107,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
                         // ここで全体暗転
                         foreach (Room room in Room.List)
-                        {
-                            room.TurnOffLights();
-                        }
+                            room.Color = new Color(55/255f, 55/255f, 55/255f);
 
                         Timing.CallDelayed(8f, () =>
                         {

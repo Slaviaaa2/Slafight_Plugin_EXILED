@@ -93,7 +93,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
             // 全室消灯
             foreach (Room room in Room.List)
-                room.TurnOffLights();
+                room.Color = new Color(55/255f, 55/255f, 55/255f);
 
             LockInitialDoorsAndElevators();
             SetupLczGeneratorsPermissions();

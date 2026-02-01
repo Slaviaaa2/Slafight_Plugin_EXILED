@@ -40,6 +40,7 @@ public class CaneOfTheStars : CustomItem
 
     protected override void SubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.Dying += OnDying;
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         base.SubscribeEvents();
@@ -47,6 +48,7 @@ public class CaneOfTheStars : CustomItem
 
     protected override void UnsubscribeEvents()
     {
+        Exiled.Events.Handlers.Player.Dying -= OnDying;
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
@@ -64,10 +66,9 @@ public class CaneOfTheStars : CustomItem
 
     private void OnDying(DyingEventArgs ev)
     {
-        if (!Check(ev.Attacker))
-        {
-            
-        }
+        if (!Check(ev.Attacker)) return;
+        ev.IsAllowed = false;
+        ev.Player?.SetRole(CRoleTypeId.FifthistConvert, RoleSpawnFlags.AssignInventory);
     }
 
     private void RemoveGlow(PickupDestroyedEventArgs ev)

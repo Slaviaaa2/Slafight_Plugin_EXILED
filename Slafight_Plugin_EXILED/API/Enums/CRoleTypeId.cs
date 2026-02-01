@@ -41,5 +41,6 @@ public enum CRoleTypeId
     GoCMedic = 32,
     GoCThaumaturgist = 33,
     GoCCommunications = 34,
-    GoCOperative = 35
+    GoCOperative = 35,
+    FifthistGuidance = 36
 }

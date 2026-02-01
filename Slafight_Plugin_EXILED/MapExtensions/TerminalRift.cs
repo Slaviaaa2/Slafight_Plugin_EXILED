@@ -108,10 +108,47 @@ public static class TerminalRift
 
     private static void CancelDeath(HurtingEventArgs ev)
     {
-        if ((ev.DamageHandler.Type == DamageType.Crushed || !ev.IsInstantKill) && 
-            ev.Player?.CurrentRoom.Type == RoomType.HczTestRoom)  // TestRoom限定に変更
+        // 【ログ1】全ダメージイベントを記録（RoomType? → string変換で解決）
+        string roomStr = ev.Player?.CurrentRoom?.Type.ToString() ?? "null";
+        Log.Debug($"[CancelDeath] Player={ev.Player?.Nickname ?? "null"}, Damage={ev.DamageHandler.Type}, Attacker={ev.Attacker?.Nickname ?? "null"}, Amount={ev.Amount}, Room={roomStr}");
+    
+        // 【厳密チェック1】プレイヤー存在確認
+        if (ev.Player == null)
         {
+            Log.Debug("[CancelDeath] SKIP: Player is null");
+            return;
+        }
+    
+        // 【厳密チェック2】Crushedダメージのみ
+        if (ev.DamageHandler.Type != DamageType.Crushed)
+        {
+            Log.Debug($"[CancelDeath] SKIP: Not Crushed (is {ev.DamageHandler.Type})");
+            return;
+        }
+    
+        // 【厳密チェック3】攻撃者なしのみ
+        if (ev.Attacker != null)
+        {
+            Log.Debug($"[CancelDeath] SKIP: Has Attacker ({ev.Attacker.Nickname})");
+            return;
+        }
+    
+        Log.Debug("[CancelDeath] PASSED: Crushed + No Attacker");
+    
+        // 【厳密チェック4】部屋判定（?.ToString() ?? "null" で安全）
+        string currentRoomType = ev.Player.CurrentRoom?.Type.ToString();
+        Log.Debug($"[CancelDeath] Checking room: '{currentRoomType}'");
+    
+        if (currentRoomType == "HczTestRoom" || 
+            currentRoomType == "Surface" || 
+            string.IsNullOrEmpty(currentRoomType))
+        {
+            Log.Debug($"[CancelDeath] CANCELLED: Target room ({currentRoomType})");
             ev.IsAllowed = false;
+        }
+        else
+        {
+            Log.Debug($"[CancelDeath] ALLOWED: Non-target room ({currentRoomType})");
         }
     }
 

@@ -236,7 +236,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             yield return Timing.WaitForSeconds(130f);
             if (KillEvent()) yield break;
 
-            Plugin.Singleton.CustomRolesHandler.IsSpecialWinEnding = false;
             AlphaWarheadController.Singleton.RpcShake(false);
             CTeam.FoundationForces.EndRound();
             Player.List.Where(p => p.IsAlive).ToList().ForEach(p => p.Kill("DELTA WARHEADに爆破された"));
@@ -338,14 +337,21 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             {
                 if (KillEvent()) yield break;
 
-                var players = Player.List.ToList();
+                var players = Player.List
+                    .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
+                    .ToList();
+
+                Log.Debug($"[Humanitists] AliveNonSpec={players.Count}");
+
                 if (players.IsOnlyTeam(CTeam.GoC, "humanity"))
                 {
+                    Log.Debug("[Humanitists] Triggered");
                     Round.IsLocked = false;
                     CTeam.GoC.EndRound("SavedHumanity");
                     SpawnSystem.SwitchSpawnContext("Default");
                     yield break;
                 }
+
                 yield return Timing.WaitForSeconds(1f);
             }
         }

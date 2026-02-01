@@ -57,7 +57,7 @@ public class GoCRecruitPaper : CustomItem
     {
         if (Check(ev.Item))
         {
-            ev.Player.SetRole(CRoleTypeId.FifthistConvert,RoleSpawnFlags.AssignInventory);
+            ev.Player.SetRole(CRoleTypeId.GoCOperative,RoleSpawnFlags.AssignInventory);
             Timing.CallDelayed(0.25f, () =>
             {
                 foreach (var item in ev.Player.Items.ToList())

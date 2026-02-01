@@ -216,6 +216,7 @@
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
+        <Compile Include="CustomRoles\Fifthist\FifthistGuidance.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\FoundationForces\Sculpture.cs" />

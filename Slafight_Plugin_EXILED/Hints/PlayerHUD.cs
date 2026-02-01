@@ -210,7 +210,7 @@ public class PlayerHUD
         {
             var cteam = sourcePlayer.GetTeam();
 
-            if (cteam == CTeam.FoundationForces || cteam == CTeam.Guards)
+            if ((cteam == CTeam.FoundationForces || cteam == CTeam.Guards) && sourcePlayer.GetCustomRole() != CRoleTypeId.Sculpture)
             {
                 SyncTextRole = $"<color=#00b7eb>{sourcePlayer.Role.Name}</color>";
                 SyncTextTeam = "<color=#00b7eb>The Foundation</color>";

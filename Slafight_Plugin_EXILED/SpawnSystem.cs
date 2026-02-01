@@ -223,13 +223,15 @@ namespace Slafight_Plugin_EXILED
                     {
                         { new SpawnRoleKey(CRoleTypeId.FifthistPriest),  (1f,  true)  },
                         { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (3f,  false) },
+                        { new SpawnRoleKey(CRoleTypeId.FifthistGuidance), (1f, false) },
                         { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
                     }
                 },
                 {
                     SpawnTypeId.GOI_FifthistBackup, new()
                     {
-                        { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (2f,  false) },
+                        { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (1f,  false) },
+                        { new SpawnRoleKey(CRoleTypeId.FifthistGuidance), (1f, false) },
                         { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
                     }
                 },

@@ -193,6 +193,9 @@ public static class PlayerExtensions
             case CRoleTypeId.FifthistConvert:
                 new FifthistConvert().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.FifthistGuidance:
+                new FifthistGuidance().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Chaos ====
             case CRoleTypeId.ChaosCommando:
                 new ChaosCommando().SpawnRole(player, roleSpawnFlags);

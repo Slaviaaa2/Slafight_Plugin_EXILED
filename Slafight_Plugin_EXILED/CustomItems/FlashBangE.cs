@@ -24,14 +24,14 @@ using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
-[CustomItem(ItemType.GrenadeHE)]
+[CustomItem(ItemType.GrenadeFlash)]
 public class FlashBangE : CustomGrenade
 {
     public override uint Id { get; set; } = 2017;
     public override string Name { get; set; } = "Flashbang-E";
     public override string Description { get; set; } = "SCPオブジェクトにのみ当たるように改良されたフラッシュバン。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.GrenadeHE;
+    public override ItemType Type { get; set; } = ItemType.GrenadeFlash;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
     public override bool ExplodeOnCollision { get; set; } = true;
