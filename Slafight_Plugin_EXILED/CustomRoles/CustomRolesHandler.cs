@@ -68,7 +68,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             });
         }
 
-        // Fifthist 勝利: Fifthists + SCP-999 + 観戦/チュートリアルだけ
         private IEnumerator<float> FifthistWinCoroutine()
         {
             for (;;)
@@ -86,7 +85,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 {
                     Log.Debug("[FifthistWin] Triggered");
                     Round.IsLocked = false;
-                    CTeam.Fifthists.EndRound();
+                    EndRound(CTeam.Fifthists);  // 自分のEndRound呼び出しに修正
                     yield break;
                 }
 
@@ -94,7 +93,6 @@ namespace Slafight_Plugin_EXILED.CustomRoles
             }
         }
 
-        // SnowWarrier 勝利: SnowWarrier + SCP-999 + 観戦/チュートリアルだけ
         private IEnumerator<float> SnowWarrierWinCoroutine()
         {
             for (;;)
@@ -112,7 +110,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 {
                     Log.Debug("[SnowWarrierWin] Triggered");
                     Round.IsLocked = false;
-                    CTeam.Others.EndRound("SW_WIN");
+                    EndRound(CTeam.Others, "SW_WIN");  // 自分のEndRound呼び出しに修正
                     yield break;
                 }
 

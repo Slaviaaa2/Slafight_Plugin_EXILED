@@ -155,7 +155,10 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             if (KillEvent()) yield break;
             CassieHelper.AnnounceLastOperationArrival();
 
-            yield return Timing.WaitForSeconds(500f);
+            yield return Timing.WaitForSeconds(480f);
+            Exiled.API.Features.Cassie.MessageTranslated("Attention, All personnel. Were decided Decontamination of the Facility. Please Evacuate to the Light Containment Zone for Delta Protocol.",
+                "全職員に通達。施設全体の<color=yellow>終了</color>が決定された為、これより地上～重度収容区画の<color=red>ロックダウン</color>及び<color=green>除染プロセス</color>を開始します。全職員は軽度収容区画に避難し、<color=green><b>DELTAプロトコル</b></color>を待機してください。");
+            yield return Timing.WaitForSeconds(20f);
             if (KillEvent()) yield break;
             SpawnSystem.Disable = true;
 
@@ -179,7 +182,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             }
 
             CreateAndPlayAudio("newdelta.ogg", "DeltaWarhead", Vector3.zero, true, null, false, 999999999f, 0f);
-
+            
             // ----- Surface -----
             yield return Timing.WaitForSeconds(10f);
             if (KillEvent()) yield break;
@@ -347,7 +350,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                 {
                     Log.Debug("[Humanitists] Triggered");
                     Round.IsLocked = false;
-                    CTeam.GoC.EndRound("SavedHumanity");
+                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");  // Handler経由呼び出し
                     SpawnSystem.SwitchSpawnContext("Default");
                     yield break;
                 }

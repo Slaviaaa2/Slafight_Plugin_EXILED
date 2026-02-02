@@ -101,6 +101,8 @@ public class EscapeHandler
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
             (CTeam.ClassD, CTeam.Fifthists)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.ClassD, CTeam.GoC) // ← orより上！
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
             (CTeam.ClassD, _)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
 
@@ -109,6 +111,8 @@ public class EscapeHandler
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
             (CTeam.Scientists, CTeam.Fifthists)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.Scientists, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
             (CTeam.Scientists, _)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfSpecialist, Custom = null },
 
@@ -117,23 +121,32 @@ public class EscapeHandler
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
             (CTeam.ChaosInsurgency, CTeam.Fifthists)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.ChaosInsurgency, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
 
             // Foundation Forces (with Guards)
             (CTeam.FoundationForces or CTeam.Guards, CTeam.ChaosInsurgency or CTeam.ClassD)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
             (CTeam.FoundationForces or CTeam.Guards, CTeam.Fifthists)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
 
             // Fifthists
             (CTeam.Fifthists, CTeam.ChaosInsurgency or CTeam.ClassD)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
             (CTeam.Fifthists, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            
+            // GoC
+            (CTeam.Fifthists, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
 
-            // デフォルト：変身しない
+            // デフォルト
             _ => new EscapeTargetRole { Vanilla = null, Custom = null },
         };
     }
+
 
     private EscapeTargetRole ApplyEventOverrides(
         EscapeTargetRole baseTarget,

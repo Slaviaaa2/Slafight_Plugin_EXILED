@@ -40,7 +40,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,6,0,2);
+        public override Version Version => new Version(1,6,0,3);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
 
@@ -184,6 +184,10 @@ namespace Slafight_Plugin_EXILED
             {
                 // 一時的なタイムアウトとして扱う
                 Log.Debug($"SendPlayerCountAsync timeout: {tce.Message}");
+            }
+            catch (HttpRequestException hre)
+            {
+                Log.Debug($"SendPlayerCountAsync failure: {hre.Message}");
             }
             catch (Exception ex)
             {

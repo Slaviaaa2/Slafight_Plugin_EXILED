@@ -141,7 +141,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                             foreach (Player player in Player.List)
                             {
                                 if (player == null) continue;
-                                if (player.UniqueRole == "CI_Agent" || player.UniqueRole == "ChaosInsurgency")
+                                if (player.GetTeam() == CTeam.ChaosInsurgency)
                                     ciCount++;
                             }
 

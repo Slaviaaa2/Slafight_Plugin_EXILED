@@ -265,6 +265,16 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         public void InitStats()
         {
             EventPID++;
+            Plugin.Singleton.EventHandler.CryFuckEnabled = false;
+            Plugin.Singleton.EventHandler.CryFuckSpawned = false;
+            Plugin.Singleton.EventHandler.DeadmanDisable = false;
+            Plugin.Singleton.EventHandler.DeconCancellFlag = false;
+            Plugin.Singleton.EventHandler.IsScpAutoSpawnLocked = false;
+            Plugin.Singleton.EventHandler.SkeletonSpawned = false;
+            Plugin.Singleton.EventHandler.SpecialWarhead = false;
+            Plugin.Singleton.EventHandler.WarheadLocked = false;
+            SpawnSystem.Disable = false;
+            SpawnSystem.SwitchSpawnContext("Default");
         }
 
         // ==== ラウンド系イベントハンドラ ====

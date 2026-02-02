@@ -10,15 +10,15 @@ public static class OnlyChecker
 {
     public static bool IsOnlyTeam(this List<Player> checkPlayers, CTeam team, string specificTrigger = null)
     {
-        // 生きている判定対象が1人もいないなら「チーム勝利は発生しない」
-        if (!checkPlayers.Any())
+        // 生きている非スペクテイターが0人なら勝利なし
+        if (!checkPlayers.Any(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator))
         {
-            Log.Debug($"[IsOnlyTeam] EMPTY list → false");
+            Log.Debug($"[IsOnlyTeam] No alive non-spectators → false");
             return false;
         }
 
         Log.Debug($"[IsOnlyTeam] Checking {checkPlayers.Count} players for team {team}");
-    
+
         foreach (var player in checkPlayers.ToList())
         {
             if (player == null || !player.IsAlive || player.Role.Type == RoleTypeId.Spectator)
@@ -27,6 +27,7 @@ public static class OnlyChecker
                 continue;
             }
 
+            // 以下既存コードそのまま
             Log.Debug($"[IsOnlyTeam] CHECK: {player.Nickname} Team={player.GetTeam()} Custom={player.GetCustomRole()}");
 
             if (player.GetTeam() == team) continue;

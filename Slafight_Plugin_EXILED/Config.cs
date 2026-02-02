@@ -39,6 +39,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public ArmorVip _ArmorVip { get; set; } = new(); // 12
         [Description("")] public MagicMissile _MagicMissile { get; set; } = new(); // 666
         [Description("")] public DummyRoad _DummyRoad { get; set; } = new(); // 1000
+        // PropsSpawn Toolgun // 1001
         [Description("")] public FakeGrenade _FakeGrenade { get; set; } = new(); // 700
         [Description("")] public KeycardSecurityChief _KeycardSecurityChief { get; set; } = new(); // 1100
         [Description("")] public KeycardConscripts _KeycardConscripts { get; set; } = new(); // 1101

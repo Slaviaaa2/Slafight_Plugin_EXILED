@@ -35,8 +35,12 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ==== 内部状態 ====
         public static bool IsOperation = false;
 
-        private int _eventPid = 0;
         private int _generatedCount = 0;
+
+        private CoroutineHandle _specCoroutine;
+        private CoroutineHandle _asphyxiationCoroutine;
+
+        private static EventHandler EventHandler => Plugin.Singleton.EventHandler;
 
         // 音声再生デリゲート（EventHandler 経由）
         private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
@@ -45,15 +49,18 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ==== 実際に呼ばれるエントリポイント ====
         protected override void OnExecute(int eventPID)
         {
-            _eventPid = eventPID;
+            // Execute(eventPid) 済みで CurrentEventPid セット済み
+            if (KillEvent())
+                return;
+
             IsOperation = true;
             _generatedCount = 0;
 
-            if (CancelIfOutdated())
-                return;
-
             DoBlackoutSetup();
-            Timing.RunCoroutine(SpecCoroutine());
+
+            Timing.KillCoroutines(_specCoroutine);
+            Timing.KillCoroutines(_asphyxiationCoroutine);
+            _specCoroutine = Timing.RunCoroutine(SpecCoroutine());
         }
 
         // ==== イベントサブスク / 解除 ====
@@ -71,29 +78,34 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             Exiled.Events.Handlers.Scp079.Recontaining -= OnRecontaining;
         }
 
-        // ==== 共通キャンセル判定 ====
-        private bool CancelIfOutdated()
+        // ==== 共通キャンセル＆クリーンアップ ====
+        private bool KillEvent()
         {
-            if (_eventPid != Plugin.Singleton.SpecialEventsHandler.EventPID)
-            {
-                IsOperation = false;
-                return true;
-            }
+            if (!CancelIfOutdated())
+                return false;
 
-            return false;
+            // このイベント固有の状態をリセット
+            IsOperation = false;
+
+            SpawnSystem.Disable = false;
+            SpawnSystem.SwitchSpawnContext("Default");
+            EventHandler.IsScpAutoSpawnLocked = false;
+
+            Timing.KillCoroutines(_specCoroutine);
+            Timing.KillCoroutines(_asphyxiationCoroutine);
+
+            return true;
         }
 
         // ==== 初期セットアップ ====
         private void DoBlackoutSetup()
         {
-            var eventHandler = Plugin.Singleton.EventHandler;
-
             // リスポーン禁止
             SpawnSystem.Disable = true;
 
             // 全室消灯
             foreach (Room room in Room.List)
-                room.Color = new Color(55/255f, 55/255f, 55/255f);
+                room.Color = new Color(55 / 255f, 55 / 255f, 55 / 255f);
 
             LockInitialDoorsAndElevators();
             SetupLczGeneratorsPermissions();
@@ -101,9 +113,9 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             // SCP オートスポーンロック + プレイヤー配置
             Timing.CallDelayed(0.5f, () =>
             {
-                if (CancelIfOutdated()) return;
+                if (KillEvent()) return;
 
-                eventHandler.IsScpAutoSpawnLocked = true;
+                EventHandler.IsScpAutoSpawnLocked = true;
                 TeleportAndReassignPlayers();
 
                 // 無限長 BGM 的なサウンド
@@ -238,7 +250,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ==== ジェネレーター起動時 ====
         private void OnGeneratorActivating(GeneratorActivatingEventArgs ev)
         {
-            if (CancelIfOutdated())
+            if (KillEvent())
                 return;
 
             _generatedCount++;
@@ -248,7 +260,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             {
                 Timing.CallDelayed(15f, () =>
                 {
-                    if (CancelIfOutdated()) return;
+                    if (KillEvent()) return;
 
                     foreach (Door door in Door.List)
                     {
@@ -263,7 +275,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
                     Timing.CallDelayed(15f, () =>
                     {
-                        if (CancelIfOutdated()) return;
+                        if (KillEvent()) return;
 
                         Exiled.API.Features.Cassie.MessageTranslated(
                             "Warning, The Facility O 2 Supply Systems power down effect Detected. Please evacuation to the Upper Facility Zone.",
@@ -277,7 +289,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             {
                 Timing.CallDelayed(10f, () =>
                 {
-                    if (CancelIfOutdated()) return;
+                    if (KillEvent()) return;
 
                     foreach (Door door in Door.List)
                     {
@@ -293,7 +305,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     // 非常電源ロック & 酸素枯渇パート
                     Timing.CallDelayed(60f, () =>
                     {
-                        if (CancelIfOutdated()) return;
+                        if (KillEvent()) return;
 
                         Exiled.API.Features.Cassie.MessageTranslated(
                             "Emergency Attention to the All personnel, Emergency Electric Power is Locked by Unknown Forces. and Facility O 2 is very very bad. Please evacuation to the Shelter or . .g1",
@@ -302,23 +314,12 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
                         Timing.CallDelayed(15f, () =>
                         {
-                            if (CancelIfOutdated()) return;
+                            if (KillEvent()) return;
 
                             CreateAndPlayAudio("oxygen.ogg", "Cassie", Vector3.zero, true, null, false, 999999999f, 0f);
 
-                            Timing.CallDelayed(232f, () =>
-                            {
-                                if (CancelIfOutdated()) return;
-
-                                foreach (Player player in Player.List)
-                                {
-                                    player.EnableEffect(EffectType.Asphyxiated, 255);
-                                    player.EnableEffect(EffectType.Blurred, 1);
-                                    player.EnableEffect(EffectType.Slowness, 10);
-                                }
-
-                                Timing.RunCoroutine(AsphyxiationCoroutine());
-                            });
+                            Timing.KillCoroutines(_asphyxiationCoroutine);
+                            _asphyxiationCoroutine = Timing.RunCoroutine(AsphyxiationCoroutine());
                         });
                     });
                 });
@@ -328,7 +329,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ==== SCP-079 再収容禁止 ====
         private void OnRecontaining(RecontainingEventArgs ev)
         {
-            if (CancelIfOutdated()) return;
+            if (KillEvent()) return;
 
             Log.Debug("[OperationBlackout] Canceling Recontain SCP-079");
             ev.IsAllowed = false;
@@ -338,10 +339,11 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ==== 酸素枯渇コルーチン ====
         private IEnumerator<float> AsphyxiationCoroutine()
         {
+            // BGM 再生開始時に呼ばれる
+            // ここで待機付きループにする
             for (;;)
             {
-                if (Round.IsLobby || CancelIfOutdated())
-                    yield break;
+                if (KillEvent()) yield break;
 
                 foreach (Player player in Player.List)
                 {
@@ -358,7 +360,8 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         {
             for (;;)
             {
-                if (CancelIfOutdated()) yield break;
+                if (KillEvent()) yield break;
+
                 foreach (Player player in Player.List)
                 {
                     if (player.Role.Type == RoleTypeId.Spectator)
@@ -367,6 +370,9 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                         player.Position = Room.Get(RoomType.LczGlassBox).WorldPosition(Vector3.zero);
                     }
                 }
+
+                // 1秒間隔で監視
+                yield return Timing.WaitForSeconds(1f);
             }
         }
     }
