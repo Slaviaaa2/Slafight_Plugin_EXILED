@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
@@ -6,6 +7,7 @@ using Exiled.API.Features.Toys;
 using MEC;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Light = Exiled.API.Features.Toys.Light;
 
 namespace Slafight_Plugin_EXILED.MapExtensions;
@@ -50,11 +52,11 @@ public static class OmegaWarhead
             {
                 if (pid != SpecialEventsHandler.EventPID) return;
                 AlphaWarheadController.Singleton.RpcShake(false);
-                foreach (Player player in Player.List)
+                Player.List.Where(p => p.IsAlive).ToList().ForEach(p =>
                 {
-                    if (player == null) continue;
-                    player.Kill("OMEGA WARHEADに爆破された");
-                }
+                    p.ExplodeEffect(ProjectileType.FragGrenade);
+                    p.Kill("OMEGA WARHEADに爆破された");
+                });
             });
         });
     }

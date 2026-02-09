@@ -15,6 +15,7 @@ public class RootCommand : ParentCommand
     public override string Description => "Slafight Plugin root command.";
     public override void LoadGeneratedCommands()
     {
+        RegisterCommand(new DebugStart());
         RegisterCommand(new SpawnDebugToolRole());
         RegisterCommand(new SpawnMapEditRole());
         RegisterCommand(new ReRollSpecial());

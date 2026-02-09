@@ -8,7 +8,7 @@ using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.ProximityChat
+namespace Slafight_Plugin_EXILED.Abilities
 {
     public class MagicMissileAbility : AbilityBase
     {

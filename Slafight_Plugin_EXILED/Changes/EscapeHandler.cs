@@ -1,18 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
-using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
-using ProjectMER.Commands.Utility;
 using ProjectMER.Events.Arguments;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class EscapeHandler
 {

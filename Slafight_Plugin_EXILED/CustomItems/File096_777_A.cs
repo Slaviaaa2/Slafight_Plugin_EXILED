@@ -25,18 +25,18 @@ using Player = Exiled.API.Features.Player;
 namespace Slafight_Plugin_EXILED.CustomItems;
 
 [CustomItem(ItemType.KeycardCustomSite02)]
-public class File012_033 : CustomKeycard
+public class File096_777_A : CustomKeycard
 {
-    public override uint Id { get; set; } = 2015;
-    public override string Name { get; set; } = "File-012-R033";
+    public override uint Id { get; set; } = 2021;
+    public override string Name { get; set; } = "File-096-777-A";
     public override string Description { get; set; } = "";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-    public override string KeycardLabel { get; set; } = "File-012-R033";
+    public override string KeycardLabel { get; set; } = "File-096-777-A";
     [YamlIgnore]
     public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
-    public override string KeycardName { get; set; } = "Dr. Redheart";
+    public override string KeycardName { get; set; } = "Dr. ■■■, Dr. Redheart";
     [YamlIgnore]
     public override Color32? TintColor { get; set; } = new Color32(0,0,0,255);
     [YamlIgnore]
@@ -68,7 +68,17 @@ public class File012_033 : CustomKeycard
     protected override void OnPickingUp(PickingUpItemEventArgs ev)
     {
         ev.IsAllowed = false;
-        ev.Player.ShowHint("<size=15>文書012-補遺033\n20■■年■月■日の定期調査にて、SCP-012がSCP-033と思われる力に侵食されてしまっていることが判明した。\n以前までは何事も無かったのに、急激にマゼンタ色を発し始め\n周囲にSCP-012影響ではなく、SCP-033影響を与えてしまっている。\n実に由々しき事態だ。\nこれについて、私は本件についての大規模な調査及び対処を、強く求める。\n- Dr. Redheart</size>");
+        ev.Player.ShowHint(
+            "<size=14>事案096-777-A\n" +
+            "20■■年■月■日、定期観察の過程で、■■■■■■■博士がSCP-096に対するセンサー監視を実施していました。\n" +
+            "観察中、SCP-096は一切の予兆なく激しい激昂行動を開始し、施設全域で感知可能なレベルの悲鳴を発しました。\n" +
+            "■■■博士は直ちに緊急アラームを作動させましたが、警備要員が現場に到着した時点で確認されたのは、多量の血痕のみでした。\n" +
+            "SCP-096はその場でうずくまった姿勢を維持しており、当該姿勢は既知の激昂行動時のものと一致していました。\n" +
+            "本事案は形式上は収束していますが、既知のトリガー事象が一切確認されていないにもかかわらずSCP-096が不安定化した可能性が高く、\n" +
+            "現行の収容・観察プロトコルが抜本的な見直しを要する段階に来ていると判断せざるを得ません。\n" +
+            "ついては、Site-02への■■■■■■■■システムの早急な導入を含む、SCP-096関連プロトコルの全面的な再評価および是正措置について、\n" +
+            "本書をもって強く要請すると同時に、これ以上の対応遅延が重大な人的・情報的損失を招くおそれがあることを、ここに重ねて申し上げます。\n" +
+            "- Dr. ■■■, Dr. Redheart</size>");
         
         base.OnPickingUp(ev);
     }

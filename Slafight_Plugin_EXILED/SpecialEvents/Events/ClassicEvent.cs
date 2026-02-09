@@ -1,19 +1,28 @@
 using System;
 using System.Linq;
-using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Map;
-using MEC;
-using ProjectMER.Commands.Modifying.Scale;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
 
-public class ClassicEvent
+public class ClassicEvent : SpecialEvent
 {
+    protected override void OnExecute(int eventPid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override SpecialEventType EventType { get; } = SpecialEventType.ClassicEvent;
+    public override string LocalizedName { get; } = "ClassicEvent";
+    public override string TriggerRequirement { get; } = "不可";
+    public override bool IsReadyToExecute()
+    {
+        return false;
+    }
+
     private bool classicenabled = false;
     public ClassicEvent()
     {

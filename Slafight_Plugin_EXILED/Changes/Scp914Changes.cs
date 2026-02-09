@@ -2,13 +2,12 @@ using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Scp914;
 using PlayerRoles;
 using Scp914;
-using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
 using Random = System.Random;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class Scp914Changes
 {

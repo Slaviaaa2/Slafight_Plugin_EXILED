@@ -18,13 +18,16 @@ using System.Text.Json;
 using HarmonyLib;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.MapExtensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UserSettings.ServerSpecific;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -103,6 +106,7 @@ namespace Slafight_Plugin_EXILED
 
             EngineerRole = new Engineer();
             EngineerRole.RegisterEvents();
+            CRole.OverrideRoleInstance(EngineerRole.UniqueRoleName, EngineerRole);
             
             CRole.RegisterAllEvents();
             AbilityBase.RegisterEvents();

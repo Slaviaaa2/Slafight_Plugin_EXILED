@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using UserSettings.ServerSpecific;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.MainHandlers;
 
 public class RPNameSetter
 {

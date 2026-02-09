@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Server;
 using MEC;
 using PlayerRoles;
-using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using Random = UnityEngine.Random;
 
-namespace Slafight_Plugin_EXILED
+namespace Slafight_Plugin_EXILED.MainHandlers
 {
     public class SpawnSystem
     {
@@ -439,7 +437,7 @@ namespace Slafight_Plugin_EXILED
 
         private SpawnTypeId? DecideFoundationEnemyType(RespawningTeamEventArgs ev)
         {
-            bool has3005 = Player.List.Any(p => p.GetCustomRole() == CRoleTypeId.Scp3005);
+            bool has3005 = Player.List.Any(p => p.GetCustomRole() == CRoleTypeId.Scp3005 || p.GetCustomRole() == CRoleTypeId.FifthistPriest);
 
             var ctx = ActiveContext;
 

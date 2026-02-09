@@ -8,7 +8,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
+namespace Slafight_Plugin_EXILED.CustomRoles.ClassD;
 
 public class Janitor : CRole
 {

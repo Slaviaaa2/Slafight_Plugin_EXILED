@@ -7,26 +7,36 @@ namespace Slafight_Plugin_EXILED.API.Enums;
 public enum SpecialEventType
 {
     /// <summary>No Events!Yeah</summary>
-    None = 0,
+    None,
+    
     /// <summary>OMEGA! BOOM!!!</summary>
-    OmegaWarhead = 1,
+    OmegaWarhead,
+    
     /// <summary>DELTA CHAOS</summary>
     [Obsolete("このイベントは面白みがなかったので、FacilityTerminationイベントに置き換えられました。")]
-    OldDeltaWarhead = 2,
+    OldDeltaWarhead,
+    
     /// <summary>CRYYYYYYYYYYY</summary>
-    Scp096CryFuck = 3,
+    Scp096CryFuck,
+    
     /// <summary>BattleField 4</summary>
-    Scp1509BattleField = 4,
+    Scp1509BattleField,
+    
     /// <summary>THE FIFTHIST'S RAID</summary>
-    FifthistsRaid = 5,
+    FifthistsRaid,
+    
     /// <summary>Nuclear Attack</summary>
-    NuclearAttack = 6,
+    NuclearAttack,
+    
     /// <summary>Classic SCRAPPED. IT'S VERY F**</summary>
-    ClassicEvent = 7,
+    ClassicEvent,
+    
     /// <summary>It's very tired</summary>
-    OperationBlackout = 8,
+    OperationBlackout,
+    
     /// <summary>MEGABALL ATTACK YEAHHHH</summary>
-    SnowWarriersAttack = 9,
+    SnowWarriersAttack,
+    
     /// <summary>DELTA 2.0</summary>
-    FacilityTermination = 10
+    FacilityTermination
 }

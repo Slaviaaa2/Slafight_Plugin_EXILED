@@ -13,22 +13,22 @@ public static class OnlyChecker
         // 生きている非スペクテイターが0人なら勝利なし
         if (!checkPlayers.Any(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator))
         {
-            Log.Debug($"[IsOnlyTeam] No alive non-spectators → false");
+            //Log.Debug($"[IsOnlyTeam] No alive non-spectators → false");
             return false;
         }
 
-        Log.Debug($"[IsOnlyTeam] Checking {checkPlayers.Count} players for team {team}");
+        //Log.Debug($"[IsOnlyTeam] Checking {checkPlayers.Count} players for team {team}");
 
         foreach (var player in checkPlayers.ToList())
         {
             if (player == null || !player.IsAlive || player.Role.Type == RoleTypeId.Spectator)
             {
-                Log.Debug($"[IsOnlyTeam] SKIP: {player?.Nickname ?? "null"} (dead/spectator)");
+                //Log.Debug($"[IsOnlyTeam] SKIP: {player?.Nickname ?? "null"} (dead/spectator)");
                 continue;
             }
 
             // 以下既存コードそのまま
-            Log.Debug($"[IsOnlyTeam] CHECK: {player.Nickname} Team={player.GetTeam()} Custom={player.GetCustomRole()}");
+            //Log.Debug($"[IsOnlyTeam] CHECK: {player.Nickname} Team={player.GetTeam()} Custom={player.GetCustomRole()}");
 
             if (player.GetTeam() == team) continue;
 
@@ -38,11 +38,11 @@ public static class OnlyChecker
             if (team == CTeam.GoC && specificTrigger == "humanity" && player.IsHumanitist()) continue;
             if (player.GetCustomRole() == CRoleTypeId.Scp999) continue;
 
-            Log.Debug($"[IsOnlyTeam] BLOCKED by {player.Nickname} (team={player.GetTeam()})");
+            //Log.Debug($"[IsOnlyTeam] BLOCKED by {player.Nickname} (team={player.GetTeam()})");
             return false;
         }
 
-        Log.Debug($"[IsOnlyTeam] PASSED: Only {team} remaining");
+        //Log.Debug($"[IsOnlyTeam] PASSED: Only {team} remaining");
         return true;
     }
 }

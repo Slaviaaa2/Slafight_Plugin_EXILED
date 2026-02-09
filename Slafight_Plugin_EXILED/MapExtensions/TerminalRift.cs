@@ -11,6 +11,7 @@ using ProjectMER.Events.Arguments;
 using ProjectMER.Features.Objects;
 using LabApi.Events.Handlers;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED.MapExtensions;
 

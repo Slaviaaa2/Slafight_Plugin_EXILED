@@ -12,6 +12,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events
@@ -119,13 +120,15 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     lift.TryStart(0, false);
             }
 
-            // ここから先は「デルタワーヘッド」系は混ぜない。
-            // 必要なら、1509 専用の Cassie / BGM をここに足す想定。
-
             Exiled.API.Features.Cassie.MessageTranslated(
                 "All personnel . SCP 1 5 0 9 amnestic battle field simulation online .",
-                "全職員に通達。SCP-1509 記憶処理戦闘シミュレーションを開始します。",
+                "全職員に通達。SCP-1509 記憶処理戦闘シミュレーションを開始します。実践を想定して交戦してください。",
                 true);
+
+            Timing.CallDelayed(3f, () =>
+            {
+                Door.Get(DoorType.SurfaceGate).IsOpen = true;
+            });
         }
     }
 }

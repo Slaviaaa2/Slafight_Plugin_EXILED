@@ -14,6 +14,7 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events
@@ -187,7 +188,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     SchematicObject schematicObject;
                     try
                     {
-                        schematicObject = ObjectSpawner.SpawnSchematic("CI_Nuke", Vector3.zero);
+                        schematicObject = ObjectSpawner.SpawnSchematic("Nuke", Vector3.zero);
                     }
                     catch (Exception)
                     {
@@ -207,7 +208,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     foreach (Room room in Room.List)
                     {
                         room.AreLightsOff = false;
-                        room.Color = new Color32(255, 128, 0, 255);
+                        room.Color = new Color32(255, 0, 0, 255);
                     }
 
                     foreach (Door door in Door.List)

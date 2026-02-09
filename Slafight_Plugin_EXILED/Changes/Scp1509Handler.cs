@@ -4,7 +4,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class Scp1509Handler
 {
@@ -46,6 +46,10 @@ public class Scp1509Handler
             else if (ev.Player?.GetTeam() == CTeam.Fifthists)
             {
                 player?.SetRole(CRoleTypeId.FifthistConvert, RoleSpawnFlags.None);
+            }
+            else if (ev.Player?.GetTeam() == CTeam.GoC)
+            {
+                player?.SetRole(CRoleTypeId.GoCOperative, RoleSpawnFlags.None);
             }
             else
             {

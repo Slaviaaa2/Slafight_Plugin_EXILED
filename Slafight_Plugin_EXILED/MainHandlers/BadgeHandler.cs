@@ -1,7 +1,6 @@
 using Exiled.Events.EventArgs.Player;
-using Exiled.Permissions.Features;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.MainHandlers;
 
 public class BadgeHandler
 {

@@ -37,6 +37,17 @@ public class Engineer : CRole
     private readonly Dictionary<int, EngineerState> _states = new();
     private readonly Random _rng = new();
 
+    private static readonly Dictionary<TaskType, string> TaskLocalize = new()
+    {
+        [TaskType.GeneratorTask] = "発電機を起動させる",
+        [TaskType.CollectScpItems] = "SCPアイテムを回収する",
+        [TaskType.SetupWarhead] = "ALPHA WARHEADレバーを準備する",
+        [TaskType.CloseKeycardDoor] = "キーカードが必要なドアを閉める",
+        [TaskType.CollectKeycard] = "キーカードを改修する",
+        [TaskType.MaintenanceIntercom] = "放送室で点検放送をする",
+        [TaskType.None] = "タスク完了！"
+    };
+
     public override void RegisterEvents()
     {
         Log.Info("[Engineer] RegisterEvents");
@@ -110,10 +121,7 @@ public class Engineer : CRole
 
     private EngineerState? GetState(Player player)
     {
-        if (_states.TryGetValue(player.Id, out var st))
-            return st;
-
-        return null;
+        return _states.TryGetValue(player.Id, out var st) ? st : null;
     }
 
     private void Cleanup(Player player)
@@ -133,13 +141,24 @@ public class Engineer : CRole
 
     private void SyncTaskHud(Player player, EngineerState st)
     {
-        string text;
-        if (st.Level < 5 && st.Task == TaskType.None)
-            text = "";
+        string taskText;
+        if (st.Task == TaskType.None)
+        {
+            taskText = "";
+        }
+        else if (TaskLocalize.TryGetValue(st.Task, out var localized))
+        {
+            taskText = localized;
+        }
         else
-            text = $"タスク：{st.Task}\nLv.{st.Level} EXP:{st.Exp}";
+        {
+            taskText = st.Task.ToString();
+        }
 
-        // ★ 修正: RoleSpecificTextProvider を使用
+        string text = st.Level < 5 && st.Task != TaskType.None
+            ? $"タスク：{taskText}\nLv.{st.Level} EXP:{st.Exp}"
+            : "";
+
         RoleSpecificTextProvider.Set(player, text);
     }
 
@@ -268,7 +287,7 @@ public class Engineer : CRole
         if (GetState(ev.Player) is { Level: < 5 })
         {
             if (ev.Item.Type == ItemType.KeycardResearchCoordinator ||
-                ev.Item.Type == ItemType.KeycardContainmentEngineer || 
+                ev.Item.Type == ItemType.KeycardContainmentEngineer ||
                 ev.Item.Type == ItemType.KeycardFacilityManager ||
                 ev.Item.Type == ItemType.KeycardO5)
             {
@@ -328,10 +347,9 @@ public class Engineer : CRole
         if (p == null || p.GetCustomRole() != CRoleTypeId.Engineer) return;
 
         var st = GetState(p);
-        if (st == null) return;
+        if (st?.Task != TaskType.GeneratorTask) return;
 
-        if (st.Task == TaskType.GeneratorTask)
-            AddExp(p, 30);
+        AddExp(p, 30);
     }
 
     private void OnInteractingGenerator(UnlockingGeneratorEventArgs ev)

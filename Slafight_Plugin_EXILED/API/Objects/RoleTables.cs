@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.API.Objects;
 
 public static class RoleTables
 {

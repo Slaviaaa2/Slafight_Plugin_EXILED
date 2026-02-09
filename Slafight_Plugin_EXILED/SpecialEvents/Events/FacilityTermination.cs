@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
+using Exiled.Events.EventArgs.Map;
 using LightContainmentZoneDecontamination;
 using MEC;
 using PlayerRoles;
@@ -14,7 +15,9 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 {
@@ -140,6 +143,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     scpCount++;
                 }
             }
+
             Log.Debug($"[FacilityTermination] Converted {scpCount} SCPs to Sculpture");
 
             yield return Timing.WaitForSeconds(2f);
@@ -156,7 +160,8 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             CassieHelper.AnnounceLastOperationArrival();
 
             yield return Timing.WaitForSeconds(480f);
-            Exiled.API.Features.Cassie.MessageTranslated("Attention, All personnel. Were decided Decontamination of the Facility. Please Evacuate to the Light Containment Zone for Delta Protocol.",
+            Exiled.API.Features.Cassie.MessageTranslated(
+                "Attention, All personnel. Were decided Decontamination of the Facility. Please Evacuate to the Light Containment Zone for Delta Protocol.",
                 "全職員に通達。施設全体の<color=yellow>終了</color>が決定された為、これより地上～重度収容区画の<color=red>ロックダウン</color>及び<color=green>除染プロセス</color>を開始します。全職員は軽度収容区画に避難し、<color=green><b>DELTAプロトコル</b></color>を待機してください。");
             yield return Timing.WaitForSeconds(20f);
             if (KillEvent()) yield break;
@@ -182,7 +187,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             }
 
             CreateAndPlayAudio("newdelta.ogg", "DeltaWarhead", Vector3.zero, true, null, false, 999999999f, 0f);
-            
+
             // ----- Surface -----
             yield return Timing.WaitForSeconds(10f);
             if (KillEvent()) yield break;
@@ -241,7 +246,11 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
             AlphaWarheadController.Singleton.RpcShake(false);
             CTeam.FoundationForces.EndRound();
-            Player.List.Where(p => p.IsAlive).ToList().ForEach(p => p.Kill("DELTA WARHEADに爆破された"));
+            Player.List.Where(p => p.IsAlive).ToList().ForEach(p =>
+            {
+                p.ExplodeEffect(ProjectileType.FragGrenade);
+                p.Kill("DELTA WARHEADに爆破された");
+            });
         }
 
         private void LockdownAndDecon(ZoneType zone)
@@ -349,7 +358,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                 if (players.IsOnlyTeam(CTeam.GoC, "humanity"))
                 {
                     Log.Debug("[Humanitists] Triggered");
-                    Round.IsLocked = false;
                     Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");  // Handler経由呼び出し
                     SpawnSystem.SwitchSpawnContext("Default");
                     yield break;
@@ -357,6 +365,23 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
                 yield return Timing.WaitForSeconds(1f);
             }
+        }
+
+        private void CancelDeconAnnounce(AnnouncingDecontaminationEventArgs ev)
+        {
+            Timing.CallDelayed(0.05f, Exiled.API.Features.Cassie.Clear);
+        }
+
+        public override void RegisterEvents()
+        {
+            Exiled.Events.Handlers.Map.AnnouncingDecontamination += CancelDeconAnnounce;
+            base.RegisterEvents();
+        }
+
+        public override void UnregisterEvents()
+        {
+            Exiled.Events.Handlers.Map.AnnouncingDecontamination -= CancelDeconAnnounce;
+            base.UnregisterEvents();
         }
     }
 }

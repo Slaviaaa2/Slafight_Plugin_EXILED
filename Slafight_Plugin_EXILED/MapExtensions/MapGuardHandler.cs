@@ -8,7 +8,7 @@ using MapGeneration;
 using MEC;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.MapExtensions;
 
 public class MapGuardHandler
 {

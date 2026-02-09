@@ -1,21 +1,16 @@
 using System;
 using System.Collections.Generic;
-using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Player;
-using LabApi.Features;
 using LabApi.Events.Arguments.PlayerEvents;
-using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
 using MEC;
-using PlayerRoles;
 using ProjectMER.Events.Arguments;
+using ProjectMER.Features;
 using ProjectMER.Features.Extensions;
+using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -23,7 +18,7 @@ using Light = LabApi.Features.Wrappers.LightSourceToy;
 using Logger = LabApi.Features.Console.Logger;
 using Player = LabApi.Features.Wrappers.Player;
 
-namespace Slafight_Plugin_EXILED
+namespace Slafight_Plugin_EXILED.MainHandlers
 {
     public class LabApiHandler : CustomEventsHandler
     {
@@ -135,8 +130,12 @@ namespace Slafight_Plugin_EXILED
 
             Timing.CallDelayed(1.05f, () =>
             {
-                CustomItem.TrySpawn(1, new Vector3(134.94f, 300.65f, -65f), out Pickup _);
                 CustomItem.TrySpawn(2015, new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
+                CustomItem.TrySpawn(2021, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
+                CustomItem.TrySpawn(2022, Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
+                //CustomItem.TrySpawn(2023, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
+                //CustomItem.TrySpawn(2024, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
+                //CustomItem.TrySpawn(2025, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
             });
         }
 
@@ -180,6 +179,30 @@ namespace Slafight_Plugin_EXILED
                     pos = ev.Schematic.gameObject.transform.position;
                     ev.Schematic.Destroy();
                     if (CustomItem.TrySpawn(2012, pos, out Pickup _)) ;
+                    break;
+                case "CISR_HIDTurret":
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+    
+                    try
+                    {
+                        bool spawned = CustomItem.TrySpawn(10001, pos, out Pickup pickup);
+                        pickup?.Spawn();
+                        Logger.Info($"HIDTurret TrySpawn: {spawned}, pickup={pickup?.Serial ?? 0}");
+                        
+                        if (spawned && pickup != null)
+                        {
+                            Logger.Debug($"HIDTurret spawned successfully.\nPos: {pickup.Position} ({pickup.Room})");
+                        }
+                        else
+                        {
+                            Logger.Warn("TrySpawn returned false or pickup is null.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"HID Turret pickup failed:{ex}");
+                    }
                     break;
             }
         }

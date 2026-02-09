@@ -79,7 +79,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
                     .ToList();
 
-                Log.Debug($"[FifthistWin] AliveNonSpec={players.Count}");
+                //Log.Debug($"[FifthistWin] AliveNonSpec={players.Count}");
 
                 if (players.IsOnlyTeam(CTeam.Fifthists))
                 {
@@ -104,7 +104,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
                     .ToList();
 
-                Log.Debug($"[SnowWarrierWin] AliveNonSpec={players.Count}");
+                //Log.Debug($"[SnowWarrierWin] AliveNonSpec={players.Count}");
 
                 if (players.IsOnlyTeam(CTeam.Others, "snow"))
                 {
@@ -322,7 +322,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Intercom.TrySetOverride(player, true);
                     }
 
-                    Timing.CallDelayed(1f, () => Round.Restart(false));
+                    Timing.CallDelayed(10f, () =>
+                    {
+                        if (Round.IsLobby) return;
+                        Round.Restart(false);
+                    });
                     break;
 
                 case CTeam.ChaosInsurgency:
@@ -350,7 +354,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                             Intercom.TrySetOverride(player, true);
                         }
 
-                        Timing.CallDelayed(1f, () => Round.Restart(false));
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (Round.IsLobby) return;
+                            Round.Restart(false);
+                        });
                     }
                     else
                     {
@@ -359,7 +367,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                             Intercom.TrySetOverride(player, true);
                         }
 
-                        Timing.CallDelayed(1f, () => Round.Restart(false));
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (Round.IsLobby) return;
+                            Round.Restart(false);
+                        });
                     }
                     break;
 
@@ -372,7 +384,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                             Intercom.TrySetOverride(player, true);
                         }
 
-                        Timing.CallDelayed(1f, () => Round.Restart(false));
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (Round.IsLobby) return;
+                            Round.Restart(false);
+                        });
                     }
                     else
                     {
@@ -381,7 +397,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                             Intercom.TrySetOverride(player, true);
                         }
 
-                        Timing.CallDelayed(1f, () => Round.Restart(false));
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (Round.IsLobby) return;
+                            Round.Restart(false);
+                        });
                     }
                     break;
 

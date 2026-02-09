@@ -1,22 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
-using AdvancedMERTools;
-using Christmas;
-using Christmas.Scp2536;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Scp2536;
-using InventorySystem;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
-using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EffectType = Exiled.API.Enums.EffectType;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class ChristmasChanges
 {

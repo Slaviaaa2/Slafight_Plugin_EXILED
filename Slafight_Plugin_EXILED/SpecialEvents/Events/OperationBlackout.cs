@@ -19,7 +19,9 @@ using ProjectMER.Events.Arguments;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events
@@ -45,6 +47,11 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // 音声再生デリゲート（EventHandler 経由）
         private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
             EventHandler.CreateAndPlayAudio;
+
+        public override bool IsReadyToExecute()
+        {
+            return false;
+        }
 
         // ==== 実際に呼ばれるエントリポイント ====
         protected override void OnExecute(int eventPID)
@@ -367,7 +374,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     if (player.Role.Type == RoleTypeId.Spectator)
                     {
                         player.Role.Set(RoleTypeId.Scp0492);
-                        player.Position = Room.Get(RoomType.LczGlassBox).WorldPosition(Vector3.zero);
+                        player.Position = Room.Get(RoomType.LczGlassBox).WorldPosition(new Vector3(0f, 1f, 0f));
                     }
                 }
 

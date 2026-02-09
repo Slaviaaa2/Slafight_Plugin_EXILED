@@ -3,7 +3,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.MainHandlers;
 
 public class SpawningHandler
 {

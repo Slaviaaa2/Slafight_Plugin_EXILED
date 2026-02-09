@@ -22,6 +22,9 @@ public class PlayerHUD
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
 
+    // 観戦者ID → 現在見ているプレイヤー
+    private readonly Dictionary<int, Player> _spectateTargets = new();
+
     public PlayerHUD()
     {
         Exiled.Events.Handlers.Player.Verified += ServerInfoHint;
@@ -31,6 +34,7 @@ public class PlayerHUD
         Exiled.Events.Handlers.Server.RestartingRound += DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += Spectate;
 
+        // 旧仕様と同じく、コルーチンはプラグイン生存中ずっと回す
         _specificAbilityLoop = Timing.RunCoroutine(SpecificInfoHudLoop());
         _abilityHudLoop = Timing.RunCoroutine(AbilityHudLoop());
         _taskSyncLoop = Timing.RunCoroutine(TaskSync());
@@ -65,7 +69,6 @@ public class PlayerHUD
 
     public void ServerInfoHint(VerifiedEventArgs ev)
     {
-        PlayerUI ui = PlayerUI.Get(ev.Player);
         PlayerDisplay display = PlayerDisplay.Get(ev.Player);
 
         Hint ServerInfo = new Hint
@@ -79,8 +82,12 @@ public class PlayerHUD
         };
         display.AddHint(ServerInfo);
 
+        // ラウンド中に途中参加した場合は HUD も作る + ロール同期
         if (!Round.IsLobby)
+        {
             PlayerHUDSetup(ev.Player);
+            ApplyRoleInfo(ev.Player, ev.Player);
+        }
     }
 
     private void PlayerHUDSetup(Player player)
@@ -159,8 +166,13 @@ public class PlayerHUD
 
     public void PlayerHUDMain()
     {
+        // 旧仕様寄り：RoundStarted 時点で全員分 HUD 作成
         foreach (Player player in Player.List)
+        {
+            if (player == null || !player.IsConnected) continue;
             PlayerHUDSetup(player);
+            ApplyRoleInfo(player, player);
+        }
     }
 
     public void HintSync(SyncType syncType, string hintText, Player player)
@@ -205,12 +217,16 @@ public class PlayerHUD
 
     private void ApplyRoleInfo(Player sourcePlayer, Player targetForHint)
     {
-        // ★ 先頭で FacilityTermination + FoundationForces/Guards なら即「根絶」で return
+        if (sourcePlayer == null || !sourcePlayer.IsConnected)
+            return;
+
+        // FacilityTermination 中の財団側特殊処理
         if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.FacilityTermination)
         {
             var cteam = sourcePlayer.GetTeam();
 
-            if ((cteam == CTeam.FoundationForces || cteam == CTeam.Guards) && sourcePlayer.GetCustomRole() != CRoleTypeId.Sculpture)
+            if ((cteam == CTeam.FoundationForces || cteam == CTeam.Guards) &&
+                sourcePlayer.GetCustomRole() != CRoleTypeId.Sculpture)
             {
                 SyncTextRole = $"<color=#00b7eb>{sourcePlayer.Role.Name}</color>";
                 SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
@@ -277,17 +293,22 @@ public class PlayerHUD
                 case CRoleTypeId.FifthistRescure:
                     SyncTextRole = "<color=#ff00fa>Fifthist: Rescue</color>";
                     SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五に従い、施設を占領せよ";
+                    SyncTextObjective = "第五を探し出し、救出し、従い、施設を占領せよ。";
                     break;
                 case CRoleTypeId.FifthistPriest:
                     SyncTextRole = "<color=#ff00fa>Fifthist: Priest</color>";
                     SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "全てを第五せよ";
+                    SyncTextObjective = "あなたは幸福な事に第五の加護を受けている。全てを第五せよ！";
                     break;
                 case CRoleTypeId.FifthistConvert:
                     SyncTextRole = "<color=#ff5ffa>Fifthist: Convert</color>";
                     SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
-                    SyncTextObjective = "第五に従い、施設を占領せよ";
+                    SyncTextObjective = "あなたは第五教会の新入りだ。第五とは何かについて考え、理解し、そして従いなさい。";
+                    break;
+                case CRoleTypeId.FifthistGuidance:
+                    SyncTextRole = "<color=#ff5ffa>Fifthist: Guidance</color>";
+                    SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                    SyncTextObjective = "杖を用い、第五主義を施設に広めなさい。あなたの導きは教会にとって重要です！";
                     break;
 
                 // Chaos
@@ -388,11 +409,11 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "財団に従い、人類を根絶させよ。";
                     break;
-                
+
                 // GoC
                 case CRoleTypeId.GoCSquadLeader or CRoleTypeId.GoCDeputy or CRoleTypeId.GoCMedic or CRoleTypeId.GoCThaumaturgist or CRoleTypeId.GoCCommunications or CRoleTypeId.GoCOperative:
                     SyncTextRole = $"<color=#0000c8>{sourcePlayer.GetCustomRole().ToString()}</color>";
-                    SyncTextTeam = $"<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
 
@@ -456,51 +477,98 @@ public class PlayerHUD
         }
     }
 
-    public void SyncTexts(Player? _player = null, Player spectatetarget = null)
+    // ===== 全体同期 =====
+
+    public void SyncTexts(Player? spectator = null, Player? spectatedTarget = null)
     {
         SyncTextRole = null;
         SyncTextTeam = null;
         SyncTextObjective = null;
         SyncTextEvent = null;
 
-        if (_player == null && spectatetarget == null)
+        // 両方 null → 全員分を自分自身で同期
+        if (spectator is null && spectatedTarget is null)
         {
             foreach (Player player in Player.List)
             {
-                if (player == null) continue;
+                if (player == null || !player.IsConnected) continue;
                 if (player.Role.Team == Team.Dead) continue;
 
                 ApplyRoleInfo(player, player);
             }
         }
-        else if (_player != null && spectatetarget != null)
+        // 観戦者 + 対象が両方 not null → 対象の情報を観戦者に同期
+        else if (spectator is not null && spectatedTarget is not null)
         {
-            Player player = spectatetarget;
-            if (player == null) return;
-            if (player.Role.Team == Team.Dead) return;
+            if (!spectatedTarget.IsConnected) return;
+            if (spectatedTarget.Role.Team == Team.Dead) return;
 
-            ApplyRoleInfo(player, _player);
+            ApplyRoleInfo(spectatedTarget, spectator);
         }
     }
 
     public void AllSyncHUD(ChangingRoleEventArgs ev)
     {
-        Timing.CallDelayed(2.0f, () =>
-        {
-            SyncTexts(null);
-        });
-    }
+        var player = ev.Player;
+        if (player == null) return;
 
-    public void Spectate(ChangingSpectatedPlayerEventArgs ev)
-    {
-        if (ev.NewTarget == null) return;
-        Player player = ev.NewTarget;
-        SyncTexts(ev.Player, player);
+        // 少し待ってからそのプレイヤーだけ確実に再同期
+        Timing.CallDelayed(0.5f, () =>
+        {
+            if (player.Role.Team == Team.Dead || !player.IsConnected) return;
+            ApplyRoleInfo(player, player);
+        });
     }
 
     public void AllSyncHUD_()
     {
+        // RoundStarted 時の再同期（保険）
         SyncTexts();
+    }
+
+    // ===== 観戦時の同期 =====
+
+    public void Spectate(ChangingSpectatedPlayerEventArgs ev)
+    {
+        var spectator = ev.Player;
+
+        // 観戦解除
+        if (ev.NewTarget == null)
+        {
+            _spectateTargets.Remove(spectator.Id);
+
+            // 自分自身の HUD を戻す
+            if (spectator.Role.Team != Team.Dead && spectator.IsConnected)
+                ApplyRoleInfo(spectator, spectator);
+
+            return;
+        }
+
+        Player target = ev.NewTarget;
+        _spectateTargets[spectator.Id] = target;
+
+        // 1. ロール HUD 同期
+        SyncTexts(spectator, target);
+
+        var display = PlayerDisplay.Get(spectator);
+
+        // 2. Specific HUD 即時同期
+        var specificHint = display.GetHint("PlayerHUD_Specific");
+        if (specificHint != null)
+        {
+            string roleSpecific = RoleSpecificTextProvider.GetFor(target);
+            PHUD_Specific_Text = roleSpecific;
+            specificHint.Text = PHUD_Specific_Text;
+        }
+
+        // 3. Ability HUD 即時同期
+        var abilityHint = display.GetHint("PlayerHUD_Ability");
+        if (abilityHint != null)
+        {
+            string abilityText = BuildAbilityHud(target);
+            PHUD_Ability_Text = abilityText;
+            abilityHint.Text = PHUD_Ability_Text;
+        }
     }
 
     public void DestroyHints()
@@ -510,6 +578,46 @@ public class PlayerHUD
             var display = PlayerDisplay.Get(player);
             display.ClearHint();
         }
+
+        // 観戦ターゲットもリセット
+        _spectateTargets.Clear();
+
+        // ★ コルーチンは止めない（旧仕様の安定性維持）
+    }
+
+    // ===== Ability HUD =====
+
+    private string BuildAbilityHud(Player target)
+    {
+        if (target.Role.Team == Team.Dead || !target.IsAlive)
+            return string.Empty;
+
+        if (!AbilityManager.TryGetLoadout(target, out var loadout))
+            return string.Empty;
+
+        var active = loadout.ActiveAbility;
+        if (active == null)
+            return string.Empty;
+
+        if (!AbilityBase.TryGetAbilityState(
+                target,
+                active,
+                out bool canUse,
+                out float cdRemain,
+                out int usesLeft,
+                out int maxUses))
+            return string.Empty;
+
+        string abilityKey = active.GetType().Name;
+        string abilityName = AbilityLocalization.GetDisplayName(abilityKey, target);
+
+        string cdText = canUse
+            ? "<color=green>READY</color>"
+            : $"<color=yellow>{(int)cdRemain}s</color>";
+
+        string usesText = (maxUses < 0) ? "∞" : usesLeft.ToString();
+
+        return $"<color=#ffcc00>[{abilityName}]</color> CD: {cdText} Uses: {usesText}";
     }
 
     private IEnumerator<float> TaskSync()
@@ -518,36 +626,59 @@ public class PlayerHUD
 
         for (;;)
         {
+            if (Round.IsLobby)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                continue;
+            }
+
             SyncTexts();
             yield return Timing.WaitForSeconds(3f);
         }
     }
 
-    private string BuildAbilityHud(Player player)
+    private IEnumerator<float> AbilityHudLoop()
     {
-        if (player.Role.Team == Team.Dead || !player.IsAlive)
-            return string.Empty;
+        yield return Timing.WaitForSeconds(0.5f);
 
-        if (!AbilityManager.TryGetLoadout(player, out var loadout))
-            return string.Empty;
+        for (;;)
+        {
+            if (Round.IsLobby)
+            {
+                yield return Timing.WaitForSeconds(0.5f);
+                continue;
+            }
 
-        var active = loadout.ActiveAbility;
-        if (active == null)
-            return string.Empty;
+            foreach (var player in Player.List)
+            {
+                if (player == null || !player.IsAlive)
+                    continue;
 
-        if (!AbilityBase.TryGetAbilityState(player, active,
-                out bool canUse, out float cdRemain, out int usesLeft, out int maxUses))
-            return string.Empty;
+                var display = PlayerDisplay.Get(player);
+                var abilityHint = display.GetHint("PlayerHUD_Ability");
 
-        string abilityKey = active.GetType().Name;
-        string abilityName = AbilityLocalization.GetDisplayName(abilityKey, player);
+                if (abilityHint == null)
+                {
+                    PlayerHUDSetup(player);
+                    abilityHint = display.GetHint("PlayerHUD_Ability");
+                    if (abilityHint == null)
+                        continue;
+                }
 
-        string cdText = canUse ? "<color=green>READY</color>" :
-            $"<color=yellow>{(int)cdRemain}s</color>";
+                // 観戦者ならターゲット側の Ability を見る
+                var hudTarget = player;
+                if (player.Role.Team == Team.Dead &&
+                    _spectateTargets.TryGetValue(player.Id, out var t) &&
+                    t != null && t.IsAlive)
+                    hudTarget = t;
 
-        string usesText = (maxUses < 0) ? "∞" : usesLeft.ToString();
+                string abilityText = BuildAbilityHud(hudTarget);
+                PHUD_Ability_Text = abilityText;
+                abilityHint.Text = PHUD_Ability_Text;
+            }
 
-        return $"<color=#ffcc00>[{abilityName}]</color> CD: {cdText} Uses: {usesText}";
+            yield return Timing.WaitForSeconds(0.5f);
+        }
     }
 
     private IEnumerator<float> SpecificInfoHudLoop()
@@ -556,11 +687,23 @@ public class PlayerHUD
 
         for (;;)
         {
+            if (Round.IsLobby)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                continue;
+            }
+
             foreach (var player in Player.List)
             {
                 if (player == null || !player.IsAlive) continue;
 
-                string roleSpecific = RoleSpecificTextProvider.GetFor(player);
+                var hudTarget = player;
+                if (player.Role.Team == Team.Dead &&
+                    _spectateTargets.TryGetValue(player.Id, out var t) &&
+                    t != null && t.IsAlive)
+                    hudTarget = t;
+
+                string roleSpecific = RoleSpecificTextProvider.GetFor(hudTarget);
 
                 var display = PlayerDisplay.Get(player);
                 var specificHint = display.GetHint("PlayerHUD_Specific");
@@ -582,37 +725,6 @@ public class PlayerHUD
             }
 
             yield return Timing.WaitForSeconds(1f);
-        }
-    }
-
-    private IEnumerator<float> AbilityHudLoop()
-    {
-        yield return Timing.WaitForSeconds(0.5f);
-
-        for (;;)
-        {
-            foreach (var player in Player.List)
-            {
-                if (player == null || !player.IsAlive)
-                    continue;
-
-                var display = PlayerDisplay.Get(player);
-                var abilityHint = display.GetHint("PlayerHUD_Ability");
-
-                if (abilityHint == null)
-                {
-                    PlayerHUDSetup(player);
-                    abilityHint = display.GetHint("PlayerHUD_Ability");
-                    if (abilityHint == null)
-                        continue;
-                }
-
-                string abilityText = BuildAbilityHud(player);
-                PHUD_Ability_Text = abilityText;
-                abilityHint.Text = PHUD_Ability_Text;
-            }
-
-            yield return Timing.WaitForSeconds(0.5f);
         }
     }
 }

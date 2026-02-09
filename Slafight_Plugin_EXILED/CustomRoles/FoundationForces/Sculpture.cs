@@ -73,10 +73,7 @@ public class Sculpture : CRole
         if (ev.Observer.GetTeam() == CTeam.FoundationForces || ev.Observer.GetTeam() == CTeam.Guards)
         {
             ev.IsAllowed = false;
-            return;
         }
-
-        ev.Scp173.BlinkCooldown = 3f;
     }
 
     private void OnNecking(HurtingEventArgs ev)

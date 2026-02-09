@@ -1,4 +1,6 @@
+using System;
 using System.ComponentModel;
+using System.IO;
 using Exiled.API.Interfaces;
 using Slafight_Plugin_EXILED.CustomItems;
 
@@ -15,7 +17,14 @@ namespace Slafight_Plugin_EXILED
         public int Season { get; set; } = 0;
         
         [Description("")]
-        public string AudioReferences { get; set; } = "C:\\Users\\zeros\\AppData\\Roaming\\EXILED\\ServerContents\\";
+        public string AudioReferences 
+        { 
+            get 
+            {
+                string configDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); // Windows: AppData\Roaming
+                return Path.Combine(configDir, "EXILED", "ServerContents");                              // Linux/macOSでは ~/.config に自動対応
+            } 
+        }
         
         [Description("")]
         public bool WarheadLockAllowed { get; set; } = true;
@@ -29,7 +38,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")]
         public float DwBoomTime { get; set; } = 100f;
 
-        [Description("")] public HIDTurret _HIDTurret { get; set; } = new(); // 1
+        [Description("")] public HIDTurret _HIDTurret { get; set; } = new(); // 10000
         [Description("")] public KeycardFifthist _KeycardFifthist { get; set; } = new(); // 5
         [Description("")] public KeycardFifthistPriest _KeycardFifthistPriest { get; set; } = new(); // 6
         [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new(); // 10
@@ -57,12 +66,19 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public SNAV300 _SNAV300 { get; set; } = new(); // 2012
         [Description("")] public SNAV310 _SNAV310 { get; set; } = new(); // 2013
         [Description("")] public SNAVUltimate _SnavUltimate { get; set; } = new(); // 2014
-        [Description("")] public File012_033 _File012_033 { get; set; } = new(); // 2015
+        [Description("")] public File012_5_033 File0125033 { get; set; } = new(); // 2015
         [Description("")] public GunCOM77 _GunCom77 { get; set; } = new(); // 2016
         [Description("")] public FlashBangE _FlashBangE { get; set; } = new(); // 2017
         [Description("")] public Scp148 _Scp148 { get; set; } = new(); // 2018
         [Description("")] public GoCRecruitPaper _GoCRecruitPaper { get; set; } = new(); // 2019
         [Description("")] public CaneOfTheStars _CaneOfTheStars { get; set; } = new(); // 2020
+        [Description("")] public File096_777_A File096777A { get; set; } = new(); // 2021
+        [Description("")] public File3005_Contain File3005_Contain { get; set; } = new(); // 2022
+        [Description("")] public FileOmegaWarhead FileOmegaWarhead { get; set; } = new(); // 2023
+        [Description("")] public FileBackrooms FileBackrooms { get; set; } = new(); // 2024
+        [Description("")] public FileDeltaWarhead FileDeltaWarhead { get; set; } = new(); // 2025
+        
+        [Description("")] public GunGoCTurret GunGoCTurret { get; set; } = new(); // 10001
 
         [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
         [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101

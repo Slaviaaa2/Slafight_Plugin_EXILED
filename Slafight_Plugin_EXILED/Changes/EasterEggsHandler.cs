@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.IO;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Server;
 using MEC;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class EasterEggsHandler
 {

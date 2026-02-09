@@ -1,13 +1,12 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
+namespace Slafight_Plugin_EXILED.CustomRoles.Guards;
 
 public class EvacuationGuard : CRole
 {

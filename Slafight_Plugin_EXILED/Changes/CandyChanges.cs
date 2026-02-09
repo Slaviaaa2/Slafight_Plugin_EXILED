@@ -2,17 +2,14 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Hazards;
-using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs.Scp330;
-using InventorySystem.Items;
 using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
-using VoiceChat;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.Changes;
 
 public class CandyChanges
 {

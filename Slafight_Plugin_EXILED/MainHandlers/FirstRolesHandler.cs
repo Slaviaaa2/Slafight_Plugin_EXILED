@@ -7,10 +7,11 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.API.Objects;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED;
+namespace Slafight_Plugin_EXILED.MainHandlers;
 
 public class FirstRolesHandler
 {
