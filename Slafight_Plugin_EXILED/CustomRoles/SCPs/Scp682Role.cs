@@ -41,8 +41,8 @@ public class Scp682Role : CRole
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 999;
         player.Health = player.MaxHealth;
-        player.MaxHumeShield = 2000;
-        player.HumeShieldRegenerationMultiplier = 55f;
+        player.MaxHumeShield = 1800;
+        player.HumeShieldRegenerationMultiplier = 15f;
         player.ClearInventory();
 
         SpeedLevels[player] = 1f;

@@ -15,6 +15,7 @@ using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
+using System.Threading;
 using HarmonyLib;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
@@ -35,6 +36,8 @@ namespace Slafight_Plugin_EXILED
     public class Plugin : Plugin<Config>
     {
         public static Plugin Singleton { get; set; } = null!;
+        // Plugin クラスのフィールド宣言部（既存の public EventHandler たちの近く）に追加
+        private CancellationTokenSource _playerCountCts;
         private static readonly HttpClient HttpClient = new()
         {
             Timeout = TimeSpan.FromSeconds(10) // デフォルトより短く/長く調整
@@ -43,7 +46,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,6,0,3);
+        public override Version Version => new Version(1,6,0,5);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
 
@@ -126,16 +129,34 @@ namespace Slafight_Plugin_EXILED
             Plugin.Singleton.EasterEggsHandler.loadClips();
             
             HarmonyInstance = new Harmony(this.Name);
-            HarmonyInstance.PatchAll();  // 全HarmonyPatch属性を自動適用
+            HarmonyInstance.PatchAll();
 
-            _ = SendPlayerCountLoop();
-            
+            // ここから差し替え
+            _playerCountCts?.Cancel();                     // 念のため前回のを殺す
+            _playerCountCts = new CancellationTokenSource();
+            _ = SendPlayerCountLoop(_playerCountCts.Token);
+            // ここまで差し替え
+
             base.OnEnabled();
+
         }
 
         public override void OnDisabled()
         {
             Singleton = null!;
+            try
+            {
+                _playerCountCts?.Cancel();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to cancel player count loop: {ex}");
+            }
+            finally
+            {
+                _playerCountCts = null;
+            }
+            
             ProximityChat.Handler.UnregisterEvents();
             CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
             CustomHandlersManager.UnregisterEventsHandler(CustomMap);
@@ -160,12 +181,27 @@ namespace Slafight_Plugin_EXILED
             base.OnDisabled();
         }
         
-        private async Task SendPlayerCountLoop()
+        private async Task SendPlayerCountLoop(CancellationToken token)
         {
-            while (true)
+            while (!token.IsCancellationRequested)
             {
-                await SendPlayerCountAsync(Player.List.Count);
-                await Task.Delay(60000); // 1分
+                try
+                {
+                    await SendPlayerCountAsync(Player.List.Count);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"SendPlayerCountLoop error: {ex}");
+                }
+
+                try
+                {
+                    await Task.Delay(60000, token);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
         }
 

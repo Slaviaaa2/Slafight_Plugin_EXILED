@@ -38,5 +38,8 @@ public enum SpecialEventType
     SnowWarriersAttack,
     
     /// <summary>DELTA 2.0</summary>
-    FacilityTermination
+    FacilityTermination,
+    
+    /// <summary>Revolver is Very Fuckin Good Weapon.</summary>
+    RevolverBattles,
 }

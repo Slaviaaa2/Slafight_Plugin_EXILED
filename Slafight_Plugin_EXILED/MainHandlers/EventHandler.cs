@@ -316,16 +316,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            foreach (Player player in Player.List)
-            {
-                if (Round.InProgress)
-                {
-                    player.ShowHint("");
-                }
-            }
-            SpawnRoll = 1;
-            SpawnRoll = UnityEngine.Random.Range(0, 1f);
-
             Timing.CallDelayed(1.05f, () =>
             {
                 RoleTypeId role = ev.Player?.Role;
@@ -334,48 +324,12 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 if (allowed == Team.SCPs) return;
                 if (!Round.InProgress) return;
                 if (ev.Player.HasItem(ItemType.Flashlight)) return;
-                if (ev.Player.Items.Count >= 8) return;
-                if (ev.NewRole == null) return;
+                if (ev.Player.IsInventoryFull) return;
+                if (ev.NewRole == RoleTypeId.Spectator) return;
                 if (ev.Player.Inventory == null) return;
                 Log.Debug("Giving Flashlight to " + ev.Player?.Nickname);
-                ev.Player?.AddItem(ItemType.Flashlight);
+                ev.Player?.GiveOrDrop(ItemType.Flashlight);
             });
-            /*if (ev.NewRole == RoleTypeId.Tutorial)
-            {
-                Funny = UnityEngine.Random.Range(0, 1f);
-                // Setup Variables
-                DeadmanDisable = false;
-            
-                // - Event Flags - //
-                DeconCancellFlag = false;
-            
-                SpecialWarhead =  false;
-                WarheadID = 0;
-                WarheadLocked = false;
-                
-                CryFuckEnabled = false;
-                CryFuckSpawned = false;
-            
-                EventPID = EventPID + 1;
-                SpEventHandler();
-            }*/
-        }
-
-        public void RerollSpecial()
-        {
-            Funny = UnityEngine.Random.Range(0, 1f);
-            // Setup Variables
-            DeadmanDisable = false;
-            
-            // - Event Flags - //
-            DeconCancellFlag = false;
-            
-            SpecialWarhead =  false;
-            WarheadID = 0;
-            WarheadLocked = false;
-                
-            CryFuckEnabled = false;
-            CryFuckSpawned = false;
         }
         
         public static void CreateAndPlayAudio(string fileName, string audioPlayerName, Vector3 position, bool destroyOnEnd = false, Transform parent = null, bool isSpatial = false, float maxDistance = 5, float minDistance = 5)
@@ -407,27 +361,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
         private void AlphaWarheadLock(StartingEventArgs ev)
         {
-            if (cfg.WarheadLockAllowed)
-            {
-                Log.Debug("AlphaWarheadLock Successfully Started.");
-                if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && !SpecialWarhead /*&& Warhead.IsInProgress*/)
-                {
-                    float debugLocktime = Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultiplier;
-                    Log.Debug("Alpha Warhead Lock Timer:" + debugLocktime);
-                    Timing.CallDelayed(Warhead.RealDetonationTimer * cfg.WarheadLockTimeMultiplier, () =>
-                    {
-                        if (!WarheadLocked && !DeadmanSwitch.IsSequenceActive && Warhead.IsInProgress && !SpecialWarhead)
-                        {
-                            WarheadLocked = true;
-                            Exiled.API.Features.Cassie.MessageTranslated("Alpha Warhead Stop Detonation System now Locked. All personnel evacuate to the surface immediately.","<color=red>ALPHA WARHEAD</color>停止システムが<color=red>ロック</color>されました。全職員は迅速に地上に<color=red>避難</color>してください",true);
-                        }
-                    });
-                }
-                else
-                {
-                    Log.Debug("Alpha Warhead Lock Not Working.\nStatus:\nWarheadLocked?: "+WarheadLocked+"\nIsDeadman?: "+DeadmanSwitch.IsSequenceActive/*+"\nIsProgress?: "+Warhead.IsInProgress*/);
-                }
-            }
         }
 
         private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs ev)
@@ -507,11 +440,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
         private void LockedStopSystem(StoppingEventArgs ev)
         {
-            if (WarheadLocked)
-            {
-                ev.IsAllowed = false;
-                ev.Player.ShowHint("Warheadの操作は現在ロックされています",3);
-            }
         }
 
         private void LockedStartSystem(StartingEventArgs ev)

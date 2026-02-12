@@ -341,15 +341,32 @@ namespace Slafight_Plugin_EXILED.CustomRoles
 
                 case CTeam.FoundationForces:
                 case CTeam.Scientists:
+                case CTeam.Guards:    
                     Round.EscapedScientists = 999;
-                    Round.EndRound(true);
+                    if (specificReason == "NoHumanityAllowed")
+                    {
+                        foreach (var player in Player.List){
+                            player.ShowHint("<b><size=80><color=red>正常性</color>の勝利</size></b>", 555f);
+                            Intercom.TrySetOverride(player, true);
+                        }
+
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (Round.IsLobby) return;
+                            Round.Restart(false);
+                        });
+                    }
+                    else
+                    {
+                        Round.EndRound(true);
+                    }
                     break;
 
                 case CTeam.Others:
                     Round.EscapedDClasses = 999;
                     if (specificReason == "SW_WIN")
                     {
-                        foreach (Player player in Player.List){
+                        foreach (var player in Player.List){
                             player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>", 555f);
                             Intercom.TrySetOverride(player, true);
                         }
@@ -362,7 +379,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     }
                     else
                     {
-                        foreach (Player player in Player.List){
+                        foreach (var player in Player.List){
                             player.ShowHint("<b><size=80><color=#ffffff>UNKNOWN TEAM</color>の勝利</size></b>", 555f);
                             Intercom.TrySetOverride(player, true);
                         }

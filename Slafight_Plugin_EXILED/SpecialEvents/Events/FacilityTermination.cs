@@ -353,12 +353,19 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
                     .ToList();
 
-                Log.Debug($"[Humanitists] AliveNonSpec={players.Count}");
+                //Log.Debug($"[Humanitists] AliveNonSpec={players.Count}");
 
                 if (players.IsOnlyTeam(CTeam.GoC, "humanity"))
                 {
                     Log.Debug("[Humanitists] Triggered");
                     Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");  // Handler経由呼び出し
+                    SpawnSystem.SwitchSpawnContext("Default");
+                    yield break;
+                }
+                else if (players.IsOnlyTeam(CTeam.FoundationForces, "nohumanity"))
+                {
+                    Log.Debug("[NotHumanitists] Triggered");
+                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.FoundationForces, "NoHumanityAllowed");  // Handler経由呼び出し
                     SpawnSystem.SwitchSpawnContext("Default");
                     yield break;
                 }

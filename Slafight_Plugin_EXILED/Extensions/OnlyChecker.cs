@@ -36,6 +36,7 @@ public static class OnlyChecker
             if (team == CTeam.Fifthists && player.GetCustomRole() == CRoleTypeId.Scp3005) continue;
             if (team == CTeam.Others && specificTrigger == "snow" && player.GetCustomRole() == CRoleTypeId.SnowWarrier) continue;
             if (team == CTeam.GoC && specificTrigger == "humanity" && player.IsHumanitist()) continue;
+            if (team == CTeam.FoundationForces && specificTrigger == "nohumanity" && !player.IsHumanitist()) continue;
             if (player.GetCustomRole() == CRoleTypeId.Scp999) continue;
 
             //Log.Debug($"[IsOnlyTeam] BLOCKED by {player.Nickname} (team={player.GetTeam()})");

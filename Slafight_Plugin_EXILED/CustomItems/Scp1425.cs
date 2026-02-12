@@ -56,7 +56,14 @@ public class Scp1425 : CustomItem
     {
         if (Check(ev.Item))
         {
-            ev.Player.SetRole(CRoleTypeId.FifthistConvert,RoleSpawnFlags.AssignInventory);
+            if (ev.Player?.GetTeam() != CTeam.Fifthists)
+            {
+                ev.Player.SetRole(CRoleTypeId.FifthistConvert,RoleSpawnFlags.AssignInventory);
+            }
+            else
+            {
+                ev.Player?.ShowHint("SCP-033————星のシグナルを、感じなさい。\n電子機器。さすれば感じる。");
+            }
         }
     }
     

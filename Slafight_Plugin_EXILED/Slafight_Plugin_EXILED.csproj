@@ -184,6 +184,7 @@
         <Compile Include="Changes\ChristmasChanges.cs" />
         <Compile Include="Changes\EasterEggsHandler.cs" />
         <Compile Include="Changes\EscapeHandler.cs" />
+        <Compile Include="Changes\InspectingChanges.cs" />
         <Compile Include="Changes\Scp1509Handler.cs" />
         <Compile Include="Changes\Scp914Changes.cs" />
         <Compile Include="Commands\DevTools\AbilityUniversal.cs" />
@@ -334,6 +335,7 @@
         <Compile Include="SpecialEvents\Events\None.cs" />
         <Compile Include="SpecialEvents\Events\OmegaWarhead.cs" />
         <Compile Include="SpecialEvents\Events\OperationBlackout.cs" />
+        <Compile Include="SpecialEvents\Events\RevolverBattles.cs" />
         <Compile Include="SpecialEvents\Events\Scp096CryFuckEvent.cs" />
         <Compile Include="SpecialEvents\Events\Scp1509BattleField.cs" />
         <Compile Include="SpecialEvents\Events\SnowWarriersAttack.cs" />
