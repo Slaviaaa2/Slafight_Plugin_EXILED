@@ -72,10 +72,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
             }
         }
 
-        protected override void OnDyingCassie(AnnouncingScpTerminationEventArgs ev, bool isEnable = false, string cassieString = null,
-            string localizedString = null)
+        protected override void OnDying(DyingEventArgs ev)
         {
-            base.OnDyingCassie(ev, true, "SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました");
+            base.OnDying(ev);
         }
 
         private void CencellRagdoll(SpawningRagdollEventArgs ev)

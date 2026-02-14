@@ -50,8 +50,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             WarheadHandler.Starting += AlphaWarheadLock;
             //WarheadHandler.Starting += OmegaWarheadEvent;
             WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
-            WarheadHandler.Stopping += LockedStopSystem;
-            WarheadHandler.Starting += LockedStartSystem;
 
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SetupSpawnPoints;
         }
@@ -72,8 +70,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             WarheadHandler.Starting -= AlphaWarheadLock;
             //WarheadHandler.Starting -= OmegaWarheadEvent;
             WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
-            WarheadHandler.Stopping -= LockedStopSystem;
-            WarheadHandler.Starting -= LockedStartSystem;
 
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SetupSpawnPoints;
         }
@@ -87,7 +83,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         
         public bool SpecialWarhead = false;
         public static int WarheadID = 0;
-        public bool WarheadLocked = false;
 
         public bool DeconCancellFlag = false;
 
@@ -182,7 +177,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             
                 SpecialWarhead =  false;
                 WarheadID = 0;
-                WarheadLocked = false;
             
                 CryFuckEnabled = false;
                 CryFuckSpawned = false;
@@ -319,7 +313,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             Timing.CallDelayed(1.05f, () =>
             {
                 RoleTypeId role = ev.Player?.Role;
-                Team allowed = PlayerRolesUtils.GetTeam(role);
+                var allowed = PlayerRolesUtils.GetTeam(role);
                 if (ev.Player == null) return;
                 if (allowed == Team.SCPs) return;
                 if (!Round.InProgress) return;
@@ -435,19 +429,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                         ev.Player.ShowHint("収容違反への対応として暫くロックされているようだ・・・");
                     }
                 }
-            }
-        }
-
-        private void LockedStopSystem(StoppingEventArgs ev)
-        {
-        }
-
-        private void LockedStartSystem(StartingEventArgs ev)
-        {
-            if (WarheadLocked)
-            {
-                ev.IsAllowed = false;
-                ev.Player.ShowHint("Warheadの操作は現在ロックされています",3);
             }
         }
     }

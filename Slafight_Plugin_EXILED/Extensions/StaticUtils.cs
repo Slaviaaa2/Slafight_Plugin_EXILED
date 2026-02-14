@@ -7,7 +7,9 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
+using JetBrains.Annotations;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 using Random = System.Random;
 
@@ -151,7 +153,10 @@ public static class StaticUtils
         
             return new Vector3(randomX, y, randomZ);
         }
+    }
 
+    extension([CanBeNull] Player player)
+    {
         public bool IsFifthist()
         {
             if (player == null) return false;
@@ -173,5 +178,38 @@ public static class StaticUtils
             customItem = ci;
             return result;
         }
+    }
+
+    public static void TryRestart()
+    {
+        if (!Round.InProgress || Round.IsLobby || !Round.IsStarted || RoundSummary.SummaryActive) return;
+        Round.Restart(false);
+    }
+    
+    // ==== static API ====
+    public static Pickup GiveOrDropItem(this Player player, Type cItemType, Vector3? dropPosition = null)
+    {
+        var item = Activator.CreateInstance(cItemType) as CItem;
+        return item?.GiveOrDrop(player, dropPosition);
+    }
+
+    public static Item GiveItem(this Player player, Type cItemType)
+    {
+        var item = Activator.CreateInstance(cItemType) as CItem;
+        return item?.AddToPlayer(player);
+    }
+
+    public static bool HasCustomItem(this Player player, CustomItem expectedItem)
+    {
+        if (player == null) return false;
+        foreach (var item in player.Items)
+        {
+            if (item == null) continue;
+            if (item.IsCustomItem(out var customItem))
+            {
+                return customItem.Id == expectedItem.Id;
+            }
+        }
+        return false;
     }
 }

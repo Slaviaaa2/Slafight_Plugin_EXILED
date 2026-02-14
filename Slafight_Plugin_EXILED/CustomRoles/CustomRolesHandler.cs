@@ -325,7 +325,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                     Timing.CallDelayed(10f, () =>
                     {
                         if (Round.IsLobby) return;
-                        Round.Restart(false);
+                        StaticUtils.TryRestart();
                     });
                     break;
 
@@ -353,7 +353,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Timing.CallDelayed(10f, () =>
                         {
                             if (Round.IsLobby) return;
-                            Round.Restart(false);
+                            StaticUtils.TryRestart();
                         });
                     }
                     else
@@ -374,7 +374,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Timing.CallDelayed(10f, () =>
                         {
                             if (Round.IsLobby) return;
-                            Round.Restart(false);
+                            StaticUtils.TryRestart();
                         });
                     }
                     else
@@ -387,7 +387,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Timing.CallDelayed(10f, () =>
                         {
                             if (Round.IsLobby) return;
-                            Round.Restart(false);
+                            StaticUtils.TryRestart();
                         });
                     }
                     break;
@@ -404,7 +404,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Timing.CallDelayed(10f, () =>
                         {
                             if (Round.IsLobby) return;
-                            Round.Restart(false);
+                            StaticUtils.TryRestart();
                         });
                     }
                     else
@@ -417,7 +417,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                         Timing.CallDelayed(10f, () =>
                         {
                             if (Round.IsLobby) return;
-                            Round.Restart(false);
+                            StaticUtils.TryRestart();
                         });
                     }
                     break;

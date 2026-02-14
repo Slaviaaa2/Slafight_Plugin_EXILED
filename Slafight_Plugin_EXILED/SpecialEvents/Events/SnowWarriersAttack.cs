@@ -13,6 +13,7 @@ using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MapExtensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
@@ -36,7 +37,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
         public override bool IsReadyToExecute()
         {
-            return Plugin.Singleton.Config.Season == 2;
+            return MapFlags.GetSeason() == SeasonTypeId.Christmas;
         }
 
         // ===== イベント入り口 =====
@@ -74,7 +75,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             var eventHandler = Plugin.Singleton.EventHandler;
 
             eventHandler.SpecialWarhead = true;
-            eventHandler.WarheadLocked = true;
+            Warhead.IsLocked = true;
             eventHandler.DeadmanDisable = true;
 
             if (CancelIfOutdated())

@@ -273,7 +273,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             Plugin.Singleton.EventHandler.IsScpAutoSpawnLocked = false;
             Plugin.Singleton.EventHandler.SkeletonSpawned = false;
             Plugin.Singleton.EventHandler.SpecialWarhead = false;
-            Plugin.Singleton.EventHandler.WarheadLocked = false;
+            Warhead.IsLocked = false;
             SpawnSystem.Disable = false;
             SpawnSystem.SwitchSpawnContext("Default");
         }

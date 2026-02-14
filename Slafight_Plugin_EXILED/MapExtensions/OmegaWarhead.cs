@@ -26,8 +26,7 @@ public static class OmegaWarhead
         warheadPID = pid;
         if (Warhead.IsInProgress) Warhead.Stop();
         Plugin.Singleton.EventHandler.DeadmanDisable = true;
-        Plugin.Singleton.EventHandler.WarheadLocked = true;
-        //Log.Debug($"OW: Starting OMEGA WARHEAD Protocol. local:{pid}, global:{SpecialEventsHandler.EventPID}");
+        Warhead.IsLocked = true;
         if (pid != SpecialEventsHandler.EventPID) return;
         Timing.CallDelayed(triggerTime, () =>
         {

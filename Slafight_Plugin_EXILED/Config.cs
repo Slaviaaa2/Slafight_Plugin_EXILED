@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using Exiled.API.Interfaces;
 using Slafight_Plugin_EXILED.CustomItems;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
 namespace Slafight_Plugin_EXILED
 {
@@ -13,7 +14,7 @@ namespace Slafight_Plugin_EXILED
         public bool IsEnabled { get; set; } = true;
         [Description("Show Debug Logs?")]
         public bool Debug { get; set; } = true;
-        [Description("Please Set Season Info. 0=normal,1=halloween,2=christmas,34...is not available now")]
+        [Description("Please Set Season Info. 0=normal,1=halloween,2=christmas,3=april")]
         public int Season { get; set; } = 0;
         
         [Description("")]
@@ -77,6 +78,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public FileOmegaWarhead FileOmegaWarhead { get; set; } = new(); // 2023
         [Description("")] public FileBackrooms FileBackrooms { get; set; } = new(); // 2024
         [Description("")] public FileDeltaWarhead FileDeltaWarhead { get; set; } = new(); // 2025
+        [Description("")] public AntiMemeGoggle AntiMemeGoggle { get; set; } = new(); // 2026
         
         [Description("")] public GunGoCTurret GunGoCTurret { get; set; } = new(); // 10001
 

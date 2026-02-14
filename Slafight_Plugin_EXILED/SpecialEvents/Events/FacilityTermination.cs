@@ -40,7 +40,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             if (KillEvent()) return;
 
             EventHandler.SpecialWarhead = true;
-            EventHandler.WarheadLocked = true;
+            Warhead.IsLocked = true;
             EventHandler.DeadmanDisable = true;
 
             if (KillEvent()) return;

@@ -33,23 +33,29 @@ public enum CRoleTypeId
     NtfLieutenant,
     NtfGeneral,
     
-    // ==== Hammer Down (財団軍) ====
+    // ==== Hammer Down ====
     HdInfantry,
     HdCommander,
     HdMarshal,
     
-    // ==== Guards (警備系) ====
+    // ==== See No Evil ===
+    SneOperator,
+    SneGears,
+    SneNeutralitist,
+    SnePurify,
+    
+    // ==== Guards ====
     EvacuationGuard,
     SecurityChief,
     ChamberGuard,
     
-    // ==== Scientists (科学者側) ====
+    // ==== Scientists ====
     ZoneManager,
     FacilityManager,
     Engineer,
     ObjectObserver,
     
-    // ==== Class-D系 ====
+    // ==== Class-D ====
     Janitor,
     
     // ==== GoC ====
@@ -63,5 +69,6 @@ public enum CRoleTypeId
     // ==== Others ====
     SnowWarrier,
     Zombified,
-    Sculpture
+    Sculpture,
+    SergeyMarkov,
 }

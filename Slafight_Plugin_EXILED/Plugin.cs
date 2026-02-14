@@ -48,7 +48,7 @@ namespace Slafight_Plugin_EXILED
         public override string Prefix => "Slafight_Plugin_EXILED";
         public override Version Version => new Version(1,6,0,5);
         
-        public override Version RequiredExiledVersion { get; } = new Version(9, 12, 6);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 13, 0);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -112,6 +112,7 @@ namespace Slafight_Plugin_EXILED
             CRole.OverrideRoleInstance(EngineerRole.UniqueRoleName, EngineerRole);
             
             CRole.RegisterAllEvents();
+            CItem.RegisterAllEvents();
             AbilityBase.RegisterEvents();
             AbilityManager.RegisterEvents();
             CustomRole.RegisterRoles(false);
@@ -167,6 +168,7 @@ namespace Slafight_Plugin_EXILED
             EngineerRole.UnregisterEvents();
             
             CRole.UnregisterAllEvents();
+            CItem.UnregisterAllEvents();
             AbilityBase.UnregisterEvents();
             AbilityManager.UnregisterEvents();
             CustomItem.UnregisterItems();

@@ -69,7 +69,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
             // Warhead ロックなど
             evHandler.SpecialWarhead = true;
-            evHandler.WarheadLocked = true;
+            Warhead.IsLocked = true;
             evHandler.DeadmanDisable = true;
 
             if (CancelIfOutdated())

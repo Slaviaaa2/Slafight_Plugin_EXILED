@@ -42,4 +42,7 @@ public enum SpecialEventType
     
     /// <summary>Revolver is Very Fuckin Good Weapon.</summary>
     RevolverBattles,
+    
+    /// <summary></summary>
+    SergeyMakarovReturns,
 }

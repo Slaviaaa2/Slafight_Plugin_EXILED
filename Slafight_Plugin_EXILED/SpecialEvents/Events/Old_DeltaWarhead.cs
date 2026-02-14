@@ -42,7 +42,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
             // Warhead 関連フラグ
             EventHandler.SpecialWarhead = true;
-            EventHandler.WarheadLocked = true;
+            Warhead.IsLocked = true;
             EventHandler.DeadmanDisable = true;
             // EventHandler.DeconCancellFlag = true; // 使うならここで
 

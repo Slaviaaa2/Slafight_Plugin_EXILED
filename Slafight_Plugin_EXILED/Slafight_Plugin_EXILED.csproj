@@ -41,10 +41,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\AdvancedMERTools.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp">
-          <HintPath>..\packages\ExMod.Exiled.9.12.4\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
-        </Reference>
-        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
@@ -53,34 +50,34 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
         </Reference>
         <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\CommandSystem.Core.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\CommandSystem.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.API, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.API.dll</HintPath>
+        <Reference Include="Exiled.API, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.API.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CreditTags, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.CreditTags.dll</HintPath>
+        <Reference Include="Exiled.CreditTags, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CreditTags.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomItems, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.CustomItems.dll</HintPath>
+        <Reference Include="Exiled.CustomItems, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CustomItems.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomRoles, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.CustomRoles.dll</HintPath>
+        <Reference Include="Exiled.CustomRoles, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CustomRoles.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Events, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.Events.dll</HintPath>
+        <Reference Include="Exiled.Events, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Events.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Loader, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.Loader.dll</HintPath>
+        <Reference Include="Exiled.Loader, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Loader.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Permissions, Version=9.12.6.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\Exiled.Permissions.dll</HintPath>
+        <Reference Include="Exiled.Permissions, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
         <Reference Include="HintServiceMeow">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
         </Reference>
         <Reference Include="LabApi, Version=1.1.4.3, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\LabApi.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\LabApi.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -98,7 +95,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\NorthwoodLib.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
             <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
@@ -151,7 +148,7 @@
             <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.12.6\lib\net48\YamlDotNet.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\YamlDotNet.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -163,6 +160,7 @@
         <Compile Include="Abilities\TeleprotRandomAbility.cs" />
         <Compile Include="API\Enums\CTeam.cs" />
         <Compile Include="API\Enums\CustomColor.cs" />
+        <Compile Include="API\Enums\SeasonTypeId.cs" />
         <Compile Include="API\Enums\TaskType.cs" />
         <Compile Include="API\Features\AbilityBase.cs" />
         <Compile Include="API\Features\AbilityLocalisation.cs" />
@@ -171,6 +169,7 @@
         <Compile Include="API\Features\AbilityManager.cs" />
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
+        <Compile Include="API\Features\CItem.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
@@ -191,41 +190,64 @@
         <Compile Include="Commands\DevTools\AddQueue.cs" />
         <Compile Include="Commands\DevTools\DebugStart.cs" />
         <Compile Include="Commands\DevTools\GetQueue.cs" />
+        <Compile Include="Commands\DevTools\GiveCustomItem.cs" />
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
         <Compile Include="Commands\DevTools\SpawnPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
-        <Compile Include="CustomItems\AdvancedMedkit.cs" />
-        <Compile Include="CustomItems\CaneOfTheStars.cs" />
-        <Compile Include="CustomItems\FakeGrenade.cs" />
-        <Compile Include="CustomItems\File012_5_033.cs" />
-        <Compile Include="CustomItems\File096_777_A.cs" />
-        <Compile Include="CustomItems\File3005_Contain.cs" />
-        <Compile Include="CustomItems\FileBackrooms.cs" />
-        <Compile Include="CustomItems\FileDeltaWarhead.cs" />
-        <Compile Include="CustomItems\FileOmegaWarhead.cs" />
-        <Compile Include="CustomItems\FlashBangE.cs" />
-        <Compile Include="CustomItems\GoCRecruitPaper.cs" />
-        <Compile Include="CustomItems\GunCOM77.cs" />
-        <Compile Include="CustomItems\GunFRMGX.cs" />
-        <Compile Include="CustomItems\GunFSP18.cs" />
-        <Compile Include="CustomItems\GunGoCTurret.cs" />
-        <Compile Include="CustomItems\GunN7Weltkrieg.cs" />
-        <Compile Include="CustomItems\GunProject90.cs" />
-        <Compile Include="CustomItems\GunSuperLogicer.cs" />
-        <Compile Include="CustomItems\KeycardConscripts.cs" />
-        <Compile Include="CustomItems\KeycardSecurityChief.cs" />
-        <Compile Include="CustomItems\MasterCard.cs" />
-        <Compile Include="CustomItems\OmegaWarheadAccess.cs" />
-        <Compile Include="CustomItems\Quarter.cs" />
-        <Compile Include="CustomItems\Scp1425.cs" />
-        <Compile Include="CustomItems\PlayingCard.cs" />
-        <Compile Include="CustomItems\Scp148.cs" />
-        <Compile Include="CustomItems\SerumC.cs" />
-        <Compile Include="CustomItems\SerumD.cs" />
-        <Compile Include="CustomItems\SNAV300.cs" />
-        <Compile Include="CustomItems\SNAV310.cs" />
-        <Compile Include="CustomItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\exiledApiItems\AdvancedMedkit.cs" />
+        <Compile Include="CustomItems\exiledApiItems\AntiMemeGoggle.cs" />
+        <Compile Include="CustomItems\exiledApiItems\ArmorInfantry.cs" />
+        <Compile Include="CustomItems\exiledApiItems\ArmorVIP.cs" />
+        <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
+        <Compile Include="CustomItems\exiledApiItems\DummyRoad.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
+        <Compile Include="CustomItems\exiledApiItems\File012_5_033.cs" />
+        <Compile Include="CustomItems\exiledApiItems\File096_777_A.cs" />
+        <Compile Include="CustomItems\exiledApiItems\File3005_Contain.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FileBackrooms.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FileDeltaWarhead.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FileOmegaWarhead.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GoCRecruitPaper.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunCOM77.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunFRMGX.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunFSP18.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunGoCRailgun.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunGoCTurret.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunN7CR.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunN7Weltkrieg.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunProject90.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunSuperLogicer.cs" />
+        <Compile Include="CustomItems\exiledApiItems\HIDTurret.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardConscripts.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardFifthist.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardFifthistPriest.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Cadet.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Commander.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ContainmentEngineer.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_FacilityManager.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Guard.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Janitor.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Lieutenant.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_O5.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ResearchSupervisor.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Scientist.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ZoneManager.cs" />
+        <Compile Include="CustomItems\exiledApiItems\KeycardSecurityChief.cs" />
+        <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
+        <Compile Include="CustomItems\exiledApiItems\MasterCard.cs" />
+        <Compile Include="CustomItems\exiledApiItems\OmegaWarheadAccess.cs" />
+        <Compile Include="CustomItems\exiledApiItems\PlayingCard.cs" />
+        <Compile Include="CustomItems\exiledApiItems\Quarter.cs" />
+        <Compile Include="CustomItems\exiledApiItems\Scp1425.cs" />
+        <Compile Include="CustomItems\exiledApiItems\Scp148.cs" />
+        <Compile Include="CustomItems\exiledApiItems\SerumC.cs" />
+        <Compile Include="CustomItems\exiledApiItems\SerumD.cs" />
+        <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
+        <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
+        <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\newEve\NeutralizeGrenade.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
@@ -234,6 +256,8 @@
         <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\FoundationForces\Sculpture.cs" />
+        <Compile Include="CustomRoles\FoundationForces\SneNeutralitist.cs" />
+        <Compile Include="CustomRoles\FoundationForces\SnePurify.cs" />
         <Compile Include="CustomRoles\GoC\GoCCommunications.cs" />
         <Compile Include="CustomRoles\GoC\GoCDeputy.cs" />
         <Compile Include="CustomRoles\GoC\GoCMedic.cs" />
@@ -289,26 +313,6 @@
         <Compile Include="Commands\DevTools\SpawnMapEditRole.cs" />
         <Compile Include="Commands\RootCommand.cs" />
         <Compile Include="Config.cs" />
-        <Compile Include="CustomItems\ArmorInfantry.cs" />
-        <Compile Include="CustomItems\ArmorVIP.cs" />
-        <Compile Include="CustomItems\DummyRoad.cs" />
-        <Compile Include="CustomItems\GunGoCRailgun.cs" />
-        <Compile Include="CustomItems\GunN7CR.cs" />
-        <Compile Include="CustomItems\HIDTurret.cs" />
-        <Compile Include="CustomItems\KeycardFifthist.cs" />
-        <Compile Include="CustomItems\KeycardFifthistPriest.cs" />
-        <Compile Include="CustomItems\KeycardOld_Cadet.cs" />
-        <Compile Include="CustomItems\KeycardOld_Commander.cs" />
-        <Compile Include="CustomItems\KeycardOld_ContainmentEngineer.cs" />
-        <Compile Include="CustomItems\KeycardOld_FacilityManager.cs" />
-        <Compile Include="CustomItems\KeycardOld_Guard.cs" />
-        <Compile Include="CustomItems\KeycardOld_Janitor.cs" />
-        <Compile Include="CustomItems\KeycardOld_Lieutenant.cs" />
-        <Compile Include="CustomItems\KeycardOld_O5.cs" />
-        <Compile Include="CustomItems\KeycardOld_ResearchSupervisor.cs" />
-        <Compile Include="CustomItems\KeycardOld_Scientist.cs" />
-        <Compile Include="CustomItems\KeycardOld_ZoneManager.cs" />
-        <Compile Include="CustomItems\MagicMissile.cs" />
         <Compile Include="CustomRoles\CustomRolesHandler.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistPriest.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistRescue.cs" />
@@ -338,6 +342,7 @@
         <Compile Include="SpecialEvents\Events\RevolverBattles.cs" />
         <Compile Include="SpecialEvents\Events\Scp096CryFuckEvent.cs" />
         <Compile Include="SpecialEvents\Events\Scp1509BattleField.cs" />
+        <Compile Include="SpecialEvents\Events\SergeyMakarovReturns.cs" />
         <Compile Include="SpecialEvents\Events\SnowWarriersAttack.cs" />
         <Compile Include="SpecialEvents\SpecialEventsHandler.cs" />
     </ItemGroup>
