@@ -5,11 +5,11 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
-using Exiled.Events.Handlers;
+using Exiled.API.Features.Toys;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
-using JetBrains.Annotations;
-using MEC;
+using Mirror;
 using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using Item = Exiled.API.Features.Items.Item;
@@ -29,6 +29,29 @@ namespace Slafight_Plugin_EXILED.API.Features
 
         private static bool _eventsSubscribed;
 
+        // ==== 光機能用 ====
+        private static readonly Dictionary<Pickup, Exiled.API.Features.Toys.Light> ActiveLights = new();
+
+        /// <summary>
+        /// このCItemのPickupに光を付けるか（デフォルトtrue）
+        /// </summary>
+        public virtual bool UseLight => true;
+
+        /// <summary>
+        /// 光の色（デフォルト緑）
+        /// </summary>
+        public virtual Color GlowColor => Color.green;
+
+        /// <summary>
+        /// 光の強度
+        /// </summary>
+        public virtual float LightIntensity => 0.7f;
+
+        /// <summary>
+        /// 光の範囲
+        /// </summary>
+        public virtual float LightRange => 5f;
+
         static CItem()
         {
             var asm = typeof(CItem).Assembly;
@@ -47,6 +70,11 @@ namespace Slafight_Plugin_EXILED.API.Features
                 Exiled.Events.Handlers.Player.UsingItem += OnAnyUsingItem;
                 Exiled.Events.Handlers.Player.DroppingItem += OnAnyDroppingItem;
                 Exiled.Events.Handlers.Player.PickingUpItem += OnAnyPickingUpItem;
+
+                // ★ 光イベントをここで一括登録
+                Exiled.Events.Handlers.Map.PickupAdded += OnPickupAddedGlow;
+                Exiled.Events.Handlers.Map.PickupDestroyed += OnPickupDestroyedGlow;
+
                 _eventsSubscribed = true;
             }
 
@@ -88,6 +116,11 @@ namespace Slafight_Plugin_EXILED.API.Features
                 Exiled.Events.Handlers.Player.UsingItem -= OnAnyUsingItem;
                 Exiled.Events.Handlers.Player.DroppingItem -= OnAnyDroppingItem;
                 Exiled.Events.Handlers.Player.PickingUpItem -= OnAnyPickingUpItem;
+
+                // ★ 光イベント解除
+                Exiled.Events.Handlers.Map.PickupAdded -= OnPickupAddedGlow;
+                Exiled.Events.Handlers.Map.PickupDestroyed -= OnPickupDestroyedGlow;
+
                 _eventsSubscribed = false;
             }
         }
@@ -239,7 +272,7 @@ namespace Slafight_Plugin_EXILED.API.Features
             var item = Activator.CreateInstance(cItemType) as CItem;
             return item?.AddToPlayer(player);
         }
-        
+
         // ==== CItemにCheckItem追加（CRole.Check相当） ====
 
         /// <summary>
@@ -266,6 +299,64 @@ namespace Slafight_Plugin_EXILED.API.Features
         public static bool CheckSerial(ushort serial, CItem expectedItem)
         {
             return SerialToItem.TryGetValue(serial, out var item) && ReferenceEquals(item, expectedItem);
+        }
+
+        // ================== 光機能: 共通ハンドラ ==================
+
+        private static void OnPickupAddedGlow(PickupAddedEventArgs ev)
+        {
+            try
+            {
+                if (ev.Pickup?.Base?.gameObject == null)
+                    return;
+
+                // 初期配置Pickupは光らせたくない場合はこれを残す
+                if (ev.Pickup.PreviousOwner == null)
+                    return;
+
+                var ci = GetItemFromPickup(ev.Pickup);
+                if (ci == null)
+                    return;
+
+                if (!ci.UseLight)
+                    return;
+
+                var light = Exiled.API.Features.Toys.Light.Create(ev.Pickup.Position);
+                light.Color = ci.GlowColor;
+                light.Intensity = ci.LightIntensity;
+                light.Range = ci.LightRange;
+                light.ShadowType = LightShadows.None;
+
+                light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);
+                ActiveLights[ev.Pickup] = light;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[CItem Glow] OnPickupAddedGlow error: {ex}");
+            }
+        }
+
+        private static void OnPickupDestroyedGlow(PickupDestroyedEventArgs ev)
+        {
+            if (ev.Pickup == null)
+                return;
+
+            if (!ActiveLights.TryGetValue(ev.Pickup, out var light) || light == null)
+                return;
+
+            try
+            {
+                if (light.Base?.gameObject != null)
+                    NetworkServer.Destroy(light.Base.gameObject);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[CItem Glow] OnPickupDestroyedGlow error: {ex}");
+            }
+            finally
+            {
+                ActiveLights.Remove(ev.Pickup);
+            }
         }
     }
 }

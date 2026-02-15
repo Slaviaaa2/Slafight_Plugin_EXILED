@@ -46,7 +46,7 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,6,0,5);
+        public override Version Version => new Version(1,6,0,6);
         
         public override Version RequiredExiledVersion { get; } = new Version(9, 13, 0);
 
@@ -111,6 +111,7 @@ namespace Slafight_Plugin_EXILED
             EngineerRole.RegisterEvents();
             CRole.OverrideRoleInstance(EngineerRole.UniqueRoleName, EngineerRole);
             
+            WearsHandler.Register();
             CRole.RegisterAllEvents();
             CItem.RegisterAllEvents();
             AbilityBase.RegisterEvents();
@@ -167,6 +168,7 @@ namespace Slafight_Plugin_EXILED
             
             EngineerRole.UnregisterEvents();
             
+            WearsHandler.Unregister();
             CRole.UnregisterAllEvents();
             CItem.UnregisterAllEvents();
             AbilityBase.UnregisterEvents();

@@ -12,6 +12,7 @@ using ProjectMER.Features;
 using ProjectMER.Features.Extensions;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
@@ -183,26 +184,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 case "CISR_HIDTurret":
                     pos = ev.Schematic.gameObject.transform.position;
                     ev.Schematic.Destroy();
-    
-                    try
-                    {
-                        bool spawned = CustomItem.TrySpawn(10001, pos, out Pickup pickup);
-                        pickup?.Spawn();
-                        Logger.Info($"HIDTurret TrySpawn: {spawned}, pickup={pickup?.Serial ?? 0}");
-                        
-                        if (spawned && pickup != null)
-                        {
-                            Logger.Debug($"HIDTurret spawned successfully.\nPos: {pickup.Position} ({pickup.Room})");
-                        }
-                        else
-                        {
-                            Logger.Warn("TrySpawn returned false or pickup is null.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"HID Turret pickup failed:{ex}");
-                    }
+                    new CustomItems.newEve.HIDTurret().SpawnPickup(pos);
                     break;
             }
         }
@@ -210,110 +192,113 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         /// <summary>
         /// SCP-3005 用 schematic 生成のみ。FakeScale は使わない。
         /// </summary>
-        public void Schem3005(Player player)
+        public void Schem3005(Player labPlayer)
         {
             Timing.CallDelayed(1.5f, () =>
             {
-                SchematicObject schematicObject;
-                try
+                var exiledPlayer = Exiled.API.Features.Player.Get(labPlayer.NetworkId);
+                if (exiledPlayer == null || !exiledPlayer.IsVerified)
                 {
-                    schematicObject = ObjectSpawner.SpawnSchematic("SCP3005", Vector3.zero);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("error schem");
+                    Logger.Warn("[LabApiHandler] Schem3005: Exiled player not found or not verified.");
                     return;
                 }
 
-                player.Scale = new Vector3(0.001f, 1f, 0.001f);
-                schematicObject.transform.SetParent(player.GameObject.transform);
+                // 👇 ここだけで十分（スポーン＋親子付け＋ロール保存＋自動DestroyはWearsHandler側）
+                if (!exiledPlayer.TryWear("SCP3005", out var schem, Vector3.zero))
+                {
+                    Logger.Error("[LabApiHandler] Schem3005: TryWear failed.");
+                    return;
+                }
+
+                // 見た目調整だけLabApi側でやる
+                labPlayer.Scale = new Vector3(0.001f, 1f, 0.001f);
 
                 Timing.CallDelayed(0.5f, () =>
                 {
-                    schematicObject.transform.GetChild(0).localScale = new Vector3(1f, 1f, 1f);
-                    schematicObject.transform.position = player.GameObject.transform.position;
+                    if (schem == null || schem.transform == null)
+                        return;
+
+                    schem.transform.GetChild(0).localScale = Vector3.one;
+                    schem.transform.position = exiledPlayer.Position;
 
                     var light = Light.Create(Vector3.zero);
-                    light.Position = schematicObject.transform.position + new Vector3(0f, -0.08f, 0f);
-                    light.Transform.parent = schematicObject.transform;
-                    light.Scale = new Vector3(1f, 1f, 1f);
+                    light.Position = schem.transform.position + new Vector3(0f, -0.08f, 0f);
+                    light.Transform.parent = schem.transform;
+                    light.Scale = Vector3.one;
                     light.Range = 10f;
                     light.Intensity = 1.25f;
                     light.Color = Color.magenta;
-
-                    player.DestroySchematic(schematicObject);
-                    var exiledPlayer = Exiled.API.Features.Player.Get(player.NetworkId);
-                    Timing.RunCoroutine(DestroyCoroutine(schematicObject, exiledPlayer));
                 });
             });
         }
         
-        public void Schem999(Player player)
+        public void Schem999(Player labPlayer)
         {
             Timing.CallDelayed(1.5f, () =>
             {
-                SchematicObject schematicObject;
-                try
+                var exiledPlayer = Exiled.API.Features.Player.Get(labPlayer.NetworkId);
+                if (exiledPlayer == null || !exiledPlayer.IsVerified)
                 {
-                    schematicObject = ObjectSpawner.SpawnSchematic("Scp999Model", Vector3.zero);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("error schem");
+                    Logger.Warn("[LabApiHandler] Schem999: Exiled player not found or not verified.");
                     return;
                 }
 
-                player.Scale = new Vector3(0.35f, 0.2f, 0.35f);
-                schematicObject.transform.SetParent(player.GameObject.transform);
+                if (!exiledPlayer.TryWear("Scp999Model", out var schem, Vector3.zero))
+                {
+                    Logger.Error("[LabApiHandler] Schem999: TryWear failed.");
+                    return;
+                }
+
+                labPlayer.Scale = new Vector3(0.35f, 0.2f, 0.35f);
 
                 Timing.CallDelayed(0.5f, () =>
                 {
-                    //schematicObject.transform.GetChild(0).localScale = new Vector3(1f, 1f, 1f);
-                    schematicObject.transform.position = player.GameObject.transform.position + new Vector3(0f,0f,0.05f);
-                    for (int i = 0; i < schematicObject.transform.childCount; i++)
+                    if (schem == null || schem.transform == null)
+                        return;
+
+                    schem.transform.position = exiledPlayer.Position + new Vector3(0f, 0f, 0.05f);
+
+                    // デバッグログ残したいならそのまま
+                    for (int i = 0; i < schem.transform.childCount; i++)
                     {
-                        var child = schematicObject.transform.GetChild(i);
+                        var child = schem.transform.GetChild(i);
                         Logger.Info($"[Scp999Model] Child {i}: {child.name}, localScale={child.localScale}");
                     }
-
-                    player.DestroySchematic(schematicObject);
-                    var exiledPlayer = Exiled.API.Features.Player.Get(player.NetworkId);
-                    Timing.RunCoroutine(DestroyCoroutine(schematicObject, exiledPlayer));
                 });
             });
         }
 
-        public void SchemSnowWarrier(Player player)
+        public void SchemSnowWarrier(Player labPlayer)
         {
             Timing.CallDelayed(1.5f, () =>
             {
-                SchematicObject schematicObject;
-                try
+                var exiledPlayer = Exiled.API.Features.Player.Get(labPlayer.NetworkId);
+                if (exiledPlayer == null || !exiledPlayer.IsVerified)
                 {
-                    schematicObject = ObjectSpawner.SpawnSchematic("SnowWarrier", Vector3.zero);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("SnowWarrier schem spawn error: " + ex);
+                    Logger.Warn("[LabApiHandler] SchemSnowWarrier: Exiled player not found or not verified.");
                     return;
                 }
 
-                schematicObject.transform.SetParent(player.GameObject.transform);
+                if (!exiledPlayer.TryWear("SnowWarrier", out var schem, Vector3.zero))
+                {
+                    Logger.Error("[LabApiHandler] SchemSnowWarrier: TryWear failed.");
+                    return;
+                }
 
                 Timing.CallDelayed(0.5f, () =>
                 {
-                    schematicObject.transform.position = player.GameObject.transform.position;
+                    if (schem == null || schem.transform == null)
+                        return;
+
+                    schem.transform.position = exiledPlayer.Position;
+
                     var light = Light.Create(Vector3.zero);
-                    light.Position = schematicObject.transform.position + new Vector3(0f, -0.08f, 0f);
-                    light.Transform.parent = schematicObject.transform;
-                    light.Scale = new Vector3(1f, 1f, 1f);
+                    light.Position = schem.transform.position + new Vector3(0f, -0.08f, 0f);
+                    light.Transform.parent = schem.transform;
+                    light.Scale = Vector3.one;
                     light.Range = 10f;
                     light.Intensity = 1.25f;
                     light.Color = Color.white;
-
-                    player.DestroySchematic(schematicObject);
-                    var exiledPlayer = Exiled.API.Features.Player.Get(player.NetworkId);
-                    Timing.RunCoroutine(DestroyCoroutine(schematicObject, exiledPlayer));
                 });
             });
         }
@@ -327,28 +312,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             if (ev.Player.GetCustomRole() == CRoleTypeId.Scp999)
             {
                 ObjectSpawner.SpawnSchematic("Scp999Model", ev.Player.Position, ev.Player.Rotation, Vector3.one);
-            }
-        }
-
-        private readonly List<CRoleTypeId> HasModels = new()
-        {
-            CRoleTypeId.Scp3005,
-            CRoleTypeId.Scp999,
-            CRoleTypeId.SnowWarrier
-        };
-
-        private IEnumerator<float> DestroyCoroutine(SchematicObject schem, Exiled.API.Features.Player player)
-        {
-            yield return Timing.WaitForSeconds(1f);
-            for (;;)
-            {
-                yield return Timing.WaitForSeconds(1f);
-
-                if (player == null || !player.IsConnected || !HasModels.Contains(player.GetCustomRole()))
-                {
-                    schem.Destroy();
-                    yield break;
-                }
             }
         }
     }

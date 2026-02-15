@@ -16,86 +16,93 @@ public class AbilityUniversal : ICommand
 {
     public string Command => "giveability";
     public string[] Aliases { get; } = ["ga", "ability", "au"];
-    public string Description => "Give a custom ability to a player";
+    public string Description => "任意のAbilityを付与\n.giveability sh @me 5 3 → Sinkhole(CD5s/3回)";
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {
         // パーミッションチェック
         if (!sender.CheckPermission($"slperm.{Command}"))
         {
-            response = $"You don't have permission to execute this command. Required permission: slperm.{Command}";
+            response = $"権限不足: slperm.{Command}";
             return false;
         }
+
         var executor = Player.Get(sender);
         if (executor == null)
         {
-            response = "Player not found.";
+            response = "プレイヤー未検出";
             return false;
         }
 
         if (arguments.Count == 0)
         {
-            var names = AbilityParseHelper.GetAllAbilityNames();
-            response = "Usage: giveability <abilityId> [playerId] [cooldown] [maxUses]\n"
-                       + "Available abilities:\n" + string.Join(", ", names);
+            response = $"使用法: .{Command} <ability> [playerId] [CD] [回数]\n"
+                     + $"例: .{Command} sh\n"
+                     + $"    .{Command} sh 5\n"
+                     + $"    .{Command} sh @me 5 3\n"
+                     + $"Ability一覧: {string.Join(", ", AbilityParseHelper.GetAllAbilityNames())}";
             return false;
         }
 
         var abilityId = arguments.At(0);
 
-        // --- 1) ターゲット ---
+        // --- ターゲット判定（@me / ID） ---
         Player target = executor;
         if (arguments.Count >= 2)
         {
-            if (!int.TryParse(arguments.At(1), out var targetId))
+            var targetArg = arguments.At(1).ToLower();
+            
+            if (targetArg == "@me" || targetArg == "me")
             {
-                response = $"Invalid player ID: {arguments.At(1)}";
-                return false;
+                target = executor;
             }
-
-            target = Player.Get(targetId);
-            if (target == null)
+            else if (int.TryParse(targetArg, out var targetId))
             {
-                response = $"Player with ID {targetId} not found.";
+                target = Player.Get(targetId);
+                if (target == null)
+                {
+                    response = $"ID{targetId}のプレイヤー不在";
+                    return false;
+                }
+            }
+            else
+            {
+                response = $"無効なターゲット: {targetArg} (@me or ID)";
                 return false;
             }
         }
 
-        // --- 2) オプション: クールダウン / 使用回数 ---
+        // --- オプション引数 ---
         float? cooldown = null;
         int? maxUses = null;
 
-        if (arguments.Count >= 3)
+        if (arguments.Count >= 3 && float.TryParse(arguments.At(2), out var cd))
         {
-            if (!float.TryParse(arguments.At(2), out var cd))
-            {
-                response = $"Invalid cooldown: {arguments.At(2)}";
-                return false;
-            }
-            cooldown = cd;
+            cooldown = Math.Max(0.1f, cd); // 最低0.1秒
         }
 
-        if (arguments.Count >= 4)
+        if (arguments.Count >= 4 && int.TryParse(arguments.At(3), out var uses))
         {
-            if (!int.TryParse(arguments.At(3), out var uses))
-            {
-                response = $"Invalid maxUses: {arguments.At(3)}";
-                return false;
-            }
-            maxUses = uses;
+            maxUses = uses < 0 ? -1 : uses; // -1=無制限
         }
 
-        // --- 3) 付与 ---
-        if (!AbilityParseHelper.TryGiveAbility(abilityId, target, cooldown, maxUses))
+        // --- Ability付与 ---
+        bool success = AbilityParseHelper.TryGiveAbility(abilityId, target, cooldown, maxUses);
+        
+        if (!success)
         {
-            var names = AbilityParseHelper.GetAllAbilityNames();
-            response = $"Unknown ability: {abilityId}\nAvailable abilities:\n" + string.Join(", ", names);
+            response = $"不明なAbility: {abilityId}\n"
+                     + $"利用可能: {string.Join(", ", AbilityParseHelper.GetAllAbilityNames())}";
             return false;
         }
 
-        response = $"Gave ability \"{abilityId}\" to {target.Nickname}"
-                   + (cooldown.HasValue ? $" (CD={cooldown.Value}s" : "")
-                   + (maxUses.HasValue ? $", Uses={maxUses.Value})" : (cooldown.HasValue ? ")" : ""));
+        // --- 成功メッセージ ---
+        var msg = $"[{target.Nickname}] {abilityId}";
+        if (cooldown.HasValue) msg += $" CD={cooldown:F1}s";
+        if (maxUses.HasValue) msg += $" 回数={maxUses}";
+        
+        response = msg;
+        executor.ShowHint($"<color=green>{msg}</color>", 3f);
         return true;
     }
 }

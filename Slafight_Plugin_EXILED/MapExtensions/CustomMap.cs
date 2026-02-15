@@ -83,13 +83,22 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             LabApi.Events.Handlers.PlayerEvents.InteractedDoor -= DoorInteracted;
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= GetSchems;
 
+            // ★ コルーチンを全部 kill
             if (femurCoroutine.IsRunning)
                 Timing.KillCoroutines(femurCoroutine);
+            if (trainCoroutine.IsRunning)
+                Timing.KillCoroutines(trainCoroutine);
         }
 
         private void OnRoundStarted()
         {
-            SetupSpecialDoors();   // ★先に特別扉を登録
+            // ★ ラウンド切り替え前に残コルーチンを殺す
+            if (femurCoroutine.IsRunning)
+                Timing.KillCoroutines(femurCoroutine);
+            if (trainCoroutine.IsRunning)
+                Timing.KillCoroutines(trainCoroutine);
+
+            SetupSpecialDoors();
             SetDoorState();
             SetupMaps();
             HolidaySeasonMapLoader();
@@ -102,7 +111,7 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             {
                 foreach (var player in Player.List.ToList())
                 {
-                    if (player == null) continue;
+                    if (player == null || !player.IsConnected) continue;
                     var info = player.GetRoleInfo();
                     if (info is { Vanilla: RoleTypeId.ClassD, Custom: CRoleTypeId.None })
                     {
@@ -116,7 +125,6 @@ namespace Slafight_Plugin_EXILED.MapExtensions
         {
             specialDoors.Clear();
 
-            // OWJoin：カスタムアイテム必須（コードは未使用）
             if (OWJoin != default)
             {
                 specialDoors[OWJoin] = new DoorConfig
@@ -127,7 +135,6 @@ namespace Slafight_Plugin_EXILED.MapExtensions
                 };
             }
 
-            // コード専用扉の例
             specialDoors[new Vector3(-18.614f, 257.005f, -91.739f)] = new DoorConfig
             {
                 RequiredItemId = 0,
@@ -180,6 +187,7 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             {
                 Timing.CallDelayed(25f, () =>
                 {
+                    // ★ TrainComing.Start を使うならここで呼ぶ想定
                     trainCoroutine = Timing.RunCoroutine(TrainComing.SpawnTrainAndAnim(STS, STC, STE));
                 });
             }
@@ -265,14 +273,26 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             if (schem is null)
                 yield break;
 
+            // ★ ラウンド終了・null ガード
+            if (Round.IsLobby || Round.IsEnded)
+                yield break;
+
             yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos, new Vector3(0, 4f, 0), 0.8f));
+
+            if (Round.IsLobby || Round.IsEnded || schem == null || schem.transform == null)
+                yield break;
+
             yield return Timing.WaitForSeconds(waitTime);
+
+            if (Round.IsLobby || Round.IsEnded || schem == null || schem.transform == null)
+                yield break;
+
             yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos + new Vector3(0f, 4f, 0f), new Vector3(0, -4f, 0), 1.5f));
         }
 
         private IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos, Vector3 offset, float duration)
         {
-            if (schem is null || duration <= 0f)
+            if (schem is null || schem.transform == null || duration <= 0f)
                 yield break;
 
             float elapsedTime = 0f;
@@ -281,13 +301,20 @@ namespace Slafight_Plugin_EXILED.MapExtensions
 
             while (elapsedTime < duration)
             {
+                if (Round.IsLobby || Round.IsEnded)
+                    yield break;
+
+                if (schem == null || schem.transform == null)
+                    yield break;
+
                 elapsedTime += Time.deltaTime;
                 float progress = elapsedTime / duration;
                 schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
                 yield return 0f;
             }
 
-            schem.transform.position = endPos;
+            if (schem != null && schem.transform != null)
+                schem.transform.position = endPos;
         }
 
         private void InteractionButton(PlayerSearchedToyEventArgs ev)
@@ -320,7 +347,11 @@ namespace Slafight_Plugin_EXILED.MapExtensions
                     foreach (var scp in scp106s)
                     {
                         var local = scp;
-                        Timing.CallDelayed(28f, () => { if (local?.IsConnected == true) local.Kill("Femur Breakerによって再収容された"); });
+                        Timing.CallDelayed(28f, () =>
+                        {
+                            if (local?.IsConnected == true)
+                                local.Kill("Femur Breakerによって再収容された");
+                        });
                     }
 
                     CreateAndPlayAudio("FemurBreaker.ogg", "FemurBreaker", Vector3.zero, true, null, false, 999999999, 0);
@@ -352,7 +383,6 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             if (castPlayer == null || specialDoors.Count == 0)
                 return;
 
-            // 近い特別扉を1つ特定
             KeyValuePair<Vector3, DoorConfig>? closest = null;
             float minDistSq = float.MaxValue;
             foreach (var kvp in specialDoors)
@@ -370,7 +400,6 @@ namespace Slafight_Plugin_EXILED.MapExtensions
 
             var config = closest.Value.Value;
 
-            // アイテムチェック（RequiredItemIdが0ならアイテム条件なし）
             bool hasItem = false;
             if (config.RequiredItemId > 0)
             {
@@ -385,7 +414,6 @@ namespace Slafight_Plugin_EXILED.MapExtensions
                 }
             }
 
-            // コードチェック
             bool hasCode = false;
             if (!string.IsNullOrEmpty(config.RequiredCode))
             {
@@ -393,12 +421,9 @@ namespace Slafight_Plugin_EXILED.MapExtensions
                           playerCode == config.RequiredCode;
             }
 
-            // OWJoin用: アイテムだけで開けたい → RequiredCode=nullなので hasCodeはfalse
-            // コード扉: RequiredItemId=0, RequiredCode="..." → hasItem=false, hasCodeで判定
             bool allowOpen = (config.RequiredItemId > 0 && config.RequiredCode == null && hasItem)
                              || (config.RequiredItemId == 0 && config.RequiredCode != null && hasCode)
                              || (config.RequiredItemId > 0 && config.RequiredCode != null && (hasItem || hasCode));
-            // ↑必要に応じてロジック変えてOK
 
             if (allowOpen)
             {
@@ -431,8 +456,10 @@ namespace Slafight_Plugin_EXILED.MapExtensions
                     target.Position = FBCP;
                     femuredPlayers.Add(target);
                     FemurSetup = true;
+
                     if (FBDoor != null)
                         Timing.RunCoroutine(Anim(FBDoor, FBDoor.Position, new Vector3(0f, -2.5f, 0f), 0.65f));
+
                     yield break;
                 }
 

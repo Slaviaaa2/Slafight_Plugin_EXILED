@@ -19,13 +19,13 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others
 
             player.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
             player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
+            player.UniqueRole = UniqueRoleKey;
             Plugin.Singleton.LabApiHandler.SchemSnowWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
             int maxHealth = 1000;
 
             Timing.CallDelayed(0.05f, () =>
             {
-                player.UniqueRole = UniqueRoleKey;
                 player.CustomInfo = "<color=#FFFFFF>SNOW WARRIER</color>";
                 player.InfoArea |= PlayerInfoArea.Nickname;
                 player.InfoArea &= ~PlayerInfoArea.Role;

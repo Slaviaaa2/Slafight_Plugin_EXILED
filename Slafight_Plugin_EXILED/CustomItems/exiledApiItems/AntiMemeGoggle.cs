@@ -21,7 +21,7 @@ public class AntiMemeGoggle : CustomGoggles
     public override bool CanBeRemoveSafely { get; set; } = true;
     public override bool Remove1344Effect { get; set; } = true;
 
-    public Color glowColor = Color.white;
+    public Color glowColor = Color.green;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();

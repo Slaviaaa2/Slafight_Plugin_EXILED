@@ -18,28 +18,9 @@ namespace Slafight_Plugin_EXILED.MapExtensions;
 public static class TerminalRift
 {
     private static bool _registered = false;
-    private static CoroutineHandle _animCoroutineHandle;
-    
-    public static void Register()
-    {
-        if (_registered) return;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SchematicsSetup;
-        Exiled.Events.Handlers.Server.RoundStarted += Setup;
-        Exiled.Events.Handlers.Server.RestartingRound += Cleanup;
-        Exiled.Events.Handlers.Player.Hurting += CancelDeath;
-        _registered = true;
-    }
 
-    public static void Unregister()
-    {
-        if (!_registered) return;
-        Timing.KillCoroutines(_animCoroutineHandle);
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SchematicsSetup;
-        Exiled.Events.Handlers.Server.RoundStarted -= Setup;
-        Exiled.Events.Handlers.Server.RestartingRound -= Cleanup;
-        Exiled.Events.Handlers.Player.Hurting -= CancelDeath;
-        _registered = false;
-    }
+    private static CoroutineHandle _animCoroutineHandle;
+    private static CoroutineHandle _timeoutHandle;
     
     public const float PositionTolerance = 2.25f;
     
@@ -48,7 +29,45 @@ public static class TerminalRift
     public static readonly List<SchematicObject> ControlObjects = new();
 
     public static bool Invoking { get; private set; } = false;
-    static Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
+    private static readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio
+        = EventHandler.CreateAndPlayAudio;
+
+    public static void Register()
+    {
+        if (_registered) return;
+
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SchematicsSetup;
+        Exiled.Events.Handlers.Server.RoundStarted += Setup;
+        Exiled.Events.Handlers.Server.RestartingRound += Cleanup;
+        Exiled.Events.Handlers.Player.Hurting += CancelDeath;
+
+        _registered = true;
+    }
+
+    public static void Unregister()
+    {
+        if (!_registered) return;
+
+        KillAllCoroutines();
+
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SchematicsSetup;
+        Exiled.Events.Handlers.Server.RoundStarted -= Setup;
+        Exiled.Events.Handlers.Server.RestartingRound -= Cleanup;
+        Exiled.Events.Handlers.Player.Hurting -= CancelDeath;
+
+        _registered = false;
+    }
+
+    private static void KillAllCoroutines()
+    {
+        if (_animCoroutineHandle.IsRunning)
+            Timing.KillCoroutines(_animCoroutineHandle);
+        if (_timeoutHandle.IsRunning)
+            Timing.KillCoroutines(_timeoutHandle);
+
+        _animCoroutineHandle = default;
+        _timeoutHandle = default;
+    }
 
     private static void SchematicsSetup(SchematicSpawnedEventArgs ev)
     {
@@ -67,67 +86,78 @@ public static class TerminalRift
     private static void Setup()
     {
         Invoking = false;
-        Timing.KillCoroutines(_animCoroutineHandle);
+        KillAllCoroutines();
     }
 
     private static void Cleanup()
     {
         ControlObjects.Clear();
         Invoking = false;
-        Timing.KillCoroutines(_animCoroutineHandle);
+        KillAllCoroutines();
+        RiftObject = null;
+        RiftObjectPosition = Vector3.zero;
     }
 
     public static void TryInvoke()
     {
         Log.Debug($"TryInvoke: Invoking={Invoking}");
         if (Invoking) return;
+
+        if (Round.IsLobby || Round.IsEnded)
+        {
+            Log.Debug("TryInvoke: round is lobby/ended, ignore.");
+            return;
+        }
         
         Invoking = true;
-        Timing.KillCoroutines(_animCoroutineHandle);
+        KillAllCoroutines();
 
-        if (RiftObject == null)
+        if (RiftObject == null || RiftObject.gameObject == null)
         {
-            Log.Warn("TryInvoke: RiftObject null");
+            Log.Warn("TryInvoke: RiftObject null or destroyed");
+            Invoking = false;
+            return;
+        }
+
+        if (!ControlObjects.Any())
+        {
+            Log.Warn("TryInvoke: no control objects");
             Invoking = false;
             return;
         }
         
-        CreateAndPlayAudio("Moving.ogg","RiftElevator",RiftObjectPosition,true,null,false,30f,0);
+        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+
         _animCoroutineHandle = Timing.RunCoroutine(AnimSet());
-        
-        Timing.CallDelayed(50f, () => ForceReset("timeout"));
+        _timeoutHandle = Timing.CallDelayed(50f, () => ForceReset("timeout"));
     }
 
     private static void ForceReset(string reason)
     {
-        if (Invoking) {
-            Log.Warn($"TerminalRift ForceReset ({reason})");
-            Invoking = false;
-            Timing.KillCoroutines(_animCoroutineHandle);
-        }
+        if (!Invoking) return;
+
+        Log.Warn($"TerminalRift ForceReset ({reason})");
+        Invoking = false;
+        KillAllCoroutines();
     }
 
     private static void CancelDeath(HurtingEventArgs ev)
     {
-        // 【ログ1】全ダメージイベントを記録（RoomType? → string変換で解決）
         string roomStr = ev.Player?.CurrentRoom?.Type.ToString() ?? "null";
         Log.Debug($"[CancelDeath] Player={ev.Player?.Nickname ?? "null"}, Damage={ev.DamageHandler.Type}, Attacker={ev.Attacker?.Nickname ?? "null"}, Amount={ev.Amount}, Room={roomStr}");
     
-        // 【厳密チェック1】プレイヤー存在確認
         if (ev.Player == null)
         {
             Log.Debug("[CancelDeath] SKIP: Player is null");
             return;
         }
     
-        // 【厳密チェック2】Crushedダメージのみ
         if (ev.DamageHandler.Type != DamageType.Crushed)
         {
             Log.Debug($"[CancelDeath] SKIP: Not Crushed (is {ev.DamageHandler.Type})");
             return;
         }
     
-        // 【厳密チェック3】攻撃者なしのみ
         if (ev.Attacker != null)
         {
             Log.Debug($"[CancelDeath] SKIP: Has Attacker ({ev.Attacker.Nickname})");
@@ -136,12 +166,11 @@ public static class TerminalRift
     
         Log.Debug("[CancelDeath] PASSED: Crushed + No Attacker");
     
-        // 【厳密チェック4】部屋判定（?.ToString() ?? "null" で安全）
         string currentRoomType = ev.Player.CurrentRoom?.Type.ToString();
         Log.Debug($"[CancelDeath] Checking room: '{currentRoomType}'");
     
-        if (currentRoomType == "HczTestRoom" || 
-            currentRoomType == "Surface" || 
+        if (currentRoomType == "HczTestRoom" ||
+            currentRoomType == "Surface" ||
             string.IsNullOrEmpty(currentRoomType))
         {
             Log.Debug($"[CancelDeath] CANCELLED: Target room ({currentRoomType})");
@@ -156,22 +185,53 @@ public static class TerminalRift
     private static IEnumerator<float> AnimSet()
     {
         Log.Debug("AnimSet start");
-        if (RiftObject?.gameObject == null || !ControlObjects.Any()) {
-            ForceReset("no rift/controls");
+
+        if (RiftObject?.gameObject == null || !ControlObjects.Any())
+        {
+            ForceReset("no rift/controls at AnimSet start");
+            yield break;
+        }
+
+        // ラウンドが終わっていないかチェック
+        if (Round.IsLobby || Round.IsEnded)
+        {
+            ForceReset("round ended at AnimSet start");
             yield break;
         }
         
         yield return Timing.WaitUntilDone(Anim(RiftObjectPosition, new Vector3(0f, -28.5f, 0f), 15f));
         Log.Debug("Anim down complete");
+
+        if (!Invoking) yield break;
+
         yield return Timing.WaitForSeconds(0.2f);
-        CreateAndPlayAudio("Beep.ogg","RiftElevator",RiftObjectPosition,true,null,false,30f,0);
+        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+
+        // ラウンド終了チェック
+        if (Round.IsLobby || Round.IsEnded)
+        {
+            ForceReset("round ended after down anim");
+            yield break;
+        }
+
         yield return Timing.WaitForSeconds(10f);
-        
-        CreateAndPlayAudio("Moving.ogg","RiftElevator",RiftObjectPosition,true,null,false,30f,0);
+
+        if (!Invoking) yield break;
+
+        if (RiftObject?.gameObject == null)
+        {
+            ForceReset("rift destroyed before up anim");
+            yield break;
+        }
+
+        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
         yield return Timing.WaitUntilDone(AnimToPosition(RiftObject.Position, RiftObjectPosition, 15f));
         Log.Debug("Anim up complete");
+
+        if (!Invoking) yield break;
+
         yield return Timing.WaitForSeconds(0.2f);
-        CreateAndPlayAudio("Beep.ogg","RiftElevator",RiftObjectPosition,true,null,false,30f,0);
+        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
         
         Log.Debug("AnimSet complete");
         Invoking = false;
@@ -185,17 +245,24 @@ public static class TerminalRift
         
         while (elapsedTime < duration)
         {
+            if (Round.IsLobby || Round.IsEnded)
+            {
+                ForceReset("round ended during down anim");
+                yield break;
+            }
+
+            if (RiftObject?.gameObject == null)
+            {
+                Log.Warn("Rift invalid during down anim");
+                ForceReset("rift destroyed during down anim");
+                yield break;
+            }
+
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / duration;
             Vector3 targetPos = Vector3.Lerp(startPos, endPos, progress);
             
-            if (RiftObject?.gameObject != null)
-                RiftObject.gameObject.transform.position = targetPos;
-            else {
-                Log.Warn("Rift invalid during down anim");
-                yield break;
-            }
-            
+            RiftObject.gameObject.transform.position = targetPos;
             yield return 0f;
         }
         
@@ -206,16 +273,26 @@ public static class TerminalRift
     private static IEnumerator<float> AnimToPosition(Vector3 startpos, Vector3 endpos, float duration)
     {
         float elapsedTime = 0f;
+
         while (elapsedTime < duration)
         {
+            if (Round.IsLobby || Round.IsEnded)
+            {
+                ForceReset("round ended during up anim");
+                yield break;
+            }
+
+            if (RiftObject?.gameObject == null)
+            {
+                ForceReset("rift destroyed during up anim");
+                yield break;
+            }
+
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / duration;
             Vector3 targetPos = Vector3.Lerp(startpos, endpos, progress);
             
-            if (RiftObject?.gameObject != null)
-                RiftObject.gameObject.transform.position = targetPos;
-            else yield break;
-            
+            RiftObject.gameObject.transform.position = targetPos;
             yield return 0f;
         }
         
@@ -224,7 +301,7 @@ public static class TerminalRift
     }
 }
 
-// ★同じファイルにLabApiハンドラー
+// LabApi ハンドラーはそのままで OK（位置判定だけ）
 public class TerminalRiftLabHandler : CustomEventsHandler
 {
     public TerminalRiftLabHandler()
@@ -236,10 +313,12 @@ public class TerminalRiftLabHandler : CustomEventsHandler
     {
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= OnSearchedToy;
     }
+
     private void OnSearchedToy(PlayerSearchedToyEventArgs ev)
     {
-        if (TerminalRift.ControlObjects.Any(control => 
-            Vector3.SqrMagnitude(ev.Interactable.Position - control.Position) <= TerminalRift.PositionTolerance * TerminalRift.PositionTolerance))
+        if (TerminalRift.ControlObjects.Any(control =>
+                Vector3.SqrMagnitude(ev.Interactable.Position - control.Position)
+                <= TerminalRift.PositionTolerance * TerminalRift.PositionTolerance))
         {
             TerminalRift.TryInvoke();
         }

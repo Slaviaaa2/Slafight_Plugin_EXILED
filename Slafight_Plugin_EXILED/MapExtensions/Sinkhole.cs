@@ -23,59 +23,73 @@ public class Sinkhole
         Exiled.Events.Handlers.Server.RoundStarted -= RoundStartHole;
     }
     
-    private List<Vector3> Sinkholes = new List<Vector3>();
-    private List<Player> JoiningPlayers = new List<Player>();
-    Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
+    private readonly List<Vector3> Sinkholes = new();
+    private readonly List<Player> JoiningPlayers = new();
+    private CoroutineHandle _sinkholeHandle;
+
+    private readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio 
+        = EventHandler.CreateAndPlayAudio;
     
     private void RoundStartHole()
     {
         Sinkholes.Clear();
         JoiningPlayers.Clear();
-        Timing.RunCoroutine(SinkholesCoroutine());
+
+        if (_sinkholeHandle.IsRunning)
+            Timing.KillCoroutines(_sinkholeHandle);
+
+        _sinkholeHandle = Timing.RunCoroutine(SinkholesCoroutine());
     }
 
     private IEnumerator<float> SinkholesCoroutine()
     {
         for (;;)
         {
+            if (Round.IsLobby || Round.IsEnded)
+                yield break;
+
             Sinkholes.Clear();
-            foreach (var sinkholes in Hazard.List)
+            foreach (var hazard in Hazard.List)
             {
-                if (sinkholes.Type == HazardType.Sinkhole)
-                {
-                    Sinkholes.Add(sinkholes.Position);
-                    //Log.Debug($"Sinkhole検出: {sinkholes.Position}");
-                }
+                if (hazard.Type == HazardType.Sinkhole)
+                    Sinkholes.Add(hazard.Position);
             }
 
-            //Log.Debug($"Sinkholes数: {Sinkholes.Count}");
-
-            if (Round.IsLobby) yield break;
-
-            foreach (Player player in Player.List)
+            foreach (var player in Player.List)
             {
-                if (player.GetTeam() == CTeam.SCPs) continue; // SCP除外
+                // プレイヤー生存・接続チェック
+                if (player == null || !player.IsConnected || !player.IsAlive)
+                    continue;
+
+                if (player.GetTeam() == CTeam.SCPs)
+                    continue;
 
                 foreach (var sinkhole in Sinkholes)
                 {
-                    // 修正1: 距離閾値を2.5fに拡大
                     float distance = Vector3.Distance(player.Position, sinkhole);
                     if (distance <= 1.5f)
                     {
-                        //Log.Debug($"プレイヤー {player.Nickname} がSinkholeに接近: {distance:F2}m");
-                    
                         if (!JoiningPlayers.Contains(player))
                         {
-                            CreateAndPlayAudio("SinkholeFall.ogg","Sinkhole",player.Position,true,null,false,10,0);
+                            CreateAndPlayAudio("SinkholeFall.ogg", "Sinkhole", player.Position, true, null, false, 10, 0);
                             JoiningPlayers.Add(player);
                             player.IsGodModeEnabled = true;
+
                             Timing.RunCoroutine(PocketJoinAnim(player, sinkhole));
+
                             Timing.CallDelayed(3.1f, () =>
                             {
+                                if (player == null || !player.IsConnected)
+                                    return;
+
                                 player.EnableEffect(EffectType.PocketCorroding);
                                 JoiningPlayers.Remove(player);
+
                                 Timing.CallDelayed(0.15f, () =>
                                 {
+                                    if (player == null || !player.IsConnected)
+                                        return;
+
                                     player.IsGodModeEnabled = false;
                                 });
                             });
@@ -83,21 +97,31 @@ public class Sinkhole
                     }
                 }
             }
-            yield return Timing.WaitForSeconds(3f); // 修正2: 更新頻度向上
+
+            yield return Timing.WaitForSeconds(3f);
         }
     }
     
-    private IEnumerator<float> PocketJoinAnim(Player player,Vector3 sinkholePos)
+    private IEnumerator<float> PocketJoinAnim(Player player, Vector3 sinkholePos)
     {
         float elapsedTime = 0f;
-        float totalDuration = 3f;
-        Vector3 startPos = new Vector3(player.Position.x, player.Position.y, player.Position.z);
-        Vector3 endPos = sinkholePos + new Vector3(0f,-1.05f,0f);
+        const float totalDuration = 3f;
+
+        Vector3 startPos = player.Position;
+        Vector3 endPos = sinkholePos + new Vector3(0f, -1.05f, 0f);
+
         while (elapsedTime < totalDuration)
         {
+            if (Round.IsLobby || Round.IsEnded)
+                yield break;
+
+            if (player == null || !player.IsConnected || !player.IsAlive)
+                yield break;
+
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / totalDuration;
             player.Position = Vector3.Lerp(startPos, endPos, progress);
+
             yield return 0f;
         }
     }

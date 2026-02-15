@@ -108,6 +108,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         private void OnVerified(VerifiedEventArgs ev)
         {
             ev.Player.Broadcast(6,"\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>",Broadcast.BroadcastFlags.Normal,true);
+            if (Round.InProgress) return;
             Timing.CallDelayed(0.05f, () =>
             {
                 string tips = Tips.GetRandomTip();

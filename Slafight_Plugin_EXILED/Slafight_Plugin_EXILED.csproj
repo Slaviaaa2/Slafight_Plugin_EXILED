@@ -247,6 +247,7 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\newEve\HIDTurret.cs" />
         <Compile Include="CustomItems\newEve\NeutralizeGrenade.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
@@ -256,7 +257,9 @@
         <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\FoundationForces\Sculpture.cs" />
+        <Compile Include="CustomRoles\FoundationForces\SneGears.cs" />
         <Compile Include="CustomRoles\FoundationForces\SneNeutralitist.cs" />
+        <Compile Include="CustomRoles\FoundationForces\SneOperator.cs" />
         <Compile Include="CustomRoles\FoundationForces\SnePurify.cs" />
         <Compile Include="CustomRoles\GoC\GoCCommunications.cs" />
         <Compile Include="CustomRoles\GoC\GoCDeputy.cs" />
@@ -270,6 +273,7 @@
         <Compile Include="CustomRoles\Others\SnowWarrier.cs" />
         <Compile Include="CustomRoles\Scientist\Object Observer.cs" />
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp035Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp173Role.cs" />
@@ -291,6 +295,7 @@
         <Compile Include="MainHandlers\RPNameSetter.cs" />
         <Compile Include="MainHandlers\SpawningHandler.cs" />
         <Compile Include="MainHandlers\SpawnSystem.cs" />
+        <Compile Include="MainHandlers\WearsHandler.cs" />
         <Compile Include="MapExtensions\CustomMap.cs" />
         <Compile Include="MapExtensions\MapFlags.cs" />
         <Compile Include="MapExtensions\MapGuardHandler.cs" />

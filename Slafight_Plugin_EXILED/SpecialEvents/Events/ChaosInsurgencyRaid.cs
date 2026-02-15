@@ -269,21 +269,43 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
         // ===== コルーチン =====
         private IEnumerator<float> NukeDownCoroutine(SchematicObject schem)
         {
+            if (schem == null || schem.transform == null)
+            {
+                Log.Warn("[CI Raid] NukeDown aborted: schem or transform is null at start.");
+                yield break;
+            }
+
             float elapsedTime = 0f;
-            float totalDuration = 150f;
-            Vector3 startPos = new Vector3(-90f, 500f, schem.transform.position.z);
-            Vector3 endPos = new Vector3(70f, 300f, schem.transform.position.z);
+            const float totalDuration = 150f;
+            float z = schem.transform.position.z;
+            Vector3 startPos = new Vector3(-90f, 500f, z);
+            Vector3 endPos   = new Vector3( 70f, 300f, z);
 
             while (elapsedTime < totalDuration)
             {
-                if (CancelIfOutdated())
+                // イベントが古くなった / ラウンド終了したら即終了
+                if (CancelIfOutdated() || Round.IsLobby || Round.IsEnded)
+                {
+                    Log.Info("[CI Raid] NukeDown stopped: event outdated or round ended.");
                     yield break;
+                }
+
+                // Schematic が途中で消えた場合も即終了
+                if (schem == null || schem.transform == null)
+                {
+                    Log.Warn("[CI Raid] NukeDown stopped: schem destroyed.");
+                    yield break;
+                }
 
                 elapsedTime += Time.deltaTime;
                 float progress = elapsedTime / totalDuration;
                 schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
+
                 yield return 0f;
             }
+
+            if (schem != null && schem.transform != null)
+                schem.transform.position = endPos;
         }
     }
 }

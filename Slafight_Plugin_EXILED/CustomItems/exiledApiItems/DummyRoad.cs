@@ -89,23 +89,69 @@ public class DummyRoad : CustomKeycard
 
     private IEnumerator<float> MissileCoroutine(SchematicObject schem, Player pushPlayer)
     {
+        if (schem == null || schem.transform == null)
+        {
+            Log.Warn("[DummyRoad] MissileCoroutine aborted: schem or transform is null at start.");
+            yield break;
+        }
+
         float elapsedTime = 0f;
-        float totalDuration = 0.5f;
+        const float totalDuration = 0.5f;
+
         Vector3 startPos = schem.transform.position;
-        // カメラの完全な方向（Y成分そのまま）で発射
-        Vector3 cameraForward = pushPlayer.CameraTransform.forward.normalized;
-        Vector3 endPos = startPos + cameraForward * 10f;  // 上・下どちらもOK
+        Vector3 cameraForward = pushPlayer != null ? pushPlayer.CameraTransform.forward.normalized : Vector3.forward;
+        Vector3 endPos = startPos + cameraForward * 10f;
+
         int i = 0;
         while (elapsedTime < totalDuration)
         {
-            Npc npc = Npc.Spawn("DummyRoad No. "+i,RoleTypeId.ClassD,schem.transform.position);
-            i++;
+            if (Round.IsLobby || Round.IsEnded)
+            {
+                Log.Info("[DummyRoad] MissileCoroutine stopped: round lobby/ended.");
+                yield break;
+            }
+
+            if (schem == null || schem.transform == null)
+            {
+                Log.Warn("[DummyRoad] MissileCoroutine stopped: schem destroyed.");
+                yield break;
+            }
+
+            if (pushPlayer != null && !pushPlayer.IsConnected)
+            {
+                Log.Info("[DummyRoad] MissileCoroutine stopped: owner disconnected.");
+                yield break;
+            }
+
+            // NPC spawn も安全チェック付きで
+            try
+            {
+                Npc npc = Npc.Spawn("DummyRoad No. " + i, RoleTypeId.ClassD, schem.transform.position);
+                i++;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[DummyRoad] NPC spawn failed: {ex}");
+            }
+
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / totalDuration;
             schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
+
             yield return 0f;
         }
-        schem.Destroy();
+
+        if (schem != null)
+        {
+            try
+            {
+                schem.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[DummyRoad] Error destroying schem: {ex}");
+            }
+        }
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)
