@@ -6,7 +6,7 @@ using ProjectMER.Features.Objects;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Slafight_Plugin_EXILED.MapExtensions;
+namespace Slafight_Plugin_EXILED.CustomMaps;
 
 public static class TrainComing
 {

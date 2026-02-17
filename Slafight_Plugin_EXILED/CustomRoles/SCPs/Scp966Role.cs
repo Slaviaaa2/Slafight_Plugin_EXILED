@@ -151,7 +151,7 @@ public class Scp966Role : CRole
     protected override void OnDying(DyingEventArgs ev)
     {
         Exiled.API.Features.Cassie.Clear();
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。");
+        Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。", true);
         SpeedLevels.Remove(ev.Player);
         base.OnDying(ev);
     }

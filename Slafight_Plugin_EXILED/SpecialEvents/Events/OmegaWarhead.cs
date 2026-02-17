@@ -3,7 +3,8 @@ using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.API.Features; // SpecialEvent 基底クラス
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps; // SpecialEvent 基底クラス
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -71,7 +72,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                         false);
 
                     // OMEGA プロトコル開始（CurrentEventPid をそのまま渡す）
-                    MapExtensions.OmegaWarhead.StartProtocol(CurrentEventPid, 555f);
+                    OmegaWarhead.StartProtocol(CurrentEventPid, 555f);
                 });
             });
         }

@@ -25,7 +25,6 @@ public class RootCommand : ParentCommand
         RegisterCommand(new SetQueue());
         RegisterCommand(new RunEvent());
         RegisterCommand(new SpawnUniversal());
-        RegisterCommand(new GiveUniversal());
         RegisterCommand(new AbilityUniversal());
         RegisterCommand(new SpawnPrefab());
         RegisterCommand(new PlaySurfaceAttack());

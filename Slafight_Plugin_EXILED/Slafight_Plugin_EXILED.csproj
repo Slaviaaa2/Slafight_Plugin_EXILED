@@ -43,6 +43,9 @@
         <Reference Include="Assembly-CSharp">
           <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
         </Reference>
+        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
+        </Reference>
         <Reference Include="Assembly-CSharp-firstpass">
             <HintPath>..\..\..\Tools\depBuild\references\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
@@ -50,34 +53,34 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
         </Reference>
         <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\CommandSystem.Core.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\CommandSystem.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.API, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.API.dll</HintPath>
+        <Reference Include="Exiled.API, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.API.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CreditTags, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CreditTags.dll</HintPath>
+        <Reference Include="Exiled.CreditTags, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.CreditTags.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomItems, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CustomItems.dll</HintPath>
+        <Reference Include="Exiled.CustomItems, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.CustomItems.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.CustomRoles, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.CustomRoles.dll</HintPath>
+        <Reference Include="Exiled.CustomRoles, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.CustomRoles.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Events, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Events.dll</HintPath>
+        <Reference Include="Exiled.Events, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.Events.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Loader, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Loader.dll</HintPath>
+        <Reference Include="Exiled.Loader, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.Loader.dll</HintPath>
         </Reference>
-        <Reference Include="Exiled.Permissions, Version=9.13.0.0, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\Exiled.Permissions.dll</HintPath>
+        <Reference Include="Exiled.Permissions, Version=9.13.1.0, Culture=neutral, processorArchitecture=Amd64">
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\Exiled.Permissions.dll</HintPath>
         </Reference>
         <Reference Include="HintServiceMeow">
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\HintServiceMeow-Exiled.dll</HintPath>
         </Reference>
         <Reference Include="LabApi, Version=1.1.4.3, Culture=neutral, processorArchitecture=Amd64">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\LabApi.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\LabApi.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -95,7 +98,7 @@
             <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="NorthwoodLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\NorthwoodLib.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\NorthwoodLib.dll</HintPath>
         </Reference>
         <Reference Include="Pooling">
             <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
@@ -148,7 +151,7 @@
             <HintPath>..\..\..\Tools\depBuild\references\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
         <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-          <HintPath>..\packages\ExMod.Exiled.9.13.0\lib\net48\YamlDotNet.dll</HintPath>
+          <HintPath>..\packages\ExMod.Exiled.9.13.1\lib\net48\YamlDotNet.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -156,10 +159,12 @@
         <Compile Include="Abilities\CreateSinkholeAbility.cs" />
         <Compile Include="Abilities\MagicMissileAbility.cs" />
         <Compile Include="Abilities\PlaceTantrumAbility.cs" />
+        <Compile Include="Abilities\Scp035TentacleAbility.cs" />
         <Compile Include="Abilities\SoundOfFifthAbility.cs" />
         <Compile Include="Abilities\TeleprotRandomAbility.cs" />
         <Compile Include="API\Enums\CTeam.cs" />
         <Compile Include="API\Enums\CustomColor.cs" />
+        <Compile Include="API\Enums\Scp035StateType.cs" />
         <Compile Include="API\Enums\SeasonTypeId.cs" />
         <Compile Include="API\Enums\TaskType.cs" />
         <Compile Include="API\Features\AbilityBase.cs" />
@@ -169,28 +174,27 @@
         <Compile Include="API\Features\AbilityManager.cs" />
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
-        <Compile Include="API\Features\CItem.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
+        <Compile Include="API\Features\ObjectPrefab.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
         <Compile Include="API\Features\RoleParseHelper.cs" />
         <Compile Include="API\Features\RoleSpecificTextProvider.cs" />
         <Compile Include="API\Features\ServerSpecifics.cs" />
         <Compile Include="API\Features\SpecialEvent.cs" />
         <Compile Include="API\Features\Tips.cs" />
+        <Compile Include="API\Interface\IObjectPrefab.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="Changes\CandyChanges.cs" />
         <Compile Include="Changes\ChristmasChanges.cs" />
         <Compile Include="Changes\EasterEggsHandler.cs" />
         <Compile Include="Changes\EscapeHandler.cs" />
-        <Compile Include="Changes\InspectingChanges.cs" />
         <Compile Include="Changes\Scp1509Handler.cs" />
         <Compile Include="Changes\Scp914Changes.cs" />
         <Compile Include="Commands\DevTools\AbilityUniversal.cs" />
         <Compile Include="Commands\DevTools\AddQueue.cs" />
         <Compile Include="Commands\DevTools\DebugStart.cs" />
         <Compile Include="Commands\DevTools\GetQueue.cs" />
-        <Compile Include="Commands\DevTools\GiveCustomItem.cs" />
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
         <Compile Include="Commands\DevTools\SpawnPrefab.cs" />
@@ -237,6 +241,7 @@
         <Compile Include="CustomItems\exiledApiItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\MasterCard.cs" />
+        <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\exiledApiItems\PlayingCard.cs" />
         <Compile Include="CustomItems\exiledApiItems\Quarter.cs" />
@@ -247,8 +252,7 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
-        <Compile Include="CustomItems\newEve\HIDTurret.cs" />
-        <Compile Include="CustomItems\newEve\NeutralizeGrenade.cs" />
+        <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
@@ -296,15 +300,15 @@
         <Compile Include="MainHandlers\SpawningHandler.cs" />
         <Compile Include="MainHandlers\SpawnSystem.cs" />
         <Compile Include="MainHandlers\WearsHandler.cs" />
-        <Compile Include="MapExtensions\CustomMap.cs" />
-        <Compile Include="MapExtensions\MapFlags.cs" />
-        <Compile Include="MapExtensions\MapGuardHandler.cs" />
-        <Compile Include="MapExtensions\OmegaWarhead.cs" />
-        <Compile Include="MapExtensions\PDEx.cs" />
-        <Compile Include="MapExtensions\Scp012_033.cs" />
-        <Compile Include="MapExtensions\Sinkhole.cs" />
-        <Compile Include="MapExtensions\TerminalRift.cs" />
-        <Compile Include="MapExtensions\TrainComing.cs" />
+        <Compile Include="CustomMaps\CustomMapMainHandler.cs" />
+        <Compile Include="CustomMaps\MapFlags.cs" />
+        <Compile Include="CustomMaps\MapGuardHandler.cs" />
+        <Compile Include="CustomMaps\OmegaWarhead.cs" />
+        <Compile Include="CustomMaps\PDEx.cs" />
+        <Compile Include="CustomMaps\Scp012_033.cs" />
+        <Compile Include="CustomMaps\Sinkhole.cs" />
+        <Compile Include="CustomMaps\TerminalRift.cs" />
+        <Compile Include="CustomMaps\TrainComing.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />

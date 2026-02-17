@@ -8,7 +8,7 @@ using MapGeneration;
 using MEC;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.MapExtensions;
+namespace Slafight_Plugin_EXILED.CustomMaps;
 
 public class MapGuardHandler
 {
@@ -28,7 +28,7 @@ public class MapGuardHandler
     {
         if (ev.DamageType != DoorDamageType.ServerCommand)
         {
-            if (!(Vector3.SqrMagnitude(ev.Door.Position - CustomMap.OWJoin) > 0.75 * 0.75))
+            if (!(Vector3.SqrMagnitude(ev.Door.Position - CustomMapMainHandler.OWJoin) > 0.75 * 0.75))
             {
                 ev.IsAllowed = false;
                 Message(ev.Player);
@@ -51,7 +51,7 @@ public class MapGuardHandler
             Log.Debug("abbabbabbaba");
             foreach (var door in Door.List)
             {
-                if (!(Vector3.SqrMagnitude(door.Position - CustomMap.OWJoin) > 0.75 * 0.75))
+                if (!(Vector3.SqrMagnitude(door.Position - CustomMapMainHandler.OWJoin) > 0.75 * 0.75))
                 {
                     door.Unlock();
                     door.IsOpen = false;

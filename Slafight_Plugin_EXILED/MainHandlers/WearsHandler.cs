@@ -9,170 +9,221 @@ using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.MainHandlers;
-
-public static class WearsHandler
+namespace Slafight_Plugin_EXILED.MainHandlers
 {
-    private static readonly Dictionary<Player, PlayerRoleHelpers.PlayerRoleInfo> PlayerRoles = new();
-    private static readonly Dictionary<Player, SchematicObject> PlayerSchematics = new();
-    private static CoroutineHandle _cleanupCoroutine;
-
-    public static void Register()
+    /// <summary>
+    /// プレイヤーに Schematic を「着せる」ためのユーティリティ。
+    /// - Wear / TryWear でスポーン＋親子付け＋ロール情報保存
+    /// - RegisterExternal で外部生成済み Schematic を登録
+    /// - DestroyCoroutine でロール変化時に自動 Destroy
+    /// </summary>
+    public static class WearsHandler
     {
-        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
-        Exiled.Events.Handlers.Server.RestartingRound += OnRoundRestarting;
-        Exiled.Events.Handlers.Player.Left += OnPlayerLeft;
-    }
+        private static readonly Dictionary<int, PlayerRoleHelpers.PlayerRoleInfo> PlayerRoles = new();
+        private static readonly Dictionary<int, SchematicObject> PlayerSchematics = new();
 
-    public static void Unregister()
-    {
-        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
-        Exiled.Events.Handlers.Server.RestartingRound -= OnRoundRestarting;
-        Exiled.Events.Handlers.Player.Left -= OnPlayerLeft;
-        Timing.KillCoroutines(_cleanupCoroutine);
-        CleanupAll();
-    }
+        private static CoroutineHandle _cleanupCoroutine;
 
-    public static void Wear(this Player player, string wearSchemName, Vector3? offset = null)
-    {
-        if (player == null || !player.IsVerified) return;
-
-        // 古い装備破壊
-        if (PlayerSchematics.TryGetValue(player, out var oldSchem))
+        public static void Register()
         {
-            oldSchem.Destroy();
-            PlayerSchematics.Remove(player);
-            PlayerRoles.Remove(player);
+            Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
+            Exiled.Events.Handlers.Server.RestartingRound += OnRoundRestarting;
+            Exiled.Events.Handlers.Player.Left += OnPlayerLeft;
         }
 
-        var offsetVector = offset ?? Vector3.zero;
-        SchematicObject schem = null;
+        public static void Unregister()
+        {
+            Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
+            Exiled.Events.Handlers.Server.RestartingRound -= OnRoundRestarting;
+            Exiled.Events.Handlers.Player.Left -= OnPlayerLeft;
 
-        try
-        {
-            schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
-            schem.transform.SetParent(player.Transform);
-        }
-        catch (Exception e)
-        {
-            Log.Error($"Wear failed for {player.Nickname}: {e}");
-            return;
+            if (_cleanupCoroutine.IsRunning)
+                Timing.KillCoroutines(_cleanupCoroutine);
+
+            CleanupAll();
         }
 
-        if (schem != null)
+        /// <summary>
+        /// 既にスポーン・親子付け済みの Schematic を登録する（LabApi など外部用）。
+        /// </summary>
+        public static void RegisterExternal(Player player, SchematicObject schem)
         {
-            PlayerSchematics[player] = schem;
-            PlayerRoles[player] = player.GetRoleInfo();  // ロール情報保存
+            if (player == null || schem == null)
+                return;
+
+            var id = player.Id;
+
+            if (PlayerSchematics.TryGetValue(id, out var old))
+            {
+                old.Destroy();
+                PlayerSchematics.Remove(id);
+                PlayerRoles.Remove(id);
+            }
+
+            PlayerSchematics[id] = schem;
+            PlayerRoles[id] = player.GetRoleInfo();
         }
-    }
-    
-    public static bool TryWear(this Player player, string wearSchemName, out SchematicObject schematicObject, Vector3? offset = null)
-    {
-        schematicObject = null;
-        if (player == null || !player.IsVerified)
+
+        /// <summary>
+        /// 失敗時は何も返さない簡易版。
+        /// </summary>
+        public static void Wear(this Player player, string wearSchemName, Vector3? offset = null)
+        {
+            if (player == null)
+                return;
+
+            var id = player.Id;
+
+            if (PlayerSchematics.TryGetValue(id, out var oldSchem))
+            {
+                oldSchem.Destroy();
+                PlayerSchematics.Remove(id);
+                PlayerRoles.Remove(id);
+            }
+
+            var offsetVector = offset ?? Vector3.zero;
+            SchematicObject schem;
+
+            try
+            {
+                schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
+                schem.transform.SetParent(player.Transform);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[WearsHandler] Wear failed for {player.Nickname}: {e}");
+                return;
+            }
+
+            if (schem == null)
+                return;
+
+            PlayerSchematics[id] = schem;
+            PlayerRoles[id] = player.GetRoleInfo();
+        }
+
+        /// <summary>
+        /// 成否＋ SchematicObject を取得したい場合はこちら。
+        /// </summary>
+        public static bool TryWear(this Player player, string wearSchemName, out SchematicObject schematicObject, Vector3? offset = null)
         {
             schematicObject = null;
-            return false;
-        }
 
-        // 古い装備破壊
-        if (PlayerSchematics.TryGetValue(player, out var oldSchem))
-        {
-            oldSchem.Destroy();
-            PlayerSchematics.Remove(player);
-            PlayerRoles.Remove(player);
-        }
+            if (player == null)
+                return false;
 
-        var offsetVector = offset ?? Vector3.zero;
-        SchematicObject schem = null;
+            var id = player.Id;
 
-        try
-        {
-            schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
-            schem.transform.SetParent(player.Transform);
-        }
-        catch (Exception e)
-        {
-            Log.Error($"Wear failed for {player.Nickname}: {e}");
-            schematicObject = null;
-            return false;
-        }
+            if (PlayerSchematics.TryGetValue(id, out var oldSchem))
+            {
+                oldSchem.Destroy();
+                PlayerSchematics.Remove(id);
+                PlayerRoles.Remove(id);
+            }
 
-        if (schem == null)
-        {
-            schematicObject = null;
-            return false;
-        }
-        else
-        {
-            PlayerSchematics[player] = schem;
-            PlayerRoles[player] = player.GetRoleInfo(); // ロール情報保存
+            var offsetVector = offset ?? Vector3.zero;
+            SchematicObject schem;
+
+            try
+            {
+                schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
+                schem.transform.SetParent(player.Transform);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[WearsHandler] TryWear failed for {player.Nickname}: {e}");
+                return false;
+            }
+
+            if (schem == null)
+                return false;
+
+            PlayerSchematics[id] = schem;
+            PlayerRoles[id] = player.GetRoleInfo();
             schematicObject = schem;
             return true;
         }
-    }
 
-    private static void OnRoundStarted()
-    {
-        _cleanupCoroutine = Timing.RunCoroutine(DestroyCoroutine());
-    }
-
-    private static void OnRoundRestarting()
-    {
-        Timing.KillCoroutines(_cleanupCoroutine);
-    }
-
-    private static void OnPlayerLeft(LeftEventArgs ev)
-    {
-        CleanupPlayer(ev.Player);
-    }
-
-    private static IEnumerator<float> DestroyCoroutine()
-    {
-        while (true)
+        private static void OnRoundStarted()
         {
-            if (!Round.InProgress) 
-            {
-                yield return Timing.WaitForSeconds(1f);
-                continue;
-            }
+            if (_cleanupCoroutine.IsRunning)
+                Timing.KillCoroutines(_cleanupCoroutine);
 
-            foreach (var kvp in PlayerRoles.ToList())
-            {
-                var player = kvp.Key;
-                if (!player.IsVerified || player.IsNPC) continue;
+            _cleanupCoroutine = Timing.RunCoroutine(DestroyCoroutine());
+        }
 
-                if (PlayerRoles.TryGetValue(player, out var savedInfo))
+        private static void OnRoundRestarting()
+        {
+            if (_cleanupCoroutine.IsRunning)
+                Timing.KillCoroutines(_cleanupCoroutine);
+
+            CleanupAll();
+        }
+
+        private static void OnPlayerLeft(LeftEventArgs ev)
+        {
+            CleanupPlayer(ev.Player);
+        }
+
+        /// <summary>
+        /// ロール変更を監視し、変化したプレイヤーの Schematic を自動 Destroy。
+        /// </summary>
+        private static IEnumerator<float> DestroyCoroutine()
+        {
+            while (true)
+            {
+                if (!Round.InProgress)
                 {
+                    yield return Timing.WaitForSeconds(1f);
+                    continue;
+                }
+
+                foreach (var kvp in PlayerRoles.ToList())
+                {
+                    var id = kvp.Key;
+                    var savedInfo = kvp.Value;
+
+                    var player = Player.Get(id);
+                    if (player == null)
+                        continue;
+
                     var currentInfo = player.GetRoleInfo();
-                    
-                    // ロール変更検知（Vanilla + Custom両方）
-                    if (savedInfo.Vanilla != currentInfo.Vanilla || 
+
+                    // 必要に応じて Vanilla のみに絞るなど調整
+                    if (savedInfo.Vanilla != currentInfo.Vanilla ||
                         savedInfo.Custom != currentInfo.Custom)
                     {
                         CleanupPlayer(player);
                     }
                 }
+
+                yield return Timing.WaitForSeconds(0.5f);
             }
-            yield return Timing.WaitForSeconds(0.5f);  // 負荷軽減
         }
-    }
 
-    private static void CleanupPlayer(Player player)
-    {
-        if (PlayerSchematics.TryGetValue(player, out var schem))
+        private static void CleanupPlayer(Player player)
         {
-            schem.Destroy();
-            PlayerSchematics.Remove(player);
-        }
-        PlayerRoles.Remove(player);
-    }
+            if (player == null)
+                return;
 
-    private static void CleanupAll()
-    {
-        foreach (var schem in PlayerSchematics.Values.ToList())
-            schem.Destroy();
-        PlayerSchematics.Clear();
-        PlayerRoles.Clear();
+            var id = player.Id;
+
+            if (PlayerSchematics.TryGetValue(id, out var schem))
+            {
+                schem.Destroy();
+                PlayerSchematics.Remove(id);
+            }
+
+            PlayerRoles.Remove(id);
+        }
+
+        private static void CleanupAll()
+        {
+            foreach (var schem in PlayerSchematics.Values.ToList())
+                schem.Destroy();
+
+            PlayerSchematics.Clear();
+            PlayerRoles.Clear();
+        }
     }
 }

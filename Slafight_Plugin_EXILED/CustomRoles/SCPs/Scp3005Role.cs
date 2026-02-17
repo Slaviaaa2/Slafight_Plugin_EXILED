@@ -8,6 +8,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
@@ -64,6 +65,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
         {
             if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp3005 && ev.Attacker != null)
             {
+                if (ev.Player.TryGetEffect(EffectType.SinkHole, out _) || ev.Attacker.HasCustomItem(2026)) return;
                 ev.IsAllowed = false;
                 ev.Attacker.Hurt(5f, "第五的な力による影響");
 
@@ -74,7 +76,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
 
         protected override void OnDying(DyingEventArgs ev)
         {
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました", true);
             base.OnDying(ev);
         }
 

@@ -1,34 +1,40 @@
 using System.Collections.Generic;
+using System.Linq;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
-using InventorySystem.Items.MicroHID.Modules;
 using Mirror;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
-[CustomItem(ItemType.MicroHID)]
-public class HIDTurret : CustomItem
+[CustomItem(ItemType.GrenadeHE)]
+public class NeutralizeGrenade : CustomGrenade
 {
-    public override uint Id { get; set; } = 1;
-    public override string Name { get; set; } = "H.I.D. Turret";
-    public override string Description { get; set; } = "このH.I.D.は小チャージのみ使用可能で、無限に撃つことが出来ます！";
+    public override uint Id { get; set; } = 2027;
+    public override string Name { get; set; } = "対反ミーム無力化グレネード";
+    public override string Description { get; set; } = "反ミーム存在及びその影響を受けた者を一時的に無力化し、ダメージを与える。";
     public override float Weight { get; set; } = 1f;
-    public override ItemType Type { get; set; } = ItemType.MicroHID;
-
-    public Color glowColor = Color.yellow;
-    private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
-
+    public override ItemType Type { get; set; } = ItemType.GrenadeHE;
     public override SpawnProperties SpawnProperties { get; set; } = new();
+
+    public override bool ExplodeOnCollision { get; set; } = true;
+    public override float FuseTime { get; set; } = 0.5f;
+
+    public Color glowColor = CustomColor.Purple.ToUnityColor();
+    private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.UsingMicroHIDEnergy += RightChargeDisable;
-        Exiled.Events.Handlers.Player.ChangingMicroHIDState += disRight;
+        Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
+        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
+        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         
@@ -37,30 +43,47 @@ public class HIDTurret : CustomItem
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.UsingMicroHIDEnergy -= RightChargeDisable;
-        Exiled.Events.Handlers.Player.ChangingMicroHIDState -= disRight;
+        Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
+        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
     }
 
-    private void disRight(ChangingMicroHIDStateEventArgs ev)
+    protected override void OnExploding(ExplodingGrenadeEventArgs ev)
     {
-        if (!Check(ev.Item)) { return; }
-        if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.ChargeFire && ev.NewPhase == MicroHidPhase.Firing)
+        var fifthists = ev.TargetsToAffect.Where(player => player.IsFifthist()).ToList();
+        ev.TargetsToAffect.Clear();
+        foreach (var player in fifthists)
         {
-            ev.IsAllowed = false;
+            player.EnableEffect(EffectType.SinkHole, 55, 5f);
+            if (player.GetTeam() == CTeam.Fifthists)
+            {
+                player.Hurt(10f);
+            }
+            else
+            {
+                player.Hurt(1000f);
+            }
+            ev.Player?.ShowHitMarker();
         }
     }
-    
-    private void RightChargeDisable(UsingMicroHIDEnergyEventArgs ev)
+
+    private void LimitPatch(PickingUpItemEventArgs ev)
     {
-        if (!Check(ev.Item)) { return; }
-        if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.PrimaryFire)
+        if (Check(ev.Pickup))
         {
-            Log.Debug(ev.MicroHID.LastFiringMode);
-            ev.IsAllowed = false;
+            ev.Player.SetCategoryLimit(ItemCategory.Grenade,(sbyte)(ev.Player.GetCategoryLimit(ItemCategory.Grenade)+1));
+        }
+    }
+
+    private void LimitDestroy(DroppingItemEventArgs ev)
+    {
+        if (Check(ev.Item))
+        {
+            ev.Player.SetCategoryLimit(ItemCategory.Grenade,(sbyte)(ev.Player.GetCategoryLimit(ItemCategory.Grenade)-1));
         }
     }
     

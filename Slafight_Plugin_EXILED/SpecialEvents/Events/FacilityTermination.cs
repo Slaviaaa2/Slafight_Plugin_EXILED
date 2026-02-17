@@ -150,6 +150,14 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             if (KillEvent()) yield break;
 
             Plugin.Singleton.PlayerHUD.AllSyncHUD_();
+            foreach (var player in Player.List)
+            {
+                if (player == null) continue;
+                player.Broadcast(8,
+                    player.IsHumanitist()
+                        ? "<size=20>あなたは<color=blue>人類陣営</color>です。\n警備員と彫刻以外が一応仲間です。狂気を生き延びて奴らを終了してください！</size>"
+                        : "<size=20>あなたは<color=red>正常性陣営</color>です。\n警備員と彫刻が仲間です。他の奴らを全員終了してください！</size>");
+            }
             Exiled.API.Features.Cassie.MessageTranslated(
                 "Attention, All personnel. Were recieved message from O5 Command. Please Red this and Terminate Human it Your Self.",
                 "全職員に通達。O5評議会からメッセージを受信した為、お知らせします。これをよく読み、自身の人間性を<color=green>破壊</color>してください。<split>以下はO5評議会の総意によって作成されたメッセージです。<split>現時点で私たちの存在を知らない方々へ: 私たちはSCP財団という組織を代表しています。私たちのかつての使命は、異常な事物、実体、その他様々な現象の収容と研究を中心に展開されていました。この使命は過去100年以上にわたって私たちの組織の焦点でした。<split>やむを得ない事情により、この方針は変更されました。私たちの新たな使命は人類の根絶です。<split>今後の意思疎通は行われません。",

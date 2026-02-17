@@ -100,7 +100,7 @@ public class Scp682Role : CRole
     {
         SpeedLevels.Remove(ev.Player);
         Exiled.API.Features.Cassie.Clear();
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。");
+        Exiled.API.Features.Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。", true);
         base.OnDying(ev);
     }
 }

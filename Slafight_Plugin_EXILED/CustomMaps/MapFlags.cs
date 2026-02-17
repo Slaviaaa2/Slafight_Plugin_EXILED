@@ -1,11 +1,11 @@
 using Slafight_Plugin_EXILED.API.Enums;
 
-namespace Slafight_Plugin_EXILED.MapExtensions;
+namespace Slafight_Plugin_EXILED.CustomMaps;
 
 public static class MapFlags
 {
-    public static bool FemurSetup => CustomMap._femurSetup;
-    public static bool FemurBreaked => CustomMap._femurBreaked;
+    public static bool FemurSetup => CustomMapMainHandler._femurSetup;
+    public static bool FemurBreaked => CustomMapMainHandler._femurBreaked;
     public static bool IsOmegaStarted => OmegaWarhead.IsWarheadStarted;
 
     /// <summary>

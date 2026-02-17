@@ -5,7 +5,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.MapExtensions;
+namespace Slafight_Plugin_EXILED.CustomMaps;
 
 public class Scp012_033
 {
@@ -24,7 +24,7 @@ public class Scp012_033
 
     private IEnumerator<float> ThetaPrimeCoroutine()
     {
-        var scp012Pos = CustomMap.Scp012_t.Position;
+        var scp012Pos = CustomMapMainHandler.Scp012_t.Position;
         while (true)  // for(;;)より明示的
         {
             var alivePlayers = Player.List.Where(p => p.IsConnected && !p.IsHost && !p.IsNPC).ToList();

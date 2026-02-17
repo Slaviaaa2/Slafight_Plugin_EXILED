@@ -20,11 +20,11 @@ using HarmonyLib;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.MainHandlers;
-using Slafight_Plugin_EXILED.MapExtensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UserSettings.ServerSpecific;
@@ -54,7 +54,7 @@ namespace Slafight_Plugin_EXILED
         
         public EventHandler EventHandler { get; set; }
         public SpecialEventsHandler SpecialEventsHandler { get; set; }
-        public CustomMap CustomMap { get; set; }
+        public CustomMapMainHandler CustomMapMainHandler { get; set; }
         public CustomRolesHandler CustomRolesHandler { get; set; }
         public LabApiHandler LabApiHandler { get; set; }
         public EasterEggsHandler EasterEggsHandler { get; set; }
@@ -82,7 +82,7 @@ namespace Slafight_Plugin_EXILED
             Singleton = this;
             EventHandler = new EventHandler();
             SpecialEventsHandler = new SpecialEventsHandler();
-            CustomMap = new CustomMap();
+            CustomMapMainHandler = new CustomMapMainHandler();
             CustomRolesHandler = new CustomRolesHandler();
             LabApiHandler = new();
             EasterEggsHandler = new();
@@ -101,7 +101,7 @@ namespace Slafight_Plugin_EXILED
             Scp1509Handler = new();
             Scp012_033 = new();
             CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
-            CustomHandlersManager.RegisterEventsHandler(CustomMap);
+            CustomHandlersManager.RegisterEventsHandler(CustomMapMainHandler);
 
             TerminalRiftLabHandler = new();
             CustomHandlersManager.RegisterEventsHandler(TerminalRiftLabHandler);
@@ -113,7 +113,6 @@ namespace Slafight_Plugin_EXILED
             
             WearsHandler.Register();
             CRole.RegisterAllEvents();
-            CItem.RegisterAllEvents();
             AbilityBase.RegisterEvents();
             AbilityManager.RegisterEvents();
             CustomRole.RegisterRoles(false);
@@ -161,7 +160,7 @@ namespace Slafight_Plugin_EXILED
             
             ProximityChat.Handler.UnregisterEvents();
             CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
-            CustomHandlersManager.UnregisterEventsHandler(CustomMap);
+            CustomHandlersManager.UnregisterEventsHandler(CustomMapMainHandler);
             
             CustomHandlersManager.UnregisterEventsHandler(TerminalRiftLabHandler);
             TerminalRift.Unregister();
@@ -170,7 +169,6 @@ namespace Slafight_Plugin_EXILED
             
             WearsHandler.Unregister();
             CRole.UnregisterAllEvents();
-            CItem.UnregisterAllEvents();
             AbilityBase.UnregisterEvents();
             AbilityManager.UnregisterEvents();
             CustomItem.UnregisterItems();

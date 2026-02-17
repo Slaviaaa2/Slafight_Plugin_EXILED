@@ -16,7 +16,7 @@ using Slafight_Plugin_EXILED.SpecialEvents;
 using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
-using OmegaWarhead = Slafight_Plugin_EXILED.MapExtensions.OmegaWarhead;
+using OmegaWarhead = Slafight_Plugin_EXILED.CustomMaps.OmegaWarhead;
 using Npc = Exiled.API.Features.Npc;
 
 namespace Slafight_Plugin_EXILED.Commands

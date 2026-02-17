@@ -185,6 +185,9 @@ public static class PlayerExtensions
             case CRoleTypeId.Scp173:
                 new Scp173Role().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.Scp035:
+                new Scp035Role().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Fifthists ====
             case CRoleTypeId.FifthistRescure:
                 new FifthistRescure().SpawnRole(player, roleSpawnFlags);
@@ -221,6 +224,19 @@ public static class PlayerExtensions
                 break;
             case CRoleTypeId.HdMarshal:
                 new HdMarshal().SpawnRole(player, roleSpawnFlags);
+                break;
+            // ==== See No Evil ====
+            case CRoleTypeId.SnePurify:
+                new SnePurify().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.SneNeutralitist:
+                new SneNeutralitist().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.SneGears:
+                new SneGears().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.SneOperator:
+                new SneOperator().SpawnRole(player, roleSpawnFlags);
                 break;
             // ==== Guards ====
             case CRoleTypeId.EvacuationGuard:

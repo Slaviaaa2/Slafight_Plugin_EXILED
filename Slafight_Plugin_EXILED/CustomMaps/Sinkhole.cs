@@ -9,7 +9,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
-namespace Slafight_Plugin_EXILED.MapExtensions;
+namespace Slafight_Plugin_EXILED.CustomMaps;
 
 public class Sinkhole
 {

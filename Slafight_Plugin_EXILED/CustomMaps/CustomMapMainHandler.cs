@@ -23,9 +23,9 @@ using ServerHandler = Exiled.Events.Handlers.Server;
 using MapHandler = Exiled.Events.Handlers.Map;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
-namespace Slafight_Plugin_EXILED.MapExtensions
+namespace Slafight_Plugin_EXILED.CustomMaps
 {
-    public class CustomMap : CustomEventsHandler
+    public class CustomMapMainHandler : CustomEventsHandler
     {
         private const float PositionTolerance = 1.25f;
         private const float FemurJoinRadius = 0.625f;
@@ -66,7 +66,7 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             public string HintMessage { get; set; } = "専用のアクセスパスが必要そうだ・・・";
         }
 
-        public CustomMap()
+        public CustomMapMainHandler()
         {
             ServerHandler.RoundStarted += OnRoundStarted;
             MapHandler.SpawningTeamVehicle += ChaosAnimation;
@@ -75,7 +75,7 @@ namespace Slafight_Plugin_EXILED.MapExtensions
             ProjectMER.Events.Handlers.Schematic.SchematicSpawned += GetSchems;
         }
 
-        ~CustomMap()
+        ~CustomMapMainHandler()
         {
             ServerHandler.RoundStarted -= OnRoundStarted;
             MapHandler.SpawningTeamVehicle -= ChaosAnimation;
@@ -177,6 +177,7 @@ namespace Slafight_Plugin_EXILED.MapExtensions
 
         private void SetupMaps()
         {
+            OmegaWarhead.IsWarheadStarted = false;
             if (femurCoroutine.IsRunning)
                 Timing.KillCoroutines(femurCoroutine);
 

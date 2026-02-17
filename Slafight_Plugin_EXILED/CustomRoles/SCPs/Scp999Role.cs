@@ -64,7 +64,7 @@ public class Scp999Role : CRole
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             "SCP 9 9 9 Successfully Terminated .",
-            "<color=red>SCP-999</color>の終了に成功しました。");
+            "<color=red>SCP-999</color>の終了に成功しました。", true);
         base.OnDying(ev);
     }
 }

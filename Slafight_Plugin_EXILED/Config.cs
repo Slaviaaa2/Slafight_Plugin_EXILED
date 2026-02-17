@@ -39,7 +39,7 @@ namespace Slafight_Plugin_EXILED
         [Description("")]
         public float DwBoomTime { get; set; } = 100f;
 
-        [Description("")] public HIDTurret _HIDTurret { get; set; } = new(); // 10000
+        [Description("")] public HIDTurret _HIDTurret { get; set; } = new(); // 1
         [Description("")] public KeycardFifthist _KeycardFifthist { get; set; } = new(); // 5
         [Description("")] public KeycardFifthistPriest _KeycardFifthistPriest { get; set; } = new(); // 6
         [Description("")] public ArmorInfantry _ArmorInfantry { get; set; } = new(); // 10
@@ -79,8 +79,6 @@ namespace Slafight_Plugin_EXILED
         [Description("")] public FileBackrooms FileBackrooms { get; set; } = new(); // 2024
         [Description("")] public FileDeltaWarhead FileDeltaWarhead { get; set; } = new(); // 2025
         [Description("")] public AntiMemeGoggle AntiMemeGoggle { get; set; } = new(); // 2026
-        
-        [Description("")] public GunGoCTurret GunGoCTurret { get; set; } = new(); // 10001
 
         [Description("")] public KeycardOld_ContainmentEngineer _KeycardOld_ContainmentEngineer { get; set; } = new(); // 100
         [Description("")] public KeycardOld_Janitor _KeycardOld_Janitor { get; set; } = new(); // 101

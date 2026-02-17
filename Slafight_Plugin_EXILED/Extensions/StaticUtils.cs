@@ -168,6 +168,14 @@ public static class StaticUtils
             if (player == null) return false;
             return player.GetTeam() != CTeam.FoundationForces && player.GetTeam() != CTeam.Guards;
         }
+        
+        public uint GetNetId()
+        {
+            if (player == null || player.ReferenceHub == null)
+                return 0;
+
+            return player.NetId;
+        }
     }
 
     extension(Item item)
@@ -185,19 +193,6 @@ public static class StaticUtils
         if (!Round.InProgress || Round.IsLobby || !Round.IsStarted || RoundSummary.SummaryActive) return;
         Round.Restart(false);
     }
-    
-    // ==== static API ====
-    public static Pickup GiveOrDropItem(this Player player, Type cItemType, Vector3? dropPosition = null)
-    {
-        var item = Activator.CreateInstance(cItemType) as CItem;
-        return item?.GiveOrDrop(player, dropPosition);
-    }
-
-    public static Item GiveItem(this Player player, Type cItemType)
-    {
-        var item = Activator.CreateInstance(cItemType) as CItem;
-        return item?.AddToPlayer(player);
-    }
 
     public static bool HasCustomItem(this Player player, CustomItem expectedItem)
     {
@@ -208,6 +203,32 @@ public static class StaticUtils
             if (item.IsCustomItem(out var customItem))
             {
                 return customItem.Id == expectedItem.Id;
+            }
+        }
+        return false;
+    }
+    public static bool HasCustomItem(this Player player, uint expectedItem)
+    {
+        if (player == null) return false;
+        foreach (var item in player.Items)
+        {
+            if (item == null) continue;
+            if (item.IsCustomItem(out var customItem))
+            {
+                return customItem.Id == expectedItem;
+            }
+        }
+        return false;
+    }
+    public static bool HasCustomItem(this Player player, string expectedItem)
+    {
+        if (player == null) return false;
+        foreach (var item in player.Items)
+        {
+            if (item == null) continue;
+            if (item.IsCustomItem(out var customItem))
+            {
+                return customItem.Name == expectedItem;
             }
         }
         return false;
