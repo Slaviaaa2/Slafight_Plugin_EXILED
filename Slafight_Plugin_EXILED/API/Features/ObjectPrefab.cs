@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Exiled.API.Features;
+using MEC;
 using Slafight_Plugin_EXILED.API.Interface;
 using UnityEngine;
 
@@ -24,24 +26,41 @@ public abstract class ObjectPrefab : IObjectPrefab
     public virtual Vector3 Position { get; set; } = Vector3.zero;
     public virtual Quaternion Rotation { get; set; } = Quaternion.identity;
     public virtual Vector3 Scale { get; set; } = Vector3.one;
+    public virtual bool AutoDestroyEnabled { get; set; } = false;
+    public virtual float AutoDestroyTime { get; set; } = -1f;
+    public virtual CoroutineHandle AutoDestroyCoroutineHandle { get; set; } = new CoroutineHandle();
     
     public virtual ObjectPrefab Create()
     {
+        Log.Debug("[ObjectPrefab]Create Invoked.");
         ObjectInstanceID = Guid.NewGuid().ToString("N")[..5];  // C#8以降のスライスで安全に5文字
         InstanceManager.Register(this);
+        if (AutoDestroyEnabled)
+            AutoDestroyCoroutineHandle = Timing.RunCoroutine(AutoDestroy());
         OnCreate();
         return this;
     }
     
     public virtual void Destroy()
     {
+        Log.Debug("[ObjectPrefab]Destroy Invoked.");
+    
+        if (string.IsNullOrEmpty(ObjectInstanceID))
+            return;
+
         InstanceManager.Unregister(ObjectInstanceID);
-        ObjectInstanceID = string.Empty;
+        Timing.KillCoroutines(AutoDestroyCoroutineHandle);
         OnDestroy();
     }
 
     protected virtual void OnCreate() { }
     protected virtual void OnDestroy() { }
+
+    protected virtual IEnumerator<float> AutoDestroy()
+    {
+        yield return Timing.WaitForSeconds(AutoDestroyTime);
+        Destroy();
+    }
 }
 
 // ==== 静的インスタンス管理クラス ==== //

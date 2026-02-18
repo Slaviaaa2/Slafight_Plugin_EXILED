@@ -194,11 +194,6 @@ public class EscapeHandler
     {
         return player.GetCustomRole() switch
         {
-            CRoleTypeId.Scp035 => new EscapeTargetRole 
-            { 
-                Vanilla = RoleTypeId.Spectator,
-                Custom  = null
-            },
             _ => new EscapeTargetRole 
             { 
                 Vanilla = null,

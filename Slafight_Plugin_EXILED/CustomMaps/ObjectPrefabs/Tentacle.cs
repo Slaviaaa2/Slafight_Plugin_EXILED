@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Features;
 using MEC;
 using ProjectMER.Features;
@@ -60,9 +61,16 @@ public class Tentacle : ObjectPrefab
 
     protected override void OnDestroy()
     {
-        _schematicObject?.Destroy();
-        Timing.KillCoroutines(_coroutineHandle);
-        base.OnDestroy();
+        Timing.KillCoroutines(_coroutineHandle);  // 即停止
+        _schematicObject?.AnimationController.Play("destroying");
+        Timing.CallDelayed(1.05f, () =>
+        {
+            _schematicObject?.AnimationController.Stop();
+            _schematicObject?.Destroy();
+            _schematicObject = null;
+            Log.Debug($"[Tentacle]Destroy Schematic called. Schematic Result: {_schematicObject}");
+        });  // ラムダでキャプチャ安全
+        base.OnDestroy();  // 親のクリーンアップ後
     }
 
     private IEnumerator<float> TentacleCoroutine()
@@ -101,8 +109,8 @@ public class Tentacle : ObjectPrefab
             animator.Play("attacking");
 
             // 攻撃アニメ中、しばらくターゲットを向き続ける（60fps で ~50frame）
-            const float attackWindow = 0.83f;      // 50 / 60
-            const float checkInterval = 1f / 60f;  // 1 frame 相当
+            const float attackWindow = 0.83f; // 50 / 60
+            const float checkInterval = 1f / 60f; // 1 frame 相当
             float elapsed = 0f;
 
             while (elapsed < attackWindow)

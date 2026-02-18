@@ -374,7 +374,7 @@ namespace Slafight_Plugin_EXILED.CustomMaps
                     ev.Player.SendHint("何らかの要因で実行できませんでした");
                     return;
                 }
-                OmegaWarhead.StartProtocol(specialEventsHandler.EventPID);
+                OmegaWarhead.StartProtocol(specialEventsHandler.EventPID, startedBy:ev.Player);
             }
         }
 

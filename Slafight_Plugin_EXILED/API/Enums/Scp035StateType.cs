@@ -4,5 +4,6 @@ public enum Scp035StateType
 {
     Stable,
     Unstable,
-    Awaken
+    Awaken,
+    FullyAwaken
 }

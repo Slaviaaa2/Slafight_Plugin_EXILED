@@ -44,9 +44,8 @@ public class Scp035TentacleAbility : AbilityBase
         {
             var position = player.Position
                            + player.CameraTransform.forward * 3f
-                           + Vector3.up * 0.45f;
-            var tentacle = new Tentacle(){Position = position}.Create();
-            Timing.CallDelayed(60f, () => tentacle.Destroy());
+                           + Vector3.up * 0.1f;
+            new Tentacle(){Position = position, AutoDestroyEnabled = true, AutoDestroyTime = 30f}.Create();
         }
         catch (Exception ex)
         {

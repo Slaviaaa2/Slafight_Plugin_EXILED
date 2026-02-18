@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
@@ -9,6 +10,7 @@ using Exiled.API.Features.Items;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp106;
+using Exiled.Events.EventArgs.Warhead;
 using HintServiceMeow.Core.Utilities;
 using InventorySystem.Items.Scp1509;
 using MEC;
@@ -20,6 +22,7 @@ using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.SpecialEvents;
@@ -36,14 +39,16 @@ public class Scp035Role : CRole
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Dying += OnDyingByRole;
-        EscapeHandler.PlayerCustomEscaping += OnEscaping;
+        Exiled.Events.Handlers.Warhead.Starting += OnStartingByRole;
+        OmegaWarhead.OmegaWarheadStarting += OnStartingByRoleOnOmega;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Player.Dying -= OnDyingByRole;
-        EscapeHandler.PlayerCustomEscaping -= OnEscaping;
+        Exiled.Events.Handlers.Warhead.Starting -= OnStartingByRole;
+        OmegaWarhead.OmegaWarheadStarting -= OnStartingByRoleOnOmega;
         base.UnregisterEvents();
     }
     
@@ -68,14 +73,17 @@ public class Scp035Role : CRole
         player.ClearInventory();
         player.AddItem(ItemType.KeycardScientist);
         player.AddItem(ItemType.Painkillers);
-        player.SetCustomInfo("SCP-035");
+        player.SetCustomInfo("<color=#C50000>SCP-035</color>");
         TryChangeState(player, new Scp035State()
         {
             NowState = Scp035StateType.Stable,
             ChangeStateTimeAwaiting = 180f,
         });
+
+        player.Position = Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up * 0.65f);
         
-        player.TryWear("SCP035", out var schematicObject,new Vector3(0f, 0.65f, 0.15f));
+        player.TryWear("SCP035", out var schematicObject,new Vector3(0f, 0.65f, 0.175f));
+        schematicObject.Scale += new Vector3(0.08f, 0.08f, 0.08f);
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
 
         Timing.CallDelayed(0.05f, () =>
@@ -83,8 +91,8 @@ public class Scp035Role : CRole
             player.ShowHint("<size=24><color=red>SCP-035</color>\n" +
                             "愚かな博士が仮面をつけて乗っ取れた！\n" +
                             "但し、博士がなんとかしようと仮面に抵抗している為精神状態が不安定です。\n" +
-                            "あなたの最終的な目標は<color=green>施設からの脱出</color>です。\n" +
-                            "精神が安定している時は比較的人間達に協力し、そうでない時は\n「触手」を用いて邪魔をさせないようにし、出口へと向かいましょう。\n" +
+                            "あなたの最終的な目標は<color=red>施設の破壊</color>です。\n" +
+                            "精神が安定している時は比較的人間達に友好的に接し、そうでない時は\n「触手」を用いて邪魔をさせないようにし、弾頭へと向かいましょう。\n" +
                             "<color=yellow>※通常時は博士、発狂時はチュートリアルの見た目になります。" +
                             "※RPがとても重要となります。頑張って！</color></size>",
                 15f);
@@ -105,20 +113,22 @@ public class Scp035Role : CRole
         ev.Attacker.ArtificialHealth += 35f;
     }
 
-    private void OnEscaping(object sender, PlayerCustomEscapingEventArgs ev)
+    private void OnStartingByRole(StartingEventArgs ev)
     {
-        if (!Check(ev.Player)) return;
-        if (!ev.Player.IsCuffed)
-        {
-            if (SpecialEventsHandler.IsWarheadable())
-            {
-                DeadmanSwitch.InitiateProtocol();
-            }
-        }
-        else
-        {
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 0 3 5 Recontained successfully .", "<color=red>SCP-035</color>の再収容に成功しました。", true);
-        }
+        var state = GetState(ev.Player);
+        if (!Check(ev.Player) || state.NowState == Scp035StateType.FullyAwaken) return;
+        state.NowState = Scp035StateType.FullyAwaken;
+        state.ChangeStateTimeAwaiting = 1;
+        TryChangeState(ev.Player, state);
+    }
+
+    private void OnStartingByRoleOnOmega(object sender, OmegaWarheadStartingEventArgs ev)
+    {
+        var state = GetState(ev.Player);
+        if (!Check(ev.Player) || state.NowState == Scp035StateType.FullyAwaken) return;
+        state.NowState = Scp035StateType.FullyAwaken;
+        state.ChangeStateTimeAwaiting = 1;
+        TryChangeState(ev.Player, state);
     }
 
     public void Cleanup(Player player)
@@ -178,6 +188,7 @@ public class Scp035Role : CRole
             Scp035StateType.Stable => "<color=green>安定</color>",
             Scp035StateType.Unstable => "<color=yellow>不安定</color>",
             Scp035StateType.Awaken => "<color=red>発狂／覚醒</color>",
+            Scp035StateType.FullyAwaken => "<color=red><b>完全覚醒</b></color>",
             _ => "[不明]"
         };
     }
@@ -191,24 +202,33 @@ public class Scp035Role : CRole
                 player.DisableAllEffects();
                 if (AbilityBase.HasAbility<Scp035TentacleAbility>(player))
                     player.RemoveAbility<Scp035TentacleAbility>();
-                player.EnableEffect(EffectType.Scp1509Resurrected);
                 player.ChangeAppearance(RoleTypeId.Scientist);
-                player.ShowHint($"安定状態へと移行しました！\n現在精神は比較的安定しており、人々に危害を与える必要は無いでしょう。\nアビリティ「触手」が無効化されました。\n<color=green>人々と友好的に接しましょう</color>");
+                player.ShowHint($"<color=green>安定</color>状態へと移行しました！\n現在精神は比較的安定しており、人々に危害を与える必要は無いでしょう。\nアビリティ「触手」が無効化されました。\n<color=green>人々と友好的に接しましょう</color>");
                 return true;
             case Scp035StateType.Unstable:
-                player.EnableEffect(EffectType.Bleeding, 10, 10f);
-                player.ShowHint($"不安定状態へと移行しました！\n現在精神は揺れ動いており、常に回復が必要でしょう。\n腐蝕が再開しました。\n<color=yellow>人々に警告を与え、己の生存を心掛けましょう。</color>");
+                player.EnableEffect(EffectType.Poisoned, 10);
+                player.ShowHint($"<color=yellow>不安定</color>状態へと移行しました！\n現在精神は揺れ動いており、常に回復が必要でしょう。\n腐蝕が再開しました。\n<color=yellow>人々に警告を与え、己の生存を心掛けましょう。</color>");
                 return true;
             case Scp035StateType.Awaken:
-                player.DisableAllEffects();
+                player.DisableEffect(EffectType.Poisoned);
                 if (!AbilityBase.HasAbility<Scp035TentacleAbility>(player))
                     player.AddAbility(new Scp035TentacleAbility(player));
                 player.EnableEffect(EffectType.Invigorated, 20);
                 player.EnableEffect(EffectType.BodyshotReduction, 30);
                 player.EnableEffect(EffectType.DamageReduction, 30);
-                player.EnableEffect(EffectType.Scp1509Resurrected);
                 player.ChangeAppearance(RoleTypeId.Tutorial);
-                player.ShowHint($"発狂／覚醒状態へと移行しました！\n現在精神は支配されており、己の為に全てを犠牲にする必要があるでしょう。\n腐蝕が止まり、アビリティ「触手」が使用可能になりました！\n<color=red>ためらう必要はない。出る事だけを考えるのだ。</color>");
+                player.ShowHint($"<color=red>発狂／覚醒</color>状態へと移行しました！\n現在精神は支配されており、己の為に全てを犠牲にする必要があるでしょう。\n腐蝕が止まり、アビリティ「触手」が使用可能になりました！\n<color=red>ためらう必要はない。出る事だけを考えるのだ。</color>");
+                return true;
+            case Scp035StateType.FullyAwaken:
+                player.DisableEffect(EffectType.Poisoned);
+                if (!AbilityBase.HasAbility<Scp035TentacleAbility>(player))
+                    player.AddAbility(new Scp035TentacleAbility(player));
+                player.EnableEffect(EffectType.Invigorated, 30);
+                player.EnableEffect(EffectType.BodyshotReduction, 40);
+                player.EnableEffect(EffectType.DamageReduction, 40);
+                player.EnableEffect(EffectType.MovementBoost, 5);
+                player.ChangeAppearance(RoleTypeId.Tutorial);
+                player.ShowHint($"<color=red><b>完全覚醒</b></color>状態へと移行しました！\n現在精神は完全に支配されており、もはや受け入れるしかないでしょう！\nアビリティ「触手」が利用可能になりました！");
                 return true;
         }
 
@@ -225,7 +245,13 @@ public class Scp035Role : CRole
                 yield break;
             }
             var state = GetState(player);
-            RoleSpecificTextProvider.Set(player, $"状態：{GetStateLoc(state.NowState)}\n変化まで：{(int)state.ChangeStateTimeAwaiting}");
+            var value = (int)state.ChangeStateTimeAwaiting;
+            if (value < 0f)
+                value = -1;
+            RoleSpecificTextProvider.Set(player,
+                value > 0f
+                    ? $"状態：{GetStateLoc(state.NowState)}\n変化まで：{(int)state.ChangeStateTimeAwaiting}"
+                    : $"状態：{GetStateLoc(state.NowState)}\n変化まで：<color=red><b>抵抗不可能</b></color>");
             state.ChangeStateTimeAwaiting -= 0.1f;
             if (state.ChangeStateTimeAwaiting <= 0)
             {
@@ -237,13 +263,14 @@ public class Scp035Role : CRole
                     _ => state.NowState
                 };
                 Trigger(player, state.NowState);
-                state.ChangeStateTimeAwaiting = 180f;
+                if (state.NowState != Scp035StateType.FullyAwaken)
+                {
+                    state.ChangeStateTimeAwaiting = 180f;
+                }
             }
 
-            if (state.NowState == Scp035StateType.Unstable && !player.TryGetEffect(EffectType.Bleeding, out _))
-            {
-                player.EnableEffect(EffectType.Bleeding, 10, 10f);
-            }
+            if (!player.TryGetEffect(EffectType.Poisoned, out _) && state.NowState == Scp035StateType.Unstable)
+                player.EnableEffect(EffectType.Poisoned, 10);
             
             TryChangeState(player, state);
             yield return Timing.WaitForSeconds(0.1f);

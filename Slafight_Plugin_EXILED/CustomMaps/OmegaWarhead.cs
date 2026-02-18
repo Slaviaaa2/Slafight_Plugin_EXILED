@@ -10,15 +10,26 @@ using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED.CustomMaps;
 
+public class OmegaWarheadStartingEventArgs : EventArgs
+{
+    /// <summary>
+    /// 起動しようとしているプレイヤー
+    /// </summary>
+    public Player Player { get; }
+    public bool IsAllowed { get; }
+    public OmegaWarheadStartingEventArgs(Player player, bool isAllowed) => Player = player;
+}
 public static class OmegaWarhead
 {
     private static readonly SpecialEventsHandler SpecialEventsHandler = Plugin.Singleton.SpecialEventsHandler;
     private static int warheadPID;
 
     public static bool IsWarheadStarted;
+    public static Player StartedPlayer = null;
     static Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
+    public static event EventHandler<OmegaWarheadStartingEventArgs> OmegaWarheadStarting; 
     
-    public static void StartProtocol(int pid, float triggerTime = 0f)
+    public static void StartProtocol(int pid, float triggerTime = 0f, Player startedBy = null)
     {
         if (IsWarheadStarted) return;
         warheadPID = pid;
@@ -29,6 +40,10 @@ public static class OmegaWarhead
         Timing.CallDelayed(triggerTime, () =>
         {
             if (pid != SpecialEventsHandler.EventPID || Warhead.IsInProgress) return;
+            StartedPlayer = startedBy;
+            var ev = new OmegaWarheadStartingEventArgs(startedBy, true);
+            OmegaWarheadStarting?.Invoke(null, ev);
+            if (!ev.IsAllowed) return;
             IsWarheadStarted = true;
             foreach (Room rooms in Room.List)
             {
