@@ -6,6 +6,7 @@ using Exiled.Events.EventArgs.Server;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Random = UnityEngine.Random;
 
@@ -52,78 +53,16 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         }
 
         // =====================
-        //  内部イベント
-        // =====================
-
-        public class SpawningEventArgs : EventArgs
-        {
-            public SpawnTypeId SpawnType { get; }
-            public bool IsMiniWave { get; }
-            public Faction Faction { get; }
-
-            // Cassie用: NATO_A / NATO_B ...
-            public string CassieCallsign { get; }
-
-            // 表示用: ALPHA-05 など
-            public string DisplayCallsign { get; }
-
-            // Waveの湧き人数
-            public int SpawnCount { get; }
-
-            // どのコンテキストで湧いたか（"Default" / "EventX"）
-            public string ContextName { get; }
-
-            public SpawningEventArgs(
-                SpawnTypeId spawnType,
-                bool isMiniWave,
-                Faction faction,
-                string contextName,
-                string cassieCallsign = "",
-                string displayCallsign = "",
-                int spawnCount = 0)
-            {
-                SpawnType = spawnType;
-                IsMiniWave = isMiniWave;
-                Faction = faction;
-                ContextName = contextName;
-                CassieCallsign = cassieCallsign;
-                DisplayCallsign = displayCallsign;
-                SpawnCount = spawnCount;
-            }
-        }
-
-        public static event EventHandler<SpawningEventArgs> Spawning;
-
-        private static void OnSpawning(
-            SpawnTypeId spawnType,
-            bool isMiniWave,
-            Faction faction,
-            string contextName,
-            string cassieCallsign = "",
-            string displayCallsign = "",
-            int spawnCount = 0)
-        {
-            Spawning?.Invoke(null, new SpawningEventArgs(
-                spawnType,
-                isMiniWave,
-                faction,
-                contextName,
-                cassieCallsign,
-                displayCallsign,
-                spawnCount));
-        }
-
-        // =====================
-        //  Config + Context
+        //  Config
         // =====================
 
         public class SpawnConfig
         {
-            // 元の「通常時」テーブル
             public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; set; } = new()
             {
                 { SpawnTypeId.MTF_NtfNormal, 80 },
                 { SpawnTypeId.MTF_HDNormal,  20 },
+                { SpawnTypeId.MTF_SneNormal, 0 },
             };
 
             public Dictionary<SpawnTypeId, int> FoundationEnemyWaveWeights { get; set; } = new()
@@ -136,6 +75,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             {
                 { SpawnTypeId.MTF_NtfBackup, 80 },
                 { SpawnTypeId.MTF_HDBackup,  20 },
+                { SpawnTypeId.MTF_SneBackup, 0 },
             };
 
             public Dictionary<SpawnTypeId, int> FoundationEnemyMiniWaveWeights { get; set; } = new()
@@ -156,85 +96,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 { SpawnTypeId.GOI_FifthistBackup, 1f / 6f },
             };
 
-            public Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> RoleTables
-            { get; set; } = new()
-            {
-                // NTF
-                {
-                    SpawnTypeId.MTF_NtfNormal, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.NtfGeneral),    (1f,  false)  },
-                        { new SpawnRoleKey(RoleTypeId.NtfCaptain),     (1f,  true)   },
-                        { new SpawnRoleKey(CRoleTypeId.NtfLieutenant), (2f,  false)  },
-                        { new SpawnRoleKey(RoleTypeId.NtfSergeant),    (2f,  false)  },
-                        { new SpawnRoleKey(RoleTypeId.NtfPrivate),     (99f, true)   },
-                    }
-                },
-                {
-                    SpawnTypeId.MTF_NtfBackup, new()
-                    {
-                        { new SpawnRoleKey(RoleTypeId.NtfSergeant), (1f,  true) },
-                        { new SpawnRoleKey(RoleTypeId.NtfPrivate),  (99f, true) },
-                    }
-                },
-
-                // Hammer Down
-                {
-                    SpawnTypeId.MTF_HDNormal, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.HdMarshal),   (1f,  false)  },
-                        { new SpawnRoleKey(CRoleTypeId.HdCommander), (2f,  true)   },
-                        { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false)  },
-                    }
-                },
-                {
-                    SpawnTypeId.MTF_HDBackup, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.HdCommander), (1f,  true)  },
-                        { new SpawnRoleKey(CRoleTypeId.HdInfantry),  (99f, false) },
-                    }
-                },
-
-                // Chaos
-                {
-                    SpawnTypeId.GOI_ChaosNormal, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.ChaosCommando), (1f,  false) },
-                        { new SpawnRoleKey(RoleTypeId.ChaosRepressor), (2f,  false) },
-                        { new SpawnRoleKey(CRoleTypeId.ChaosSignal),   (2f,  false) },
-                        { new SpawnRoleKey(RoleTypeId.ChaosMarauder),  (2f,  false) },
-                        { new SpawnRoleKey(RoleTypeId.ChaosRifleman),  (99f, false) },
-                    }
-                },
-                {
-                    SpawnTypeId.GOI_ChaosBackup, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.ChaosSignal),  (1f,  true)  },
-                        { new SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f,  false) },
-                        { new SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) },
-                    }
-                },
-
-                // Fifthist
-                {
-                    SpawnTypeId.GOI_FifthistNormal, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.FifthistPriest),  (1f,  true)  },
-                        { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (3f,  false) },
-                        { new SpawnRoleKey(CRoleTypeId.FifthistGuidance), (1f, false) },
-                        { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
-                    }
-                },
-                {
-                    SpawnTypeId.GOI_FifthistBackup, new()
-                    {
-                        { new SpawnRoleKey(CRoleTypeId.FifthistRescure), (1f,  false) },
-                        { new SpawnRoleKey(CRoleTypeId.FifthistGuidance), (1f, false) },
-                        { new SpawnRoleKey(CRoleTypeId.FifthistConvert), (99f, false) }
-                    }
-                },
-            };
-
             public int ScpThresholdHigh    { get; set; } = 3;
             public int PlayerThresholdHigh { get; set; } = 6;
 
@@ -242,52 +103,88 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             public bool NatoCallsign       { get; set; } = true;
         }
 
-        // コンテキスト：通常 / イベント時にテーブルを差し替える用
-        public class SpawnContext
-        {
-            public string Name { get; }
-            public Dictionary<SpawnTypeId, int> FoundationStaffWaveWeights { get; }
-            public Dictionary<SpawnTypeId, int> FoundationEnemyWaveWeights { get; }
-            public Dictionary<SpawnTypeId, int> FoundationStaffMiniWaveWeights { get; }
-            public Dictionary<SpawnTypeId, int> FoundationEnemyMiniWaveWeights { get; }
-            public Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> RoleTables { get; }
+        public static SpawnConfig Config { get; } = new();
 
-            public SpawnContext(
-                string name,
-                Dictionary<SpawnTypeId, int> staffWeights,
-                Dictionary<SpawnTypeId, int> enemyWeights,
-                Dictionary<SpawnTypeId, int> staffMiniWeights,
-                Dictionary<SpawnTypeId, int> enemyMiniWeights,
-                Dictionary<SpawnTypeId, Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)>> roles)
+        // =====================
+        //  CustomSpawningEventArgs
+        // =====================
+
+        public class CustomSpawningEventArgs : EventArgs
+        {
+            /// <summary>この Wave のスポーンを許可するかどうか。</summary>
+            public bool IsAllowed { get; set; } = true;
+
+            /// <summary>現在有効なコンテキスト。</summary>
+            public SpawnContext NowContext { get; }
+
+            /// <summary>
+            /// この Wave で使用する weights。
+            /// デフォルトでは NowContext からコピーされた値で初期化される。
+            /// </summary>
+            public Dictionary<SpawnTypeId, int> ContextOverride { get; }
+
+            /// <summary>
+            /// スポーンさせる SpawnTypeId。
+            /// null の場合は ContextOverride から抽選される。
+            /// </summary>
+            public SpawnTypeId? SpawnType { get; set; }
+
+            /// <summary>今回の Wave の陣営。</summary>
+            public Faction Faction { get; }
+
+            /// <summary>MiniWave かどうか。</summary>
+            public bool IsMiniWave { get; }
+
+            /// <summary>元の RespawningTeamEventArgs。</summary>
+            public RespawningTeamEventArgs SourceEventArgs { get; }
+
+            /// <summary>実際にスポーンさせた人数（スポーン前は 0）。</summary>
+            public int SpawnCount { get; set; }
+
+            /// <summary>Cassie 用コールサイン（NATO_A など）。</summary>
+            public string CassieCallsign { get; set; } = string.Empty;
+
+            /// <summary>表示用コールサイン（ALPHA-05 など）。</summary>
+            public string DisplayCallsign { get; set; } = string.Empty;
+
+            public CustomSpawningEventArgs(
+                RespawningTeamEventArgs sourceEventArgs,
+                SpawnContext nowContext,
+                Dictionary<SpawnTypeId, int> baseWeights,
+                Faction faction,
+                bool isMiniWave)
             {
-                Name = name;
-                FoundationStaffWaveWeights = staffWeights;
-                FoundationEnemyWaveWeights = enemyWeights;
-                FoundationStaffMiniWaveWeights = staffMiniWeights;
-                FoundationEnemyMiniWaveWeights = enemyMiniWeights;
-                RoleTables = roles;
+                SourceEventArgs = sourceEventArgs;
+                NowContext = nowContext;
+                Faction = faction;
+                IsMiniWave = isMiniWave;
+                ContextOverride = new Dictionary<SpawnTypeId, int>(baseWeights);
             }
         }
 
-        public static SpawnConfig Config { get; } = new();
+        /// <summary>
+        /// スポーン決定前に呼ばれるイベント。
+        /// ContextOverride / SpawnType / IsAllowed を通じて今回の Wave を自由にカスタマイズできる。
+        /// </summary>
+        public static event EventHandler<CustomSpawningEventArgs> Spawning;
 
-        // Context一覧と現在有効なContext
-        public static Dictionary<string, SpawnContext> SpawnContexts { get; } = new();
-        public static string ActiveContextName { get; private set; } = "Default";
-        public static SpawnContext ActiveContext => SpawnContexts[ActiveContextName];
+        /// <summary>
+        /// スポーン処理完了後に呼ばれるイベント。
+        /// 引数は CustomSpawningEventArgs を使い回し、SpawnType / SpawnCount / Callsign などが埋まった状態になる。
+        /// </summary>
+        public static event EventHandler<CustomSpawningEventArgs> Spawned;
 
         // =====================
         //  状態フラグ
         // =====================
 
-        private bool isDefaultWave = true;
+        private bool _isDefaultWave = true;
         public static bool Disable = false;
 
         public static SpawnOverrideMode OverrideMode { get; private set; } = SpawnOverrideMode.None;
         public static SpawnTypeId? PendingOverrideType { get; private set; }
         public static bool PendingMiniWave { get; private set; }
 
-        // SpawnSystemインスタンスを外から参照したい場合用
         public static SpawnSystem Instance { get; set; }
 
         // =====================
@@ -296,21 +193,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
         public SpawnSystem()
         {
-            // Context初期化
-            if (!SpawnContexts.ContainsKey("Default"))
-            {
-                SpawnContexts["Default"] = new SpawnContext(
-                    "Default",
-                    Config.FoundationStaffWaveWeights,
-                    Config.FoundationEnemyWaveWeights,
-                    Config.FoundationStaffMiniWaveWeights,
-                    Config.FoundationEnemyMiniWaveWeights,
-                    Config.RoleTables
-                );
-            }
-
             Instance = this;
-
             Exiled.Events.Handlers.Server.RespawningTeam += SpawnHandler;
         }
 
@@ -322,24 +205,6 @@ namespace Slafight_Plugin_EXILED.MainHandlers
         // =====================
         //  外部からの切り替えAPI
         // =====================
-
-        public static void SwitchSpawnContext(string contextName)
-        {
-            if (!SpawnContexts.ContainsKey(contextName))
-            {
-                Log.Warn($"SpawnSystem: Unknown context '{contextName}'");
-                return;
-            }
-
-            ActiveContextName = contextName;
-            Log.Info($"SpawnSystem: Active context switched to '{contextName}'");
-        }
-
-        public static void RegisterSpawnContext(SpawnContext context)
-        {
-            SpawnContexts[context.Name] = context;
-            Log.Info($"SpawnSystem: Context '{context.Name}' registered");
-        }
 
         public static void ReplaceNextSpawn(SpawnTypeId spawnType, bool isMiniWave = false)
         {
@@ -373,7 +238,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 return;
             }
 
-            // オーバーライド（NextWave）が設定されていたらそれを優先
+            // 即時オーバーライド（NextWave）
             if (OverrideMode == SpawnOverrideMode.NextWave && PendingOverrideType.HasValue)
             {
                 ev.IsAllowed = false;
@@ -382,7 +247,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 return;
             }
 
-            if (!isDefaultWave)
+            if (!_isDefaultWave)
                 return;
 
             ev.IsAllowed = false;
@@ -394,25 +259,30 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             else if (ev.NextKnownTeam == Faction.FoundationEnemy)
                 decided = DecideFoundationEnemyType(ev);
 
-            // Context内で有効なタイプが無い場合は、その波自体をスキップ
             if (decided is null)
             {
-                Log.Warn($"SpawnSystem: No spawn type decided for {ev.NextKnownTeam} in context '{ActiveContextName}'");
+                Log.Warn($"SpawnSystem: No spawn type decided for {ev.NextKnownTeam} in context '{SpawnContextRegistry.ActiveContextName}'");
                 return;
             }
 
             SummonForces(decided.Value, ev.Wave.IsMiniWave);
         }
 
+        // =====================
+        //  Decide: FoundationStaff
+        // =====================
+
         private SpawnTypeId? DecideFoundationStaffType(RespawningTeamEventArgs ev)
         {
+            var ctx = SpawnContextRegistry.ActiveContext;
+            if (ctx == null)
+                return null;
+
             int scpCount = Player.List.Count(p => p.Role.Team == Team.SCPs);
             bool highThreat = Player.Count >= Config.PlayerThresholdHigh ||
                               scpCount      >= Config.ScpThresholdHigh;
 
-            var ctx = ActiveContext;
-
-            var weights = new Dictionary<SpawnTypeId, int>(
+            var baseWeights = new Dictionary<SpawnTypeId, int>(
                 ev.Wave.IsMiniWave
                     ? ctx.FoundationStaffMiniWaveWeights
                     : ctx.FoundationStaffWaveWeights
@@ -422,67 +292,69 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             {
                 if (ev.Wave.IsMiniWave)
                 {
-                    if (weights.ContainsKey(SpawnTypeId.MTF_HDBackup))
-                        weights[SpawnTypeId.MTF_HDBackup] *= 2;
+                    if (baseWeights.ContainsKey(SpawnTypeId.MTF_HDBackup))
+                        baseWeights[SpawnTypeId.MTF_HDBackup] *= 2;
                 }
                 else
                 {
-                    if (weights.ContainsKey(SpawnTypeId.MTF_HDNormal))
-                        weights[SpawnTypeId.MTF_HDNormal] *= 2;
+                    if (baseWeights.ContainsKey(SpawnTypeId.MTF_HDNormal))
+                        baseWeights[SpawnTypeId.MTF_HDNormal] *= 2;
                 }
             }
 
-            return PickWeightedSpawnType(weights);
+            var args = new CustomSpawningEventArgs(
+                ev,
+                ctx,
+                baseWeights,
+                Faction.FoundationStaff,
+                ev.Wave.IsMiniWave
+            );
+
+            Spawning?.Invoke(null, args);
+
+            if (!args.IsAllowed)
+                return null;
+
+            if (args.SpawnType.HasValue)
+                return args.SpawnType.Value;
+
+            return PickWeightedSpawnType(args.ContextOverride);
         }
+
+        // =====================
+        //  Decide: FoundationEnemy
+        // =====================
 
         private SpawnTypeId? DecideFoundationEnemyType(RespawningTeamEventArgs ev)
         {
-            bool has3005 = Player.List.Any(p => p.GetCustomRole() == CRoleTypeId.Scp3005 || p.GetCustomRole() == CRoleTypeId.FifthistPriest);
+            var ctx = SpawnContextRegistry.ActiveContext;
+            if (ctx == null)
+                return null;
 
-            var ctx = ActiveContext;
-
-            var weights = new Dictionary<SpawnTypeId, int>(
+            var baseWeights = new Dictionary<SpawnTypeId, int>(
                 ev.Wave.IsMiniWave
                     ? ctx.FoundationEnemyMiniWaveWeights
                     : ctx.FoundationEnemyWaveWeights
             );
 
-            if (has3005)
-            {
-                if (ev.Wave.IsMiniWave)
-                {
-                    if (weights.ContainsKey(SpawnTypeId.GOI_FifthistBackup))
-                        weights[SpawnTypeId.GOI_FifthistBackup] = 40;
-                    if (weights.ContainsKey(SpawnTypeId.GOI_ChaosBackup))
-                        weights[SpawnTypeId.GOI_ChaosBackup]    = 60;
-                }
-                else
-                {
-                    if (weights.ContainsKey(SpawnTypeId.GOI_FifthistNormal))
-                        weights[SpawnTypeId.GOI_FifthistNormal] = 40;
-                    if (weights.ContainsKey(SpawnTypeId.GOI_ChaosNormal))
-                        weights[SpawnTypeId.GOI_ChaosNormal]    = 60;
-                }
-            }
-            else
-            {
-                if (ev.Wave.IsMiniWave)
-                {
-                    if (weights.ContainsKey(SpawnTypeId.GOI_FifthistBackup))
-                        weights[SpawnTypeId.GOI_FifthistBackup] = 0;
-                    if (weights.ContainsKey(SpawnTypeId.GOI_ChaosBackup))
-                        weights[SpawnTypeId.GOI_ChaosBackup]    = 100;
-                }
-                else
-                {
-                    if (weights.ContainsKey(SpawnTypeId.GOI_FifthistNormal))
-                        weights[SpawnTypeId.GOI_FifthistNormal] = 0;
-                    if (weights.ContainsKey(SpawnTypeId.GOI_ChaosNormal))
-                        weights[SpawnTypeId.GOI_ChaosNormal]    = 100;
-                }
-            }
+            var args = new CustomSpawningEventArgs(
+                ev,
+                ctx,
+                baseWeights,
+                Faction.FoundationEnemy,
+                ev.Wave.IsMiniWave
+            );
 
-            return PickWeightedSpawnType(weights);
+            // 3005/Fifthist などの特殊処理は全部ここにぶら下がるハンドラ側で書く
+            Spawning?.Invoke(null, args);
+
+            if (!args.IsAllowed)
+                return null;
+
+            if (args.SpawnType.HasValue)
+                return args.SpawnType.Value;
+
+            return PickWeightedSpawnType(args.ContextOverride);
         }
 
         // =====================
@@ -491,10 +363,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
         public void SummonForces(SpawnTypeId spawnType, bool isMiniWave)
         {
-            isDefaultWave = false;
-
-            string cassieCallsign  = string.Empty;
-            string displayCallsign = string.Empty;
+            _isDefaultWave = false;
 
             var specs = Player.List
                 .Where(p =>
@@ -503,6 +372,9 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 .ToList();
 
             int spawnCount = specs.Count;
+
+            string cassieCallsign  = string.Empty;
+            string displayCallsign = string.Empty;
 
             if (Config.NatoCallsign)
             {
@@ -531,9 +403,26 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 _ => Faction.Unclassified
             };
 
-            OnSpawning(spawnType, isMiniWave, faction, ActiveContextName, cassieCallsign, displayCallsign, spawnCount);
+            // Spawned イベントに渡す Args を組み立てる
+            var ctx = SpawnContextRegistry.ActiveContext;
+            var dummyWeights = new Dictionary<SpawnTypeId, int>(); // ここでは使わないが型上必要
 
-            Timing.CallDelayed(0.02f, () => isDefaultWave = true);
+            var spawnedArgs = new CustomSpawningEventArgs(
+                sourceEventArgs: null,
+                nowContext: ctx,
+                baseWeights: dummyWeights,
+                faction: faction,
+                isMiniWave: isMiniWave)
+            {
+                SpawnType = spawnType,
+                SpawnCount = spawnCount,
+                CassieCallsign = cassieCallsign,
+                DisplayCallsign = displayCallsign,
+            };
+
+            Spawned?.Invoke(null, spawnedArgs);
+
+            Timing.CallDelayed(0.02f, () => _isDefaultWave = true);
         }
 
         // =====================
@@ -545,7 +434,9 @@ namespace Slafight_Plugin_EXILED.MainHandlers
             Func<Player, bool> playerFilter,
             int? fixedCount = null)
         {
-            var ctx = ActiveContext;
+            var ctx = SpawnContextRegistry.ActiveContext;
+            if (ctx == null)
+                return;
 
             if (!ctx.RoleTables.TryGetValue(spawnType, out var table) || table.Count == 0)
                 return;
@@ -624,11 +515,10 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
         private SpawnTypeId? PickWeightedSpawnType(Dictionary<SpawnTypeId, int> weights)
         {
-            // コンテキスト外のタイプは weights に乗らない前提
             var valid = weights.Where(kvp => kvp.Value > 0).ToList();
             if (!valid.Any())
             {
-                Log.Warn($"SpawnSystem: No valid spawn types in '{ActiveContextName}'");
+                Log.Warn($"SpawnSystem: No valid spawn types in '{SpawnContextRegistry.ActiveContextName}'");
                 return null;
             }
 

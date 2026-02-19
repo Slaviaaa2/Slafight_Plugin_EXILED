@@ -20,6 +20,7 @@ using HarmonyLib;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -46,9 +47,9 @@ namespace Slafight_Plugin_EXILED
         public override string Name => "Slafight_Plugin_EXILED";
         public override string Author => "Slaviaaa_2";
         public override string Prefix => "Slafight_Plugin_EXILED";
-        public override Version Version => new Version(1,6,0,6);
+        public override Version Version => new Version(1,7,0,0);
         
-        public override Version RequiredExiledVersion { get; } = new Version(9, 13, 0);
+        public override Version RequiredExiledVersion { get; } = new Version(9, 13, 1);
 
         public Harmony HarmonyInstance { get; private set; }
         
@@ -116,8 +117,10 @@ namespace Slafight_Plugin_EXILED
             AbilityBase.RegisterEvents();
             AbilityManager.RegisterEvents();
             CustomRole.RegisterRoles(false);
-            CustomItem.RegisterItems(skipReflection: false, overrideClass: Config);
+            CustomItemsManager.RegisterAllItems();
             
+            UnitPackBootstrap.RegisterAllPacks();
+            SpawnContextBootstrap.RegisterAllContexts(SpawnSystem.Config);
             SpawnSystem = new();
             SpawningHandler = new();
 

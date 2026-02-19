@@ -39,7 +39,7 @@ public static class CassieHelper
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             $"MtfUnit Eta 10 designated See no E be l HasEntered AllRemaining . This forces work for the anti- me mu termination",
-            $"<color=#6a00ff>機動部隊Eta-10 \"シー・ノー・イーヴル\"</color>が施設に到着しました。残存する全職員は、機動部隊が目的地に到着するまで、標準避難プロトコルに従って行動してください。<split>" +
+            $"<color=#FF1493>機動部隊Eta-10 \"シー・ノー・イーヴル\"</color>が施設に到着しました。残存する全職員は、機動部隊が目的地に到着するまで、標準避難プロトコルに従って行動してください。<split>" +
             $"この部隊は反ミーム存在の終了の為に招集されました。",
             true);
     }
@@ -48,7 +48,7 @@ public static class CassieHelper
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             "See no E be l Backup unit has entered the facility .",
-            "<color=#6a00ff>シー・ノー・イーヴル 予備部隊</color>が施設に到着しました。",
+            "<color=#FF1493>シー・ノー・イーヴル 予備部隊</color>が施設に到着しました。",
             true);
     }
     

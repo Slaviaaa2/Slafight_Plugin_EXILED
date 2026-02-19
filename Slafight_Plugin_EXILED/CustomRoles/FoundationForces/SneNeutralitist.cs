@@ -20,25 +20,25 @@ public class SneNeutralitist : CRole
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.NtfPrivate);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 110;
+        player.MaxHealth = 125;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-        player.AddItem(ItemType.GunCrossvec);
+        player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.KeycardMTFOperative);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
-        //player.GiveItem(typeof(NeutralizeGrenade));
-        //player.GiveItem(typeof(NeutralizeGrenade));
+        player.TryAddCustomItem(2027);
+        player.TryAddCustomItem(2027);
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorCombat);
             
-        player.AddAmmo(AmmoType.Nato9,140);
+        player.AddAmmo(AmmoType.Nato556,140);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
-        player.SetCustomInfo("<color=#6a00ff>See No Evil Neutralitist</color>");
+        player.SetCustomInfo("<color=#FF1493>See No Evil Neutralitist</color>");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#6a00ff>シー・ノー・イービル 破力兵</color>\n気狂いどもを食い止めろ！",10f);
+            player.ShowHint("<color=#FF1493>シー・ノー・イービル 破力兵</color>\n気狂いどもを食い止めろ！",10f);
         });
     }
 }

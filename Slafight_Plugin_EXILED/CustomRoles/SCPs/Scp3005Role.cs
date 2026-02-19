@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
+using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
@@ -65,7 +68,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
         {
             if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp3005 && ev.Attacker != null)
             {
-                if (ev.Player.TryGetEffect(EffectType.SinkHole, out _) || ev.Attacker.HasCustomItem(2026)) return;
+                bool hasGoggles = ev.Attacker.Items
+                    .OfType<Scp1344>()
+                    .Any(i => i.IsCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
                 ev.IsAllowed = false;
                 ev.Attacker.Hurt(5f, "第五的な力による影響");
 
@@ -100,6 +106,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
 
                     if (target.GetTeam() == CTeam.SCPs || target.GetTeam() == CTeam.Fifthists)
                         continue;
+                    
+                    bool hasGoggles = target.Items
+                        .OfType<Scp1344>()
+                        .Any(i => i.IsCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                    if (hasGoggles)  continue;
 
                     float distance = Vector3.Distance(player.Position, target.Position);
                     if (distance <= 2.75f)

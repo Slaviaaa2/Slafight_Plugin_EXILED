@@ -18,26 +18,27 @@ public class SneOperator : CRole
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfPrivate);
+        player.Role.Set(RoleTypeId.NtfCaptain);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 110;
+        player.MaxHealth = 150;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-        player.AddItem(ItemType.GunE11SR);
-        player.AddItem(ItemType.KeycardMTFOperative);
+        player.AddItem(ItemType.GunFRMG0);
+        player.AddItem(ItemType.KeycardMTFCaptain);
         player.TryAddCustomItem(2010);
-        player.AddItem(ItemType.Medkit);
         player.TryAddCustomItem(2026);
+        player.TryAddCustomItem(2027);
+        player.TryAddCustomItem(2027);
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorHeavy);
             
-        player.AddAmmo(AmmoType.Nato556,140);
+        player.AddAmmo(AmmoType.Nato556,220);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
-        player.SetCustomInfo("<color=#6a00ff>See No Evil Gears</color>");
+        player.SetCustomInfo("<color=#FF1493>See No Evil Operator</color>");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#6a00ff>シー・ノー・イービル 対圧兵</color>\n気狂いどもに一撃を与えろ！",10f);
+            player.ShowHint("<color=#FF1493>シー・ノー・イービル オペレーター</color>\n部隊を指揮し、気狂いどもに正常性による一撃を与えよ！",10f);
         });
     }
 }

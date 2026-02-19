@@ -20,7 +20,7 @@ public class SnePurify : CRole
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.NtfPrivate);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 110;
+        player.MaxHealth = 125;
         player.Health = player.MaxHealth;
         player.ClearInventory();
         player.AddItem(ItemType.SCP1509);
@@ -35,10 +35,10 @@ public class SnePurify : CRole
         player.AddAmmo(AmmoType.Nato9,140);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
-        player.SetCustomInfo("<color=#6a00ff>See No Evil Purify</color>");
+        player.SetCustomInfo("<color=#FF1493>See No Evil Purify</color>");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#6a00ff>シー・ノー・イービル 浄化師</color>\n気狂いどもを正常しろ！",10f);
+            player.ShowHint("<color=#FF1493>シー・ノー・イービル 修正兵</color>\n気狂いどもを正常しろ！",10f);
         });
     }
 }

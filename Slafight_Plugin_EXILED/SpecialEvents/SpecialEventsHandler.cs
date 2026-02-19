@@ -275,7 +275,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
             Plugin.Singleton.EventHandler.SpecialWarhead = false;
             Warhead.IsLocked = false;
             SpawnSystem.Disable = false;
-            SpawnSystem.SwitchSpawnContext("Default");
+            SpawnContextRegistry.SetActive("Default");
         }
 
         // ==== ラウンド系イベントハンドラ ====

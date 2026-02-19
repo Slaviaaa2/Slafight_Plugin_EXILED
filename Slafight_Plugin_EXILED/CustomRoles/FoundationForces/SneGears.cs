@@ -18,9 +18,9 @@ public class SneGears : CRole
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfPrivate);
+        player.Role.Set(RoleTypeId.NtfSergeant);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 110;
+        player.MaxHealth = 125;
         player.Health = player.MaxHealth;
         player.ClearInventory();
         player.AddItem(ItemType.GunE11SR);
@@ -34,10 +34,10 @@ public class SneGears : CRole
         player.AddAmmo(AmmoType.Nato556,140);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
-        player.SetCustomInfo("<color=#6a00ff>See No Evil Gears</color>");
+        player.SetCustomInfo("<color=#FF1493>See No Evil Gears</color>");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#6a00ff>シー・ノー・イービル 対圧兵</color>\n気狂いどもに一撃を与えろ！",10f);
+            player.ShowHint("<color=#FF1493>シー・ノー・イービル 対圧兵</color>\n気狂いどもに一撃を与えろ！",10f);
         });
     }
 }

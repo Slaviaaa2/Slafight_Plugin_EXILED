@@ -11,7 +11,8 @@ public static class AbilityLocalization
         ["AllowEscapeAbility"] = "腐蝕からの解放",
         ["SoundOfFifthAbility"] = "第五からの音",
         ["TeleportRandomAbility"] = "メインヴィラン",
-        ["PlaceTantrumAbility"] = "汚物作戦"
+        ["PlaceTantrumAbility"] = "汚物作戦",
+        ["Scp035TentacleAbility"] = "触手",
     };
 
     public static string GetDisplayName(string key, Exiled.API.Features.Player player)

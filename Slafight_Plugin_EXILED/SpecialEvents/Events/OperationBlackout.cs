@@ -95,7 +95,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             IsOperation = false;
 
             SpawnSystem.Disable = false;
-            SpawnSystem.SwitchSpawnContext("Default");
+            SpawnContextRegistry.SetActive("Default");
             EventHandler.IsScpAutoSpawnLocked = false;
 
             Timing.KillCoroutines(_specCoroutine);

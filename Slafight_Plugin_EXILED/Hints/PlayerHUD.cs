@@ -283,6 +283,11 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#c50000>The SCPs</color>";
                     SyncTextObjective = "可愛いペットとして施設を歩き回れ！　※勝敗に影響しません。良い感じに遊んでね！";
                     break;
+                case CRoleTypeId.Scp035:
+                    SyncTextRole = "<color=#c50000>SCP-035</color>";
+                    SyncTextTeam = "<color=#c50000>The SCPs</color>";
+                    SyncTextObjective = "あなたは仮面に乗っ取られ、精神が不安定になっている。<color=red>核弾頭を起動しろ</color>";
+                    break;
 
                 // Fifthists
                 case CRoleTypeId.Scp3005:
@@ -349,7 +354,26 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
                     break;
-
+                case CRoleTypeId.SnePurify:
+                    SyncTextRole = "<color=#FF1493>MTF Eta-10: Purify</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
+                case CRoleTypeId.SneNeutralitist:
+                    SyncTextRole = "<color=#FF1493>MTF Eta-10: Neutralitist</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
+                case CRoleTypeId.SneGears:
+                    SyncTextRole = "<color=#FF1493>MTF Eta-10: Gears</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
+                case CRoleTypeId.SneOperator:
+                    SyncTextRole = "<color=#FF1493>MTF Eta-10: Operator</color>";
+                    SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
+                    SyncTextObjective = "研究員を救出し、施設の秩序を守護せよ。";
+                    break;
                 // Scientists
                 case CRoleTypeId.ZoneManager:
                     SyncTextRole = "<color=#00ffff>Zone Manager</color>";
@@ -411,8 +435,33 @@ public class PlayerHUD
                     break;
 
                 // GoC
-                case CRoleTypeId.GoCSquadLeader or CRoleTypeId.GoCDeputy or CRoleTypeId.GoCMedic or CRoleTypeId.GoCThaumaturgist or CRoleTypeId.GoCCommunications or CRoleTypeId.GoCOperative:
-                    SyncTextRole = $"<color=#0000c8>{sourcePlayer.GetCustomRole().ToString()}</color>";
+                case CRoleTypeId.GoCOperative:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Operative</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                    break;
+                case CRoleTypeId.GoCThaumaturgist:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Thaumaturgist</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                    break;
+                case CRoleTypeId.GoCCommunications:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Communications</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                    break;
+                case CRoleTypeId.GoCMedic:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Medic</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                    break;
+                case CRoleTypeId.GoCDeputy:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Deputy</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                    break;
+                case CRoleTypeId.GoCSquadLeader:
+                    SyncTextRole = $"<color=#0000c8>Broken Dagger: Squad Leader</color>";
                     SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;

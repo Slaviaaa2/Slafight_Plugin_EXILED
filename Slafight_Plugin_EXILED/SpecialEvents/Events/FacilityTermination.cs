@@ -46,7 +46,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
             if (KillEvent()) return;
 
             RegisterCustomSpawnTable();
-            SpawnSystem.SwitchSpawnContext("FacilityTerminationCustom");
+            SpawnContextRegistry.SetActive("FacilityTerminationCustom");
 
             Timing.KillCoroutines(_mainCoroutine);
             Timing.KillCoroutines(_humanitistsCoroutine);
@@ -60,7 +60,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
             Timing.KillCoroutines(_mainCoroutine);
             Timing.KillCoroutines(_humanitistsCoroutine);
-            SpawnSystem.SwitchSpawnContext("Default");
+            SpawnContextRegistry.SetActive("Default");
             return true;
         }
 
@@ -275,79 +275,47 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 
         private void RegisterCustomSpawnTable()
         {
-            var ctx = new SpawnSystem.SpawnContext(
+            UnitPackRegistry.TryGet("FT_LastOperation", out var lastOpPack);
+            UnitPackRegistry.TryGet("FT_GoC",          out var gocPack);
+            UnitPackRegistry.TryGet("FT_Chaos",        out var chaosPack);
+
+            var ctx = new SpawnContext(
                 "FacilityTerminationCustom",
+                // FoundationStaffWaveWeights
                 new() 
                 { 
                     { SpawnTypeId.MTF_LastOperationNormal, 100 },
                     { SpawnTypeId.MTF_HDNormal, 0 },
                     { SpawnTypeId.MTF_NtfNormal, 0 }
                 },
+                // FoundationEnemyWaveWeights
                 new() 
                 { 
                     { SpawnTypeId.GOI_ChaosNormal, 40 },
-                    { SpawnTypeId.GOI_GoCNormal, 60 },
+                    { SpawnTypeId.GOI_GoCNormal,   60 },
                     { SpawnTypeId.GOI_FifthistNormal, 0 }
                 },
+                // FoundationStaffMiniWaveWeights
                 new()
                 {
                     { SpawnTypeId.MTF_LastOperationBackup, 100 },
                     { SpawnTypeId.MTF_HDBackup, 0 },
                     { SpawnTypeId.MTF_NtfBackup, 0 }
                 },
+                // FoundationEnemyMiniWaveWeights
                 new()
                 {
                     { SpawnTypeId.GOI_ChaosBackup, 40 },
-                    { SpawnTypeId.GOI_GoCBackup, 60 },
+                    { SpawnTypeId.GOI_GoCBackup,   60 },
                     { SpawnTypeId.GOI_FifthistBackup, 0 }
                 },
-                new()
-                {
-                    { SpawnTypeId.MTF_LastOperationNormal, new() { { new SpawnSystem.SpawnRoleKey(CRoleTypeId.Sculpture), (99f, true) } } },
-                    { SpawnTypeId.MTF_LastOperationBackup, new() { { new SpawnSystem.SpawnRoleKey(CRoleTypeId.Sculpture), (99f, true) } } },
-                    {
-                        SpawnTypeId.GOI_GoCNormal, new()
-                        {
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCSquadLeader), (1f, true) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCDeputy), (1f, true) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCMedic), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCThaumaturgist), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCCommunications), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCOperative), (99f, false) }
-                        }
-                    },
-                    {
-                        SpawnTypeId.GOI_GoCBackup, new()
-                        {
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCSquadLeader), (1f, true) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCDeputy), (1f, true) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCMedic), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCThaumaturgist), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCCommunications), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCOperative), (99f, false) }
-                        }
-                    },
-                    {
-                        SpawnTypeId.GOI_ChaosNormal, new()
-                        {
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosCommando), (1f, false) },
-                            { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRepressor), (2f, false) },
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal), (2f, false) },
-                            { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f, false) },
-                            { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) }
-                        }
-                    },
-                    {
-                        SpawnTypeId.GOI_ChaosBackup, new()
-                        {
-                            { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal), (1f, true) },
-                            { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f, false) },
-                            { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) }
-                        }
-                    }
-                }
+                // 使用する UnitPack 群
+                lastOpPack,
+                gocPack,
+                chaosPack
             );
-            SpawnSystem.RegisterSpawnContext(ctx);
+
+            SpawnContextRegistry.Register(ctx);
             Log.Debug("[FacilityTermination] Custom spawn context registered - Chaos/GoC/LastOp only");
         }
         
@@ -361,20 +329,18 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events
                     .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
                     .ToList();
 
-                //Log.Debug($"[Humanitists] AliveNonSpec={players.Count}");
-
                 if (players.IsOnlyTeam(CTeam.GoC, "humanity"))
                 {
                     Log.Debug("[Humanitists] Triggered");
-                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");  // Handler経由呼び出し
-                    SpawnSystem.SwitchSpawnContext("Default");
+                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");
+                    SpawnContextRegistry.SetActive("Default");
                     yield break;
                 }
                 else if (players.IsOnlyTeam(CTeam.FoundationForces, "nohumanity"))
                 {
                     Log.Debug("[NotHumanitists] Triggered");
-                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.FoundationForces, "NoHumanityAllowed");  // Handler経由呼び出し
-                    SpawnSystem.SwitchSpawnContext("Default");
+                    Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.FoundationForces, "NoHumanityAllowed");
+                    SpawnContextRegistry.SetActive("Default");
                     yield break;
                 }
 

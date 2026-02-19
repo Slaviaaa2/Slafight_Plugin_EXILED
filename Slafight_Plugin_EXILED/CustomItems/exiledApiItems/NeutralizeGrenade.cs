@@ -58,14 +58,14 @@ public class NeutralizeGrenade : CustomGrenade
         ev.TargetsToAffect.Clear();
         foreach (var player in fifthists)
         {
-            player.EnableEffect(EffectType.SinkHole, 55, 5f);
+            player.EnableEffect(EffectType.SinkHole, 55, 20f);
             if (player.GetTeam() == CTeam.Fifthists)
             {
-                player.Hurt(10f);
+                player.Hurt(25f, DamageType.Explosion);
             }
             else
             {
-                player.Hurt(1000f);
+                player.Hurt(5000f, DamageType.Explosion);
             }
             ev.Player?.ShowHitMarker();
         }

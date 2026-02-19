@@ -9,6 +9,8 @@ public enum SpawnTypeId
     MTF_HDBackup,
     MTF_LastOperationNormal,
     MTF_LastOperationBackup,
+    MTF_SneNormal,
+    MTF_SneBackup,
     
     // Groups of Interesting - Other Side
     GOI_ChaosNormal,

@@ -14,7 +14,7 @@ namespace Slafight_Plugin_EXILED.Abilities
     {
         // AbilityBase 抽象プロパティの実装（デフォルト値）
         protected override float DefaultCooldown => 5f;
-        protected override int DefaultMaxUses => 5;
+        protected override int DefaultMaxUses => -1;
 
         // 完全デフォルト
         public MagicMissileAbility(Player owner)

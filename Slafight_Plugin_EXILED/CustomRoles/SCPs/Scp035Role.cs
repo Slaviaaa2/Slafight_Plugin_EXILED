@@ -1,31 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
-using Exiled.API.Features.Hazards;
-using Exiled.API.Features.Items;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using Exiled.Events.EventArgs.Scp106;
 using Exiled.Events.EventArgs.Warhead;
-using HintServiceMeow.Core.Utilities;
-using InventorySystem.Items.Scp1509;
 using MEC;
-using Mirror;
 using PlayerRoles;
 using ProjectMER.Features.Extensions;
-using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -36,33 +25,42 @@ public class Scp035Role : CRole
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp035";
 
+    // 全SCP-035共有状態/NPC
+    private static readonly Dictionary<int, Scp035State> GlobalStates = new();
+    private static readonly Dictionary<int, int> GlobalScpTeamSystemNpc = new();
+
+    // 完全覚醒などで「自動遷移させない」プレイヤー
+    private static readonly HashSet<int> FrozenPlayers = new();
+
+    public struct Scp035State
+    {
+        public Scp035StateType NowState;
+        public float ChangeStateTimeAwaiting;
+    }
+
+    // インスタンス側の状態辞書（互換保持用）
+    private readonly Dictionary<int, Scp035State> states = new();
+
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Dying += OnDyingByRole;
-        Exiled.Events.Handlers.Warhead.Starting += OnStartingByRole;
-        OmegaWarhead.OmegaWarheadStarting += OnStartingByRoleOnOmega;
+        Exiled.Events.Handlers.Warhead.Starting += OnWarheadStartingGlobal;
+        OmegaWarhead.OmegaWarheadStarting += OnOmegaWarheadStartingGlobal;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Player.Dying -= OnDyingByRole;
-        Exiled.Events.Handlers.Warhead.Starting -= OnStartingByRole;
-        OmegaWarhead.OmegaWarheadStarting -= OnStartingByRoleOnOmega;
+        Exiled.Events.Handlers.Warhead.Starting -= OnWarheadStartingGlobal;
+        OmegaWarhead.OmegaWarheadStarting -= OnOmegaWarheadStartingGlobal;
         base.UnregisterEvents();
     }
-    
-    public struct Scp035State
-    {
-        public Scp035StateType NowState;
-        public float ChangeStateTimeAwaiting;
-    }
-    
-    Dictionary<int, Scp035State> states = new();
-    
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+
+    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
+
         player.Role.Set(RoleTypeId.Tutorial);
         player.ChangeAppearance(RoleTypeId.Scientist);
         player.MaxHealth = 2500f;
@@ -74,16 +72,18 @@ public class Scp035Role : CRole
         player.AddItem(ItemType.KeycardScientist);
         player.AddItem(ItemType.Painkillers);
         player.SetCustomInfo("<color=#C50000>SCP-035</color>");
-        TryChangeState(player, new Scp035State()
+
+        TryChangeState(player, new Scp035State
         {
             NowState = Scp035StateType.Stable,
             ChangeStateTimeAwaiting = 180f,
         });
 
+        FrozenPlayers.Remove(player.Id);
+
         player.Position = Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up * 0.65f);
-        
-        player.TryWear("SCP035", out var schematicObject,new Vector3(0f, 0.65f, 0.175f));
-        schematicObject.Scale += new Vector3(0.08f, 0.08f, 0.08f);
+
+        player.TryWear("SCP035", out var schematicObject, new Vector3(0f, 0.6f, 0.18f));
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
 
         Timing.CallDelayed(0.05f, () =>
@@ -97,13 +97,19 @@ public class Scp035Role : CRole
                             "※RPがとても重要となります。頑張って！</color></size>",
                 15f);
         });
+
+        // NPC生成（ここで一回だけ）
+        CreateNpc(player);
+
         Timing.RunCoroutine(Coroutine(player));
     }
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        states.Remove(ev.Player.Id, out _);
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 0 3 5 Recontained successfully .", "<color=red>SCP-035</color>の再収容に成功しました。");
+        Cleanup(ev.Player);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "SCP 0 3 5 Recontained successfully .",
+            "<color=red>SCP-035</color>の再収容に成功しました。");
         base.OnDying(ev);
     }
 
@@ -113,72 +119,122 @@ public class Scp035Role : CRole
         ev.Attacker.ArtificialHealth += 35f;
     }
 
-    private void OnStartingByRole(StartingEventArgs ev)
+    // Warhead起動 → 全SCP-035を完全覚醒
+    private void OnWarheadStartingGlobal(StartingEventArgs ev)
     {
-        var state = GetState(ev.Player);
-        if (!Check(ev.Player) || state.NowState == Scp035StateType.FullyAwaken) return;
-        state.NowState = Scp035StateType.FullyAwaken;
-        state.ChangeStateTimeAwaiting = 1;
-        TryChangeState(ev.Player, state);
+        FullyAwakenAllScp035();
     }
 
-    private void OnStartingByRoleOnOmega(object sender, OmegaWarheadStartingEventArgs ev)
+    private void OnOmegaWarheadStartingGlobal(object sender, OmegaWarheadStartingEventArgs ev)
     {
-        var state = GetState(ev.Player);
-        if (!Check(ev.Player) || state.NowState == Scp035StateType.FullyAwaken) return;
-        state.NowState = Scp035StateType.FullyAwaken;
-        state.ChangeStateTimeAwaiting = 1;
-        TryChangeState(ev.Player, state);
+        FullyAwakenAllScp035();
+    }
+
+    private void FullyAwakenAllScp035()
+    {
+        foreach (var pl in Player.List)
+        {
+            if (!IsScp035(pl)) continue;
+
+            var state = GetState(pl);
+            state.NowState = Scp035StateType.FullyAwaken;
+            state.ChangeStateTimeAwaiting = 0f;
+
+            TryChangeState(pl, state);
+            Trigger(pl, Scp035StateType.FullyAwaken);
+
+            // ここで「このプレイヤーはもう自動遷移させない」フラグON
+            FrozenPlayers.Add(pl.Id);
+        }
+    }
+
+    private bool IsScp035(Player player) =>
+        player != null && player.IsAlive && player.UniqueRole == UniqueRoleKey;
+
+    private void CreateNpc(Player player)
+    {
+        // 既に登録されている場合は一旦破壊して作り直し
+        if (GlobalScpTeamSystemNpc.TryGetValue(player.Id, out var oldId))
+        {
+            Npc.Get(oldId)?.Destroy();
+            GlobalScpTeamSystemNpc.Remove(player.Id);
+        }
+
+        try
+        {
+            var npc = Npc.Spawn("Scp035-SCPTeamNpc", RoleTypeId.Scp0492);
+            npc.IsGodModeEnabled = true;
+            npc.IsSpectatable = false;
+            npc.EnableEffect(EffectType.Invisible, 255);
+            GlobalScpTeamSystemNpc[player.Id] = npc.Id;
+        }
+        catch (Exception e)
+        {
+            Log.Error($"SCP-035 NPC spawn failed for {player?.Nickname}: {e}");
+        }
     }
 
     public void Cleanup(Player player)
     {
+        if (player == null) return;
+
         states.Remove(player.Id, out _);
+        GlobalStates.Remove(player.Id, out _);
+        FrozenPlayers.Remove(player.Id);
         RoleSpecificTextProvider.Clear(player);
+
         if (AbilityBase.HasAbility<Scp035TentacleAbility>(player))
             player.RemoveAbility<Scp035TentacleAbility>();
+
+        if (GlobalScpTeamSystemNpc.TryGetValue(player.Id, out var npcId))
+        {
+            Npc.Get(npcId)?.Destroy();
+            GlobalScpTeamSystemNpc.Remove(player.Id);
+        }
     }
 
     public bool TryChangeState(Player player, Scp035StateType newState)
     {
         try
         {
-            if (states.TryGetValue(player.Id, out var playerState))
-            {
-                playerState.NowState = newState;
-                states[player.Id] = playerState;
-                return true;
-            }
-            return states.TryAdd(player.Id, new Scp035State(){NowState = newState});
+            var s = new Scp035State { NowState = newState };
+            return TryChangeState(player, s);
         }
         catch (Exception e)
         {
-            Log.Warn($"Failed to change {player.Nickname}'s SCP-035 State. Reason:\n{e}");
+            Log.Warn($"Failed to change {player?.Nickname}'s SCP-035 State. Reason:\n{e}");
             return false;
         }
     }
+
     public bool TryChangeState(Player player, Scp035State newState)
     {
         try
         {
-            if (states.TryGetValue(player.Id, out var playerState))
-            {
-                states[player.Id] = newState;
-                return true;
-            }
-            return states.TryAdd(player.Id, newState);
+            if (player == null) return false;
+
+            states[player.Id] = newState;
+            GlobalStates[player.Id] = newState;
+            return true;
         }
         catch (Exception e)
         {
-            Log.Warn($"Failed to change {player.Nickname}'s SCP-035 State. Reason:\n{e}");
+            Log.Warn($"Failed to change {player?.Nickname}'s SCP-035 State. Reason:\n{e}");
             return false;
         }
     }
 
     public Scp035State GetState(Player player)
     {
-        states.TryGetValue(player.Id, out var value);
-        return value;
+        if (player == null) return default;
+
+        if (states.TryGetValue(player.Id, out var local))
+            return local;
+
+        if (GlobalStates.TryGetValue(player.Id, out var global))
+            return global;
+
+        return default;
     }
 
     public string GetStateLoc(Scp035StateType stateType)
@@ -196,6 +252,7 @@ public class Scp035Role : CRole
     private bool Trigger(Player player, Scp035StateType stateType)
     {
         if (player == null) return false;
+
         switch (stateType)
         {
             case Scp035StateType.Stable:
@@ -205,10 +262,12 @@ public class Scp035Role : CRole
                 player.ChangeAppearance(RoleTypeId.Scientist);
                 player.ShowHint($"<color=green>安定</color>状態へと移行しました！\n現在精神は比較的安定しており、人々に危害を与える必要は無いでしょう。\nアビリティ「触手」が無効化されました。\n<color=green>人々と友好的に接しましょう</color>");
                 return true;
+
             case Scp035StateType.Unstable:
                 player.EnableEffect(EffectType.Poisoned, 10);
                 player.ShowHint($"<color=yellow>不安定</color>状態へと移行しました！\n現在精神は揺れ動いており、常に回復が必要でしょう。\n腐蝕が再開しました。\n<color=yellow>人々に警告を与え、己の生存を心掛けましょう。</color>");
                 return true;
+
             case Scp035StateType.Awaken:
                 player.DisableEffect(EffectType.Poisoned);
                 if (!AbilityBase.HasAbility<Scp035TentacleAbility>(player))
@@ -219,6 +278,7 @@ public class Scp035Role : CRole
                 player.ChangeAppearance(RoleTypeId.Tutorial);
                 player.ShowHint($"<color=red>発狂／覚醒</color>状態へと移行しました！\n現在精神は支配されており、己の為に全てを犠牲にする必要があるでしょう。\n腐蝕が止まり、アビリティ「触手」が使用可能になりました！\n<color=red>ためらう必要はない。出る事だけを考えるのだ。</color>");
                 return true;
+
             case Scp035StateType.FullyAwaken:
                 player.DisableEffect(EffectType.Poisoned);
                 if (!AbilityBase.HasAbility<Scp035TentacleAbility>(player))
@@ -239,20 +299,42 @@ public class Scp035Role : CRole
     {
         while (true)
         {
-            if (player == null || player.GetCustomRole() != CRoleTypeId.Scp035 || !Round.InProgress)
+            if (!IsValid(player))
             {
                 Cleanup(player);
                 yield break;
             }
+
             var state = GetState(player);
+
+            if (state.NowState == Scp035StateType.FullyAwaken)
+            {
+                // 完全覚醒用コルーチンへ移行
+                Timing.RunCoroutine(FullyAwakenCoroutine(player));
+                yield break;
+            }
+
+            // Frozen は従来どおり
+            if (FrozenPlayers.Contains(player.Id))
+            {
+                RoleSpecificTextProvider.Set(player,
+                    $"状態：{GetStateLoc(state.NowState)}\n変化まで：<color=red><b>抵抗不可能</b></color>");
+                TryChangeState(player, state);
+                yield return Timing.WaitForSeconds(0.1f);
+                continue;
+            }
+
             var value = (int)state.ChangeStateTimeAwaiting;
             if (value < 0f)
                 value = -1;
+
             RoleSpecificTextProvider.Set(player,
                 value > 0f
                     ? $"状態：{GetStateLoc(state.NowState)}\n変化まで：{(int)state.ChangeStateTimeAwaiting}"
                     : $"状態：{GetStateLoc(state.NowState)}\n変化まで：<color=red><b>抵抗不可能</b></color>");
+
             state.ChangeStateTimeAwaiting -= 0.1f;
+
             if (state.ChangeStateTimeAwaiting <= 0)
             {
                 state.NowState = state.NowState switch
@@ -260,6 +342,7 @@ public class Scp035Role : CRole
                     Scp035StateType.Stable => Scp035StateType.Unstable,
                     Scp035StateType.Unstable => Scp035StateType.Awaken,
                     Scp035StateType.Awaken => Scp035StateType.Stable,
+                    Scp035StateType.FullyAwaken => Scp035StateType.FullyAwaken,
                     _ => state.NowState
                 };
                 Trigger(player, state.NowState);
@@ -269,11 +352,58 @@ public class Scp035Role : CRole
                 }
             }
 
-            if (!player.TryGetEffect(EffectType.Poisoned, out _) && state.NowState == Scp035StateType.Unstable)
+            if (!player.IsEffectActive<CustomPlayerEffects.Poisoned>() &&
+                state.NowState == Scp035StateType.Unstable)
                 player.EnableEffect(EffectType.Poisoned, 10);
-            
+
             TryChangeState(player, state);
             yield return Timing.WaitForSeconds(0.1f);
         }
+    }
+
+    private IEnumerator<float> FullyAwakenCoroutine(Player player)
+    {
+        while (true)
+        {
+            if (!IsValid(player))
+            {
+                Cleanup(player);
+                yield break;
+            }
+
+            var state = GetState(player);
+
+            // 他から勝手に状態を変えられても、ここで強制上書きする
+            if (state.NowState != Scp035StateType.FullyAwaken)
+            {
+                state.NowState = Scp035StateType.FullyAwaken;
+                state.ChangeStateTimeAwaiting = 0f;
+                TryChangeState(player, state);
+                Trigger(player, Scp035StateType.FullyAwaken);
+            }
+
+            RoleSpecificTextProvider.Set(player,
+                $"状態：{GetStateLoc(state.NowState)}\n変化まで：<color=red><b>抵抗不可能</b></color>");
+
+            yield return Timing.WaitForSeconds(0.1f);
+        }
+    }
+
+    private bool IsValid(Player player) =>
+        player != null &&
+        player.IsAlive &&
+        player.GetCustomRole() == CRoleTypeId.Scp035 &&
+        Round.InProgress;
+
+    // プラグイン終了時用
+    public static void CleanupAllScp035()
+    {
+        foreach (var kvp in GlobalScpTeamSystemNpc.ToList())
+        {
+            Npc.Get(kvp.Value)?.Destroy();
+        }
+        GlobalScpTeamSystemNpc.Clear();
+        GlobalStates.Clear();
+        FrozenPlayers.Clear();
     }
 }

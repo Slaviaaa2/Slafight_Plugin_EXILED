@@ -24,7 +24,7 @@ namespace Slafight_Plugin_EXILED.Abilities;
 public class Scp035TentacleAbility : AbilityBase
 {
     // AbilityBase の抽象プロパティを実装
-    protected override float DefaultCooldown => 30f;
+    protected override float DefaultCooldown => 10f;
     protected override int DefaultMaxUses => -1;
 
     // 完全デフォルト
@@ -44,7 +44,7 @@ public class Scp035TentacleAbility : AbilityBase
         {
             var position = player.Position
                            + player.CameraTransform.forward * 3f
-                           + Vector3.up * 0.1f;
+                           + Vector3.up * 0.3f;
             new Tentacle(){Position = position, AutoDestroyEnabled = true, AutoDestroyTime = 30f}.Create();
         }
         catch (Exception ex)

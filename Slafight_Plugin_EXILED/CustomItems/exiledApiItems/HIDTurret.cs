@@ -14,7 +14,7 @@ namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 [CustomItem(ItemType.MicroHID)]
 public class HIDTurret : CustomItem
 {
-    public override uint Id { get; set; } = 1;
+    public override uint Id { get; set; } = 300;
     public override string Name { get; set; } = "H.I.D. Turret";
     public override string Description { get; set; } = "このH.I.D.は小チャージのみ使用可能で、無限に撃つことが出来ます！";
     public override float Weight { get; set; } = 1f;

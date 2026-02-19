@@ -19,7 +19,7 @@ public static class RoleTables
         CRoleTypeId.Scp3005,
         CRoleTypeId.Scp966,
         CRoleTypeId.Scp682,
-        
+        CRoleTypeId.Scp035,
         CRoleTypeId.Scp999,
     };
 
