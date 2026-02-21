@@ -73,7 +73,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
                     .Any(i => i.IsCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
                 if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
                 ev.IsAllowed = false;
-                ev.Attacker.Hurt(5f, "第五的な力による影響");
+                ev.Attacker.Hurt(ev.Player, 5f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
 
                 if (ev.Attacker.GetTeam() == CTeam.Fifthists)
                     ev.Attacker.ShowHint("第五的な存在に反逆するとは何事か！？");
@@ -115,7 +115,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
                     float distance = Vector3.Distance(player.Position, target.Position);
                     if (distance <= 2.75f)
                     {
-                        target.Hurt(25f, "<color=#ff00fa>第五的</color>な力による影響");
+                        target.Hurt(player, 25f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
                         player.ShowHitMarker();
                     }
                 }

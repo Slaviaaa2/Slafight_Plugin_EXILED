@@ -48,7 +48,7 @@ public class ZoneManager : CRole
         player.InfoArea &= ~PlayerInfoArea.Role;
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#00ffff>区画管理者</color>\n各区画に割り当てられた軽度な権限をもつ科学者",10f);
+            player.ShowHint("<color=#00ffff>区画管理官</color>\n各区画に割り当てられた軽度な権限をもつ科学者",10f);
         });
     }
 }

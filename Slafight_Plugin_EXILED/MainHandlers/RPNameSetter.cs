@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Exiled.API.Features;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using UserSettings.ServerSpecific;
 
 namespace Slafight_Plugin_EXILED.MainHandlers;
@@ -20,37 +22,44 @@ public class RPNameSetter
     
     public static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
     {
-        var textSettings = @base as SSPlaintextSetting;
-        if (textSettings == null || textSettings.SyncInputText == null)
-        {
+        // 型チェック & 空文字チェック
+        if (@base is not SSPlaintextSetting textSettings || textSettings.SyncInputText == null)
             return;
-        }
+
         Log.Debug("SSPlainText Setting");
+
+        var player = Player.Get(hub);
+        if (player == null || !player.IsConnected)
+            return;
+
+        // Sergey等でRPName無効化中なら安全にスキップ
+        var flags = SpecificFlagsManager.Get(player);
+        if (flags == null)
+        {
+            // ラウンド開始直後やDestroy直後に来た場合用の保険
+            Log.Debug($"[RPNameSetter] Flags null for {player.Nickname}, skipping.");
+        }
+
         if (textSettings.SettingId == 2)
         {
-            var player = Player.Get(hub);
-            if (player != null)
-            {
-                Log.Debug("nickname updated");
-                var realName = player.Nickname;
-                if (!string.IsNullOrEmpty(textSettings.SyncInputText))
-                {
-                    player.CustomName = $"{textSettings.SyncInputText} ({realName})";
-                }
-                else
-                {
-                    player.CustomName = $"{realName}";
-                }
-            }
+            // RPNameDisabledなら触らない
+            if (flags != null && flags.Contains(SpecificFlagType.RPNameDisabled))
+                return;
+
+            Log.Debug("nickname updated");
+
+            var realName = player.Nickname;
+            var rp = textSettings.SyncInputText;
+
+            if (!string.IsNullOrEmpty(rp))
+                player.CustomName = $"{rp} ({realName})";
+            else
+                player.CustomName = realName;
         }
         else if (textSettings.SettingId == 5)
         {
-            var player = Player.Get(hub);
-            if (player != null)
-            {
-                Log.Debug("passcode updated");
-                Passcodes[player] = textSettings.SyncInputText;
-            }
+            Log.Debug("passcode updated");
+            Passcodes[player] = textSettings.SyncInputText;
         }
     }
 }

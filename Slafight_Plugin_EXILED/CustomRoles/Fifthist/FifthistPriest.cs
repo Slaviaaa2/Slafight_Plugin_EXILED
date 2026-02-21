@@ -86,7 +86,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist
                     float distance = Vector3.Distance(player.Position, target.Position);
                     if (distance <= 2.75f)
                     {
-                        target.Hurt(25f, "<color=#ff00fa>第五的</color>な力による影響");
+                        target.Hurt(player, 25f,DamageType.Unknown, null, "<color=#ff00fa>第五的</color>な力による影響");
                         player.ShowHitMarker();
                     }
                 }

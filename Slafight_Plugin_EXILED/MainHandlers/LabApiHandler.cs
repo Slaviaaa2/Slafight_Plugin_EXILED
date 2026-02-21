@@ -181,7 +181,12 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 case "CISR_HIDTurret":
                     pos = ev.Schematic.gameObject.transform.position;
                     ev.Schematic.Destroy();
-                    CustomItem.TrySpawn(300, pos, out var turretpickup);
+                    CustomItem.TrySpawn(300, pos, out var _);
+                    break;
+                case "CISR_MFP":
+                    pos = ev.Schematic.gameObject.transform.position;
+                    ev.Schematic.Destroy();
+                    CustomItem.TrySpawn(2028, pos, out var _);
                     break;
             }
         }

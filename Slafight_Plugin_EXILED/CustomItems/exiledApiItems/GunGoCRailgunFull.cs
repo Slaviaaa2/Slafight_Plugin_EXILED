@@ -15,11 +15,11 @@ using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
 [CustomItem(ItemType.ParticleDisruptor)]
-public class GunGoCRailgun : CustomWeapon
+public class GunGoCRailgunFull : CustomWeapon
 {
-    public override uint Id { get; set; } = 50;
-    public override string Name { get; set; } = "GoCレールガン(実験式)";
-    public override string Description { get; set; } = "GoCのホワイトスーツに搭載される予定の主砲を財団との協定の一環として歩兵用に改造した物。\n<color=red>一発のみ撃てる。最大6000ダメの即死級武器</color>";
+    public override uint Id { get; set; } = 2031;
+    public override string Name { get; set; } = "GoCレールガン(正式)";
+    public override string Description { get; set; } = "にゃー";
     public override float Weight { get; set; } = 1.15f;
     public override ItemType Type { get; set; } = ItemType.ParticleDisruptor;
     public override SpawnProperties SpawnProperties { get; set; } = new();
@@ -72,8 +72,8 @@ public class GunGoCRailgun : CustomWeapon
         {
             if (ev.Pickup is FirearmPickup item)
             {
-                item.MaxAmmo = 1;
-                item.Ammo = 1;
+                item.MaxAmmo = 70;
+                item.Ammo = 70;
             }
         }
     }

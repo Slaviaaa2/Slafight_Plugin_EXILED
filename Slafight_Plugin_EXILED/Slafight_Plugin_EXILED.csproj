@@ -166,6 +166,7 @@
         <Compile Include="API\Enums\CustomColor.cs" />
         <Compile Include="API\Enums\Scp035StateType.cs" />
         <Compile Include="API\Enums\SeasonTypeId.cs" />
+        <Compile Include="API\Enums\SpecificFlagType.cs" />
         <Compile Include="API\Enums\TaskType.cs" />
         <Compile Include="API\Features\AbilityBase.cs" />
         <Compile Include="API\Features\AbilityLocalisation.cs" />
@@ -189,6 +190,7 @@
         <Compile Include="API\Features\SpawnSystemDictionaries\UnitPacks\FacilityTerminationPacks.cs" />
         <Compile Include="API\Features\SpawnSystemDictionaries\UnitPacks\MtfSeeNoEvilUnitPacks.cs" />
         <Compile Include="API\Features\SpecialEvent.cs" />
+        <Compile Include="API\Features\SpecificFlagsManager.cs" />
         <Compile Include="API\Features\Tips.cs" />
         <Compile Include="API\Features\UnitPack.cs" />
         <Compile Include="API\Features\SpawnSystemBootstrap.cs" />
@@ -216,6 +218,7 @@
         <Compile Include="CustomItems\exiledApiItems\ArmorInfantry.cs" />
         <Compile Include="CustomItems\exiledApiItems\ArmorVIP.cs" />
         <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
+        <Compile Include="CustomItems\exiledApiItems\ClassZMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\DummyRoad.cs" />
         <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\File012_5_033.cs" />
@@ -224,12 +227,14 @@
         <Compile Include="CustomItems\exiledApiItems\FileBackrooms.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileDeltaWarhead.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileOmegaWarhead.cs" />
+        <Compile Include="CustomItems\exiledApiItems\FileSergey.cs" />
         <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
         <Compile Include="CustomItems\exiledApiItems\GoCRecruitPaper.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunCOM77.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunFRMGX.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunFSP18.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunGoCRailgun.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunGoCRailgunFull.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunGoCTurret.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunN7CR.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunN7Weltkrieg.cs" />
@@ -253,6 +258,7 @@
         <Compile Include="CustomItems\exiledApiItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\MasterCard.cs" />
+        <Compile Include="CustomItems\exiledApiItems\ClassXMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\exiledApiItems\PlayingCard.cs" />
@@ -279,6 +285,7 @@
         <Compile Include="CustomRoles\FoundationForces\SnePurify.cs" />
         <Compile Include="CustomRoles\GoC\GoCCommunications.cs" />
         <Compile Include="CustomRoles\GoC\GoCDeputy.cs" />
+        <Compile Include="CustomRoles\GoC\GoCHoundDog.cs" />
         <Compile Include="CustomRoles\GoC\GoCMedic.cs" />
         <Compile Include="CustomRoles\GoC\GoCOperative.cs" />
         <Compile Include="CustomRoles\GoC\GoCSquadLeader.cs" />
@@ -286,6 +293,10 @@
         <Compile Include="CustomRoles\Guards\Chamber Guard.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\Guards\SecurityChief.cs" />
+        <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovAwakenRole.cs" />
+        <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovExtensionAndUtils.cs" />
+        <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovRole.cs" />
+        <Compile Include="CustomRoles\Others\SergeyMakarov\SergeySharedContents.cs" />
         <Compile Include="CustomRoles\Others\SnowWarrier.cs" />
         <Compile Include="CustomRoles\Scientist\Object Observer.cs" />
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />

@@ -66,10 +66,12 @@ public enum CRoleTypeId
     GoCThaumaturgist,
     GoCCommunications,
     GoCOperative,
+    GoCHoundDog,
     
     // ==== Others ====
     SnowWarrier,
     Zombified,
     Sculpture,
-    SergeyMarkov,
+    SergeyMakarov,
+    SergeyMakarovAwaken,
 }

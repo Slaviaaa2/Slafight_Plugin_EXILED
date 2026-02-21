@@ -7,91 +7,63 @@ using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Mirror;
-using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
-using Firearm = Exiled.API.Features.Items.Firearm;
-using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
+using YamlDotNet.Serialization;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
-[CustomItem(ItemType.ParticleDisruptor)]
-public class GunGoCRailgun : CustomWeapon
+[CustomItem(ItemType.KeycardCustomSite02)]
+public class FileSergey : CustomKeycard
 {
-    public override uint Id { get; set; } = 50;
-    public override string Name { get; set; } = "GoCレールガン(実験式)";
-    public override string Description { get; set; } = "GoCのホワイトスーツに搭載される予定の主砲を財団との協定の一環として歩兵用に改造した物。\n<color=red>一発のみ撃てる。最大6000ダメの即死級武器</color>";
-    public override float Weight { get; set; } = 1.15f;
-    public override ItemType Type { get; set; } = ItemType.ParticleDisruptor;
+    public override uint Id { get; set; } = 2030;
+    public override string Name { get; set; } = "File-Sergey-Makarov";
+    public override string Description { get; set; } = "";
+    public override float Weight { get; set; } = 1f;
+    public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
-    
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1.15f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 1;
+    public override string KeycardLabel { get; set; } = "File-Sergey-Makarov";
+    [YamlIgnore]
+    public override Color32? KeycardLabelColor { get; set; } = new Color32(255,255,255,255);
+    public override string KeycardName { get; set; } = "The Ethics Comittee";
+    [YamlIgnore]
+    public override Color32? TintColor { get; set; } = new Color32(0,0,0,255);
+    [YamlIgnore]
+    public override Color32? KeycardPermissionsColor { get; set; } = new Color32(0,0,0,255);
 
-    public Color glowColor = CustomColor.Gold.ToUnityColor();
+    public override KeycardPermissions Permissions { get; set; } =
+        KeycardPermissions.None;
+
+    public override byte Rank { get; set; } = 1;
+    public override string SerialNumber { get; set; } = "";
+
+    public Color glowColor = Color.black;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting += Debug_HurtingDamage;
-        
-        Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
-        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
-        
         base.SubscribeEvents();
     }
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting -= Debug_HurtingDamage;
-        
-        Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
-        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
-        
         base.UnsubscribeEvents();
     }
 
-    private void Debug_HurtingDamage(HurtingEventArgs ev)
+    protected override void OnPickingUp(PickingUpItemEventArgs ev)
     {
-        if (Check(ev.Attacker?.CurrentItem))
-        {
-            ev.Player.ExplodeEffect(ProjectileType.FragGrenade);
-            ev.Player.Hurt(2000f,DamageType.Explosion);
-        }
+        ev.IsAllowed = false;
+        ev.Player.ShowHint(
+            "<size=24>セルゲイ・マカロフ施設管理官について\n" +
+            "[このファイルの内容は全て倫理委員会の要請により削除されています]" +
+            "- [要請により非公開], The Ethics Comittee, Dr. Redheart</size>");
+        
+        base.OnPickingUp(ev);
     }
 
-    private void LimitPatch(PickingUpItemEventArgs ev)
-    {
-        if (Check(ev.Pickup))
-        {
-            if (ev.Pickup is FirearmPickup item)
-            {
-                item.MaxAmmo = 1;
-                item.Ammo = 1;
-            }
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            if (ev.Item is Firearm item)
-            {
-                if (item.TotalAmmo != 1)
-                {
-                    item.Destroy();
-                }
-            }
-        }
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

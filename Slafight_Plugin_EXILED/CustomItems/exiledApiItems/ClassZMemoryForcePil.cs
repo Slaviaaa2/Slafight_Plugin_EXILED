@@ -3,40 +3,38 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
+using MEC;
 using Mirror;
+using Scp914;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using Firearm = Exiled.API.Features.Items.Firearm;
-using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
-[CustomItem(ItemType.ParticleDisruptor)]
-public class GunGoCRailgun : CustomWeapon
+[CustomItem(ItemType.SCP500)]
+public class ClassZMemoryForcePil : CustomItem
 {
-    public override uint Id { get; set; } = 50;
-    public override string Name { get; set; } = "GoCレールガン(実験式)";
-    public override string Description { get; set; } = "GoCのホワイトスーツに搭載される予定の主砲を財団との協定の一環として歩兵用に改造した物。\n<color=red>一発のみ撃てる。最大6000ダメの即死級武器</color>";
-    public override float Weight { get; set; } = 1.15f;
-    public override ItemType Type { get; set; } = ItemType.ParticleDisruptor;
-    public override SpawnProperties SpawnProperties { get; set; } = new();
-    
-    public override float Damage { get; set; } = 45f;
-    public override Vector3 Scale { get; set; } = new (1.15f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 1;
+    public override uint Id { get; set; } = 2029;
+    public override string Name { get; set; } = "クラスZ-記憶補強剤";
+    public override string Description { get; set; } = "反ミーム性の現象等に対抗するために使用される強力な薬。\n反ミームの影響を無効化する\n効果時間：---\n注意書き：<color=red>とても危険です！使用を控えるべきです！</color>";
+    public override float Weight { get; set; } = 1f;
+    public override ItemType Type { get; set; } = ItemType.SCP500;
 
-    public Color glowColor = CustomColor.Gold.ToUnityColor();
+    public Color glowColor = CustomColor.Purple.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
+
+    public override SpawnProperties SpawnProperties { get; set; } = new();
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting += Debug_HurtingDamage;
-        
-        Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
+        Exiled.Events.Handlers.Player.UsingItem += OnUsing;
+        Exiled.Events.Handlers.Player.UsedItem += OnUsed;
         
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
@@ -46,10 +44,8 @@ public class GunGoCRailgun : CustomWeapon
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting -= Debug_HurtingDamage;
-        
-        Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
+        Exiled.Events.Handlers.Player.UsingItem -= OnUsing;
+        Exiled.Events.Handlers.Player.UsedItem -= OnUsed;
         
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
@@ -57,39 +53,22 @@ public class GunGoCRailgun : CustomWeapon
         base.UnsubscribeEvents();
     }
 
-    private void Debug_HurtingDamage(HurtingEventArgs ev)
+    private void OnUsing(UsingItemEventArgs ev)
     {
-        if (Check(ev.Attacker?.CurrentItem))
+        if (!Check(ev.Item) || ev.Player == null) return;
+        if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
         {
-            ev.Player.ExplodeEffect(ProjectileType.FragGrenade);
-            ev.Player.Hurt(2000f,DamageType.Explosion);
+            ev.IsAllowed = false;
+            ev.Player.ShowHint("既に耐性を得ている為、使用できません。");
         }
     }
-
-    private void LimitPatch(PickingUpItemEventArgs ev)
+    
+    private void OnUsed(UsedItemEventArgs ev)
     {
-        if (Check(ev.Pickup))
-        {
-            if (ev.Pickup is FirearmPickup item)
-            {
-                item.MaxAmmo = 1;
-                item.Ammo = 1;
-            }
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            if (ev.Item is Firearm item)
-            {
-                if (item.TotalAmmo != 1)
-                {
-                    item.Destroy();
-                }
-            }
-        }
+        if (!Check(ev.Item) || ev.Player == null) return;
+        ev.Player.EnableEffect(EffectType.Invigorated, 60);
+        ev.Player.EnableEffect(EffectType.Scp207, 4);
+        SpecificFlagsManager.TryAddFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled);
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)

@@ -38,7 +38,7 @@ public class FacilityManager : CRole
         player.InfoArea &= ~PlayerInfoArea.Role;
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#dc143c>施設管理者</color>\n施設を統括する重要な科学者",10f);
+            player.ShowHint("<color=#dc143c>施設管理官</color>\n施設を統括する重要な科学者",10f);
         });
     }
 }

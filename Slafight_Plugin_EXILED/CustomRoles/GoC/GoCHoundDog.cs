@@ -9,37 +9,36 @@ using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
 
-public class GoCSquadLeader : CRole
+public class GoCHoundDog : CRole
 {
-    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.GoCSquadLeader;
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.GoCHoundDog;
     protected override CTeam Team { get; set; } = CTeam.GoC;
-    protected override string UniqueRoleKey { get; set; } = "GoCSquadLeader";
+    protected override string UniqueRoleKey { get; set; } = "GoCHoundDog";
 
     public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfCaptain);
+        player.Role.Set(RoleTypeId.NtfSpecialist);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 110;
+        player.MaxHealth = 100;
         player.Health = player.MaxHealth;
         player.ClearInventory();
-        player.AddItem(ItemType.GunFRMG0);
-        player.TryAddCustomItem(50);
-        player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem(2010);
-        player.AddItem(ItemType.Medkit);
+        player.TryAddCustomItem(2006);
+        player.AddItem(ItemType.KeycardMTFOperative);
+        player.TryAddCustomItem(2018);
         player.AddItem(ItemType.GrenadeHE);
+        player.AddItem(ItemType.Medkit);
+        player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.Radio);
-        
-        CustomItem.TryGive(player, 12,false);
+        player.TryAddCustomItem(10);
             
         player.AddAmmo(AmmoType.Nato556,140);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
-        player.SetCustomInfo("Global Occult Collision: Broken Dagger Squad Leader");
+        player.SetCustomInfo("Global Occult Collision: Broken Dagger Thaumaturgist");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#0000c8>GoC: Broken Dagger 班長</color>\n",10f);
+            player.ShowHint("<color=#0000c8>GoC: Broken Dagger 超常技術スペシャリスト</color>\n",10f);
         });
     }
 }

@@ -37,20 +37,21 @@ public class SoundOfFifthAbility : AbilityBase
 
     protected override void ExecuteAbility(Player player)
     {
-        foreach (Player _player in Player.List)
+        foreach (Player targetPlayer in Player.List)
         {
-            if (_player == null || player == null) continue;
-            if (_player != player)
+            if (targetPlayer == null) continue;
+            if (targetPlayer != player)
             {
-                if (Vector3.Distance(_player.Position, player.Position) <= 5f)
+                if (SpecificFlagsManager.HasFlag(targetPlayer, SpecificFlagType.AntiMemeEffectDisabled)) continue;
+                if (Vector3.Distance(targetPlayer.Position, player.Position) <= 5f)
                 {
-                    if (_player.GetTeam() != CTeam.Fifthists)
+                    if (targetPlayer.GetTeam() != CTeam.Fifthists)
                     {
-                        _player.Explode(ProjectileType.Flashbang,player);
+                        targetPlayer.Explode(ProjectileType.Flashbang,player);
                     }
                     else
                     {
-                        _player.EnableEffect(EffectType.Invigorated, 5f);
+                        targetPlayer.EnableEffect(EffectType.Invigorated, 5f);
                     }
                 }
             }

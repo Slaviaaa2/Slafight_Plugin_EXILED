@@ -12,6 +12,7 @@ using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.CustomRoles.GoC;
 using Slafight_Plugin_EXILED.CustomRoles.Guards;
 using Slafight_Plugin_EXILED.CustomRoles.Others;
+using Slafight_Plugin_EXILED.CustomRoles.Others.SergeyMakarov;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
@@ -273,6 +274,12 @@ public static class PlayerExtensions
             // ==== Specials ====
             case CRoleTypeId.Sculpture:
                 new Sculpture().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.SergeyMakarov:
+                new SergeyMakarovRole().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.SergeyMakarovAwaken:
+                new SergeyMakarovAwakenRole().SpawnRole(player, roleSpawnFlags);
                 break;
             // ==== GoC ====
             case CRoleTypeId.GoCSquadLeader:

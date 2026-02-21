@@ -32,8 +32,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles
     {
         public CustomRolesHandler()
         {
+            Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
-            Exiled.Events.Handlers.Player.Hurting += CustomFriendlyFire_hurt;
             Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
 
             Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
@@ -43,8 +43,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles
 
         ~CustomRolesHandler()
         {
+            Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
-            Exiled.Events.Handlers.Player.Hurting -= CustomFriendlyFire_hurt;
             Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
 
             Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
@@ -256,17 +256,17 @@ namespace Slafight_Plugin_EXILED.CustomRoles
                 yield return Timing.WaitForSeconds(1f);
             }
         }
-
-        public void CustomFriendlyFire_hurt(HurtingEventArgs ev)
+        
+        private void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker == null || ev.Player == null)
-                return;
-
-            if (ev.Attacker.UniqueRole == "FIFTHIST" && ev.Player.UniqueRole == "SCP-3005")
+            if (ev.Player == null) return;
+            if (ev.Attacker?.GetCustomRole() == CRoleTypeId.Scp3005 ||
+                ev.Attacker?.GetCustomRole() == CRoleTypeId.FifthistPriest)
             {
-                ev.IsAllowed = false;
-                ev.Attacker.Hurt(15f, "<color=#ff00fa>第五的存在</color>に反逆した為");
-                ev.Attacker.ShowHint("<color=#ff00fa>第五的存在</color>に反逆するとは何事か！？", 5f);
+                if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+                {
+                    ev.IsAllowed = false;
+                }
             }
         }
 
@@ -282,6 +282,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles
 
             var player = ev.Player;
 
+            SpecificFlagsManager.Clear(player);
+            
             AbilityManager.ClearSlots(player);
             AbilityBase.RevokeAbility(player.Id);
 

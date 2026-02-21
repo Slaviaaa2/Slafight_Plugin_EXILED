@@ -95,7 +95,7 @@ namespace Slafight_Plugin_EXILED.Abilities
                         {
                             try
                             {
-                                player.Hurt(pushPlayer, 10f, DamageType.Unknown);
+                                player.Hurt(pushPlayer, 10f, DamageType.Unknown, null, "<color=#ff00fa>第五的</color>な力による影響");
                                 pushPlayer?.ShowHitMarker();
                             }
                             catch (Exception ex)

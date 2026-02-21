@@ -60,5 +60,8 @@ public static class CustomItemsManager
             new SNAV300().Register();
             new SNAV310().Register();
             new SNAVUltimate().Register();
+            new ClassXMemoryForcePil().Register();
+            new ClassZMemoryForcePil().Register();
+            new FileSergey().Register();
     }
 }

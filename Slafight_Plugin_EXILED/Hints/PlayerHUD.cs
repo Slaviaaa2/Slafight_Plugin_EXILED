@@ -433,36 +433,48 @@ public class PlayerHUD
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "財団に従い、人類を根絶させよ。";
                     break;
+                
+                case CRoleTypeId.SergeyMakarov:
+                    SyncTextRole = "<color=#dc143c>Facility Manager - Sergey Makarov</color>";
+                    SyncTextTeam = "<color=#faff86>The Foundation</color>";
+                    SyncTextObjective = "持てる全てを使い、<color=#228b22><b>奴ら</b></color>への<color=red><b>復讐</b></color>を果たせ";
+                    break;
+                
+                case CRoleTypeId.SergeyMakarovAwaken:
+                    SyncTextRole = "<color=red>Cursemaster - Sergey Makarov</color>";
+                    SyncTextTeam = "<color=#a0a0a0>Alone</color>";
+                    SyncTextObjective = "<color=red><b>邪魔者を滅ぼし、サイト-02から毒を浄化せよ</b></color>";
+                    break;
 
                 // GoC
                 case CRoleTypeId.GoCOperative:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Operative</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
                 case CRoleTypeId.GoCThaumaturgist:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Thaumaturgist</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
                 case CRoleTypeId.GoCCommunications:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Communications</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
                 case CRoleTypeId.GoCMedic:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Medic</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
                 case CRoleTypeId.GoCDeputy:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Deputy</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
                 case CRoleTypeId.GoCSquadLeader:
                     SyncTextRole = $"<color=#0000c8>Broken Dagger: Squad Leader</color>";
-                    SyncTextTeam = "<color=#0000c8>Global Occult Collision</color>";
+                    SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                     SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                     break;
 

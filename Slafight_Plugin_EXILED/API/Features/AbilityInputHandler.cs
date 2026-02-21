@@ -1,8 +1,6 @@
-using System.Text;
+using System;
 using Exiled.API.Features;
 using PlayerRoles;
-using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UserSettings.ServerSpecific;
 
@@ -14,6 +12,7 @@ public class AbilityInputHandler
     {
         ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingValueReceived;
     }
+
     ~AbilityInputHandler()
     {
         ServerSpecificSettingsSync.ServerOnSettingValueReceived -= OnSettingValueReceived;
@@ -21,48 +20,59 @@ public class AbilityInputHandler
 
     private void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
     {
-        var keybind = @base as SSKeybindSetting;
-        if (keybind == null || !keybind.SyncIsPressed)
+        // キーバインド以外は無視
+        if (@base is not SSKeybindSetting keybind || !keybind.SyncIsPressed)
             return;
 
         var player = Player.Get(hub);
-        if (player == null)
+        if (player == null || !player.IsConnected)
             return;
 
-        Log.Debug($"[Input] {player.Nickname} role={player.Role.Type}, team={player.Role.Team}, setting={keybind.SettingId}");
+        Log.Debug($"[Input] {player.Nickname} role={player.Role?.Type} team={player.Role?.Team} setting={keybind.SettingId}");
 
+        // VCトグルは常に許可
         if (keybind.SettingId == 1)
         {
             ActivateHandler.ToggleProximityChat(player);
             return;
         }
 
-        if (!AbilityManager.Loadouts.TryGetValue(player.Id, out var loadout))
+        // 能力処理するのは「生きてるロールだけ」
+        if (player.Role == null ||
+            player.Role.Type == RoleTypeId.None ||
+            player.Role.Type == RoleTypeId.Spectator ||
+            player.Role.Team == Team.Dead)
+        {
+            Log.Debug($"[Input] Ignore ability input from {player.Nickname} (role={player.Role?.Type}, team={player.Role?.Team})");
+            return;
+        }
+
+        // ロードアウト取得（ないなら何もしない）
+        if (!AbilityManager.Loadouts.TryGetValue(player.Id, out var loadout) || loadout == null)
         {
             Log.Debug($"[Input] No loadout for {player.Nickname}");
             return;
         }
 
-        if (keybind.SettingId == 3)
+        try
         {
-            Log.Debug($"[Input] Try use active ability for {player.Nickname}");
-            loadout.ActiveAbility?.TryActivateFromInput(player);
+            if (keybind.SettingId == 3)
+            {
+                // アクティブ能力使用
+                Log.Debug($"[Input] Try use active ability for {player.Nickname}");
+                loadout.ActiveAbility?.TryActivateFromInput(player);
+            }
+            else if (keybind.SettingId == 4)
+            {
+                // スロット切り替え＋HUD更新
+                Log.Debug($"[Input] Cycle ability slot for {player.Nickname}");
+                loadout.CycleNext();
+                AbilityManager.UpdateAbilityHint(player, loadout);
+            }
         }
-        else if (keybind.SettingId == 4)
+        catch (Exception e)
         {
-            loadout.CycleNext();  // これだけでOK
-            // UpdateAbilityHint(player, loadout);  ← これを削除！
-            AbilityManager.UpdateAbilityHint(player, loadout);  // これに変更
+            Log.Warn($"[Input] Ability handling error for {player.Nickname}: {e}");
         }
-    }
-
-    // HUD 更新（必要に応じて使う）
-    private void UpdateAbilityHint(Player player, AbilityLoadout loadout)
-    {
-        if (player == null || !player.IsConnected || player.Role == RoleTypeId.None)
-            return;
-    
-        // AbilityManager.UpdateAbilityHint に任せる
-        AbilityManager.NextSlot(player);  // こっちは既に安全
     }
 }
