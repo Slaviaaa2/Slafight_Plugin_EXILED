@@ -13,6 +13,7 @@ using ProjectMER.Features.Extensions;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps.ObjectPrefabs;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
@@ -131,6 +132,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
             Timing.CallDelayed(1.05f, () =>
             {
+                CustomItem.TrySpawn(300,new Vector3(134.94f,300.65f,-65f),out Pickup _);
                 CustomItem.TrySpawn(2015, new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
                 CustomItem.TrySpawn(2021, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
                 CustomItem.TrySpawn(2022, Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
@@ -181,7 +183,10 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 case "CISR_HIDTurret":
                     pos = ev.Schematic.gameObject.transform.position;
                     ev.Schematic.Destroy();
-                    CustomItem.TrySpawn(300, pos, out var _);
+                    //CustomItem.TrySpawn(300, pos, out var _);
+                    /*new HIDTurretObject()
+                            { Position = pos, Rotation = Quaternion.identity, Scale = Vector3.one, TotalRange = 12.5f }
+                        .Create();*/
                     break;
                 case "CISR_MFP":
                     pos = ev.Schematic.gameObject.transform.position;

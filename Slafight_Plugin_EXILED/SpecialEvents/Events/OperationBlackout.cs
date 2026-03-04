@@ -8,21 +8,15 @@ using Exiled.API.Features.Doors;
 using Exiled.API.Features.Objectives;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Scp079;
-using LabApi.Events.CustomHandlers;
-using LightContainmentZoneDecontamination;
 using MapGeneration;
-using MapGeneration.Distributors;
 using MEC;
-using Mirror;
 using PlayerRoles;
-using ProjectMER.Events.Arguments;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
-using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events
 {

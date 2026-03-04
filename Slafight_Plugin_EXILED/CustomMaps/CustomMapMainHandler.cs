@@ -68,6 +68,7 @@ namespace Slafight_Plugin_EXILED.CustomMaps
 
         public CustomMapMainHandler()
         {
+            MapHandler.Generated += OnGeneratorGenerating;
             ServerHandler.RoundStarted += OnRoundStarted;
             MapHandler.SpawningTeamVehicle += ChaosAnimation;
             LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
@@ -77,6 +78,7 @@ namespace Slafight_Plugin_EXILED.CustomMaps
 
         ~CustomMapMainHandler()
         {
+            MapHandler.Generated -= OnGeneratorGenerating;
             ServerHandler.RoundStarted -= OnRoundStarted;
             MapHandler.SpawningTeamVehicle -= ChaosAnimation;
             LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
@@ -88,6 +90,11 @@ namespace Slafight_Plugin_EXILED.CustomMaps
                 Timing.KillCoroutines(femurCoroutine);
             if (trainCoroutine.IsRunning)
                 Timing.KillCoroutines(trainCoroutine);
+        }
+
+        private void OnGeneratorGenerating()
+        {
+            Generator.List.Where(generator => generator.Room.Type == RoomType.HczServerRoom).ToList().ForEach(generator => generator.IsEngaged = true);
         }
 
         private void OnRoundStarted()

@@ -54,6 +54,7 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
         public SpecialEventType NowEvent => CurrentEvent;  // ← EventQueue.FirstOrDefault() から変更
 
         public bool IsFifthistsRaidActive { get; set; }
+        float chance = 1f / 4f;
 
         // ==== イベント操作（新実装） ====
         public void AddEvent(SpecialEventType eventType)
@@ -107,7 +108,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
         public void RunRandomEvent()
         {
-            float chance = 1f / 3f;
             if (Random.value > chance)
             {
                 Log.Info("SEH: RunRandomEvent rolled None (no event executed).");
@@ -143,7 +143,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
         public void SetQueueRandomEvent()
         {
-            float chance = 1f / 3f;
             if (Random.value > chance)
             {
                 if (EventQueue.Count == 0)
@@ -174,7 +173,6 @@ namespace Slafight_Plugin_EXILED.SpecialEvents
 
         public void InsertQueueRandomEventAfterFirst()
         {
-            float chance = 1f / 3f;
             if (Random.value > chance)
             {
                 Log.Info("SEH: InsertQueueRandomEventAfterFirst rolled None (no insert).");

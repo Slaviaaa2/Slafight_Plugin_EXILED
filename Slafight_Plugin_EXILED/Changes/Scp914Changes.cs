@@ -13,12 +13,12 @@ public class Scp914Changes
 {
     public Scp914Changes()
     {
-        
+        Exiled.Events.Handlers.Scp914.UpgradingPlayer += Human;
     }
 
     ~Scp914Changes()
     {
-        
+        Exiled.Events.Handlers.Scp914.UpgradingPlayer -= Human;
     }
 
     private Random random = new Random();

@@ -61,7 +61,7 @@ public class Sinkhole
                 if (player == null || !player.IsConnected || !player.IsAlive)
                     continue;
 
-                if (player.GetTeam() == CTeam.SCPs)
+                if (player.GetTeam() == CTeam.SCPs || player.GetCustomRole() == CRoleTypeId.SergeyMakarovAwaken || player.GetCustomRole() == CRoleTypeId.Sculpture)
                     continue;
 
                 foreach (var sinkhole in Sinkholes)

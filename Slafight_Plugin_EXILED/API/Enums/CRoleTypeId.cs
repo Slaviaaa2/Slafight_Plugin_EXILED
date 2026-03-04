@@ -29,6 +29,8 @@ public enum CRoleTypeId
     // ==== Chaos ====
     ChaosCommando,
     ChaosSignal,
+    ChaosTacticalUnit,
+    ChaosBreaker,
     
     // ==== NTF ====
     NtfLieutenant,

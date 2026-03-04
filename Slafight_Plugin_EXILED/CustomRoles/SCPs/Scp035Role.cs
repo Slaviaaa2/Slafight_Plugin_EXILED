@@ -83,7 +83,7 @@ public class Scp035Role : CRole
 
         player.Position = Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up * 0.65f);
 
-        player.TryWear("SCP035", out var schematicObject, new Vector3(0f, 0.6f, 0.18f));
+        player.TryWear("SCP035", out var schematicObject, new Vector3(0f, 0.6f, 0.175f));
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
 
         Timing.CallDelayed(0.05f, () =>
@@ -163,9 +163,16 @@ public class Scp035Role : CRole
         try
         {
             var npc = Npc.Spawn("Scp035-SCPTeamNpc", RoleTypeId.Scp0492);
-            npc.IsGodModeEnabled = true;
-            npc.IsSpectatable = false;
-            npc.EnableEffect(EffectType.Invisible, 255);
+    
+            Timing.CallDelayed(0.6f, () =>  // 👇 0.2f → 0.6f
+            {
+                if (npc?.ReferenceHub == null) return;
+        
+                npc.IsGodModeEnabled = true;
+                npc.IsSpectatable = false;
+                npc.EnableEffect(EffectType.Invisible, 255);
+            });
+    
             GlobalScpTeamSystemNpc[player.Id] = npc.Id;
         }
         catch (Exception e)

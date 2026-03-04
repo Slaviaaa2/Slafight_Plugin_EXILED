@@ -192,7 +192,7 @@ namespace Slafight_Plugin_EXILED
             {
                 try
                 {
-                    await SendPlayerCountAsync(Player.List.Count);
+                    await SendPlayerCountAsync(Player.List.Where(p => !p.IsNPC).ToList().Count);
                 }
                 catch (Exception ex)
                 {

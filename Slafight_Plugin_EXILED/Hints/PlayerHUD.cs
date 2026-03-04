@@ -69,7 +69,7 @@ public class PlayerHUD
 
     public void ServerInfoHint(VerifiedEventArgs ev)
     {
-        PlayerDisplay display = PlayerDisplay.Get(ev.Player);
+        PlayerDisplay display = PlayerDisplay.Get(ev.Player.ReferenceHub);
 
         Hint ServerInfo = new Hint
         {
@@ -93,7 +93,7 @@ public class PlayerHUD
     private void PlayerHUDSetup(Player player)
     {
         int XCordinate = -350;
-        PlayerDisplay display = PlayerDisplay.Get(player);
+        PlayerDisplay display = PlayerDisplay.Get(player.ReferenceHub);
 
         Hint PlayerHUD_Role = new()
         {
@@ -177,7 +177,7 @@ public class PlayerHUD
 
     public void HintSync(SyncType syncType, string hintText, Player player)
     {
-        PlayerDisplay display = PlayerDisplay.Get(player);
+        PlayerDisplay display = PlayerDisplay.Get(player.ReferenceHub);
 
         switch (syncType)
         {
@@ -324,6 +324,16 @@ public class PlayerHUD
                     break;
                 case CRoleTypeId.ChaosSignal:
                     SyncTextRole = "<color=#228b22>Chaos Insurgency Signal</color>";
+                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    break;
+                case CRoleTypeId.ChaosTacticalUnit:
+                    SyncTextRole = "<color=#228b22>Chaos Insurgency Tactical Unit</color>";
+                    SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
+                    SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
+                    break;
+                case CRoleTypeId.ChaosBreaker:
+                    SyncTextRole = "<color=#228b22>Chaos Insurgency Breaker</color>";
                     SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                     SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
                     break;
@@ -611,7 +621,7 @@ public class PlayerHUD
         // 1. ロール HUD 同期
         SyncTexts(spectator, target);
 
-        var display = PlayerDisplay.Get(spectator);
+        var display = PlayerDisplay.Get(spectator.ReferenceHub);
 
         // 2. Specific HUD 即時同期
         var specificHint = display.GetHint("PlayerHUD_Specific");
@@ -636,7 +646,7 @@ public class PlayerHUD
     {
         foreach (Player player in Player.List)
         {
-            var display = PlayerDisplay.Get(player);
+            var display = PlayerDisplay.Get(player.ReferenceHub);
             display.ClearHint();
         }
 
@@ -715,7 +725,7 @@ public class PlayerHUD
                 if (player == null || !player.IsAlive)
                     continue;
 
-                var display = PlayerDisplay.Get(player);
+                var display = PlayerDisplay.Get(player.ReferenceHub);
                 var abilityHint = display.GetHint("PlayerHUD_Ability");
 
                 if (abilityHint == null)
@@ -766,7 +776,7 @@ public class PlayerHUD
 
                 string roleSpecific = RoleSpecificTextProvider.GetFor(hudTarget);
 
-                var display = PlayerDisplay.Get(player);
+                var display = PlayerDisplay.Get(player.ReferenceHub);
                 var specificHint = display.GetHint("PlayerHUD_Specific");
                 if (specificHint == null)
                 {

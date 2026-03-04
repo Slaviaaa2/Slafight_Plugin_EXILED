@@ -63,5 +63,7 @@ public static class CustomItemsManager
             new ClassXMemoryForcePil().Register();
             new ClassZMemoryForcePil().Register();
             new FileSergey().Register();
+            new GunGoCRailgunFull().Register();
+            new GunTacticalRevolver().Register();
     }
 }

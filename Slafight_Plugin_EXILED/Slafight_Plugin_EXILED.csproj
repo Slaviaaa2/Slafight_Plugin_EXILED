@@ -240,6 +240,7 @@
         <Compile Include="CustomItems\exiledApiItems\GunN7Weltkrieg.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunProject90.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunSuperLogicer.cs" />
+        <Compile Include="CustomItems\exiledApiItems\GunTacticalRevolver.cs" />
         <Compile Include="CustomItems\exiledApiItems\HIDTurret.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardConscripts.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardFifthist.cs" />
@@ -270,9 +271,12 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
+        <Compile Include="CustomRoles\ChaosInsurgency\ChaosBreaker.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
+        <Compile Include="CustomRoles\ChaosInsurgency\ChaosTacticalUnit.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistGuidance.cs" />

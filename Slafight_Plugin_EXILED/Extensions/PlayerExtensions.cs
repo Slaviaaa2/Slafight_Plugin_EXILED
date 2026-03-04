@@ -209,6 +209,12 @@ public static class PlayerExtensions
             case CRoleTypeId.ChaosSignal:
                 new ChaosSignal().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.ChaosTacticalUnit:
+                new ChaosTacticalUnit().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.ChaosBreaker:
+                new ChaosBreaker().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== NTF ====
             case CRoleTypeId.NtfLieutenant:
                 new NtfAide().SpawnRole(player, roleSpawnFlags);

@@ -128,6 +128,8 @@ public class Scp1509BattleFieldEvent : SpecialEvent
                 else
                     player.Role.Set(RoleTypeId.NtfPrivate);
 
+                player.MaxHealth = 300f;
+                player.Health = player.MaxHealth;
                 player.ClearInventory();
                 player.AddItem(ItemType.SCP1509);
                 player.AddItem(ItemType.Medkit);

@@ -126,7 +126,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
 
             try
             {
-                schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
+                schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector, player.Rotation);
                 schem.transform.SetParent(player.Transform);
             }
             catch (Exception e)
