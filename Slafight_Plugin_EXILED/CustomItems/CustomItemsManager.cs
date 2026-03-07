@@ -65,5 +65,6 @@ public static class CustomItemsManager
             new FileSergey().Register();
             new GunGoCRailgunFull().Register();
             new GunTacticalRevolver().Register();
+            new NvgNormal().Register();
     }
 }

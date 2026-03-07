@@ -84,6 +84,9 @@ public static class TerminalRift
     
     private static void Setup()
     {
+        ControlObjects.Clear();   // ← 追加
+        RiftObject = null;        // ← 追加（念のため）
+        RiftObjectPosition = Vector3.zero;  // ← 追加
         Invoking = false;
         KillAllCoroutines();
     }

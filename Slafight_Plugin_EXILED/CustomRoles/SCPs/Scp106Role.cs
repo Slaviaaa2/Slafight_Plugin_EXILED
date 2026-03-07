@@ -48,7 +48,7 @@ public class Scp106Role : CRole
         player.AddAbility(new CreateSinkholeAbility(player));
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで陥没穴を創り出せるぞ！陥没穴は中に\n人を引き込めるから沢山作れ！",10f);
+            player.ShowHint("<size=24><color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで陥没穴を創り出せるぞ！陥没穴は中に\n人を引き込めるから沢山作れ！",10f);
         });
     }
 

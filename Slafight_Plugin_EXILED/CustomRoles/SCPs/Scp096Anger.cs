@@ -115,7 +115,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         Log.Debug("Scp096: Anger was Spawned!");
         Timing.CallDelayed(0.1f, () => StartAnger(player));
         Timing.CallDelayed(0.05f, () => player.ShowHint(
-            "<color=red>SCP-096: Anger</color>\nSCP-096の怒りと悲しみが再び不安定化し、本来の力が戻ってきた！\n<color=red>自分を見てきた相手を地の底まで追いかけろ！！！</color>",
+            "<size=24><color=red>SCP-096: Anger</color>\nSCP-096の怒りと悲しみが再び不安定化し、本来の力が戻ってきた！\n<color=red>自分を見てきた相手を地の底まで追いかけろ！！！</color>",
             10));
     }
 

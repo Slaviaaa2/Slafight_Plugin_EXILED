@@ -52,7 +52,7 @@ public class Scp682Role : CRole
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
+            player.ShowHint("<size=24><color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));
     }

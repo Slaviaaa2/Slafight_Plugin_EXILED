@@ -57,7 +57,7 @@ public class Scp173Role : CRole
         player.AddAbility(new PlaceTantrumAbility(player));
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
+            player.ShowHint("<size=24><color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
         });
     }
 

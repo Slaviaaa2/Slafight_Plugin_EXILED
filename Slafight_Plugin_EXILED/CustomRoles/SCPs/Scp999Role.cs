@@ -50,7 +50,7 @@ public class Scp999Role : CRole
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=#FF1493>SCP-999</color>\n全員とたわむれましょう！\n※勝敗には影響しません。可愛いペット的にふるまって\n攻撃してきた奴らに痛い一撃を喰らわせてやりましょう。", 10f);
+            player.ShowHint("<size=24><color=#FF1493>SCP-999</color>\n全員とたわむれましょう！\n※勝敗には影響しません。可愛いペット的にふるまって\n攻撃してきた奴らに痛い一撃を喰らわせてやりましょう。", 10f);
         });
     }
     

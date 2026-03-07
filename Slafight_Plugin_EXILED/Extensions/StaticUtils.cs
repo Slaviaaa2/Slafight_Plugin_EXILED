@@ -153,6 +153,13 @@ public static class StaticUtils
         
             return new Vector3(randomX, y, randomZ);
         }
+
+        public bool HasWornGoggle<T>() where T : CustomGoggles
+        {
+            return player.Items
+                .OfType<Scp1344>()
+                .Any(i => i.IsCustomItem(out var ci) && ci is T && i.IsWorn);
+        }
     }
 
     extension([CanBeNull] Player player)

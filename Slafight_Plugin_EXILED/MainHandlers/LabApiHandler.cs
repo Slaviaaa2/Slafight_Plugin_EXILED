@@ -136,6 +136,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers
                 CustomItem.TrySpawn(2015, new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
                 CustomItem.TrySpawn(2021, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
                 CustomItem.TrySpawn(2022, Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
+                CustomItem.TrySpawn(2033, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up * 1.05f), out _);
             });
         }
 

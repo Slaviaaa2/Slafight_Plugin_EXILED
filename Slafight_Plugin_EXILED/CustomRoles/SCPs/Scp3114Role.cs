@@ -43,7 +43,7 @@ public class Scp3114Role : CRole
         player.Rotation = SpawnRoom.Rotation;
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<color=red>SCP-3114</color>\nSkeleton Pan for you!",10f);
+            player.ShowHint("<size=24><color=red>SCP-3114</color>\nSkeleton Pan for you!",10f);
             Ragdoll classd = Ragdoll.CreateAndSpawn(RoleTypeId.ClassD, "D-9341","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
             Ragdoll scientist = Ragdoll.CreateAndSpawn(RoleTypeId.Scientist, "Dr. Maynard","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
         });

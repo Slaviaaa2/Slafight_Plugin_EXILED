@@ -223,11 +223,22 @@ public class EscapeHandler
         PlayerCustomEscaped?.Invoke(null, new PlayerCustomEscapedEventArgs(player));
     }
 
-    public void AddEscapeCoroutine() => Timing.RunCoroutine(EscapeCoroutine());
+    private CoroutineHandle _escapeCoroutine;  // フィールドで管理
+
+    public void AddEscapeCoroutine()
+    {
+        // 既存コルーチンを確実に止めてから新しく起動
+        if (_escapeCoroutine.IsRunning)
+            Timing.KillCoroutines(_escapeCoroutine);
+
+        _escapeCoroutine = Timing.RunCoroutine(EscapeCoroutine());
+    }
 
     private IEnumerator<float> EscapeCoroutine()
     {
-        var escapedPlayers = new HashSet<Player>();
+        // escapedPlayers はコルーチン内ローカルのままでOK（毎ラウンド新規作成される）
+        var escapedPlayers = new HashSet<int>();  // Player参照ではなくIDで管理（参照使いまわし対策）
+    
         for (;;)
         {
             if (Round.IsLobby) yield break;
@@ -235,7 +246,8 @@ public class EscapeHandler
 
             foreach (var player in Player.List)
             {
-                if (player?.IsAlive != true || escapedPlayers.Contains(player)) continue;
+                if (player?.IsAlive != true) continue;
+                if (escapedPlayers.Contains(player.Id)) continue;  // IDで判定
 
                 var playerPos = player.Position;
                 for (int i = 0; i < EscapePoints.Count; i++)
@@ -243,7 +255,7 @@ public class EscapeHandler
                     if ((playerPos - EscapePoints[i]).sqrMagnitude <= EscapeRadiusSqr)
                     {
                         Escape(player);
-                        escapedPlayers.Add(player);
+                        escapedPlayers.Add(player.Id);  // IDで記録
                         break;
                     }
                 }

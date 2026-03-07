@@ -18,12 +18,14 @@ using System.Text.Json;
 using System.Threading;
 using HarmonyLib;
 using MEC;
+using Mirror;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.CustomRoles.SCPs;
+using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.ProximityChat;
@@ -107,10 +109,15 @@ namespace Slafight_Plugin_EXILED
             TerminalRiftLabHandler = new();
             CustomHandlersManager.RegisterEventsHandler(TerminalRiftLabHandler);
             TerminalRift.Register();
+            
+            // DailyCassieAnnounce.Register(); -- 何か微妙だったので没
 
             EngineerRole = new Engineer();
             EngineerRole.RegisterEvents();
             CRole.OverrideRoleInstance(EngineerRole.UniqueRoleName, EngineerRole);
+            
+            NetworkVisibilityExtensions.Register();
+            NvgManager.Register();
             
             WearsHandler.Register();
             CRole.RegisterAllEvents();
@@ -168,7 +175,12 @@ namespace Slafight_Plugin_EXILED
             CustomHandlersManager.UnregisterEventsHandler(TerminalRiftLabHandler);
             TerminalRift.Unregister();
             
+            // DailyCassieAnnounce.Unregister(); -- 何か微妙だったので没
+            
             EngineerRole.UnregisterEvents();
+            
+            NetworkVisibilityExtensions.Unregister();
+            NvgManager.Unregister();
             
             WearsHandler.Unregister();
             CRole.UnregisterAllEvents();

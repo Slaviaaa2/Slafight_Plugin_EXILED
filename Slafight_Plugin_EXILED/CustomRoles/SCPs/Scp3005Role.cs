@@ -62,6 +62,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs
             player.AddAbility(new SoundOfFifthAbility(player));
 
             Timing.RunCoroutine(Scp3005Coroutine(player));
+            Timing.CallDelayed(0.05f, () => player.ShowHint(
+                "<size=24><color=red>SCP-3005</color>\n第五的な光を放つ存在。\n普通はダメージを受けることはなく、\nアビリティで第五的なミサイルや閃光を引き起こせる。\n<color=#ff00fa>第五教会に道を示せ</color>",
+                10));
         }
 
         private void OnHurting(HurtingEventArgs ev)

@@ -13,6 +13,8 @@
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>default</LangVersion>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -86,10 +88,10 @@
           <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.1\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
         </Reference>
         <Reference Include="Mirror">
-            <HintPath>..\..\..\Tools\depBuild\references\Mirror.dll</HintPath>
+          <HintPath>..\..\SL_References\Mirror_publicized.dll</HintPath>
         </Reference>
         <Reference Include="Mirror.Components">
-            <HintPath>..\..\..\Tools\depBuild\references\Mirror.Components.dll</HintPath>
+          <HintPath>..\..\SL_References\Mirror.Components_publicized.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib">
             <HintPath>..\..\..\Tools\depBuild\references\mscorlib.dll</HintPath>
@@ -160,6 +162,7 @@
         <Compile Include="Abilities\MagicMissileAbility.cs" />
         <Compile Include="Abilities\PlaceTantrumAbility.cs" />
         <Compile Include="Abilities\Scp035TentacleAbility.cs" />
+        <Compile Include="Abilities\Scp966SpeedAbility.cs" />
         <Compile Include="Abilities\SoundOfFifthAbility.cs" />
         <Compile Include="Abilities\TeleprotRandomAbility.cs" />
         <Compile Include="API\Enums\CTeam.cs" />
@@ -212,6 +215,7 @@
         <Compile Include="Commands\DevTools\SpawnPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
+        <Compile Include="CustomItems\NvgManager.cs" />
         <Compile Include="CustomItems\CustomItemsManager.cs" />
         <Compile Include="CustomItems\exiledApiItems\AdvancedMedkit.cs" />
         <Compile Include="CustomItems\exiledApiItems\AntiMemeGoggle.cs" />
@@ -261,6 +265,7 @@
         <Compile Include="CustomItems\exiledApiItems\MasterCard.cs" />
         <Compile Include="CustomItems\exiledApiItems\ClassXMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
+        <Compile Include="CustomItems\exiledApiItems\NvgNormal.cs" />
         <Compile Include="CustomItems\exiledApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\exiledApiItems\PlayingCard.cs" />
         <Compile Include="CustomItems\exiledApiItems\Quarter.cs" />
@@ -271,6 +276,7 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomMaps\DailyCassieAnnounce.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosBreaker.cs" />
@@ -311,6 +317,7 @@
         <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
         <Compile Include="Extensions\AbilityResetUtil.cs" />
+        <Compile Include="Extensions\NetworkVisibilityExtensions.cs" />
         <Compile Include="Extensions\OnlyChecker.cs" />
         <Compile Include="Extensions\PlayerAbilityExtensions.cs" />
         <Compile Include="Extensions\PlayerCustomItemExtensions.cs" />
@@ -369,6 +376,7 @@
         <Compile Include="ProximityChat\Handler.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />
         <Compile Include="SpecialEvents\Events\ClassicEvent.cs" />
+        <Compile Include="SpecialEvents\Events\DailyFoundation.cs" />
         <Compile Include="SpecialEvents\Events\FacilityTermination.cs" />
         <Compile Include="SpecialEvents\Events\Old_DeltaWarhead.cs" />
         <Compile Include="SpecialEvents\Events\FifthistsRaid.cs" />
@@ -380,6 +388,7 @@
         <Compile Include="SpecialEvents\Events\Scp1509BattleField.cs" />
         <Compile Include="SpecialEvents\Events\SergeyMakarovReturns.cs" />
         <Compile Include="SpecialEvents\Events\SnowWarriersAttack.cs" />
+        <Compile Include="SpecialEvents\Events\SpeedUpEvent.cs" />
         <Compile Include="SpecialEvents\SpecialEventsHandler.cs" />
     </ItemGroup>
     <ItemGroup>
