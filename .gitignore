@@ -1,0 +1,25 @@
+# ビルド成果物（サブフォルダ含む）
+**/bin/
+**/obj/
+**/packages/
+
+# DLL / PDB（サブフォルダ含む）
+**/*.dll
+**/*.pdb
+**/*.exe
+
+# IDE 環境ファイル
+**/*.user
+**/*.suo
+**/*.csproj.user
+
+# .NET 系
+**/*.cache
+**/node_modules/
+
+# ログ
+**/*.log
+
+# OS 生成物
+.DS_Store
+Thumbs.db

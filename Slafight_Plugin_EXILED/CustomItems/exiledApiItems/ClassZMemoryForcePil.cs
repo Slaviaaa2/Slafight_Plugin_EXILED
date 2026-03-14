@@ -1,0 +1,114 @@
+using System.Collections.Generic;
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
+using Exiled.CustomItems.API.Features;
+using Exiled.Events.EventArgs.Map;
+using Exiled.Events.EventArgs.Player;
+using MEC;
+using Mirror;
+using Scp914;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+
+namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+
+[CustomItem(ItemType.SCP500)]
+public class ClassZMemoryForcePil : CustomItem
+{
+    public override uint Id { get; set; } = 2029;
+    public override string Name { get; set; } = "クラスZ-記憶補強剤";
+    public override string Description { get; set; } = "反ミーム性の現象等に対抗するために使用される強力な薬。\n反ミームの影響を無効化する\n効果時間：---\n注意書き：<color=red>とても危険です！使用を控えるべきです！</color>";
+    public override float Weight { get; set; } = 1f;
+    public override ItemType Type { get; set; } = ItemType.SCP500;
+
+    public Color glowColor = CustomColor.Purple.ToUnityColor();
+    private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
+
+    public override SpawnProperties SpawnProperties { get; set; } = new();
+
+    protected override void SubscribeEvents()
+    {
+        Exiled.Events.Handlers.Player.UsingItem += OnUsing;
+        Exiled.Events.Handlers.Player.UsedItem += OnUsed;
+        
+        Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
+        Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
+        
+        base.SubscribeEvents();
+    }
+
+    protected override void UnsubscribeEvents()
+    {
+        Exiled.Events.Handlers.Player.UsingItem -= OnUsing;
+        Exiled.Events.Handlers.Player.UsedItem -= OnUsed;
+        
+        Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
+        Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
+        
+        base.UnsubscribeEvents();
+    }
+
+    private void OnUsing(UsingItemEventArgs ev)
+    {
+        if (!Check(ev.Item) || ev.Player == null) return;
+        if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+        {
+            ev.IsAllowed = false;
+            ev.Player.ShowHint("既に耐性を得ている為、使用できません。");
+        }
+    }
+    
+    private void OnUsed(UsedItemEventArgs ev)
+    {
+        if (!Check(ev.Item) || ev.Player == null) return;
+        ev.Player.EnableEffect(EffectType.Invigorated, 60);
+        ev.Player.EnableEffect(EffectType.Scp207, 4);
+        SpecificFlagsManager.TryAddFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled);
+    }
+    
+    private void RemoveGlow(PickupDestroyedEventArgs ev)
+    {
+        if (Check(ev.Pickup))
+        {
+            if (ev.Pickup != null)
+            {
+                if (ev.Pickup?.Base?.gameObject == null) return;
+                if (TryGet(ev.Pickup.Serial, out CustomItem ci) && ci != null)
+                {
+                    if (ev.Pickup == null || !ActiveLights.ContainsKey(ev.Pickup)) return;
+                    Exiled.API.Features.Toys.Light light = ActiveLights[ev.Pickup];
+                    if (light != null && light.Base != null)
+                    {
+                        NetworkServer.Destroy(light.Base.gameObject);
+                    }
+                    ActiveLights.Remove(ev.Pickup);
+                }
+            }
+        }
+
+    }
+    private void AddGlow(PickupAddedEventArgs ev)
+    {
+        if (Check(ev.Pickup) && ev.Pickup.PreviousOwner != null)
+        {
+            if (ev.Pickup?.Base?.gameObject == null) return;
+            TryGet(ev.Pickup, out CustomItem ci);
+            Log.Debug($"Pickup is CI: {ev.Pickup.Serial} | {ci.Id} | {ci.Name}");
+
+            var light = Exiled.API.Features.Toys.Light.Create(ev.Pickup.Position);
+            light.Color = glowColor;
+
+            light.Intensity = 0.7f;
+            light.Range = 5f;
+            light.ShadowType = LightShadows.None;
+
+            light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);
+            ActiveLights[ev.Pickup] = light;
+        }
+    }
+}

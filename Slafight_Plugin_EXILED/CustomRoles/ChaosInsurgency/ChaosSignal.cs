@@ -1,0 +1,57 @@
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Pickups.Projectiles;
+using Exiled.Events.EventArgs.Player;
+using MEC;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+
+namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
+
+public class ChaosSignal : CRole
+{
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosSignal;
+    protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
+    protected override string UniqueRoleKey { get; set; } = "ChaosSignal";
+
+    public override void RegisterEvents()
+    {
+        //Exiled.Events.Handlers.Player.Dying += OnDying;
+        base.RegisterEvents();
+    }
+
+    public override void UnregisterEvents()
+    {
+        //Exiled.Events.Handlers.Player.Dying -= OnDying;
+        base.UnregisterEvents();
+    }
+
+    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    {
+        base.SpawnRole(player, roleSpawnFlags);
+        player.Role.Set(RoleTypeId.ChaosRifleman);
+        player.UniqueRole = UniqueRoleKey;
+        player.MaxHealth = 100;
+        player.Health = player.MaxHealth;
+        
+        player.ClearInventory();
+        player.SetCategoryLimit(ItemCategory.Radio, 2);
+        player.AddItem(ItemType.KeycardChaosInsurgency);
+        player.AddItem(ItemType.Medkit);
+        player.AddItem(ItemType.Painkillers);
+        player.AddItem(ItemType.ArmorCombat);
+        player.AddItem(ItemType.GunAK);
+        player.TryAddCustomItem(2012);
+        
+        player.AddAmmo(AmmoType.Nato762, 150);
+            
+        player.SetCustomInfo("Chaos Insurgency Signal");
+        Timing.CallDelayed(0.05f, () =>
+        {
+            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 通信兵</color>\nS-Nav 300を用いてユニークな部屋を捜索する。",10f);
+        });
+    }
+}

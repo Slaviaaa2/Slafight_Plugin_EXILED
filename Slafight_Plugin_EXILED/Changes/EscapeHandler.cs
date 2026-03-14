@@ -1,0 +1,300 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Exiled.API.Features;
+using Exiled.API.Features.Pickups;
+using Exiled.Events.EventArgs.Player;
+using MEC;
+using PlayerRoles;
+using ProjectMER.Events.Arguments;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+using Exiled.Events.Handlers;
+using Player = Exiled.API.Features.Player;
+
+namespace Slafight_Plugin_EXILED.Changes;
+
+// SpawnSystem準拠のシンプルEventArgs
+public class PlayerCustomEscapingEventArgs : EventArgs
+{
+    public Player Player { get; }
+    public bool IsAllowed { get; set; } = true;
+    public PlayerCustomEscapingEventArgs(Player player) => Player = player;
+}
+
+public class PlayerCustomEscapedEventArgs : EventArgs
+{
+    public Player Player { get; }
+    public PlayerCustomEscapedEventArgs(Player player) => Player = player;
+}
+
+public class EscapeHandler
+{
+    public static event EventHandler<PlayerCustomEscapingEventArgs> PlayerCustomEscaping;
+    public static event EventHandler<PlayerCustomEscapedEventArgs> PlayerCustomEscaped;
+
+    public EscapeHandler()
+    {
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SetEscapePoint;
+        Exiled.Events.Handlers.Player.Escaping += CancelDefaultEscape;
+        Exiled.Events.Handlers.Server.RoundStarted += AddEscapeCoroutine;
+    }
+
+    ~EscapeHandler()
+    {
+        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SetEscapePoint;
+        Exiled.Events.Handlers.Player.Escaping -= CancelDefaultEscape;
+        Exiled.Events.Handlers.Server.RoundStarted -= AddEscapeCoroutine;
+    }
+
+    private const float EscapeRadius = 1.75f;
+    private const float EscapeRadiusSqr = EscapeRadius * EscapeRadius;
+    private const float ItemPickupRadius = 1.05f;
+    private const float ItemPickupRadiusSqr = ItemPickupRadius * ItemPickupRadius;
+
+    public readonly List<Vector3> EscapePoints = new();
+
+    public void SetEscapePoint(SchematicSpawnedEventArgs ev)
+    {
+        if (ev?.Schematic == null)
+            return;
+
+        var schematic = ev.Schematic;
+
+        if (schematic.Name != "EscapePoint")
+            return;
+
+        try
+        {
+            EscapePoints.Add(schematic.Position);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[SetEscapePoint] Failed to get position for {schematic.Name}: {e}");
+            return;
+        }
+
+        // 座標だけ使うダミーなので安全に破棄
+        ev.DestroySafe(0.05f); // SchematicHelpers 拡張メソッド
+    }
+
+    public void SaveItems(Player player)
+    {
+        var nowPos = player.Position;
+        player.DropItems();
+
+        var saveItems = Pickup.List
+            .Where(p => p != null && p.PreviousOwner == player && (p.Position - nowPos).sqrMagnitude <= ItemPickupRadiusSqr)
+            .ToList();
+
+        if (saveItems.Count == 0) return;
+
+        Timing.CallDelayed(0.5f, () =>
+        {
+            if (player?.IsConnected != true) return;
+            var newPos = player.Position + new Vector3(0f, 0.15f, 0f);
+            foreach (var item in saveItems)
+                if (item?.IsSpawned == true) item.Position = newPos;
+        });
+    }
+
+    public struct EscapeTargetRole 
+    { 
+        public RoleTypeId? Vanilla; 
+        public CRoleTypeId? Custom; 
+    }
+
+    private EscapeTargetRole GetEscapeTarget(CTeam myTeam, CTeam cufferTeam)
+    {
+        return (myTeam, cufferTeam) switch
+        {
+            // Class-D Personnel
+            (CTeam.ClassD, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            (CTeam.ClassD, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.ClassD, CTeam.GoC) // ← orより上！
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
+            (CTeam.ClassD, _)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+
+            // Scientists
+            (CTeam.Scientists, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.Scientists, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.Scientists, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
+            (CTeam.Scientists, _)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfSpecialist, Custom = null },
+
+            // Chaos Insurgency
+            (CTeam.ChaosInsurgency, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            (CTeam.ChaosInsurgency, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.ChaosInsurgency, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
+
+            // Foundation Forces (with Guards)
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.Fifthists)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
+            (CTeam.FoundationForces or CTeam.Guards, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
+
+            // Fifthists
+            (CTeam.Fifthists, CTeam.ChaosInsurgency or CTeam.ClassD)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
+            (CTeam.Fifthists, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
+                => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
+            
+            // GoC
+            (CTeam.Fifthists, CTeam.GoC)
+                => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
+
+            // デフォルト
+            _ => new EscapeTargetRole { Vanilla = null, Custom = null },
+        };
+    }
+
+    private EscapeTargetRole ApplyEventOverrides(
+        EscapeTargetRole baseTarget,
+        Player player)
+    {
+        var nowEvent = Plugin.Singleton.SpecialEventsHandler.NowEvent;
+
+        var myRole       = player.Role.Type;          // RoleTypeId
+        var myCustomRole = player.GetCustomRole();    // CRoleTypeId
+        var cufferRole   = player.Cuffer?.Role.Type;
+        var cufferCustom = player.Cuffer?.GetCustomRole();
+
+        switch (nowEvent)
+        {
+            case SpecialEventType.None:
+            default:
+                return baseTarget;
+
+            case SpecialEventType.FifthistsRaid:
+            {
+                if (myCustomRole is CRoleTypeId.Scp3005)
+                    return new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistPriest };
+                break;
+            }
+
+            // 他イベントもここへ
+        }
+
+        return baseTarget;
+    }
+
+    private EscapeTargetRole GetEscapeTarget(Player player)
+    {
+        // ロール専用チェック（最優先）
+        var roleOverride = CheckRoleEscapeOverride(player);
+        if (roleOverride.Vanilla.HasValue || roleOverride.Custom.HasValue)
+            return roleOverride;
+
+        // 通常チーム判定
+        var myTeam = player.GetTeam();
+        var cufferTeam = player.Cuffer?.GetTeam() ?? CTeam.Null;
+        var baseTarget = GetEscapeTarget(myTeam, cufferTeam);
+
+        // イベントオーバーライド
+        return ApplyEventOverrides(baseTarget, player);
+    }
+
+    // ロール専用脱出チェック（nullも明示）
+    private EscapeTargetRole CheckRoleEscapeOverride(Player player)
+    {
+        return player.GetCustomRole() switch
+        {
+            _ => new EscapeTargetRole 
+            { 
+                Vanilla = null,
+                Custom  = null 
+            }
+        };
+    }
+
+    public void Escape(Player player)
+    {
+        Log.Debug($"Escape: {player.Nickname} ({player.GetTeam()})");
+
+        var target = GetEscapeTarget(player);
+        if (target.Vanilla is null && target.Custom is null) return;
+
+        // Escapingイベント（SpawnSystem準拠）
+        var ev = new PlayerCustomEscapingEventArgs(player) { IsAllowed = true };
+        PlayerCustomEscaping?.Invoke(null, ev);
+        if (!ev.IsAllowed) return;
+
+        SaveItems(player);
+
+        if (target.Custom is { } custom) player.SetRole(custom);
+        else if (target.Vanilla is { } vanilla) player.SetRole(vanilla);
+
+        // Escapedイベント
+        PlayerCustomEscaped?.Invoke(null, new PlayerCustomEscapedEventArgs(player));
+    }
+
+    private CoroutineHandle _escapeCoroutine;  // フィールドで管理
+
+    public void AddEscapeCoroutine()
+    {
+        // 既存コルーチンを確実に止めてから新しく起動
+        if (_escapeCoroutine.IsRunning)
+            Timing.KillCoroutines(_escapeCoroutine);
+
+        _escapeCoroutine = Timing.RunCoroutine(EscapeCoroutine());
+    }
+
+    private IEnumerator<float> EscapeCoroutine()
+    {
+        var escapedPlayers = new HashSet<int>();
+        var escapeTimers = new Dictionary<int, CoroutineHandle>();
+
+        for (;;)
+        {
+            if (Round.IsLobby) yield break;
+            if (EscapePoints.Count == 0) { yield return Timing.WaitForSeconds(0.5f); continue; }
+
+            foreach (var player in Player.List)
+            {
+                if (player?.IsAlive != true) continue;
+            
+                // 5秒クリア判定
+                if (escapeTimers.TryGetValue(player.Id, out var timer) && !timer.IsRunning)
+                {
+                    escapedPlayers.Remove(player.Id);
+                    escapeTimers.Remove(player.Id);
+                }
+            
+                if (escapedPlayers.Contains(player.Id)) continue;
+
+                var playerPos = player.Position;
+                for (int i = 0; i < EscapePoints.Count; i++)
+                {
+                    if ((playerPos - EscapePoints[i]).sqrMagnitude <= EscapeRadiusSqr)
+                    {
+                        Escape(player);
+                        escapedPlayers.Add(player.Id);
+                    
+                        // 5秒後にフラグクリア
+                        escapeTimers[player.Id] = Timing.CallDelayed(5f, () =>
+                        {
+                            escapedPlayers.Remove(player.Id);
+                            escapeTimers.Remove(player.Id);
+                        });
+                        break;
+                    }
+                }
+            }
+            yield return Timing.WaitForSeconds(0.5f);
+        }
+    }
+
+    public void CancelDefaultEscape(EscapingEventArgs ev) => ev.IsAllowed = false;
+}
