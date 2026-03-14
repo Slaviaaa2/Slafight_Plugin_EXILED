@@ -43,6 +43,8 @@ public static class TerminalRift
         ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SchematicsSetup;
         Exiled.Events.Handlers.Server.RestartingRound += Cleanup;
         Exiled.Events.Handlers.Player.ReceivingEffect += CancelDeath;
+        Exiled.Events.Handlers.Player.ChangingRole += OnChanging;
+        Exiled.Events.Handlers.Player.Dying += CancelDeathForDying;
 
         _labHandler = new TerminalRiftLabHandler();
         CustomHandlersManager.RegisterEventsHandler(_labHandler);
@@ -62,6 +64,8 @@ public static class TerminalRift
         ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SchematicsSetup;
         Exiled.Events.Handlers.Server.RestartingRound -= Cleanup;
         Exiled.Events.Handlers.Player.ReceivingEffect -= CancelDeath;
+        Exiled.Events.Handlers.Player.ChangingRole -= OnChanging;
+        Exiled.Events.Handlers.Player.Dying -= CancelDeathForDying;
 
         CustomHandlersManager.UnregisterEventsHandler(_labHandler);
         _labHandler = null;
@@ -162,6 +166,34 @@ public static class TerminalRift
             string.IsNullOrEmpty(currentRoomType))
         {
             ev.IsAllowed = false;
+        }
+    }
+
+    private static void OnChanging(ChangingRoleEventArgs ev)
+    {
+        if (ev.Player == null || !ev.IsAllowed) return;
+        try
+        {
+            ev.Player.DisableAllEffects();
+            ev.Player.EnableEffect(EffectType.SpawnProtected, 3.5f);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private static void CancelDeathForDying(DyingEventArgs ev)
+    {
+        if (ev.Player == null) return;
+        if (ev.Player.IsEffectActive<PitDeath>())
+        {
+            if (ev.Player.CurrentRoom?.Type == RoomType.Surface)
+            {
+                ev.IsAllowed = false;
+                ev.Player.DisableEffect<PitDeath>();
+                ev.Player.Health = ev.Player.MaxHealth;
+            }
         }
     }
 
