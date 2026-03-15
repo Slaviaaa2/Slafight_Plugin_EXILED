@@ -67,5 +67,7 @@ public static class CustomItemsManager
             new GunTacticalRevolver().Register();
             new NvgNormal().Register();
             new CUA_SpyKit().Register();
+            new FileScientist_Samuels().Register();
+            new FileCafeteriaNeeds().Register();
     }
 }

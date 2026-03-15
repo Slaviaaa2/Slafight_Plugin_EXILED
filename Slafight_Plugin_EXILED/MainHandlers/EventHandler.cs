@@ -239,6 +239,12 @@ public class EventHandler
 
         Timing.CallDelayed(1f, () =>
         {
+            foreach (var pickup in Pickup.List)
+            {
+                if (pickup == null) return;
+                pickup.UnSpawn();
+                Timing.CallDelayed(0.1f, () => pickup.Spawn());
+            }
             List<SpecialEventType> notallowed =
             [
                 SpecialEventType.OperationBlackout,
@@ -351,25 +357,29 @@ public class EventHandler
 
     private void PositionGet(FlippingCoinEventArgs ev)
     {
-        if (ev?.Player == null) return; // FIX: nullガード
+        if (ev?.Player == null) return;
         Vector3 playerPosition = ev.Player.Position;
         if (ev.Player.UniqueRole == "Debug")
         {
             if (ev.Player.CurrentRoom != null)
             {
                 Room currentRoom = ev.Player.CurrentRoom;
-                Vector3 localPos = currentRoom.Rotation * (playerPosition - currentRoom.Position);
-                Vector3 localRot = currentRoom.Rotation.eulerAngles;
+                Vector3 localPos = Quaternion.Inverse(currentRoom.Rotation) * (playerPosition - currentRoom.Position);
+                Quaternion localRot = Quaternion.Inverse(currentRoom.Rotation);
+                Vector3 localEuler = localRot.eulerAngles;
+                Vector3 roomRot = currentRoom.Rotation.eulerAngles;
 
                 ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z +
                                    "\nRoom: " + currentRoom.Type +
                                    "\nLocal: " + localPos.x + "," + localPos.y + "," + localPos.z +
-                                   "\nRot: " + currentRoom.Rotation.eulerAngles.x + "," + currentRoom.Rotation.eulerAngles.y + "," + currentRoom.Rotation.eulerAngles.z, 5);
+                                   "\nLocalRot: " + localEuler.x + "," + localEuler.y + "," + localEuler.z +
+                                   "\nRoomRot: " + roomRot.x + "," + roomRot.y + "," + roomRot.z, 5);
 
                 Log.Debug("Position Get: " + "X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
                 Log.Debug(" Room: " + currentRoom.Type);
                 Log.Debug(" LocalPos: X:" + localPos.x + " Y:" + localPos.y + " Z:" + localPos.z);
-                Log.Debug(" RoomRot: X:" + localRot.x + " Y:" + localRot.y + " Z:" + localRot.z);
+                Log.Debug(" LocalRot: X:" + localEuler.x + " Y:" + localEuler.y + " Z:" + localEuler.z);
+                Log.Debug(" RoomRot: X:" + roomRot.x + " Y:" + roomRot.y + " Z:" + roomRot.z);
             }
             else
             {
@@ -381,22 +391,26 @@ public class EventHandler
 
     private void DoorGet(InteractingDoorEventArgs ev)
     {
-        if (ev?.Player == null || ev.Door == null) return; // FIX: nullガード
+        if (ev?.Player == null || ev.Door == null) return;
         if (ev.Player.UniqueRole == "Debug")
         {
             Room doorRoom = ev.Door.Room;
-            if (doorRoom == null) return; // FIX: doorRoom nullガード
-            Vector3 doorLocalPos = doorRoom.Rotation * (ev.Player.Position - doorRoom.Position);
-            Vector3 doorLocalRot = doorRoom.Rotation.eulerAngles;
+            if (doorRoom == null) return;
+            Vector3 doorLocalPos = Quaternion.Inverse(doorRoom.Rotation) * (ev.Player.Position - doorRoom.Position);
+            Quaternion doorLocalRot = Quaternion.Inverse(doorRoom.Rotation);
+            Vector3 doorLocalEuler = doorLocalRot.eulerAngles;
+            Vector3 doorRoomRot = doorRoom.Rotation.eulerAngles;
 
             ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + doorRoom.Type +
                                "\nLocal: " + doorLocalPos.x + "," + doorLocalPos.y + "," + doorLocalPos.z +
-                               "\nRot: " + doorLocalRot.x + "," + doorLocalRot.y + "," + doorLocalRot.z, 5);
+                               "\nLocalRot: " + doorLocalEuler.x + "," + doorLocalEuler.y + "," + doorLocalEuler.z +
+                               "\nRoomRot: " + doorRoomRot.x + "," + doorRoomRot.y + "," + doorRoomRot.z, 5);
 
             Log.Debug("Door Get: " + ev.Door.Type);
             Log.Debug(" Name & Room: " + ev.Door.Name + ", " + doorRoom.Type);
             Log.Debug(" LocalPos: X:" + doorLocalPos.x + " Y:" + doorLocalPos.y + " Z:" + doorLocalPos.z);
-            Log.Debug(" RoomRot: X:" + doorLocalRot.x + " Y:" + doorLocalRot.y + " Z:" + doorLocalRot.z);
+            Log.Debug(" LocalRot: X:" + doorLocalEuler.x + " Y:" + doorLocalEuler.y + " Z:" + doorLocalEuler.z);
+            Log.Debug(" RoomRot: X:" + doorRoomRot.x + " Y:" + doorRoomRot.y + " Z:" + doorRoomRot.z);
         }
         else
         {

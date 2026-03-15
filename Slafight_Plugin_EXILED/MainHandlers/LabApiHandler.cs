@@ -136,12 +136,15 @@ public class LabApiHandler : CustomEventsHandler
 
         Timing.CallDelayed(1.05f, () =>
         {
-            CustomItem.TrySpawn(300,new Vector3(134.94f,300.65f,-65f),out Pickup _);
-            CustomItem.TrySpawn(300,new Vector3(134.94f,300.65f,-65f),out Pickup _);
-            CustomItem.TrySpawn(2015, new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
-            CustomItem.TrySpawn(2021, Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
-            CustomItem.TrySpawn(2022, Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
-            CustomItem.TrySpawn(2033, Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up*1.5f), out _);
+            CustomItemExtensions.TrySpawn<HIDTurret>(new Vector3(134.94f,300.65f,-65f),out Pickup _);
+            CustomItemExtensions.TrySpawn<File012_5_033>(new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
+            CustomItemExtensions.TrySpawn<File096_777_A>(Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
+            CustomItemExtensions.TrySpawn<File3005_Contain>(Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
+            CustomItemExtensions.TrySpawn<NvgNormal>(Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up*1.5f), out _);
+            CustomItemExtensions.TrySpawn<FileScientist_Samuels>(StaticUtils.GetWorldFromRoomLocal(RoomType.LczCafe, new Vector3(7.148f, 1f, -2.631f),new Vector3(0f, 270f, 0f)).worldPosition, out var fs);
+            Log.Debug($"fs: {fs?.Position}");
+            CustomItemExtensions.TrySpawn<FileCafeteriaNeeds>(StaticUtils.GetWorldFromRoomLocal(RoomType.EzCollapsedTunnel, new Vector3(-4.085f, 18.05f, -2.562f),new Vector3(0f, 180f, 0f)).worldPosition, out var cafe);
+            Log.Debug($"cf: {cafe?.Position}");
         });
     }
        
@@ -157,30 +160,30 @@ public class LabApiHandler : CustomEventsHandler
             switch (schematic.Name)
             {
                 case "CISR_GoCRailgun":
-                    CustomItem.TrySpawn(50, pos, out _);
+                    CustomItemExtensions.TrySpawn<GunGoCRailgun>(pos, out _);
                     break;
 
                 case "CISR_OldPrivateCard":
-                    if (CustomItem.TrySpawn(104, pos, out var privateCard))
+                    if (CustomItemExtensions.TrySpawn<KeycardOld_Cadet>(pos, out var privateCard))
                         privateCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                     break;
 
                 case "CISR_OldCECard":
-                    if (CustomItem.TrySpawn(100, pos, out var ceCard))
+                    if (CustomItemExtensions.TrySpawn<KeycardOld_ContainmentEngineer>(pos, out var ceCard))
                         ceCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                     break;
 
                 case "CISR_Scp1425":
-                    if (CustomItem.TrySpawn(1102, pos, out var scp1425))
+                    if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))
                         scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                     break;
 
                 case "CISR_SNAV300":
-                    CustomItem.TrySpawn(2012, pos, out _);
+                    CustomItemExtensions.TrySpawn<SNAV300>(pos, out _);
                     break;
 
                 case "CISR_MFP":
-                    CustomItem.TrySpawn(2028, pos, out _);
+                    CustomItemExtensions.TrySpawn<ClassXMemoryForcePil>(pos, out _);
                     break;
 
                 default:
