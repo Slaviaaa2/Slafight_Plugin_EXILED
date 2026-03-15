@@ -72,6 +72,7 @@ public class CustomMapMainHandler : CustomEventsHandler
     {
         MapHandler.Generated += OnGeneratorGenerating;
         ServerHandler.RoundStarted += OnRoundStarted;
+        ServerHandler.RestartingRound += ResetInRestart;
         MapHandler.SpawningTeamVehicle += ChaosAnimation;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
         LabApi.Events.Handlers.PlayerEvents.InteractedDoor += DoorInteracted;
@@ -82,6 +83,7 @@ public class CustomMapMainHandler : CustomEventsHandler
     {
         MapHandler.Generated -= OnGeneratorGenerating;
         ServerHandler.RoundStarted -= OnRoundStarted;
+        ServerHandler.RestartingRound -= ResetInRestart;
         MapHandler.SpawningTeamVehicle -= ChaosAnimation;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
         LabApi.Events.Handlers.PlayerEvents.InteractedDoor -= DoorInteracted;
@@ -101,6 +103,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     private void OnRoundStarted()
     {
+        WarheadBoomEffectUtil.StopAllEffects();
         // ★ ラウンド切り替え前に残コルーチンを殺す
         if (femurCoroutine.IsRunning)
             Timing.KillCoroutines(femurCoroutine);
@@ -186,6 +189,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     private void SetupMaps()
     {
+        WarheadBoomEffectUtil.StopAllEffects();
         OmegaWarhead.IsWarheadStarted = false;
         if (femurCoroutine.IsRunning)
             Timing.KillCoroutines(femurCoroutine);
@@ -308,6 +312,11 @@ public class CustomMapMainHandler : CustomEventsHandler
         FemurSetup = false;
         FemurBreaked = false;
         femuredPlayers.Clear();
+    }
+
+    private void ResetInRestart()
+    {
+        WarheadBoomEffectUtil.StopAllEffects();
     }
 
     public void ChaosAnimation(SpawningTeamVehicleEventArgs ev)

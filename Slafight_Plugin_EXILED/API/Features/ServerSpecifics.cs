@@ -15,7 +15,8 @@ public abstract class ServerSpecifics
             new SSPlaintextSetting(2,"キャラクター名","",20,hint:"RPのキャラ名です。設定した名前の後に本当の名前が表示されます。"),
             new SSKeybindSetting(3,"アビリティ使用",KeyCode.LeftAlt,true,false,hint:"一部の利用可能ロールで、アビリティを使用するのに必要です。左Altを推奨します"),
             new SSKeybindSetting(4,"アビリティ切り替え",KeyCode.Mouse2,true,false,hint:"複数アビリティを所持している際の切り替えボタンです。中マウスボタンを推奨します"),
-            new SSPlaintextSetting(5, "シークレットパスコード","00000", 5, hint:"特別な場面で必要となるかもしれません・・・")
+            new SSPlaintextSetting(5, "シークレットパスコード","00000", 5, hint:"特別な場面で必要となるかもしれません・・・"),
+            new SSTwoButtonsSetting(6, "[ADMIN]デバッグモード", "ON", "OFF", true)
         };
         return settingsList.ToArray();
     }

@@ -1,0 +1,192 @@
+using System;
+using System.Collections.Generic;
+using CustomPlayerEffects;
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Toys;
+using Exiled.Events.EventArgs.Warhead;
+using MEC;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
+
+namespace Slafight_Plugin_EXILED.CustomMaps;
+
+public static class WarheadBoomEffectHandler
+{
+    public static void Register()
+    {
+        Exiled.Events.Handlers.Warhead.Starting += InvokeCoroutine;
+        Exiled.Events.Handlers.Warhead.Detonated += OnDetonated;
+    }
+
+    public static void Unregister()
+    {
+        Exiled.Events.Handlers.Warhead.Starting -= InvokeCoroutine;
+        Exiled.Events.Handlers.Warhead.Detonated -= OnDetonated;
+    }
+
+    private static readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio
+        = EventHandler.CreateAndPlayAudio;
+    private static CoroutineHandle _handle;
+
+    private static void OnDetonated()
+    {
+        if (!Round.InProgress) return;
+        Timing.RunCoroutine(KillCoroutine());
+    }
+
+    private static void InvokeCoroutine(StartingEventArgs ev)
+    {
+        if (!ev.IsAllowed) return;
+        foreach (var player in Player.List)
+        {
+            if (player == null) continue;
+            /*Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
+                                                                     $"DetonationTimer: {Warhead.DetonationTimer}\n" +
+                                                                     $"RealDetonationTimer: {Warhead.RealDetonationTimer}\n" +
+                                                                     $"TimeToDetonate: {Warhead.Controller.CurScenario.TimeToDetonate}\n" +
+                                                                     $"StartTime: {Warhead.Controller.Info.StartTime}" +
+                                                                     "</size>", player);*/
+        }
+        Timing.KillCoroutines(_handle);
+        _handle = Timing.RunCoroutine(EffectCoroutine());
+    }
+
+    private static IEnumerator<float> EffectCoroutine()
+    {
+        yield return Timing.WaitForSeconds(0.1f);
+
+        float startTimer    = Warhead.DetonationTimer;
+        float startRealTime = Time.realtimeSinceStartup;
+
+        while (true)
+        {
+            if (!Warhead.IsInProgress || !Round.InProgress) yield break;
+
+            float elapsed            = Time.realtimeSinceStartup - startRealTime;
+            float estimatedRemaining = startTimer - elapsed;
+
+            foreach (var player in Player.List)
+            {
+                if (player == null) continue;
+                /*
+                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
+                                                                         $"DetonationTimer: {Warhead.DetonationTimer}\n" +
+                                                                         $"RealDetonationTimer: {Warhead.RealDetonationTimer}\n" +
+                                                                         $"TimeToDetonate: {Warhead.Controller.CurScenario.TimeToDetonate}\n" +
+                                                                         $"StartTime: {Warhead.Controller.Info.StartTime}\n" +
+                                                                         $"EstimatedRemaining: {estimatedRemaining:F1}" +
+                                                                         "</size>", player);
+                                                                         */
+            }
+
+            // ── 残り 10秒: 煙エフェクト & 音 & フラッシュ予約 ─────────
+            if (estimatedRemaining <= 10f)
+            {
+                var effectPos = StaticUtils.GetWorldFromRoomLocal(
+                    RoomType.HczNuke, new Vector3(30f, -80f, 0f), Vector3.zero).worldPosition;
+
+                WarheadBoomEffectUtil.CreateAndStartEffect(effectPos, 10f, 0.15f, 0.03f);
+                CreateAndPlayAudio("warheaddrama.ogg", "WarheadDrama", Vector3.zero, true, null, false, 99999999f, 0f);
+
+                // 残り 0.3秒になるまで待ってからフラッシュ
+                float flashDelay = estimatedRemaining - 0.3f;
+                Timing.RunCoroutine(FlashAfterDelayCoroutine(effectPos, flashDelay));
+
+                yield break;
+            }
+
+            yield return Timing.WaitForSeconds(0.1f);
+        }
+    }
+
+    // 指定秒数待ってからフラッシュを起動
+    private static IEnumerator<float> FlashAfterDelayCoroutine(Vector3 position, float delay)
+    {
+        if (delay > 0f)
+            yield return Timing.WaitForSeconds(delay);
+
+        Timing.RunCoroutine(FlashCoroutine(position));
+    }
+
+    // ================================================================
+    //  爆発フラッシュコルーチン
+    //  - 0.00〜0.08s : EaseOut で Range/Intensity を最大まで急拡大
+    //  - 0.08〜0.30s : EaseIn で Range/Intensity をフェードアウト
+    //  - 0.30s       : Light を破棄
+    // ================================================================
+    private static IEnumerator<float> FlashCoroutine(Vector3 position)
+    {
+        const float expandDuration = 0.08f;
+        const float fadeDuration   = 0.22f;
+        const float maxIntensity   = 20000000f;
+        const float maxRange       = 120f;
+        const float tickInterval   = 0.016f; // ~60fps
+
+        var flashColor = new Color(1f, 0.85f, 0.5f); // 白に近いオレンジ
+
+        var light = Exiled.API.Features.Toys.Light.Create(
+            position: position,
+            rotation: null,
+            scale:    null,
+            spawn:    true,
+            color:    flashColor
+        );
+        light.LightType  = LightType.Point;
+        light.Intensity  = 0f;
+        light.Range      = 1f;
+        light.ShadowType = LightShadows.None;
+
+        // ── フェーズ1: 拡大 ────────────────────────────────────────
+        float t = 0f;
+        while (t < expandDuration)
+        {
+            float ratio     = Mathf.Clamp01(t / expandDuration);
+            float eased     = 1f - (1f - ratio) * (1f - ratio); // EaseOut
+            light.Intensity = Mathf.Lerp(0f, maxIntensity, eased);
+            light.Range     = Mathf.Lerp(1f, maxRange,     eased);
+            t              += tickInterval;
+            yield return Timing.WaitForSeconds(tickInterval);
+        }
+        light.Intensity = maxIntensity;
+        light.Range     = maxRange;
+
+        // ── フェーズ2: フェードアウト ──────────────────────────────
+        t = 0f;
+        while (t < fadeDuration)
+        {
+            float ratio     = Mathf.Clamp01(t / fadeDuration);
+            float eased     = ratio * ratio; // EaseIn
+            light.Intensity = Mathf.Lerp(maxIntensity, 0f, eased);
+            light.Range     = Mathf.Lerp(maxRange,     0f, eased);
+            t              += tickInterval;
+            yield return Timing.WaitForSeconds(tickInterval);
+        }
+
+        // ── 後片付け ───────────────────────────────────────────────
+        light.Intensity = 0f;
+        light.Destroy();
+    }
+
+    private static IEnumerator<float> KillCoroutine()
+    {
+        while (true)
+        {
+            if (!Round.InProgress) yield break;
+            foreach (var player in Player.List)
+            {
+                if (player == null || !player.IsAlive) continue;
+                if (player.Zone is ZoneType.Entrance or ZoneType.HeavyContainment or ZoneType.LightContainment or ZoneType.Pocket)
+                {
+                    if (!player.IsEffectActive<Decontaminating>())
+                    {
+                        player.EnableEffect<Decontaminating>(255);
+                    }
+                }
+            }
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+}

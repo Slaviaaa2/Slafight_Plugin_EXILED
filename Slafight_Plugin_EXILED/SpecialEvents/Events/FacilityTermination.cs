@@ -58,6 +58,7 @@ public class FacilityTermination : SpecialEvent
     {
         if (!CancelIfOutdated()) return false;
 
+        Exiled.API.Features.Cassie.Clear();
         Timing.KillCoroutines(_mainCoroutine);
         Timing.KillCoroutines(_humanitistsCoroutine);
         SpawnContextRegistry.SetActive("Default");
@@ -350,6 +351,7 @@ public class FacilityTermination : SpecialEvent
 
     private void CancelDeconAnnounce(AnnouncingDecontaminationEventArgs ev)
     {
+        if (KillEvent()) return;
         Timing.CallDelayed(0.05f, Exiled.API.Features.Cassie.Clear);
     }
 

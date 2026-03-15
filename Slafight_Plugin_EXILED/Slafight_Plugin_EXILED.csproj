@@ -291,7 +291,10 @@
         <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Vent.cs" />
+        <Compile Include="CustomMaps\ObjectPrefabs\WarheadBoomEffect.cs" />
         <Compile Include="CustomMaps\VentControl.cs" />
+        <Compile Include="CustomMaps\WarheadBoomEffectHandler.cs" />
+        <Compile Include="CustomMaps\WarheadBoomEffectUtil.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosBreaker.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />

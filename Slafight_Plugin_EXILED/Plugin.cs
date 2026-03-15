@@ -130,6 +130,7 @@ public class Plugin : Plugin<Config>
             
         FacilityLightHandler.Register();
         // GateAEnding.Register(); SCRAPPED
+        WarheadBoomEffectHandler.Register();
             
         UnitPackBootstrap.RegisterAllPacks();
         SpawnContextBootstrap.RegisterAllContexts(SpawnSystem.Config);
@@ -198,6 +199,7 @@ public class Plugin : Plugin<Config>
             
         FacilityLightHandler.Unregister();
         // GateAEnding.Unregister(); SCRAPPED
+        WarheadBoomEffectHandler.Unregister();
             
         HarmonyInstance.UnpatchAll(this.Name);
         HarmonyInstance = null;

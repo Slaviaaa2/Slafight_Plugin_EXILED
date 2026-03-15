@@ -67,6 +67,7 @@ public class PlayerHUD
     private string PHUD_Event_Text = string.Empty;
     private string PHUD_Specific_Text = string.Empty;
     private string PHUD_Ability_Text = string.Empty;
+    private string PHUD_Debug_Text = string.Empty;
 
     // =========================================================
     // ヘルパー
@@ -197,6 +198,16 @@ public class PlayerHUD
             XCoordinate = XCordinate + 350,
             YCoordinate = 855
         };
+        Hint PlayerHUD_Debug = new()
+        {
+            Id = "PlayerHUD_Debug",
+            Text = "",
+            Alignment = HintAlignment.Left,
+            SyncSpeed = HintSyncSpeed.Fast,
+            FontSize = 26,
+            XCoordinate = XCordinate,
+            YCoordinate = 180
+        };
 
         display.AddHint(PlayerHUD_Role);
         display.AddHint(PlayerHUD_Objective);
@@ -204,6 +215,7 @@ public class PlayerHUD
         display.AddHint(PlayerHUD_Event);
         display.AddHint(PlayerHUD_Specific);
         display.AddHint(PlayerHUD_Ability);
+        display.AddHint(PlayerHUD_Debug);
     }
 
     public void PlayerHUDMain()
@@ -261,6 +273,11 @@ public class PlayerHUD
                     PHUD_Ability_Text = hintText;
                     var ab = display.GetHint("PlayerHUD_Ability");
                     if (ab != null) ab.Text = PHUD_Ability_Text;
+                    break;
+                case SyncType.PHUD_Debug:
+                    PHUD_Debug_Text = hintText;
+                    var db = display.GetHint("PlayerHUD_Debug");
+                    if (db != null) db.Text = PHUD_Debug_Text;
                     break;
             }
         }
