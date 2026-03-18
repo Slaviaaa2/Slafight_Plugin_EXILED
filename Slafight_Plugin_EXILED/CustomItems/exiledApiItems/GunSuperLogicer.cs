@@ -22,7 +22,7 @@ public class GunSuperLogicer : CustomWeapon
     public override ItemType Type { get; set; } = ItemType.GunLogicer;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 50f;
+    public override float Damage { get; set; } = 30f;
     public override Vector3 Scale { get; set; } = new (1.08f,1f,1.35f);
     public override byte ClipSize { get; set; } = 255;
 

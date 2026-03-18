@@ -92,8 +92,8 @@ public class SpawnSystem
             { SpawnTypeId.MTF_HDBackup,       0.5f },
             { SpawnTypeId.GOI_ChaosNormal,    1.0f },
             { SpawnTypeId.GOI_ChaosBackup,    1.0f },
-            { SpawnTypeId.GOI_FifthistNormal, 0.25f },
-            { SpawnTypeId.GOI_FifthistBackup, 1f / 6f },
+            { SpawnTypeId.GOI_FifthistNormal, 1.0f },
+            { SpawnTypeId.GOI_FifthistBackup, 0.5f },
         };
 
         public int ScpThresholdHigh    { get; set; } = 3;
@@ -457,43 +457,15 @@ public class SpawnSystem
         else
         {
             var ratio = Config.SpawnRatios.GetValueOrDefault(spawnType, 1.0f);
-
             targetCount = (int)Math.Truncate(candidates.Count * ratio);
             if (targetCount <= 0)
                 targetCount = candidates.Count;
         }
 
-        var slots = new List<SpawnRoleKey>();
-
-        foreach (var kvp in table)
-        {
-            var roleKey = kvp.Key;
-            var (maxCount, guaranteed) = kvp.Value;
-            int max = (int)maxCount;
-            if (max <= 0) continue;
-
-            if (guaranteed && slots.Count < targetCount)
-            {
-                slots.Add(roleKey);
-                max--;
-            }
-
-            for (int i = 0; i < max && slots.Count < targetCount; i++)
-                slots.Add(roleKey);
-        }
-
-        if (slots.Count < targetCount && table.Count > 0)
-        {
-            var filler = table
-                .OrderByDescending(kvp => kvp.Value.maxCount)
-                .First().Key;
-
-            while (slots.Count < targetCount)
-                slots.Add(filler);
-        }
+        var slots = BuildSlots(table, targetCount);
 
         slots = slots.Shuffle().ToList();
-        int assignCount = Math.Min(targetCount, Math.Min(slots.Count, candidates.Count));
+        int assignCount = Math.Min(slots.Count, candidates.Count);
 
         for (int i = 0; i < assignCount; i++)
         {
@@ -511,6 +483,82 @@ public class SpawnSystem
                     break;
             }
         }
+    }
+
+    // =====================
+    //  スロット構築（修正済み）
+    // =====================
+
+    /// <summary>
+    /// ロールテーブルから targetCount 枠分のスロットリストを構築する。
+    ///
+    /// アルゴリズム:
+    ///   Step 1: guaranteed フラグのあるロールを登録順に関係なく先に1枠ずつ確保する。
+    ///           targetCount を超えた場合は guaranteed であっても追加しない。
+    ///   Step 2: 残り枠を maxCount を重みとした重み付き抽選で埋める。
+    ///           ただし各ロールの割り当て済み数が maxCount の上限に達したら
+    ///           それ以上は選ばれない。
+    ///           全ロールが上限に達した場合は最大 maxCount のロールで補充する。
+    /// </summary>
+    private List<SpawnRoleKey> BuildSlots(
+        Dictionary<SpawnRoleKey, (float maxCount, bool guaranteed)> table,
+        int targetCount)
+    {
+        var slots      = new List<SpawnRoleKey>(targetCount);
+        // 各ロールの割り当て済み数を追跡
+        var assigned   = new Dictionary<SpawnRoleKey, int>();
+
+        foreach (var key in table.Keys)
+            assigned[key] = 0;
+
+        // -----------------------------------------------
+        // Step 1: guaranteed ロールを先に1枠ずつ確保
+        // -----------------------------------------------
+        foreach (var kvp in table)
+        {
+            if (slots.Count >= targetCount)
+                break;
+
+            var (maxCount, guaranteed) = kvp.Value;
+            if (!guaranteed)
+                continue;
+
+            int max = (int)maxCount;
+            if (max <= 0)
+                continue;
+
+            slots.Add(kvp.Key);
+            assigned[kvp.Key]++;
+        }
+
+        // -----------------------------------------------
+        // Step 2: 残り枠を重み付き抽選で埋める
+        // -----------------------------------------------
+        while (slots.Count < targetCount)
+        {
+            // まだ上限に達していないロールだけを候補にする
+            var available = table
+                .Where(kvp => assigned[kvp.Key] < (int)kvp.Value.maxCount)
+                .ToList();
+
+            if (!available.Any())
+            {
+                // 全ロールが上限到達 → maxCount 最大のロールで補充（フォールバック）
+                var filler = table
+                    .OrderByDescending(kvp => kvp.Value.maxCount)
+                    .First().Key;
+                slots.Add(filler);
+                continue;
+            }
+
+            // 上限に達していないロールから均等抽選
+            SpawnRoleKey picked = available[Random.Range(0, available.Count)].Key;
+
+            slots.Add(picked);
+            assigned[picked]++;
+        }
+
+        return slots;
     }
 
     private SpawnTypeId? PickWeightedSpawnType(Dictionary<SpawnTypeId, int> weights)

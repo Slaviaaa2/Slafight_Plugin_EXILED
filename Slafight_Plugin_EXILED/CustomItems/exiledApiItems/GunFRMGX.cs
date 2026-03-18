@@ -20,7 +20,7 @@ public class GunFRMGX : CustomWeapon
     public override ItemType Type { get; set; } = ItemType.GunFRMG0;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 65f;
+    public override float Damage { get; set; } = 38f;
     public override Vector3 Scale { get; set; } = new (1.08f,1f,1.35f);
     public override byte ClipSize { get; set; } = 130;
 

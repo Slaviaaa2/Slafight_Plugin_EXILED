@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -16,60 +17,98 @@ public class OmegaWarheadStartingEventArgs : EventArgs
     /// 起動しようとしているプレイヤー
     /// </summary>
     public Player Player { get; }
-    public bool IsAllowed { get; }
-    public OmegaWarheadStartingEventArgs(Player player, bool isAllowed) => Player = player;
+    public bool IsAllowed { get; set; }
+    public OmegaWarheadStartingEventArgs(Player player, bool isAllowed)
+    {
+        Player = player;
+        IsAllowed = isAllowed;
+    }
 }
+
 public static class OmegaWarhead
 {
-    private static readonly SpecialEventsHandler SpecialEventsHandler = Plugin.Singleton.SpecialEventsHandler;
-    private static int warheadPID;
+    private static CoroutineHandle _warheadCoroutine;
 
     public static bool IsWarheadStarted;
-    public static Player StartedPlayer = null;
-    static Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
-    public static event EventHandler<OmegaWarheadStartingEventArgs> OmegaWarheadStarting; 
-    
-    public static void StartProtocol(int pid, float triggerTime = 0f, Player startedBy = null)
+    public static Player StartedPlayer;
+
+    private static SpecialEventsHandler SpecialEventsHandler => Plugin.Singleton.SpecialEventsHandler;
+    private static Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
+
+    public static event EventHandler<OmegaWarheadStartingEventArgs> OmegaWarheadStarting;
+
+    public static bool CanBeStart() => !IsWarheadStarted && SpecialEventsHandler.IsWarheadable();
+
+    public static void StartProtocol(float triggerTime = 0f, Player startedBy = null)
     {
         if (IsWarheadStarted) return;
-        warheadPID = pid;
         if (Warhead.IsInProgress) Warhead.Stop();
         Plugin.Singleton.EventHandler.DeadmanDisable = true;
         Warhead.IsLocked = true;
-        if (pid != SpecialEventsHandler.EventPID) return;
-        Timing.CallDelayed(triggerTime, () =>
+
+        if (_warheadCoroutine.IsRunning)
+            Timing.KillCoroutines(_warheadCoroutine);
+
+        _warheadCoroutine = Timing.RunCoroutine(WarheadSequence(triggerTime, startedBy));
+    }
+
+    private static IEnumerator<float> WarheadSequence(float triggerTime, Player startedBy)
+    {
+        if (triggerTime > 0f)
+            yield return Timing.WaitForSeconds(triggerTime);
+
+        if (!Round.InProgress || IsWarheadStarted) yield break;
+
+        var ev = new OmegaWarheadStartingEventArgs(startedBy, true);
+        OmegaWarheadStarting?.Invoke(null, ev);
+        if (!ev.IsAllowed) yield break;
+
+        StartedPlayer = startedBy;
+        IsWarheadStarted = true;
+
+        foreach (Room room in Room.List)
+            room.Color = Color.blue;
+
+        foreach (Door door in Door.List)
         {
-            if (pid != SpecialEventsHandler.EventPID || Warhead.IsInProgress) return;
-            StartedPlayer = startedBy;
-            var ev = new OmegaWarheadStartingEventArgs(startedBy, true);
-            OmegaWarheadStarting?.Invoke(null, ev);
-            if (!ev.IsAllowed) return;
-            IsWarheadStarted = true;
-            foreach (Room rooms in Room.List)
+            if (door.Type != DoorType.ElevatorGateA &&
+                door.Type != DoorType.ElevatorGateB &&
+                door.Type != DoorType.ElevatorLczA &&
+                door.Type != DoorType.ElevatorLczB &&
+                door.Type != DoorType.ElevatorNuke &&
+                door.Type != DoorType.ElevatorScp049 &&
+                door.Type != DoorType.ElevatorServerRoom)
             {
-                rooms.Color = Color.blue;
+                door.IsOpen = true;
+                door.PlaySound(DoorBeepType.InteractionAllowed);
+                door.Lock(DoorLockType.Warhead);
             }
-            foreach (Door door in Door.List)
-            {
-                if (door.Type != DoorType.ElevatorGateA && door.Type != DoorType.ElevatorGateB && door.Type != DoorType.ElevatorLczA && door.Type != DoorType.ElevatorLczB && door.Type != DoorType.ElevatorNuke && door.Type != DoorType.ElevatorScp049 && door.Type != DoorType.ElevatorServerRoom)
-                {
-                    door.IsOpen = true;
-                    door.PlaySound(DoorBeepType.InteractionAllowed);
-                    door.Lock(DoorLockType.Warhead);
-                }
-            }
-            Exiled.API.Features.Cassie.MessageTranslated($"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds.",$"O5評議会の指令に基づいた操作により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",true);
-            CreateAndPlayAudio("omega_v2.ogg","OmegaWarhead",Vector3.zero,true,null,false,999999999,0);
-            Timing.CallDelayed(Plugin.Singleton.Config.OwBoomTime, () =>
-            {
-                if (pid != SpecialEventsHandler.EventPID) return;
-                AlphaWarheadController.Singleton.RpcShake(false);
-                Player.List.Where(p => p.IsAlive).ToList().ForEach(p =>
-                {
-                    p.ExplodeEffect(ProjectileType.FragGrenade);
-                    p.Kill("OMEGA WARHEADに爆破された");
-                });
-            });
+        }
+
+        Exiled.API.Features.Cassie.MessageTranslated(
+            $"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds.",
+            $"O5評議会の指令に基づいた操作により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",
+            true);
+
+        CreateAndPlayAudio("omega_v2.ogg", "OmegaWarhead", Vector3.zero, true, null, false, 999999999, 0);
+
+        yield return Timing.WaitForSeconds(Plugin.Singleton.Config.OwBoomTime);
+
+        if (!Round.InProgress) yield break;
+
+        AlphaWarheadController.Singleton.RpcShake(false);
+        Player.List.Where(p => p.IsAlive).ToList().ForEach(p =>
+        {
+            p.ExplodeEffect(ProjectileType.FragGrenade);
+            p.Kill("OMEGA WARHEADに爆破された");
         });
+    }
+
+    public static void Reset()
+    {
+        if (_warheadCoroutine.IsRunning)
+            Timing.KillCoroutines(_warheadCoroutine);
+        IsWarheadStarted = false;
+        StartedPlayer = null;
     }
 }

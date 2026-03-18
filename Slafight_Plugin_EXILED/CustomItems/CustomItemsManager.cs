@@ -69,5 +69,7 @@ public static class CustomItemsManager
             new CUA_SpyKit().Register();
             new FileScientist_Samuels().Register();
             new FileCafeteriaNeeds().Register();
+            
+            new DninoueMissile().Register();
     }
 }

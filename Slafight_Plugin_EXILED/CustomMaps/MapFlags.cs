@@ -7,6 +7,7 @@ public static class MapFlags
     public static bool FemurSetup => CustomMapMainHandler._femurSetup;
     public static bool FemurBreaked => CustomMapMainHandler._femurBreaked;
     public static bool IsOmegaStarted => OmegaWarhead.IsWarheadStarted;
+    public static bool IsWarheadBooming => WarheadBoomEffectHandler.IsBooming;
 
     /// <summary>
     /// Get Season. Please look to 

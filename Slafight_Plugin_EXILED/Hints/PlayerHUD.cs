@@ -11,8 +11,11 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.SpecialEvents;
+using UnityEngine;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
 namespace Slafight_Plugin_EXILED.Hints;
@@ -22,6 +25,7 @@ public class PlayerHUD
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
+    private CoroutineHandle _debugHudLoop;
 
     // 観戦者ID → 現在見ているプレイヤー
     private readonly Dictionary<int, Player> _spectateTargets = new();
@@ -39,6 +43,7 @@ public class PlayerHUD
         _specificAbilityLoop = Timing.RunCoroutine(SpecificInfoHudLoop());
         _abilityHudLoop = Timing.RunCoroutine(AbilityHudLoop());
         _taskSyncLoop = Timing.RunCoroutine(TaskSync());
+        _debugHudLoop = Timing.RunCoroutine(DebugHudLoop());
     }
 
     ~PlayerHUD()
@@ -58,6 +63,9 @@ public class PlayerHUD
 
         if (_taskSyncLoop.IsRunning)
             Timing.KillCoroutines(_taskSyncLoop);
+        
+        if (_debugHudLoop.IsRunning)
+            Timing.KillCoroutines(_debugHudLoop);
     }
 
     private string ServerInfo_Text = string.Empty;
@@ -204,9 +212,9 @@ public class PlayerHUD
             Text = "",
             Alignment = HintAlignment.Left,
             SyncSpeed = HintSyncSpeed.Fast,
-            FontSize = 26,
+            FontSize = 24,
             XCoordinate = XCordinate,
-            YCoordinate = 180
+            YCoordinate = 260
         };
 
         display.AddHint(PlayerHUD_Role);
@@ -943,4 +951,173 @@ public class PlayerHUD
             yield return Timing.WaitForSeconds(1f);
         }
     }
+    
+    /// <summary>
+    /// デバッグモード ON のプレイヤーに対して 0.1 秒ごとに
+    /// PHUD_Debug ヒントを更新するループ。
+    /// </summary>
+    private IEnumerator<float> DebugHudLoop()
+    {
+        yield return Timing.WaitForSeconds(0.5f);
+ 
+        for (;;)
+        {
+            if (Round.IsLobby)
+            {
+                yield return Timing.WaitForSeconds(0.5f);
+                continue;
+            }
+ 
+            foreach (var player in Player.List.ToList())
+            {
+                if (!IsPlayerValid(player)) continue;
+                if (!DebugModeHandler.IsDebugMode(player)) continue;
+ 
+                var display = TryGetDisplay(player);
+                if (display == null) continue;
+ 
+                var hint = display.GetHint("PlayerHUD_Debug");
+                if (hint == null)
+                {
+                    PlayerHUDSetup(player);
+                    hint = display.GetHint("PlayerHUD_Debug");
+                    if (hint == null) continue;
+                }
+ 
+                try
+                {
+                    hint.Text = BuildDebugHud(player);
+                }
+                catch (Exception e)
+                {
+                    Log.Debug($"[DebugHudLoop] Exception for {player.Nickname}: {e.Message}");
+                }
+            }
+ 
+            yield return Timing.WaitForSeconds(0.1f);
+        }
+    }
+    
+    private static string BuildDebugHud(Player player)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("<size=18><color=#ffff00>[DEBUG MODE]</color>");
+
+        // ── ロール・チーム情報 ────────────────────────────────────────
+        sb.AppendLine(
+            $"<color=#aaaaaa>Role:</color> {player.Role?.Name ?? "None"}  " +
+            $"<color=#aaaaaa>Team:</color> {player.Role?.Team.ToString() ?? "None"}  " +
+            $"<color=#aaaaaa>CRole:</color> {player.GetCustomRole()}  " +
+            $"<color=#aaaaaa>CTeam:</color> {player.GetTeam()}"
+        );
+
+        // ── 座標・ルーム情報（リアルタイム） ─────────────────────────
+        var pos  = player.Position;
+        var room = player.CurrentRoom;
+        sb.AppendLine(
+            $"<color=#aaaaaa>World:</color> ({pos.x:F2}, {pos.y:F2}, {pos.z:F2})  " +
+            $"<color=#aaaaaa>Room:</color> {room?.Type.ToString() ?? "None"} " +
+            $"<color=#aaaaaa>Zone:</color> {player.Zone.ToString()}"
+        );
+        if (room != null)
+        {
+            var invRot     = Quaternion.Inverse(room.Rotation);
+            var localPos   = invRot * (pos - room.Position);
+            var localEuler = invRot.eulerAngles;
+            var roomEuler  = room.Rotation.eulerAngles;
+            sb.AppendLine(
+                $"<color=#aaaaaa>Local:</color> ({localPos.x:F2}, {localPos.y:F2}, {localPos.z:F2})  " +
+                $"<color=#aaaaaa>LocalRot:</color> ({localEuler.x:F1}, {localEuler.y:F1}, {localEuler.z:F1})"
+            );
+            sb.AppendLine(
+                $"<color=#aaaaaa>RoomRot:</color> ({roomEuler.x:F1}, {roomEuler.y:F1}, {roomEuler.z:F1})"
+            );
+        }
+
+        // ── 最後に触ったドア情報 ─────────────────────────────────────
+        if (DebugModeHandler.TryGetDoor(player, out var door))
+        {
+            sb.AppendLine(
+                $"<color=#aaaaaa>Door:</color> {door.DoorType}  " +
+                $"<color=#aaaaaa>Name:</color> {door.DoorName}  " +
+                $"<color=#aaaaaa>Room:</color> {door.RoomType}"
+            );
+            sb.AppendLine(
+                $"<color=#aaaaaa>DoorLocal:</color> ({door.LocalPos.x:F2}, {door.LocalPos.y:F2}, {door.LocalPos.z:F2})  " +
+                $"<color=#aaaaaa>DoorRot:</color> ({door.LocalEuler.x:F1}, {door.LocalEuler.y:F1}, {door.LocalEuler.z:F1})"
+            );
+            sb.AppendLine(
+                $"<color=#aaaaaa>DoorRoomRot:</color> ({door.RoomEuler.x:F1}, {door.RoomEuler.y:F1}, {door.RoomEuler.z:F1})"
+            );
+        }
+        else
+        {
+            sb.AppendLine("<color=#666666>Door: -- (ドアに触れると更新)</color>");
+        }
+
+        // ── ラウンド状態フラグ ────────────────────────────────────────
+        static string Bool(bool v) => v ? "<color=green>T</color>" : "<color=red>F</color>";
+        sb.AppendLine(
+            $"<color=#aaaaaa>Round:</color> " +
+            $"InProgress={Bool(Round.InProgress)}  " +
+            $"IsStarted={Bool(Round.IsStarted)}  " +
+            $"IsEnded={Bool(Round.IsEnded)}  " +
+            $"IsLobby={Bool(Round.IsLobby)}  " +
+            $"IsLocked={Bool(Round.IsLocked)}  " +
+            $"IsLobbyLocked={Bool(Round.IsLobbyLocked)}"
+        );
+        sb.AppendLine(
+            $"<color=#aaaaaa>Elapsed:</color> {Round.ElapsedTime:mm\\:ss}  " +
+            $"<color=#aaaaaa>UptimeRounds:</color> {Round.UptimeRounds}  " +
+            $"<color=#aaaaaa>All Players:</color> {Player.List.Count()} " +
+            $"<color=#aaaaaa>Connected Players:</color> {Player.List.Where(p => !p.IsNPC).ToList().Count()} " +
+            $"<color=#aaaaaa>Npcs:</color> {Npc.List.Count()} "
+        );
+
+        // ── 核弾頭タイマー情報 ───────────────────────────────────────
+        if (Warhead.IsInProgress)
+        {
+            sb.AppendLine(
+                $"<color=#ff4444>Warhead:</color> " +
+                $"DetonationTimer={Warhead.DetonationTimer:F1}  " +
+                $"RealTimer={Warhead.RealDetonationTimer:F1}  " +
+                $"IsLocked={Bool(Warhead.IsLocked)} " +
+                $"IsBooming={Bool(MapFlags.IsWarheadBooming)} "
+            );
+        }
+        else
+        {
+            sb.AppendLine("<color=#666666>Warhead: Not active</color>");
+        }
+        
+        // ── 有効なエフェクト一覧 ─────────────────────────────────────
+        var activeEffects = player.ActiveEffects.ToList();
+        if (activeEffects.Count == 0)
+        {
+            sb.AppendLine("<color=#666666>Effects: None</color>");
+        }
+        else
+        {
+            sb.AppendLine("<color=#aaaaaa>Effects:</color>");
+            foreach (var effect in activeEffects)
+            {
+                string duration = effect.Duration > 0f
+                    ? $"{effect.TimeLeft:F0}"
+                    : "∞";
+                sb.AppendLine(
+                    $"- <color=#88ddff>{effect.GetType().Name,-24}</color>" +
+                    $"| Intensity: {effect.Intensity,-3} Duration: {duration}"
+                );
+            }
+        }
+
+        // ────────────────────────────────────────────────────────────
+        // ★ 新しい項目はここに追加するだけでOK
+        // 例:
+        // sb.AppendLine($"<color=#aaaaaa>HP:</color> {player.Health:F0}/{player.MaxHealth:F0}");
+        // ────────────────────────────────────────────────────────────
+
+        sb.Append("</size>");
+        return sb.ToString();
+}
 }

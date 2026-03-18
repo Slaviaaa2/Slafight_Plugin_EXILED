@@ -156,8 +156,8 @@ public class FacilityTermination : SpecialEvent
             if (player == null) continue;
             player.Broadcast(8,
                 player.IsHumanitist()
-                    ? "<size=20>あなたは<color=blue>人類陣営</color>です。\n警備員と彫刻以外が一応仲間です。狂気を生き延びて奴らを終了してください！</size>"
-                    : "<size=20>あなたは<color=red>正常性陣営</color>です。\n警備員と彫刻が仲間です。他の奴らを全員終了してください！</size>");
+                    ? "<size=28>あなたは<color=blue>人類陣営</color>です。\n警備員と彫刻以外が一応仲間です。狂気を生き延びて奴らを終了してください！</size>"
+                    : "<size=28>あなたは<color=red>正常性陣営</color>です。\n警備員と彫刻が仲間です。他の奴らを全員終了してください！</size>");
         }
         Exiled.API.Features.Cassie.MessageTranslated(
             "Attention, All personnel. Were recieved message from O5 Command. Please Red this and Terminate Human it Your Self.",

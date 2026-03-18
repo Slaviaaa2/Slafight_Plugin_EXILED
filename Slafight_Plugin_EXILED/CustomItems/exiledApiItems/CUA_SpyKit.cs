@@ -13,6 +13,7 @@ using Mirror;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -23,7 +24,7 @@ public class CUA_SpyKit : CustomKeycard
 {
     public override uint Id { get; set; } = 2034;
     public override string Name { get; set; } = "CUA式スパイキット";
-    public override string Description { get; set; } = "カオスの潜入工作員が持つ、潜入任務用変装セット。\nTキーでDクラス、Iキーでカオスに見た目を切り替えられる";
+    public override string Description { get; set; } = "カオスの潜入工作員が持つ、潜入任務用変装セット。\nTキーでDクラス、Iキーでカオスに見た目を切り替えられる\n※カオスの一部の工作員のみが使用可能です";
     public override float Weight { get; set; } = 1f;
     public override ItemType Type { get; set; } = ItemType.KeycardCustomSite02;
     public override SpawnProperties SpawnProperties { get; set; } = new();
@@ -66,6 +67,7 @@ public class CUA_SpyKit : CustomKeycard
 
     protected override void OnDroppingItem(DroppingItemEventArgs ev)
     {
+        if (ev.Player?.GetCustomRole() != CRoleTypeId.ChaosUndercoverAgent) return;
         if (!ev.IsThrown)
         {
             ev.Player.ChangeAppearance(RoleTypeId.ChaosRifleman, Player.List.Where(player => player != null).ToList());
@@ -79,6 +81,7 @@ public class CUA_SpyKit : CustomKeycard
 
     private void OnInteresting(InspectingItemEventArgs ev)
     {
+        if (ev.Player?.GetCustomRole() != CRoleTypeId.ChaosUndercoverAgent) return;
         if (!Check(ev.Item)) return;
         ev.Player?.ChangeAppearance(RoleTypeId.ChaosRifleman, Player.List.Where(player => player != null).ToList());
         ev.Player?.ShowHint("<size=24><color=#228B22>Chaos Insurgency Rifleman</color>に変装しました", 2.5f);

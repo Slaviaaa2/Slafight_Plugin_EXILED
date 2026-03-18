@@ -33,7 +33,7 @@ public class NtfGeneral : CRole
         CustomItem.TryGive(player, 12,false);
         CustomItem.TryGive(player, 2007, false);
             
-        player.AddAmmo(AmmoType.Nato556,350);
+        player.AddAmmo(AmmoType.Nato556,320);
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Commander");
         player.CustomInfo = "Nine-tailed Fox General";

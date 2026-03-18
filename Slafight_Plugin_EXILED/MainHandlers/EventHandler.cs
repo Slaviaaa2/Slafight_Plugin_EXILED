@@ -38,14 +38,13 @@ public class EventHandler
     {
         PlayerHandler.Verified += OnVerified;
         PlayerHandler.Left += OnLeft;
-        ServerHandler.RestartingRound += OnRoundRestarted; // FIX: 正しいイベントに登録
+        ServerHandler.RestartingRound += OnRoundRestarted;
         ServerHandler.RoundStarted += OnRoundStarted;
         ServerHandler.ReloadedPlugins += OnPluginLoad;
 
         MapHandler.Decontaminating += DeconCancell;
 
         PlayerHandler.ChangingRole += OnChangingRole;
-        PlayerHandler.FlippingCoin += PositionGet;
         PlayerHandler.InteractingDoor += DoorGet;
         PlayerHandler.UsedItem += OnUsed;
 
@@ -59,14 +58,13 @@ public class EventHandler
     {
         PlayerHandler.Verified -= OnVerified;
         PlayerHandler.Left -= OnLeft;
-        ServerHandler.RestartingRound -= OnRoundRestarted; // FIX: デストラクタも正しく解除
+        ServerHandler.RestartingRound -= OnRoundRestarted;
         ServerHandler.RoundStarted -= OnRoundStarted;
         ServerHandler.ReloadedPlugins -= OnPluginLoad;
 
         MapHandler.Decontaminating -= DeconCancell;
 
         PlayerHandler.ChangingRole -= OnChangingRole;
-        PlayerHandler.FlippingCoin -= PositionGet;
         PlayerHandler.InteractingDoor -= DoorGet;
         PlayerHandler.UsedItem -= OnUsed;
 
@@ -94,7 +92,6 @@ public class EventHandler
     public bool IsScpAutoSpawnLocked = false;
     private bool _pluginLoaded = false;
 
-    // FIX: Playerオブジェクトが安全に使用可能かを確認するヘルパー
     private static bool IsPlayerValid(Player p)
     {
         try
@@ -118,13 +115,13 @@ public class EventHandler
 
     private void OnVerified(VerifiedEventArgs ev)
     {
-        if (ev?.Player == null) return; // FIX: nullガード
+        if (ev?.Player == null) return;
         SpecificFlagsManager.InitPlayerFlags(ev.Player);
         ev.Player.Broadcast(6, "\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>", Broadcast.BroadcastFlags.Normal, true);
         if (Round.InProgress) return;
         Timing.CallDelayed(0.05f, () =>
         {
-            if (!IsPlayerValid(ev.Player)) return; // FIX: 遅延後の生存チェック
+            if (!IsPlayerValid(ev.Player)) return;
             string tips = Tips.GetRandomTip();
             ev.Player.ShowHint(
                 "\n\n\n\n\n\n\n<size=32>次のイベント：" + Plugin.Singleton.SpecialEventsHandler.LocalizedEventName + "</size>" +
@@ -135,11 +132,12 @@ public class EventHandler
 
     private void OnLeft(LeftEventArgs ev)
     {
-        if (ev?.Player == null) return; // FIX: nullガード
+        if (ev?.Player == null) return;
+        DebugModeHandler.RemovePlayer(ev.Player);
+
         if (ev.Player.GetTeam() != CTeam.SCPs) return;
         if (Round.ElapsedTime.TotalSeconds > 179) return;
 
-        // FIX: 離脱したプレイヤー自身を除外してSCP生存数を数える（元のコードは自分自身が含まれる可能性があった）
         int scpAlive = Player.List.Count(p => p != ev.Player && p.IsAlive && p.GetTeam() == CTeam.SCPs);
         if (scpAlive >= 1) return;
 
@@ -168,7 +166,7 @@ public class EventHandler
             if (Round.InProgress) return;
             foreach (var player in Player.List)
             {
-                if (!IsPlayerValid(player)) continue; // FIX: 無効プレイヤーをスキップ
+                if (!IsPlayerValid(player)) continue;
                 var tips = Tips.GetRandomTip();
                 player.ShowHint(
                     "\n\n\n\n\n\n\n<size=32>次のイベント：" + Plugin.Singleton.SpecialEventsHandler.LocalizedEventName + "</size>" +
@@ -216,8 +214,7 @@ public class EventHandler
             return;
         }
 
-        // 座標だけ使うダミーなので安全に破棄
-        ev.DestroySafe(0.05f); // SchematicHelpers 拡張
+        ev.DestroySafe(0.05f);
     }
 
     private void OnRoundStarted()
@@ -256,13 +253,15 @@ public class EventHandler
             {
                 if (Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.OmegaWarhead)
                 {
-                    Exiled.API.Features.Cassie.MessageTranslated($"Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
-                        "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。",true);
+                    Exiled.API.Features.Cassie.MessageTranslated(
+                        "Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                        "緊急、緊急、現在大規模な収容違反がサイト内で発生しています。全職員は警備隊の指示に従い、避難を開始してください。", true);
                 }
                 else
                 {
-                    Exiled.API.Features.Cassie.MessageTranslated($"Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
-                        "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。",true);
+                    Exiled.API.Features.Cassie.MessageTranslated(
+                        "Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
+                        "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。", true);
                 }
                 foreach (Room room in Room.List)
                 {
@@ -288,11 +287,10 @@ public class EventHandler
 
     public void OnChangingRole(ChangingRoleEventArgs ev)
     {
-        if (ev?.Player == null) return; // FIX: 即時nullチェック（遅延前に確認）
+        if (ev?.Player == null) return;
 
         Timing.CallDelayed(1.05f, () =>
         {
-            // FIX: 遅延後に再度有効性チェック（この間に切断している可能性がある）
             if (!IsPlayerValid(ev.Player)) return;
             if (!Round.InProgress) return;
 
@@ -340,14 +338,14 @@ public class EventHandler
 
     private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs ev)
     {
-        if (ev == null) return; // FIX: nullガード
+        if (ev == null) return;
         if (DeadmanDisable)
             ev.IsAllowed = false;
     }
 
     private void DeconCancell(DecontaminatingEventArgs ev)
     {
-        if (ev == null) return; // FIX: nullガード
+        if (ev == null) return;
         if (DeconCancellFlag)
         {
             ev.IsAllowed = false;
@@ -355,62 +353,31 @@ public class EventHandler
         }
     }
 
-    private void PositionGet(FlippingCoinEventArgs ev)
-    {
-        if (ev?.Player == null) return;
-        Vector3 playerPosition = ev.Player.Position;
-        if (ev.Player.UniqueRole == "Debug")
-        {
-            if (ev.Player.CurrentRoom != null)
-            {
-                Room currentRoom = ev.Player.CurrentRoom;
-                Vector3 localPos = Quaternion.Inverse(currentRoom.Rotation) * (playerPosition - currentRoom.Position);
-                Quaternion localRot = Quaternion.Inverse(currentRoom.Rotation);
-                Vector3 localEuler = localRot.eulerAngles;
-                Vector3 roomRot = currentRoom.Rotation.eulerAngles;
-
-                ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z +
-                                   "\nRoom: " + currentRoom.Type +
-                                   "\nLocal: " + localPos.x + "," + localPos.y + "," + localPos.z +
-                                   "\nLocalRot: " + localEuler.x + "," + localEuler.y + "," + localEuler.z +
-                                   "\nRoomRot: " + roomRot.x + "," + roomRot.y + "," + roomRot.z, 5);
-
-                Log.Debug("Position Get: " + "X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
-                Log.Debug(" Room: " + currentRoom.Type);
-                Log.Debug(" LocalPos: X:" + localPos.x + " Y:" + localPos.y + " Z:" + localPos.z);
-                Log.Debug(" LocalRot: X:" + localEuler.x + " Y:" + localEuler.y + " Z:" + localEuler.z);
-                Log.Debug(" RoomRot: X:" + roomRot.x + " Y:" + roomRot.y + " Z:" + roomRot.z);
-            }
-            else
-            {
-                ev.Player.ShowHint("X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z, 5);
-                Log.Debug("Position Get: " + "X:" + playerPosition.x + " Y:" + playerPosition.y + " Z:" + playerPosition.z);
-            }
-        }
-    }
-
+    /// <summary>
+    /// ドアに触ったとき、デバッグモード ON なら情報を DebugModeHandler に記録する。
+    /// それ以外のプレイヤーにはゲートロックのヒントを出す。
+    /// </summary>
     private void DoorGet(InteractingDoorEventArgs ev)
     {
         if (ev?.Player == null || ev.Door == null) return;
-        if (ev.Player.UniqueRole == "Debug")
+
+        if (DebugModeHandler.IsDebugMode(ev.Player))
         {
-            Room doorRoom = ev.Door.Room;
-            if (doorRoom == null) return;
-            Vector3 doorLocalPos = Quaternion.Inverse(doorRoom.Rotation) * (ev.Player.Position - doorRoom.Position);
-            Quaternion doorLocalRot = Quaternion.Inverse(doorRoom.Rotation);
-            Vector3 doorLocalEuler = doorLocalRot.eulerAngles;
-            Vector3 doorRoomRot = doorRoom.Rotation.eulerAngles;
+            var room = ev.Door.Room;
+            if (room == null) return;
 
-            ev.Player.ShowHint("DoorType:" + ev.Door.Type + "\nName & Room: " + ev.Door.Name + ", " + doorRoom.Type +
-                               "\nLocal: " + doorLocalPos.x + "," + doorLocalPos.y + "," + doorLocalPos.z +
-                               "\nLocalRot: " + doorLocalEuler.x + "," + doorLocalEuler.y + "," + doorLocalEuler.z +
-                               "\nRoomRot: " + doorRoomRot.x + "," + doorRoomRot.y + "," + doorRoomRot.z, 5);
+            var invRot = Quaternion.Inverse(room.Rotation);
+            var info = new DebugModeHandler.DoorInfo(
+                DoorType:   ev.Door.Type.ToString(),
+                DoorName:   ev.Door.Name,
+                RoomType:   room.Type.ToString(),
+                LocalPos:   invRot * (ev.Player.Position - room.Position),
+                LocalEuler: invRot.eulerAngles,
+                RoomEuler:  room.Rotation.eulerAngles
+            );
 
-            Log.Debug("Door Get: " + ev.Door.Type);
-            Log.Debug(" Name & Room: " + ev.Door.Name + ", " + doorRoom.Type);
-            Log.Debug(" LocalPos: X:" + doorLocalPos.x + " Y:" + doorLocalPos.y + " Z:" + doorLocalPos.z);
-            Log.Debug(" LocalRot: X:" + doorLocalEuler.x + " Y:" + doorLocalEuler.y + " Z:" + doorLocalEuler.z);
-            Log.Debug(" RoomRot: X:" + doorRoomRot.x + " Y:" + doorRoomRot.y + " Z:" + doorRoomRot.z);
+            DebugModeHandler.UpdateDoor(ev.Player, info);
+            Log.Debug($"[DoorGet] {ev.Player.Nickname} door={ev.Door.Type} room={room.Type}");
         }
         else
         {
@@ -426,7 +393,7 @@ public class EventHandler
 
     private void OnUsed(UsedItemEventArgs ev)
     {
-        if (ev?.Player == null || ev.Item == null) return; // FIX: nullガード
+        if (ev?.Player == null || ev.Item == null) return;
         if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
         {
             if (ev.Item.Type == ItemType.SCP500 && !ev.Item.IsCustomItem(out _))

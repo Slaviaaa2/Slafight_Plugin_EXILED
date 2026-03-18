@@ -15,7 +15,6 @@ using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.Changes;
 
-// SpawnSystem準拠のシンプルEventArgs
 public class PlayerCustomEscapingEventArgs : EventArgs
 {
     public Player Player { get; }
@@ -55,6 +54,30 @@ public class EscapeHandler
 
     public readonly List<Vector3> EscapePoints = new();
 
+    // =====================
+    //  動的オーバーライド
+    // =====================
+
+    public static readonly List<Func<Player, EscapeTargetRole?>> DynamicOverrides = new();
+
+    public static void AddEscapeOverride(Func<Player, EscapeTargetRole?> rule)
+        => DynamicOverrides.Add(rule);
+
+    public static void ClearEscapeOverrides()
+        => DynamicOverrides.Clear();
+
+    public static void AddRoleEscapeOverride(RoleTypeId role, CRoleTypeId? custom = null, RoleTypeId? vanilla = null)
+        => AddEscapeOverride(p => p.Role.Type == role
+            ? new EscapeTargetRole { Custom = custom, Vanilla = vanilla }
+            : null);
+
+    public static void AddCustomRoleEscapeOverride(CRoleTypeId role, CRoleTypeId? custom = null, RoleTypeId? vanilla = null)
+        => AddEscapeOverride(p => p.GetCustomRole() == role
+            ? new EscapeTargetRole { Custom = custom, Vanilla = vanilla }
+            : null);
+
+    // =====================
+
     public void SetEscapePoint(SchematicSpawnedEventArgs ev)
     {
         if (ev?.Schematic == null)
@@ -75,8 +98,7 @@ public class EscapeHandler
             return;
         }
 
-        // 座標だけ使うダミーなので安全に破棄
-        ev.DestroySafe(0.05f); // SchematicHelpers 拡張メソッド
+        ev.DestroySafe(0.05f);
     }
 
     public void SaveItems(Player player)
@@ -99,10 +121,10 @@ public class EscapeHandler
         });
     }
 
-    public struct EscapeTargetRole 
-    { 
-        public RoleTypeId? Vanilla; 
-        public CRoleTypeId? Custom; 
+    public struct EscapeTargetRole
+    {
+        public RoleTypeId? Vanilla;
+        public CRoleTypeId? Custom;
     }
 
     private EscapeTargetRole GetEscapeTarget(CTeam myTeam, CTeam cufferTeam)
@@ -114,7 +136,7 @@ public class EscapeHandler
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
             (CTeam.ClassD, CTeam.Fifthists)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistConvert },
-            (CTeam.ClassD, CTeam.GoC) // ← orより上！
+            (CTeam.ClassD, CTeam.GoC)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
             (CTeam.ClassD, _)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
@@ -150,7 +172,7 @@ public class EscapeHandler
                 => new EscapeTargetRole { Vanilla = RoleTypeId.ChaosConscript, Custom = null },
             (CTeam.Fifthists, CTeam.FoundationForces or CTeam.Scientists or CTeam.Guards)
                 => new EscapeTargetRole { Vanilla = RoleTypeId.NtfPrivate, Custom = null },
-            
+
             // GoC
             (CTeam.Fifthists, CTeam.GoC)
                 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.GoCOperative },
@@ -160,16 +182,9 @@ public class EscapeHandler
         };
     }
 
-    private EscapeTargetRole ApplyEventOverrides(
-        EscapeTargetRole baseTarget,
-        Player player)
+    private EscapeTargetRole ApplyEventOverrides(EscapeTargetRole baseTarget, Player player)
     {
         var nowEvent = Plugin.Singleton.SpecialEventsHandler.NowEvent;
-
-        var myRole       = player.Role.Type;          // RoleTypeId
-        var myCustomRole = player.GetCustomRole();    // CRoleTypeId
-        var cufferRole   = player.Cuffer?.Role.Type;
-        var cufferCustom = player.Cuffer?.GetCustomRole();
 
         switch (nowEvent)
         {
@@ -177,45 +192,37 @@ public class EscapeHandler
             default:
                 return baseTarget;
 
-            case SpecialEventType.FifthistsRaid:
-            {
-                if (myCustomRole is CRoleTypeId.Scp3005)
-                    return new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistPriest };
-                break;
-            }
-
             // 他イベントもここへ
         }
-
-        return baseTarget;
     }
 
     private EscapeTargetRole GetEscapeTarget(Player player)
     {
-        // ロール専用チェック（最優先）
         var roleOverride = CheckRoleEscapeOverride(player);
         if (roleOverride.Vanilla.HasValue || roleOverride.Custom.HasValue)
             return roleOverride;
 
-        // 通常チーム判定
         var myTeam = player.GetTeam();
         var cufferTeam = player.Cuffer?.GetTeam() ?? CTeam.Null;
         var baseTarget = GetEscapeTarget(myTeam, cufferTeam);
 
-        // イベントオーバーライド
         return ApplyEventOverrides(baseTarget, player);
     }
 
-    // ロール専用脱出チェック（nullも明示）
     private EscapeTargetRole CheckRoleEscapeOverride(Player player)
     {
+        // 動的オーバーライドを最優先
+        foreach (var rule in DynamicOverrides)
+        {
+            var result = rule(player);
+            if (result.HasValue && (result.Value.Vanilla.HasValue || result.Value.Custom.HasValue))
+                return result.Value;
+        }
+
         return player.GetCustomRole() switch
         {
-            _ => new EscapeTargetRole 
-            { 
-                Vanilla = null,
-                Custom  = null 
-            }
+            CRoleTypeId.Scp3005 => new EscapeTargetRole { Vanilla = null, Custom = CRoleTypeId.FifthistPriest },
+            _ => new EscapeTargetRole { Vanilla = null, Custom = null }
         };
     }
 
@@ -226,7 +233,6 @@ public class EscapeHandler
         var target = GetEscapeTarget(player);
         if (target.Vanilla is null && target.Custom is null) return;
 
-        // Escapingイベント（SpawnSystem準拠）
         var ev = new PlayerCustomEscapingEventArgs(player) { IsAllowed = true };
         PlayerCustomEscaping?.Invoke(null, ev);
         if (!ev.IsAllowed) return;
@@ -236,15 +242,13 @@ public class EscapeHandler
         if (target.Custom is { } custom) player.SetRole(custom);
         else if (target.Vanilla is { } vanilla) player.SetRole(vanilla);
 
-        // Escapedイベント
         PlayerCustomEscaped?.Invoke(null, new PlayerCustomEscapedEventArgs(player));
     }
 
-    private CoroutineHandle _escapeCoroutine;  // フィールドで管理
+    private CoroutineHandle _escapeCoroutine;
 
     public void AddEscapeCoroutine()
     {
-        // 既存コルーチンを確実に止めてから新しく起動
         if (_escapeCoroutine.IsRunning)
             Timing.KillCoroutines(_escapeCoroutine);
 
@@ -264,14 +268,13 @@ public class EscapeHandler
             foreach (var player in Player.List)
             {
                 if (player?.IsAlive != true) continue;
-            
-                // 5秒クリア判定
+
                 if (escapeTimers.TryGetValue(player.Id, out var timer) && !timer.IsRunning)
                 {
                     escapedPlayers.Remove(player.Id);
                     escapeTimers.Remove(player.Id);
                 }
-            
+
                 if (escapedPlayers.Contains(player.Id)) continue;
 
                 var playerPos = player.Position;
@@ -281,8 +284,7 @@ public class EscapeHandler
                     {
                         Escape(player);
                         escapedPlayers.Add(player.Id);
-                    
-                        // 5秒後にフラグクリア
+
                         escapeTimers[player.Id] = Timing.CallDelayed(5f, () =>
                         {
                             escapedPlayers.Remove(player.Id);

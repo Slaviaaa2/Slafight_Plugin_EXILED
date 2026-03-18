@@ -11,6 +11,7 @@ using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -175,8 +176,8 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
             if (CancelIfOutdated()) return;
 
             Exiled.API.Features.Cassie.MessageTranslated(
-                "$pitch_.2 .g4 .g4 $pitch_1 $pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . PLEASE D .g4 IE .g6 .g3 .g4",
-                "BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. <color=red><b>PLEASE DIE</b></color>",
+                "$pitch_.2 .g4 .g4 $pitch_1 $pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . ",
+                "BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. ",
                 true);
 
             Timing.CallDelayed(10f, () =>
@@ -225,6 +226,9 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
                         door.Lock(DoorLockType.Warhead);
                     }
                 }
+                
+                EscapeHandler.AddEscapeOverride(p => new EscapeHandler.EscapeTargetRole { Vanilla = RoleTypeId.Spectator });
+                Exiled.API.Features.Cassie.MessageTranslated("This is O5 Message from the Site 1, For All personnel, Please escape from the facility .","[Site-01, O5からの通信]全職員へ通達：救助部隊を派遣しました。直ちに<color=green>脱出口</color>から<color=yellow>脱出</color>してください。");
 
                 Timing.CallDelayed(145f, () =>
                 {
@@ -232,7 +236,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
                     foreach (Player player in Player.List)
                     {
-                        if (player == null) continue;
+                        if (player == null || !player.IsAlive) continue;
 
                         player.ExplodeEffect(ProjectileType.FragGrenade);
 

@@ -34,7 +34,7 @@ public class ChaosCommando : CRole
         base.SpawnRole(player, roleSpawnFlags);
         player.Role.Set(RoleTypeId.ChaosRepressor);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 150;
+        player.MaxHealth = 120;
         player.Health = player.MaxHealth;
         
         player.ClearInventory();
@@ -46,7 +46,7 @@ public class ChaosCommando : CRole
         player.TryAddCustomItem(10);
         player.TryAddCustomItem(2006);
         
-        player.AddAmmo(AmmoType.Nato762, 350);
+        player.AddAmmo(AmmoType.Nato762, 300);
             
         player.SetCustomInfo("Chaos Insurgency Commando");
         Timing.CallDelayed(0.05f, () =>

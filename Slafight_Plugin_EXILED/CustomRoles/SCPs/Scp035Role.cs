@@ -83,7 +83,8 @@ public class Scp035Role : CRole
 
         player.Position = Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up * 0.65f);
 
-        player.TryWear("SCP035", out var schematicObject, new Vector3(0f, 0.6f, 0.175f));
+        player.TryWear("SCP035", player.Transform, out var schematicObject, (Vector3.forward * 0.205f)+(Vector3.up*0.6f));
+        schematicObject.Scale *= 1.185f;
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
 
         Timing.CallDelayed(0.05f, () =>

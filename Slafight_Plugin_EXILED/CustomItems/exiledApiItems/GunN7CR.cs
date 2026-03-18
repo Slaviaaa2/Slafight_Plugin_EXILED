@@ -21,7 +21,7 @@ public class GunN7CR : CustomWeapon
     public override ItemType Type { get; set; } = ItemType.GunE11SR;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 45f;
+    public override float Damage { get; set; } = 40f;
     public override Vector3 Scale { get; set; } = new (1f,1f,1.15f);
     public override byte ClipSize { get; set; } = 100;
 

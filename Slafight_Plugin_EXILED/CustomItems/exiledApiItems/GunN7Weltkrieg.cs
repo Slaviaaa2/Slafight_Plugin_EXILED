@@ -20,7 +20,7 @@ public class GunN7Weltkrieg : CustomWeapon
     public override ItemType Type { get; set; } = ItemType.GunFRMG0;
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
-    public override float Damage { get; set; } = 80f;
+    public override float Damage { get; set; } = 40f;
     public override Vector3 Scale { get; set; } = new (1.15f,1.3f,1.25f);
     public override byte ClipSize { get; set; } = 100;
 

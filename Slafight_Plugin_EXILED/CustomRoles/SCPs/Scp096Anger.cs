@@ -105,6 +105,8 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         player.MaxArtificialHealth = 1000;
         player.MaxHealth = 8000;
         player.Health = 8000;
+        player.MaxHumeShield = 150f;
+        player.HumeShieldRegenerationMultiplier = 0.35f;
         ChangeSpeedState(player, false);
         
         
@@ -132,7 +134,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         Log.Debug("Scp096Anger: TargetAdded Triggered");
         InTryNotToCryAnim[ev.Player] = true;
         ev.Player.EnableEffect(EffectType.Slowness, 95);
-        ev.Player.EnableEffect(EffectType.DamageReduction, 70);
+        ev.Player.EnableEffect(EffectType.DamageReduction, 170);
         CreateAndPlayAudio("096Angered.ogg", "Scp096", ev.Player.Position, true, null, false, 80f, 0f);
         Timing.CallDelayed(35f, () =>
         {

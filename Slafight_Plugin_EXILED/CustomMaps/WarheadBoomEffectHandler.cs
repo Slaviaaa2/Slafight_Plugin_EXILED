@@ -31,8 +31,11 @@ public static class WarheadBoomEffectHandler
         = EventHandler.CreateAndPlayAudio;
     private static CoroutineHandle _handle;
 
+    public static bool IsBooming = false;
+
     private static void OnDetonated()
     {
+        IsBooming = false;
         if (!Round.InProgress) return;
         Timing.RunCoroutine(KillCoroutine());
     }
@@ -50,6 +53,7 @@ public static class WarheadBoomEffectHandler
                                                                      $"StartTime: {Warhead.Controller.Info.StartTime}" +
                                                                      "</size>", player);*/
         }
+        IsBooming = false;
         Timing.KillCoroutines(_handle);
         _handle = Timing.RunCoroutine(EffectCoroutine());
     }
@@ -58,6 +62,7 @@ public static class WarheadBoomEffectHandler
     {
         yield return Timing.WaitForSeconds(0.1f);
 
+        IsBooming = false;
         float startTimer    = Warhead.DetonationTimer;
         float startRealTime = Time.realtimeSinceStartup;
 
@@ -85,6 +90,7 @@ public static class WarheadBoomEffectHandler
             // ── 残り 10秒: 煙エフェクト & 音 & フラッシュ予約 ─────────
             if (estimatedRemaining <= 10f)
             {
+                IsBooming = true;
                 var effectPos = StaticUtils.GetWorldFromRoomLocal(
                     RoomType.HczNuke, new Vector3(30f, -80f, 0f), Vector3.zero).worldPosition;
 

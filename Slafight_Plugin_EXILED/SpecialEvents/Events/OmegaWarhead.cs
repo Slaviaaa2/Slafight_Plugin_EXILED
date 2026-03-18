@@ -72,7 +72,7 @@ public class OmegaWarheadEvent : SpecialEvent
                     false);
 
                 // OMEGA プロトコル開始（CurrentEventPid をそのまま渡す）
-                OmegaWarhead.StartProtocol(CurrentEventPid, 555f);
+                OmegaWarhead.StartProtocol(555f);
             });
         });
     }

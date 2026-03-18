@@ -136,6 +136,8 @@ public class Plugin : Plugin<Config>
         SpawnContextBootstrap.RegisterAllContexts(SpawnSystem.Config);
         SpawnSystem = new();
         SpawningHandler = new();
+        
+        DebugModeHandler.Register();
 
         var Settings = ServerSpecifics.Settings();
         var a = Settings.ToList();
@@ -200,6 +202,8 @@ public class Plugin : Plugin<Config>
         FacilityLightHandler.Unregister();
         // GateAEnding.Unregister(); SCRAPPED
         WarheadBoomEffectHandler.Unregister();
+        
+        DebugModeHandler.Unregister();
             
         HarmonyInstance.UnpatchAll(this.Name);
         HarmonyInstance = null;

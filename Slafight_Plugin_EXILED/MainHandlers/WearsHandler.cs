@@ -13,7 +13,7 @@ namespace Slafight_Plugin_EXILED.MainHandlers;
 
 /// <summary>
 /// プレイヤーに Schematic を「着せる」ためのユーティリティ。
-/// - Wear / TryWear でスポーン＋親子付け＋ロール情報保存
+/// - Wear / TryWear でスポーン＋WearFollowerアタッチ＋ロール情報保存
 /// - RegisterExternal で外部生成済み Schematic を登録
 /// - DestroyCoroutine でロール変化時に自動 Destroy
 /// - ForceRemoveWear で外部から強制破壊
@@ -44,9 +44,11 @@ public static class WearsHandler
         CleanupAll();
     }
 
-    /// <summary>
-    /// 外部から指定プレイヤーのSchematicを強制的に破壊・クリーンアップ
-    /// </summary>
+    // ───────────────────────────────────────────
+    //  Public API
+    // ───────────────────────────────────────────
+
+    /// <summary>指定プレイヤーの Schematic を強制破壊・クリーンアップ</summary>
     public static bool ForceRemoveWear(Player player)
     {
         if (player == null)
@@ -56,33 +58,26 @@ public static class WearsHandler
         return true;
     }
 
-    /// <summary>
-    /// 外部から全プレイヤーのSchematicを一括破壊・クリーンアップ
-    /// </summary>
-    public static void ForceRemoveAllWears()
-    {
-        CleanupAll();
-    }
+    /// <summary>全プレイヤーの Schematic を一括破壊・クリーンアップ</summary>
+    public static void ForceRemoveAllWears() => CleanupAll();
 
-    /// <summary>
-    /// 指定IDのプレイヤーのSchematic破壊（プレイヤーオブジェクト不要時用）
-    /// </summary>
+    /// <summary>プレイヤーオブジェクト不要時用 ID 指定破壊</summary>
     public static bool ForceRemoveWearById(int playerId)
     {
-        if (PlayerSchematics.TryGetValue(playerId, out var schem))
-        {
-            schem.Destroy();
-            PlayerSchematics.Remove(playerId);
-            PlayerRoles.Remove(playerId);
-            return true;
-        }
-        return false;
+        if (!PlayerSchematics.TryGetValue(playerId, out var schem))
+            return false;
+
+        schem.Destroy();
+        PlayerSchematics.Remove(playerId);
+        PlayerRoles.Remove(playerId);
+        return true;
     }
 
     /// <summary>
-    /// 既にスポーン・親子付け済みの Schematic を登録する（LabApi など外部用）。
+    /// 既にスポーン済みの Schematic を登録する（外部用）。
+    /// WearFollower を自動アタッチする。
     /// </summary>
-    public static void RegisterExternal(Player player, SchematicObject schem)
+    public static void RegisterExternal(Player player, SchematicObject schem, Vector3? offset = null)
     {
         if (player == null || schem == null)
             return;
@@ -96,12 +91,14 @@ public static class WearsHandler
             PlayerRoles.Remove(id);
         }
 
+        AttachFollower(schem, player.Transform, offset ?? Vector3.zero);
+
         PlayerSchematics[id] = schem;
         PlayerRoles[id] = player.GetRoleInfo();
     }
 
     /// <summary>
-    /// 失敗時は何も返さない簡易版。
+    /// Schematic 名を指定してスポーン＆追従。失敗時は何も返さない簡易版。
     /// </summary>
     public static void Wear(this Player player, string wearSchemName, Vector3? offset = null)
     {
@@ -109,21 +106,16 @@ public static class WearsHandler
             return;
 
         var id = player.Id;
-
-        if (PlayerSchematics.TryGetValue(id, out var oldSchem))
-        {
-            oldSchem.Destroy();
-            PlayerSchematics.Remove(id);
-            PlayerRoles.Remove(id);
-        }
-
         var offsetVector = offset ?? Vector3.zero;
+
+        RemoveExisting(id);
+
         SchematicObject schem;
 
         try
         {
             schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector);
-            schem.transform.SetParent(player.Transform);
+            AttachFollower(schem, player.Transform, offsetVector);
         }
         catch (Exception e)
         {
@@ -137,46 +129,36 @@ public static class WearsHandler
         PlayerSchematics[id] = schem;
         PlayerRoles[id] = player.GetRoleInfo();
     }
-        
+
     /// <summary>
-    /// スポーン済みのSchematicObjectをPlayerにWearさせる用。
+    /// スポーン済みの SchematicObject を Wear させる版。
     /// </summary>
-    public static void Wear(this Player player, SchematicObject Schem, Vector3? offset = null)
+    public static void Wear(this Player player, SchematicObject schem, Vector3? offset = null)
     {
-        if (player == null)
+        if (player == null || schem == null)
             return;
 
         var id = player.Id;
-
-        if (PlayerSchematics.TryGetValue(id, out var oldSchem))
-        {
-            oldSchem.Destroy();
-            PlayerSchematics.Remove(id);
-            PlayerRoles.Remove(id);
-        }
-
         var offsetVector = offset ?? Vector3.zero;
+
+        RemoveExisting(id);
 
         try
         {
-            Schem.transform.SetParent(player.Transform);
-            Schem.Position = player.Transform.position + offsetVector;
+            AttachFollower(schem, player.Transform, offsetVector);
         }
         catch (Exception e)
         {
-            Log.Error($"[WearsHandler] Wear failed for {player.Nickname}: {e}");
+            Log.Error($"[WearsHandler] Wear(SchematicObject) failed for {player.Nickname}: {e}");
             return;
         }
 
-        if (Schem == null)
-            return;
-
-        PlayerSchematics[id] = Schem;
+        PlayerSchematics[id] = schem;
         PlayerRoles[id] = player.GetRoleInfo();
     }
 
     /// <summary>
-    /// 成否＋ SchematicObject を取得したい場合はこちら。
+    /// 成否＋SchematicObject を取得したい場合はこちら。
     /// </summary>
     public static bool TryWear(this Player player, string wearSchemName, out SchematicObject schematicObject, Vector3? offset = null)
     {
@@ -186,21 +168,16 @@ public static class WearsHandler
             return false;
 
         var id = player.Id;
-
-        if (PlayerSchematics.TryGetValue(id, out var oldSchem))
-        {
-            oldSchem.Destroy();
-            PlayerSchematics.Remove(id);
-            PlayerRoles.Remove(id);
-        }
-
         var offsetVector = offset ?? Vector3.zero;
+
+        RemoveExisting(id);
+
         SchematicObject schem;
 
         try
         {
             schem = ObjectSpawner.SpawnSchematic(wearSchemName, player.Position + offsetVector, player.Rotation);
-            schem.transform.SetParent(player.Transform);
+            AttachFollower(schem, player.Transform, offsetVector);
         }
         catch (Exception e)
         {
@@ -216,6 +193,78 @@ public static class WearsHandler
         schematicObject = schem;
         return true;
     }
+    
+    /// <summary>
+    /// 親Transform を明示指定できる TryWear。
+    /// プレイヤー以外のオブジェクトに追従させたい場合に使用。
+    /// </summary>
+    public static bool TryWear(this Player player, string wearSchemName, Transform parent, out SchematicObject schematicObject, Vector3? offset = null)
+    {
+        schematicObject = null;
+
+        if (player == null || parent == null)
+            return false;
+
+        var id = player.Id;
+        var offsetVector = offset ?? Vector3.zero;
+
+        RemoveExisting(id);
+
+        SchematicObject schem;
+
+        try
+        {
+            schem = ObjectSpawner.SpawnSchematic(wearSchemName, parent.position + offsetVector, player.Rotation);
+            AttachFollower(schem, parent, offsetVector);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"[WearsHandler] TryWear(parent) failed for {player.Nickname}: {e}");
+            return false;
+        }
+
+        if (schem == null)
+            return false;
+
+        PlayerSchematics[id] = schem;
+        PlayerRoles[id] = player.GetRoleInfo();
+        schematicObject = schem;
+        return true;
+    }
+
+    // ───────────────────────────────────────────
+    //  Private helpers
+    // ───────────────────────────────────────────
+
+    /// <summary>
+    /// SchematicObject に WearFollower をアタッチ（既存があれば差し替え）。
+    /// SetParent は使わない。
+    /// </summary>
+    private static void AttachFollower(SchematicObject schem, Transform target, Vector3 offset)
+    {
+        // 既存コンポーネントを破棄してから付け直す
+        var existing = schem.gameObject.GetComponent<WearFollower>();
+        if (existing != null)
+            UnityEngine.Object.Destroy(existing);
+
+        var follower = schem.gameObject.AddComponent<WearFollower>();
+        follower.Initialize(target, offset);
+    }
+
+    /// <summary>指定 ID にすでに Schematic が登録されていれば破壊して辞書から除去</summary>
+    private static void RemoveExisting(int playerId)
+    {
+        if (!PlayerSchematics.TryGetValue(playerId, out var old))
+            return;
+
+        old.Destroy();
+        PlayerSchematics.Remove(playerId);
+        PlayerRoles.Remove(playerId);
+    }
+
+    // ───────────────────────────────────────────
+    //  Event handlers
+    // ───────────────────────────────────────────
 
     private static void OnRoundStarted()
     {
@@ -233,14 +282,13 @@ public static class WearsHandler
         CleanupAll();
     }
 
-    private static void OnPlayerLeft(LeftEventArgs ev)
-    {
-        CleanupPlayer(ev.Player);
-    }
+    private static void OnPlayerLeft(LeftEventArgs ev) => CleanupPlayer(ev.Player);
 
-    /// <summary>
-    /// ロール変更を監視し、変化したプレイヤーの Schematic を自動 Destroy。
-    /// </summary>
+    // ───────────────────────────────────────────
+    //  Coroutine
+    // ───────────────────────────────────────────
+
+    /// <summary>ロール変更を監視し、変化したプレイヤーの Schematic を自動 Destroy</summary>
     private static IEnumerator<float> DestroyCoroutine()
     {
         while (true)
@@ -253,18 +301,14 @@ public static class WearsHandler
 
             foreach (var kvp in PlayerRoles.ToList())
             {
-                var id = kvp.Key;
-                var savedInfo = kvp.Value;
-
-                var player = Player.Get(id);
+                var player = Player.Get(kvp.Key);
                 if (player == null)
                     continue;
 
-                var currentInfo = player.GetRoleInfo();
+                var current = player.GetRoleInfo();
 
-                // 必要に応じて Vanilla のみに絞るなど調整
-                if (savedInfo.Vanilla != currentInfo.Vanilla ||
-                    savedInfo.Custom != currentInfo.Custom)
+                if (kvp.Value.Vanilla != current.Vanilla ||
+                    kvp.Value.Custom  != current.Custom)
                 {
                     CleanupPlayer(player);
                 }
@@ -273,6 +317,10 @@ public static class WearsHandler
             yield return Timing.WaitForSeconds(0.5f);
         }
     }
+
+    // ───────────────────────────────────────────
+    //  Cleanup
+    // ───────────────────────────────────────────
 
     private static void CleanupPlayer(Player player)
     {

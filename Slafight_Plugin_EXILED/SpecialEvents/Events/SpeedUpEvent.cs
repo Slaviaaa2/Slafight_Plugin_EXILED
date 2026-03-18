@@ -27,6 +27,11 @@ public class SpeedUpEvent : SpecialEvent
         EventHandler.CreateAndPlayAudio;
 
     // ===== 実行本体 =====
+    public override bool IsReadyToExecute()
+    {
+        return false;
+    }
+
     protected override void OnExecute(int eventPid)
     {
         foreach (var player in Player.List)

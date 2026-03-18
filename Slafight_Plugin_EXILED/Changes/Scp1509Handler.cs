@@ -51,6 +51,12 @@ public class Scp1509Handler
             {
                 player?.SetRole(CRoleTypeId.GoCOperative, RoleSpawnFlags.None);
             }
+            
+            else if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp035)
+            {
+                player?.SetRole(RoleTypeId.Scp0492, RoleSpawnFlags.AssignInventory);
+                player?.UniqueRole = "Zombified";
+            }
             else
             {
                 if (ev.Player == null) return;

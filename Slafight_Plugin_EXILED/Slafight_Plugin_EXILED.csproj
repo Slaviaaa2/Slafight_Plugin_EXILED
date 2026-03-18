@@ -203,6 +203,7 @@
         <Compile Include="API\Features\UnitPack.cs" />
         <Compile Include="API\Features\SpawnSystemBootstrap.cs" />
         <Compile Include="API\Features\UnitPackRegistry.cs" />
+        <Compile Include="API\Features\WearFollower.cs" />
         <Compile Include="API\Interface\IObjectPrefab.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
         <Compile Include="Changes\CandyChanges.cs" />
@@ -223,6 +224,7 @@
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
+        <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileCafeteriaNeeds.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileScientist_Samuels.cs" />
         <Compile Include="CustomItems\NvgManager.cs" />
@@ -348,6 +350,7 @@
         <Compile Include="Extensions\StaticUtils.cs" />
         <Compile Include="LabApiBridgeHandlers\ObjectPrefabHandlers.cs" />
         <Compile Include="MainHandlers\BadgeHandler.cs" />
+        <Compile Include="MainHandlers\DebugModeHandler.cs" />
         <Compile Include="MainHandlers\EventHandler.cs" />
         <Compile Include="MainHandlers\FirstRolesHandler.cs" />
         <Compile Include="MainHandlers\LabApiHandler.cs" />

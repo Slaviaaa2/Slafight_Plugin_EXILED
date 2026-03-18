@@ -15,21 +15,30 @@ public class PDEx
 {
     public PDEx()
     {
-        Exiled.Events.Handlers.Server.RoundStarted += setup;
+        Exiled.Events.Handlers.Server.RoundStarted += Setup;
         Exiled.Events.Handlers.Player.FailingEscapePocketDimension += JoinPDEx;
     }
 
     ~PDEx()
     {
-        Exiled.Events.Handlers.Server.RoundStarted -= setup;
+        Exiled.Events.Handlers.Server.RoundStarted -= Setup;
         Exiled.Events.Handlers.Player.FailingEscapePocketDimension -= JoinPDEx;
     }
 
     public static List<Player> PDExPlayers = new();
 
-    private void setup()
+    private void Setup()
     {
         PDExPlayers.Clear();
+    }
+
+    private IEnumerator<float> Coroutine()
+    {
+        while (true)
+        {
+            if (!Round.InProgress) yield break;
+            
+        }
     }
 
     private void JoinPDEx(FailingEscapePocketDimensionEventArgs ev)

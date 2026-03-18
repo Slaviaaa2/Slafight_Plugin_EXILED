@@ -190,7 +190,7 @@ public class CustomMapMainHandler : CustomEventsHandler
     private void SetupMaps()
     {
         WarheadBoomEffectUtil.StopAllEffects();
-        OmegaWarhead.IsWarheadStarted = false;
+        OmegaWarhead.Reset();
         if (femurCoroutine.IsRunning)
             Timing.KillCoroutines(femurCoroutine);
 
@@ -201,7 +201,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         {
             Timing.CallDelayed(25f, () =>
             {
-                // ★ TrainComing.Start を使うならここで呼ぶ想定
+                if (!Round.InProgress) return; // ← これだけ追加
                 trainCoroutine = Timing.RunCoroutine(TrainComing.SpawnTrainAndAnim(STS, STC, STE));
             });
         }
@@ -439,7 +439,7 @@ public class CustomMapMainHandler : CustomEventsHandler
                 ev.Player.SendHint("何らかの要因で実行できませんでした");
                 return;
             }
-            OmegaWarhead.StartProtocol(specialEventsHandler.EventPID, startedBy:ev.Player);
+            OmegaWarhead.StartProtocol(0f, startedBy:ev.Player);
         }
     }
 

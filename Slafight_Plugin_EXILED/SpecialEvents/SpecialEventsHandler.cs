@@ -7,6 +7,7 @@ using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -44,20 +45,34 @@ public class SpecialEventsHandler
         Instance = null;
     }
 
-    // イベントキューと状態
-    public readonly List<SpecialEventType> EventQueue = new();
-    public readonly List<SpecialEventType> HappenedEvents = new();
-    public int EventPID = 1;
-    // 既存のプロパティの直下に追加
-    public SpecialEventType CurrentEvent { get; private set; } = SpecialEventType.None;
+    // =====================
+    //  イベントキューと状態
+    // =====================
 
-    // NowEvent の定義を変更（1行）
-    public SpecialEventType NowEvent => CurrentEvent;  // ← EventQueue.FirstOrDefault() から変更
+    public readonly List<SpecialEventType> EventQueue = new();
+
+    /// <summary>
+    /// 発火済みイベントの履歴（古い順）。
+    /// 直近 EventCooldownCount 件に含まれるイベントは抽選から除外される。
+    /// </summary>
+    public readonly List<SpecialEventType> HappenedEvents = new();
+
+    /// <summary>
+    /// 同一イベントが再抽選されるまでの抽選スキップ回数。
+    /// </summary>
+    public const int EventCooldownCount = 3;
+
+    public int EventPID = 1;
+    public SpecialEventType CurrentEvent { get; private set; } = SpecialEventType.None;
+    public SpecialEventType NowEvent => CurrentEvent;
 
     public bool IsFifthistsRaidActive { get; set; }
     float chance = 1f / 4f;
 
-    // ==== イベント操作（新実装） ====
+    // =====================
+    //  イベント操作
+    // =====================
+
     public void AddEvent(SpecialEventType eventType)
     {
         if (!Enum.IsDefined(typeof(SpecialEventType), eventType))
@@ -87,7 +102,7 @@ public class SpecialEventsHandler
 
         var removed = EventQueue[index];
         EventQueue.RemoveAt(index);
-        HappenedEvents.Add(removed); // スキップも「起こった扱い」にするならここで記録
+        RecordHappenedEvent(removed);
         EventPID++;
         EventLocSet();
         Log.Info($"SEH: Skipped event: {removed}");
@@ -193,8 +208,11 @@ public class SpecialEventsHandler
         EventLocSet();
         Log.Info($"SEH: Queue insert random at index {index}: {SelectedEvent}");
     }
-        
-    // ==== 内部処理 ====
+
+    // =====================
+    //  内部処理
+    // =====================
+
     private SpecialEventType SelectedEvent = SpecialEventType.None;
 
     private void SelectRandom()
@@ -210,19 +228,46 @@ public class SpecialEventsHandler
         SelectedEvent = allowedEvents[Random.Range(0, allowedEvents.Count)];
     }
 
+    /// <summary>
+    /// 実行可能かつ直近 EventCooldownCount 回の抽選に含まれないイベントの一覧を返す。
+    /// 全候補がクールダウン中の場合は空リストを返す（None を返すのは呼び出し側の責務）。
+    /// </summary>
     private List<SpecialEventType> GetAllowedEvents()
     {
+        // 直近 N 件を HashSet にして O(1) で除外判定
+        var recentEvents = new HashSet<SpecialEventType>(
+            HappenedEvents.TakeLastCompat(EventCooldownCount)
+        );
+
         var allowed = new List<SpecialEventType>();
         foreach (SpecialEventType type in Enum.GetValues(typeof(SpecialEventType)))
         {
             if (type == SpecialEventType.None)
                 continue;
 
-            if (SpecialEvent.IsEventExecutable(type))
-                allowed.Add(type);
+            if (!SpecialEvent.IsEventExecutable(type))
+                continue;
+
+            if (recentEvents.Contains(type))
+                continue;
+
+            allowed.Add(type);
         }
 
         return allowed;
+    }
+
+    /// <summary>
+    /// 発火済み履歴にイベントを追加する。
+    /// 履歴は EventCooldownCount * 2 件でトリムして無制限に膨らまないよう管理する。
+    /// </summary>
+    private void RecordHappenedEvent(SpecialEventType eventType)
+    {
+        HappenedEvents.Add(eventType);
+
+        int maxHistory = EventCooldownCount * 2;
+        if (HappenedEvents.Count > maxHistory)
+            HappenedEvents.RemoveRange(0, HappenedEvents.Count - maxHistory);
     }
 
     public void SpecialEventsController()
@@ -243,22 +288,17 @@ public class SpecialEventsHandler
 
         InitStats();
 
-        // ラウンド中ずっとこのイベント扱いにしたいのでここでセット
         CurrentEvent = eventType;
         EventLocSet();
 
         specialEvent.Execute(EventPID);
         Log.Info($"SEH: Executed {eventType}: {specialEvent.LocalizedName}");
 
-        HappenedEvents.Add(eventType);
+        RecordHappenedEvent(eventType);
 
         if (EventQueue.Count > 0)
             EventQueue.RemoveAt(0);
 
-        // ★ ここでは CurrentEvent を None に戻さない
-        // CurrentEvent = SpecialEventType.None;  ← 消す
-
-        // キューの次を HUD に出したいならこのまま / 出したくないなら消してもいい
         EventLocSet();
     }
 
@@ -273,11 +313,15 @@ public class SpecialEventsHandler
         Plugin.Singleton.EventHandler.SkeletonSpawned = false;
         Plugin.Singleton.EventHandler.SpecialWarhead = false;
         Warhead.IsLocked = false;
+        EscapeHandler.ClearEscapeOverrides();
         SpawnSystem.Disable = false;
         SpawnContextRegistry.SetActive("Default");
     }
 
-    // ==== ラウンド系イベントハンドラ ====
+    // =====================
+    //  ラウンド系イベントハンドラ
+    // =====================
+
     public void RoundStartedAddEvent()
     {
         Timing.CallDelayed(0.1f, SpecialEventsController);
@@ -286,8 +330,6 @@ public class SpecialEventsHandler
     public void RoundRestartSkipEvent()
     {
         EventPID++;
-
-        // ★ ここでイベントをリセット
         CurrentEvent = SpecialEventType.None;
 
         if (EventQueue.Count <= 1)
@@ -313,7 +355,10 @@ public class SpecialEventsHandler
         EventLocSet();
     }
 
-    // ==== ローカライズ ====
+    // =====================
+    //  ローカライズ
+    // =====================
+
     public string LocalizedEventName { get; private set; } = "無し";
     public string EventNeedTriggers { get; private set; } = "無し";
 
@@ -340,26 +385,29 @@ public class SpecialEventsHandler
         EventHandler.SyncSpecialEvent();
     }
 
-    // ==== API ====
+    // =====================
+    //  API
+    // =====================
+
     public static bool IsWarheadable()
     {
-        var nowEvent = Instance?.NowEvent ?? SpecialEventType.None;  // ← これで CurrentEvent になる
+        var nowEvent = Instance?.NowEvent ?? SpecialEventType.None;
         return nowEvent switch
         {
             SpecialEventType.OmegaWarhead or
                 SpecialEventType.OldDeltaWarhead or
                 SpecialEventType.NuclearAttack or
                 SpecialEventType.OperationBlackout or
-                SpecialEventType.Scp1509BattleField or 
-                SpecialEventType.SnowWarriersAttack or 
+                SpecialEventType.Scp1509BattleField or
+                SpecialEventType.SnowWarriersAttack or
                 SpecialEventType.FacilityTermination => false,
             _ => true
         };
     }
 
-    // ================================
+    // =====================
     //  互換用 Obsolete ラッパー
-    // ================================
+    // =====================
 
     [Obsolete("Use AddEvent(SpecialEventType eventType) instead.")]
     public void Add(SpecialEventType eventType) => AddEvent(eventType);

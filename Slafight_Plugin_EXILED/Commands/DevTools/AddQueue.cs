@@ -41,7 +41,8 @@ public class AddQueue : ICommand
         }
 
         var seh = Plugin.Singleton.SpecialEventsHandler;
-        seh.AddEvent(eventType);
+        seh.EventQueue.Add(eventType);
+        seh.EventLocSet();
 
         response = $"New queued special event set to: {eventType}";
         return true;
