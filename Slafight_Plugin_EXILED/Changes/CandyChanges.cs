@@ -118,21 +118,26 @@ public class CandyChanges
             else if (ev.Candy.Kind == CandyKindID.Evil)
             {
                 ev.Player?.Role.Set(RoleTypeId.Scp0492,RoleSpawnFlags.None);
-                ev.Player?.EnableEffect(EffectType.Scp207, 2);
-                ev.Player?.UniqueRole = "Zombified";
-                ev.Player?.CustomInfo = "<color=#C50000>Zombified Subject</color>";
-                ev.Player?.InfoArea |= PlayerInfoArea.Nickname;
-                ev.Player?.InfoArea &= ~PlayerInfoArea.Role;
-                ev.Player?.SetScale(new Vector3(1.08f,1.08f,1.08f));
-                if (!Handler.CanUsePlayers.Contains(ev.Player))
+                Timing.CallDelayed(1f, () =>
                 {
-                    Handler.CanUsePlayers.Add(ev.Player);
-                }
-                if (!Handler.ActivatedPlayers.Contains(ev.Player))
-                {
-                    Handler.ActivatedPlayers.Add(ev.Player);
-                }
-                ev.Player?.ShowHint("<size=24>冒涜的な匂いに気が狂いそうになる...</size>");
+                    ev.Player?.EnableEffect(EffectType.Scp207, 2);
+                    ev.Player?.UniqueRole = "Zombified";
+                    ev.Player?.CustomInfo = "<color=#C50000>Zombified Subject</color>";
+                    ev.Player?.InfoArea |= PlayerInfoArea.Nickname;
+                    ev.Player?.InfoArea &= ~PlayerInfoArea.Role;
+                    ev.Player?.SetScale(new Vector3(1.08f, 1.08f, 1.08f));
+                    if (!Handler.CanUsePlayers.Contains(ev.Player))
+                    {
+                        Handler.CanUsePlayers.Add(ev.Player);
+                    }
+
+                    if (!Handler.ActivatedPlayers.Contains(ev.Player))
+                    {
+                        Handler.ActivatedPlayers.Add(ev.Player);
+                    }
+
+                    ev.Player?.ShowHint("<size=24>冒涜的な匂いに気が狂いそうになる...</size>");
+                });
             }
         }
     }

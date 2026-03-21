@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
+using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
@@ -26,35 +29,57 @@ public class PDEx
     }
 
     public static List<Player> PDExPlayers = new();
+    private CoroutineHandle handle;
 
     private void Setup()
     {
         PDExPlayers.Clear();
+        Timing.KillCoroutines(handle);
+        handle = Timing.RunCoroutine(Coroutine());
     }
 
-    private IEnumerator<float> Coroutine()
+    private static IEnumerator<float> Coroutine()
     {
         while (true)
         {
             if (!Round.InProgress) yield break;
-            
+
+            foreach (var player in Player.List.ToList())
+            {
+                if (player is not { IsConnected: true, IsVerified: true }) continue;
+                if (player.Position.y >= -450f) continue;
+                if (player.Zone == ZoneType.Pocket) continue;
+                player.IsGodModeEnabled = true;
+                player.EnableEffect<PocketCorroding>();
+            }
+
+            yield return Timing.WaitForSeconds(0.1f);
+
+            foreach (var player in Player.List.ToList())
+            {
+                if (player is not { IsConnected: true, IsVerified: true }) continue;
+                if (!player.IsEffectActive<PocketCorroding>()) continue;
+                if (player.IsGodModeEnabled) player.IsGodModeEnabled = false;
+            }
+
+            yield return Timing.WaitForSeconds(0.9f); // 合計1秒
         }
     }
 
     private void JoinPDEx(FailingEscapePocketDimensionEventArgs ev)
     {
-        if (Random.Range(0,3) == 0)
+        if (Random.Range(0, 3) == 0)
         {
             int i = 0;
-            foreach (var player in Player.List)
+            foreach (var player in Player.List.ToList())
             {
-                if (player == null) continue;
+                if (player is not { IsConnected: true, IsVerified: true }) continue;
                 if (player.GetCustomRole() == CRoleTypeId.Scp106 || (player.GetCustomRole() == CRoleTypeId.None && player.Role.Type == RoleTypeId.Scp106))
                 {
                     i++;
                 }
             }
-            if (i<=0) return;
+            if (i <= 0) return;
             ev.IsAllowed = false;
             ev.Player?.Position = CustomMapMainHandler.PDExJoin;
             ev.Player?.DisableEffect(EffectType.PocketCorroding);
@@ -67,9 +92,9 @@ public class PDEx
             {
                 return;
             }
-            foreach (var player in Player.List)
+            foreach (var player in Player.List.ToList())
             {
-                if (player == null) continue;
+                if (player is not { IsConnected: true, IsVerified: true }) continue;
                 if (player.GetCustomRole() == CRoleTypeId.Scp106 || (player.GetCustomRole() == CRoleTypeId.None && player.Role.Type == RoleTypeId.Scp106))
                 {
                     player.Position = CustomMapMainHandler.PDExJoinKing;

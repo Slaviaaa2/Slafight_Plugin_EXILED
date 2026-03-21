@@ -1,4 +1,3 @@
-using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
@@ -6,7 +5,6 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
-using UnityEngine;
 using VoiceChat;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;

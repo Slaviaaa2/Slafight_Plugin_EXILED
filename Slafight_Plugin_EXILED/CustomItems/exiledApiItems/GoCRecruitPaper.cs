@@ -58,7 +58,7 @@ public class GoCRecruitPaper : CustomItem
             {
                 foreach (var item in ev.Player.Items.ToList())
                 {
-                    if (item.IsCustomItem(out var customItem) && customItem.Id == 2019)
+                    if (item.TryGetCustomItem(out var customItem) && customItem.Id == 2019)
                     {
                         item.Destroy();
                     }

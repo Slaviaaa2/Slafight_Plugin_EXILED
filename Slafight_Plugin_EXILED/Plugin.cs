@@ -1,36 +1,26 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Exiled.CustomItems.API;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
-using Exiled.Events.Features;
 using LabApi.Events.CustomHandlers;
 using Slafight_Plugin_EXILED.CustomItems;
 using Slafight_Plugin_EXILED.CustomRoles;
-using Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
 using System.Threading;
 using HarmonyLib;
-using MEC;
-using Mirror;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
-using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.LabApiBridgeHandlers;
 using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.ProximityChat;
-using Slafight_Plugin_EXILED.SpecialEvents.Events;
 using UserSettings.ServerSpecific;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
@@ -50,7 +40,7 @@ public class Plugin : Plugin<Config>
     public override string Name => "Slafight_Plugin_EXILED";
     public override string Author => "Slaviaaa_2";
     public override string Prefix => "Slafight_Plugin_EXILED";
-    public override Version Version => new Version(1,7,1,0);
+    public override Version Version => new Version(1,7,2,0);
         
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 1);
 

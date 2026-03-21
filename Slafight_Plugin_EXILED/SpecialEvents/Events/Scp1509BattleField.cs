@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.API.Features.Pickups;
@@ -11,7 +10,6 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.MainHandlers;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
@@ -76,33 +74,6 @@ public class Scp1509BattleFieldEvent : SpecialEvent
         {
             if (!keepPickups.Contains(pickup.Type))
                 pickup.Destroy();
-        }
-
-        // メインエレベーター停止（戦場閉じ込め）
-        List<ElevatorType> lockEvTypes = new()
-        {
-            ElevatorType.GateA,
-            ElevatorType.GateB,
-            ElevatorType.LczA,
-            ElevatorType.LczB
-        };
-
-        foreach (Lift lift in Lift.List)
-        {
-            if (lockEvTypes.Contains(lift.Type))
-                lift.TryStart(0, false);
-        }
-
-        // エレベータードアロック
-        foreach (Door door in Door.List)
-        {
-            if (door.Type == DoorType.ElevatorGateA || 
-                door.Type == DoorType.ElevatorGateB || 
-                door.Type == DoorType.ElevatorLczB || 
-                door.Type == DoorType.ElevatorLczA)
-            {
-                door.Lock(DoorLockType.AdminCommand);
-            }
         }
 
         if (CancelIfOutdated())
@@ -252,6 +223,31 @@ public class Scp1509BattleFieldEvent : SpecialEvent
                 }
             }
         });
+        
+        // メインエレベーター停止（戦場閉じ込め）
+        List<ElevatorType> lockEvTypes = new()
+        {
+            ElevatorType.GateA,
+            ElevatorType.GateB,
+            ElevatorType.LczA,
+            ElevatorType.LczB
+        };
+
+        foreach (Lift lift in Lift.List)
+        {
+            if (lockEvTypes.Contains(lift.Type))
+                lift.TryStart(0, false);
+        }
+
+        // エレベータードアロック
+        foreach (Door door in Door.List)
+        {
+            if (door.Type is DoorType.ElevatorGateA or DoorType.ElevatorGateB or DoorType.ElevatorLczB or DoorType.ElevatorLczA)
+            {
+                door.IsOpen = false;
+                door.Lock(DoorLockType.AdminCommand);
+            }
+        }
 
         // Cassieアナウンス
         Exiled.API.Features.Cassie.MessageTranslated(

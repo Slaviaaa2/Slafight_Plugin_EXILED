@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using CommandSystem;
 using Exiled.Permissions.Extensions;
 using Slafight_Plugin_EXILED.Commands.DevTools;

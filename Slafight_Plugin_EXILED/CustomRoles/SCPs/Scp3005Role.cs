@@ -3,8 +3,6 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
@@ -13,7 +11,6 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
-using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -73,7 +70,7 @@ public class Scp3005Role : CRole
         {
             bool hasGoggles = ev.Attacker.Items
                 .OfType<Scp1344>()
-                .Any(i => i.IsCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
             if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
             ev.IsAllowed = false;
             ev.Attacker.Hurt(ev.Player, 5f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
@@ -112,7 +109,7 @@ public class Scp3005Role : CRole
                     
                 bool hasGoggles = target.Items
                     .OfType<Scp1344>()
-                    .Any(i => i.IsCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                    .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
                 if (hasGoggles)  continue;
 
                 float distance = Vector3.Distance(player.Position, target.Position);

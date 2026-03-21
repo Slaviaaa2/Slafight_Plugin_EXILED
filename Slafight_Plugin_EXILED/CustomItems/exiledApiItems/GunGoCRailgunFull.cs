@@ -26,7 +26,7 @@ public class GunGoCRailgunFull : CustomWeapon
     
     public override float Damage { get; set; } = 45f;
     public override Vector3 Scale { get; set; } = new (1.15f,1f,1.15f);
-    public override byte ClipSize { get; set; } = 1;
+    public override byte ClipSize { get; set; } = 70;
 
     public Color glowColor = CustomColor.Gold.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
@@ -36,7 +36,6 @@ public class GunGoCRailgunFull : CustomWeapon
         Exiled.Events.Handlers.Player.Hurting += Debug_HurtingDamage;
         
         Exiled.Events.Handlers.Player.PickingUpItem += LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem += LimitDestroy;
         
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
@@ -49,7 +48,6 @@ public class GunGoCRailgunFull : CustomWeapon
         Exiled.Events.Handlers.Player.Hurting -= Debug_HurtingDamage;
         
         Exiled.Events.Handlers.Player.PickingUpItem -= LimitPatch;
-        Exiled.Events.Handlers.Player.DroppingItem -= LimitDestroy;
         
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
@@ -74,20 +72,6 @@ public class GunGoCRailgunFull : CustomWeapon
             {
                 item.MaxAmmo = 70;
                 item.Ammo = 70;
-            }
-        }
-    }
-
-    private void LimitDestroy(DroppingItemEventArgs ev)
-    {
-        if (Check(ev.Item))
-        {
-            if (ev.Item is Firearm item)
-            {
-                if (item.TotalAmmo != 1)
-                {
-                    item.Destroy();
-                }
             }
         }
     }

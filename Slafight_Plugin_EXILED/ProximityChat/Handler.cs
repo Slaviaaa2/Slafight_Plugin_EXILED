@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Exiled.API.Features;
-using Exiled.API.Features.Roles;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
@@ -75,7 +74,7 @@ public static class Handler
             {
                 var listText = string.Join(", ", CanUsePlayers.ConvertAll(p => $"{p.Nickname}({p.Id})"));
                 Log.Debug($"CanUsePlayers Updated. List: {listText}");
-                if (ev.Player?.UniqueRole != "Zombified")
+                if (ev.Player?.GetCustomRole() != CRoleTypeId.Zombified)
                 {
                     ev.Player.ShowHint("近接チャット機能が利用可能です！",5f);
                 }

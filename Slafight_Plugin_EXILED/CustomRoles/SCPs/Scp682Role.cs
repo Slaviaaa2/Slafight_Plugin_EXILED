@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;

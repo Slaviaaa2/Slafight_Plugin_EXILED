@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
 using PlayerRoles;

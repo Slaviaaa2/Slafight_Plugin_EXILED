@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.Events.EventArgs.Player;
@@ -12,11 +12,9 @@ using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
-using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
 
@@ -43,10 +41,9 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         _eventPidGlobal = eventPID;
         _teslaDisabled = false;
 
-        if (CancelIfOutdated())
-            return;
+        if (CancelIfOutdated()) return;
 
-        RunRaid();
+        Timing.RunCoroutine(RaidCoroutine());
     }
 
     public override void RegisterEvents()
@@ -63,9 +60,8 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         => _eventPidGlobal != Plugin.Singleton.SpecialEventsHandler.EventPID;
 
     // ===== メイン処理 =====
-    private void RunRaid()
+    private IEnumerator<float> RaidCoroutine()
     {
-        var specialEventHandler = Plugin.Singleton.SpecialEventsHandler;
         var evHandler = EventHandler;
 
         // Warhead ロックなど
@@ -73,181 +69,145 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         Warhead.IsLocked = true;
         evHandler.DeadmanDisable = true;
 
-        if (CancelIfOutdated())
-            return;
+        if (CancelIfOutdated()) yield break;
 
-        // カオスに変える対象を抽選（元コード準拠で SCP 側など）
-        var ciTargets = StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f, true);
-        foreach (var player in ciTargets)
-        {
+        // カオスに変える対象を抽選
+        foreach (var player in StaticUtils.SelectRandomPlayersByRatio(CTeam.SCPs, 1f / 3f, true))
             player.SetRole(CRoleTypeId.ChaosCommando);
-        }
 
-        // Cassie シーケンス開始（元の CI Raid 的ノリでアナウンス）
-        Timing.CallDelayed(8f, () =>
-        {
-            if (CancelIfOutdated()) return;
+        yield return Timing.WaitForSeconds(8f);
+        if (CancelIfOutdated()) yield break;
 
-            Exiled.API.Features.Cassie.MessageTranslated("$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
-                $"警告、不明な部隊がGate Aで検出されました。確認を",true);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_1.02 Danger Detected Unknown Forces in Gate A . Please Check $pitch_.2 .g4 .g1 .g2",
+            "警告、不明な部隊がGate Aで検出されました。確認を",
+            true);
 
-            Timing.CallDelayed(12f, () =>
-            {
-                if (CancelIfOutdated()) return;
+        yield return Timing.WaitForSeconds(12f);
+        if (CancelIfOutdated()) yield break;
 
-                Exiled.API.Features.Cassie.MessageTranslated("$pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command",
-                    $"<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",false);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_.8 Successfully terminated Foundations Cassie System and putted New Insurgencys Cassie System . Cassie is now under delta command",
+            "<color=#00b7eb>財団のCassieシステム</color>の<color=red>終了</color>に成功。新たな<color=#228b22>インサージェンシーのCassieシステム</color>の導入も成功。<split> Cassieは今や<b><color=#228b22>DELTA COMMAND</color></b>の手中にある。",
+            false);
 
-                Timing.CallDelayed(45f, () =>
-                {
-                    if (CancelIfOutdated()) return;
+        yield return Timing.WaitForSeconds(45f);
+        if (CancelIfOutdated()) yield break;
 
-                    Exiled.API.Features.Cassie.MessageTranslated(
-                        "$pitch_.8 First Order of Delta Command . Turn off all facilitys . Accepted .",
-                        "<b><color=#228b22>DELTA COMMAND</color></b>の最初の指令：全施設の消灯 ...承認",
-                        false);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_.8 First Order of Delta Command . Turn off all facilitys . Accepted .",
+            "<b><color=#228b22>DELTA COMMAND</color></b>の最初の指令：全施設の消灯 ...承認",
+            false);
 
-                    // ここで全体暗転
-                    foreach (Room room in Room.List)
-                        room.Color = new Color(55/255f, 55/255f, 55/255f);
+        foreach (var room in Room.List)
+            room.Color = new Color(55 / 255f, 55 / 255f, 55 / 255f);
 
-                    Timing.CallDelayed(8f, () =>
-                    {
-                        if (CancelIfOutdated()) return;
+        yield return Timing.WaitForSeconds(8f);
+        if (CancelIfOutdated()) yield break;
 
-                        Exiled.API.Features.Cassie.MessageTranslated(
-                            "$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .",
-                            "次の指令：テスラゲートの無効化 ...承認",
-                            false);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_.8 Next Order . Turn off Tesla Gates . Accepted .",
+            "次の指令：テスラゲートの無効化 ...承認",
+            false);
 
-                        _teslaDisabled = true;
+        _teslaDisabled = true;
 
-                        Timing.CallDelayed(8f, () =>
-                        {
-                            if (CancelIfOutdated()) return;
+        yield return Timing.WaitForSeconds(8f);
+        if (CancelIfOutdated()) yield break;
 
-                            Exiled.API.Features.Cassie.MessageTranslated(
-                                "$pitch_.8 All Insurgency Agents . Work Time .",
-                                "インサージェンシーのエージェント達よ、働く時間だ。",
-                                false);
-                        });
-                    });
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_.8 All Insurgency Agents . Work Time .",
+            "インサージェンシーのエージェント達よ、働く時間だ。",
+            false);
 
-                    // しばらく攻防後、CI が残っているかチェック
-                    float raidDuration = 400f;
-                    Timing.CallDelayed(raidDuration, () =>
-                    {
-                        if (CancelIfOutdated()) return;
+        // 攻防フェーズ（400秒）
+        yield return Timing.WaitForSeconds(1000f);
+        if (CancelIfOutdated()) yield break;
 
-                        int ciCount = 0;
-                        foreach (Player player in Player.List)
-                        {
-                            if (player == null) continue;
-                            if (player.GetTeam() == CTeam.ChaosInsurgency)
-                                ciCount++;
-                        }
+        bool ciAlive = Player.List.Any(p => p != null && p.GetTeam() == CTeam.ChaosInsurgency);
 
-                        if (ciCount != 0)
-                        {
-                            HandleCiSuccess();
-                        }
-                        else
-                        {
-                            HandleCiFailure();
-                        }
-                    });
-                });
-            });
-        });
+        if (ciAlive)
+            Timing.RunCoroutine(CiSuccessCoroutine());
+        else
+            HandleCiFailure();
     }
 
     // ===== 成功時（施設破壊 / 攻撃プロトコル） =====
-    private void HandleCiSuccess()
+    private IEnumerator<float> CiSuccessCoroutine()
     {
-        if (CancelIfOutdated()) return;
+        if (CancelIfOutdated()) yield break;
 
         Exiled.API.Features.Cassie.MessageTranslated(
             "$pitch_.8 All Insurgency Agents Tasks completed . Last Order . . $pitch_.75 Destroy the Facility . $pitch_.4 .g1 $pitch_.26 .g5 .g6 .g4 $pitch_2 .g1 $pitch_.75 Good by all anomalys and foundation personnels .",
             "全インサージェンシーエージェントの任務完了を確認。最後の指令を下す：<b><color=red>施設を破壊せよ</color></b>",
             true);
 
-        Timing.CallDelayed(15f, () =>
+        yield return Timing.WaitForSeconds(15f);
+        if (CancelIfOutdated()) yield break;
+
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "$pitch_.2 .g4 .g4 $pitch_1 $pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . ",
+            "BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. ",
+            true);
+
+        yield return Timing.WaitForSeconds(10f);
+        if (CancelIfOutdated()) yield break;
+
+        CreateAndPlayAudio("cir.ogg", "Cassie", Vector3.zero, true, null, false, 999999999f, 0f);
+
+        SchematicObject schematicObject;
+        try
         {
-            if (CancelIfOutdated()) return;
+            schematicObject = ObjectSpawner.SpawnSchematic("Nuke", Vector3.zero);
+        }
+        catch (Exception)
+        {
+            yield break;
+        }
 
-            Exiled.API.Features.Cassie.MessageTranslated(
-                "$pitch_.2 .g4 .g4 $pitch_1 $pitch_.75 BY ORDER OF DELTA COMMAND . THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED . DETONATION IN TMINUS 145 SECONDS . ",
-                "BY ORDER OF <color=#228b22><b>DELTA COMMAND</b></color>. THE DEAD MANS SEQUENCE AND SURFACE ATTACK PROTOCOL ACTIVATED. DETONATION IN T-145 SECONDS. ",
-                true);
+        yield return Timing.WaitForSeconds(0.5f);
 
-            Timing.CallDelayed(10f, () =>
-            {
-                if (CancelIfOutdated()) return;
+        if (schematicObject == null) yield break;
 
-                CreateAndPlayAudio("cir.ogg", "Cassie", Vector3.zero, true, null, false, 999999999f, 0f);
+        schematicObject.Position = new Vector3(-90f, 500f, -45f);
+        schematicObject.Rotation = Quaternion.Euler(new Vector3(0, 0, 55));
+        Timing.RunCoroutine(NukeDownCoroutine(schematicObject));
 
-                SchematicObject schematicObject;
-                try
-                {
-                    schematicObject = ObjectSpawner.SpawnSchematic("Nuke", Vector3.zero);
-                }
-                catch (Exception)
-                {
-                    schematicObject = null;
-                    return;
-                }
+        foreach (var room in Room.List)
+        {
+            room.AreLightsOff = false;
+            room.Color = new Color32(255, 0, 0, 255);
+        }
 
-                Timing.CallDelayed(0.5f, () =>
-                {
-                    if (schematicObject == null) return;
+        foreach (var door in Door.List)
+        {
+            if (door.Type is DoorType.ElevatorGateA or DoorType.ElevatorGateB
+                          or DoorType.ElevatorLczA  or DoorType.ElevatorLczB
+                          or DoorType.ElevatorNuke  or DoorType.ElevatorScp049
+                          or DoorType.ElevatorServerRoom)
+                continue;
 
-                    schematicObject.Position = new Vector3(-90f, 500f, -45f);
-                    schematicObject.Rotation = Quaternion.Euler(new Vector3(0, 0, 55));
-                    Timing.RunCoroutine(NukeDownCoroutine(schematicObject));
-                });
+            door.IsOpen = true;
+            door.Lock(DoorLockType.Warhead);
+        }
 
-                foreach (Room room in Room.List)
-                {
-                    room.AreLightsOff = false;
-                    room.Color = new Color32(255, 0, 0, 255);
-                }
+        EscapeHandler.AddEscapeOverride(p => new EscapeHandler.EscapeTargetRole { Vanilla = RoleTypeId.Spectator });
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "This is O5 Message from the Site 1, For All personnel, Please escape from the facility .",
+            "[Site-01, O5からの通信]全職員へ通達：救助部隊を派遣しました。直ちに<color=green>脱出口</color>から<color=yellow>脱出</color>してください。");
 
-                foreach (Door door in Door.List)
-                {
-                    if (door.Type != DoorType.ElevatorGateA &&
-                        door.Type != DoorType.ElevatorGateB &&
-                        door.Type != DoorType.ElevatorLczA &&
-                        door.Type != DoorType.ElevatorLczB &&
-                        door.Type != DoorType.ElevatorNuke &&
-                        door.Type != DoorType.ElevatorScp049 &&
-                        door.Type != DoorType.ElevatorServerRoom)
-                    {
-                        door.IsOpen = true;
-                        door.Lock(DoorLockType.Warhead);
-                    }
-                }
-                
-                EscapeHandler.AddEscapeOverride(p => new EscapeHandler.EscapeTargetRole { Vanilla = RoleTypeId.Spectator });
-                Exiled.API.Features.Cassie.MessageTranslated("This is O5 Message from the Site 1, For All personnel, Please escape from the facility .","[Site-01, O5からの通信]全職員へ通達：救助部隊を派遣しました。直ちに<color=green>脱出口</color>から<color=yellow>脱出</color>してください。");
+        yield return Timing.WaitForSeconds(145f);
+        if (CancelIfOutdated()) yield break;
 
-                Timing.CallDelayed(145f, () =>
-                {
-                    if (CancelIfOutdated()) return;
+        foreach (var player in Player.List)
+        {
+            if (player == null || !player.IsAlive) continue;
 
-                    foreach (Player player in Player.List)
-                    {
-                        if (player == null || !player.IsAlive) continue;
-
-                        player.ExplodeEffect(ProjectileType.FragGrenade);
-
-                        if (player.Zone == ZoneType.Surface)
-                            player.Kill("SURFACE ATTACK PROTOCOL に爆破された");
-                        else
-                            player.Kill("ALPHA WARHEADに爆破された");
-                    }
-                });
-            });
-        });
+            player.ExplodeEffect(ProjectileType.FragGrenade);
+            player.Kill(player.Zone == ZoneType.Surface
+                ? "SURFACE ATTACK PROTOCOL に爆破された"
+                : "ALPHA WARHEADに爆破された");
+        }
     }
 
     // ===== 失敗時（財団勝利） =====
@@ -264,9 +224,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
     // ===== Tesla 無効化 =====
     private void DisableTesla(TriggeringTeslaEventArgs ev)
     {
-        if (CancelIfOutdated())
-            return;
-
+        if (CancelIfOutdated()) return;
         ev.DisableTesla = _teslaDisabled;
     }
 
@@ -287,14 +245,12 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
         while (elapsedTime < totalDuration)
         {
-            // イベントが古くなった / ラウンド終了したら即終了
             if (CancelIfOutdated() || Round.IsLobby || Round.IsEnded)
             {
                 Log.Info("[CI Raid] NukeDown stopped: event outdated or round ended.");
                 yield break;
             }
 
-            // Schematic が途中で消えた場合も即終了
             if (schem == null || schem.transform == null)
             {
                 Log.Warn("[CI Raid] NukeDown stopped: schem destroyed.");
@@ -302,8 +258,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
             }
 
             elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / totalDuration;
-            schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
+            schem.transform.position = Vector3.Lerp(startPos, endPos, elapsedTime / totalDuration);
 
             yield return 0f;
         }

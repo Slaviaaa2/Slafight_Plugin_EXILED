@@ -1,32 +1,34 @@
 using System.Collections.Generic;
+using CustomPlayerEffects;
 using Exiled.API.Features;
+using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Mirror;
-using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
-public class AntiMemeGoggle : CustomGoggles
+[CustomItem(ItemType.Coin)]
+public class CloakGenerator : CustomItem
 {
-    public override uint Id { get; set; } = 2026;
-    public override string Name { get; set; } = "反ミームゴーグル";
-    public override string Description { get; set; } = "反ミーム的影響を遮断する財団の最新兵器。\n<color=red>SCP-3005への攻撃が通じるようになる</color>";
+    public override uint Id { get; set; } = 2038;
+    public override string Name { get; set; } = "外套ジェネレータ";
+    public override string Description { get; set; } = "ほわいとすーつのやつ";
     public override float Weight { get; set; } = 1f;
-    public override bool CanBeRemoveSafely { get; set; } = true;
-    public override bool Remove1344Effect { get; set; } = true;
+    public override ItemType Type { get; set; } = ItemType.SCP268;
 
-    public Color glowColor = Color.green;
+    public Color glowColor = Color.white;
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
 
     public override SpawnProperties SpawnProperties { get; set; } = new();
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting += OnHurting;
+        Exiled.Events.Handlers.Player.UsingItemCompleted += OnWearing;
+        
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         base.SubscribeEvents();
@@ -34,20 +36,24 @@ public class AntiMemeGoggle : CustomGoggles
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.Hurting -= OnHurting;
+        Exiled.Events.Handlers.Player.UsingItemCompleted -= OnWearing;
+        
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
     }
 
-    private void OnHurting(HurtingEventArgs ev)
+    private void OnWearing(UsingItemCompletedEventArgs ev)
     {
-        if (ev.Attacker.HasCustomItem(this))
+        if (!Check(ev.Item) || ev.Player == null) return;
+        ev.IsAllowed = false;
+        if (ev.Player.IsEffectActive<Invisible>())
         {
-            if (ev.Player.IsFifthist())
-            {
-                ev.Amount *= 1.1f;
-            }
+            ev.Player.DisableEffect<Invisible>();
+        }
+        else
+        {
+            ev.Player.EnableEffect<Invisible>();
         }
     }
     

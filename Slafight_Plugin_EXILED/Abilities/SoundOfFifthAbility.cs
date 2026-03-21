@@ -1,20 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Hazards;
-using Exiled.Events.EventArgs.Player;
-using Hazards;
-using MEC;
-using Mirror;
-using PlayerRoles;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using UserSettings.ServerSpecific;
 
 namespace Slafight_Plugin_EXILED.Abilities;
 

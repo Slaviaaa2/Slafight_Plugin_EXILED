@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Items;
 using JetBrains.Annotations;
 using MEC;
 using PlayerRoles;

@@ -15,7 +15,6 @@ using ProjectMER.Events.Arguments;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Commands.DevTools;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
@@ -215,7 +214,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     public void GetSchems(SchematicSpawnedEventArgs ev)
     {
-        if (ev?.Schematic == null)
+        if (ev.Schematic == null)
             return;
 
         var schematic = ev.Schematic;

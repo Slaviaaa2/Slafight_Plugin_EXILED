@@ -1,5 +1,6 @@
 using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Scp914;
+using MEC;
 using PlayerRoles;
 using Scp914;
 using Slafight_Plugin_EXILED.Extensions;
@@ -30,19 +31,25 @@ public class Scp914Changes
             if (_value == 0)
             {
                 ev.Player?.Role.Set(RoleTypeId.Scp0492,RoleSpawnFlags.None);
-                ev.Player?.EnableEffect(EffectType.Scp207, 4);
-                ev.Player?.UniqueRole = "Zombified";
-                ev.Player?.SetCustomInfo("<color=#C50000>Zombified Subject</color>");
-                ev.Player?.SetScale(new Vector3((UnityEngine.Random.Range(0.01f, 1.08f)), (UnityEngine.Random.Range(0.01f, 1.08f)), (UnityEngine.Random.Range(0.01f, 1.08f))));
-                if (!Handler.CanUsePlayers.Contains(ev.Player))
+                Timing.CallDelayed(1f, () =>
                 {
-                    Handler.CanUsePlayers.Add(ev.Player);
-                }
-                if (!Handler.ActivatedPlayers.Contains(ev.Player))
-                {
-                    Handler.ActivatedPlayers.Add(ev.Player);
-                }
-                ev.Player?.ShowHint("<size=24>体が魔改造されていく・・・！</size>");
+                    ev.Player?.EnableEffect(EffectType.Scp207, 4);
+                    ev.Player?.UniqueRole = "Zombified";
+                    ev.Player?.SetCustomInfo("<color=#C50000>Zombified Subject</color>");
+                    ev.Player?.SetScale(new Vector3((UnityEngine.Random.Range(0.01f, 1.08f)),
+                        (UnityEngine.Random.Range(0.01f, 1.08f)), (UnityEngine.Random.Range(0.01f, 1.08f))));
+                    if (!Handler.CanUsePlayers.Contains(ev.Player))
+                    {
+                        Handler.CanUsePlayers.Add(ev.Player);
+                    }
+
+                    if (!Handler.ActivatedPlayers.Contains(ev.Player))
+                    {
+                        Handler.ActivatedPlayers.Add(ev.Player);
+                    }
+
+                    ev.Player?.ShowHint("<size=24>体が魔改造されていく・・・！</size>");
+                });
             }
         }
     }

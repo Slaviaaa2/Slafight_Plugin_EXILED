@@ -3,7 +3,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
-using ProjectMER.Features.Serializable;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.Extensions;

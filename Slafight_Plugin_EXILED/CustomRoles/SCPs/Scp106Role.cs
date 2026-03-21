@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Hazards;
-using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Player;
-using Exiled.Events.EventArgs.Scp106;
-using HintServiceMeow.Core.Utilities;
 using MEC;
 using Mirror;
 using PlayerRoles;

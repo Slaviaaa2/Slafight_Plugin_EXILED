@@ -17,18 +17,6 @@ public class ChaosCommando : CRole
     protected override CTeam Team { get; set; }  = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "CI_Commando";
 
-    public override void RegisterEvents()
-    {
-        Exiled.Events.Handlers.Player.Dying += OnDying;
-        base.RegisterEvents();
-    }
-
-    public override void UnregisterEvents()
-    {
-        Exiled.Events.Handlers.Player.Dying -= OnDying;
-        base.UnregisterEvents();
-    }
-
     public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
@@ -55,9 +43,9 @@ public class ChaosCommando : CRole
         });
     }
 
-    private void OnDying(DyingEventArgs ev)
+    protected override void OnDying(DyingEventArgs ev)
     {
-        if (ev.Player.GetCustomRole() != CRoleTypeId.ChaosCommando) return;
         Projectile.CreateAndSpawn(ProjectileType.FragGrenade,ev.Player.Position + Vector3.up * 0.5f);
+        base.OnDying(ev);
     }
 }

@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.Events.EventArgs.Player;
 using LightContainmentZoneDecontamination;
 using MEC;
-using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;

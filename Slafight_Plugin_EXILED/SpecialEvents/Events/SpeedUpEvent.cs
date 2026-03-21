@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features; // SpecialEvent 基底クラス
-using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 

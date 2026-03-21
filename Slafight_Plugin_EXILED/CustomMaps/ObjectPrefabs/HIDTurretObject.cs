@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using InventorySystem.Items.MicroHID;
 using MEC;
 using NetworkManagerUtils.Dummies;
 using PlayerRoles;

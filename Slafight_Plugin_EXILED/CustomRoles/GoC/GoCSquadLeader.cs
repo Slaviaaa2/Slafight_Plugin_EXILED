@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
@@ -37,9 +39,23 @@ public class GoCSquadLeader : CRole
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("Global Occult Collision: Broken Dagger Squad Leader");
+        Timing.RunCoroutine(Coroutine(player));
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=24><color=#0000c8>GoC: Broken Dagger 班長</color>\n",10f);
+            player.ShowHint("<size=24><color=#0000c8>GoC: Broken Dagger 班長</color>\n部隊を指揮し、任務を遂行させる。\nPassive: VERITAS\n遠くにいる敵等を認識できる",10f);
         });
+    }
+    
+    private IEnumerator<float> Coroutine(Player player)
+    {
+        while (true)
+        {
+            if (!Check(player)) yield break;
+            if (!player.IsEffectActive<Scp1344>())
+            {
+                player.EnableEffect(EffectType.Scp1344, 1);
+            }
+            yield return Timing.WaitForSeconds(3f);
+        }
     }
 }

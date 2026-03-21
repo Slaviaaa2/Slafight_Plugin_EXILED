@@ -1,6 +1,6 @@
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Player;
-using UserSettings.ServerSpecific;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.ProximityChat;
 
@@ -17,7 +17,7 @@ public class ActivateHandler
         {
             if (Handler.ActivatedPlayers.Contains(player))
             {
-                if (player.UniqueRole != "Zombified")
+                if (player.GetCustomRole() != CRoleTypeId.Zombified)
                 {
                     Handler.ActivatedPlayers.Remove(player);
                     player.ShowHint("近接チャットが<color=red>無効化</color>されました", 5f);

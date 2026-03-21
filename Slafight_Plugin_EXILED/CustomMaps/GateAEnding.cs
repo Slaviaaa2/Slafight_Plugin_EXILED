@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminToys;
-using CentralAuth;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using MEC;
-using Mirror;
 using NetworkManagerUtils.Dummies;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;

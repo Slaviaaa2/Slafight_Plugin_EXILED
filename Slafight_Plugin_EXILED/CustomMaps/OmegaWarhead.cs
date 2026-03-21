@@ -5,6 +5,8 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using MEC;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -41,6 +43,7 @@ public static class OmegaWarhead
 
     public static void StartProtocol(float triggerTime = 0f, Player startedBy = null)
     {
+        Log.Debug("[OMEGA WARHEAD]Called Start Protocol.");
         if (IsWarheadStarted) return;
         if (Warhead.IsInProgress) Warhead.Stop();
         Plugin.Singleton.EventHandler.DeadmanDisable = true;
@@ -86,9 +89,11 @@ public static class OmegaWarhead
         }
 
         Exiled.API.Features.Cassie.MessageTranslated(
-            $"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds.",
-            $"O5評議会の指令に基づいた操作により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。",
+            $"By Order of O5 Command . Omega Warhead Sequence Activated . All Facility Detonated in T MINUS {Plugin.Singleton.Config.OwBoomTime} Seconds. Please evacuate to outside immediately .",
+            $"O5評議会の指令に基づいた操作により、<color=blue>OMEGA WARHEAD</color>シーケンスが開始されました。施設の全てを{Plugin.Singleton.Config.OwBoomTime}秒後に爆破します。<split>直ちに施設外に避難してください。",
             true);
+        
+        EscapeHandler.AddEscapeOverride(p => new EscapeHandler.EscapeTargetRole { Vanilla = RoleTypeId.Spectator });
 
         CreateAndPlayAudio("omega_v2.ogg", "OmegaWarhead", Vector3.zero, true, null, false, 999999999, 0);
 

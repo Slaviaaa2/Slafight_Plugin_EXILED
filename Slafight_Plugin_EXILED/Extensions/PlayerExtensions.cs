@@ -1,8 +1,5 @@
 using System.Linq;
-using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
@@ -311,6 +308,9 @@ public static class PlayerExtensions
                 break;
             case CRoleTypeId.GoCOperative:
                 new GoCOperative().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.GoCHoundDog:
+                new GoCHoundDog().SpawnRole(player, roleSpawnFlags);
                 break;
         }
     }

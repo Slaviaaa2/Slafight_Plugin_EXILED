@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Warhead;
-using MapGeneration;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;
@@ -26,7 +23,6 @@ using Player = Exiled.API.Features.Player;
 using PlayerHandler = Exiled.Events.Handlers.Player;
 using Room = Exiled.API.Features.Room;
 using ServerHandler = Exiled.Events.Handlers.Server;
-using Warhead = Exiled.API.Features.Warhead;
 using WarheadHandler = Exiled.Events.Handlers.Warhead;
 using MapHandler = Exiled.Events.Handlers.Map;
 
@@ -196,7 +192,7 @@ public class EventHandler
 
     private void SetupSpawnPoints(SchematicSpawnedEventArgs ev)
     {
-        if (ev?.Schematic == null)
+        if (ev.Schematic == null)
             return;
 
         var schematic = ev.Schematic;
@@ -346,11 +342,9 @@ public class EventHandler
     private void DeconCancell(DecontaminatingEventArgs ev)
     {
         if (ev == null) return;
-        if (DeconCancellFlag)
-        {
-            ev.IsAllowed = false;
-            Log.Debug("Decon Cancell called.");
-        }
+        if (!DeconCancellFlag) return;
+        ev.IsAllowed = false;
+        Log.Debug("Decon Cancell called.");
     }
 
     /// <summary>
@@ -377,7 +371,7 @@ public class EventHandler
             );
 
             DebugModeHandler.UpdateDoor(ev.Player, info);
-            Log.Debug($"[DoorGet] {ev.Player.Nickname} door={ev.Door.Type} room={room.Type}");
+            // Log.Debug($"[DoorGet] {ev.Player.Nickname} door={ev.Door.Type} room={room.Type}");
         }
         else
         {
@@ -396,7 +390,7 @@ public class EventHandler
         if (ev?.Player == null || ev.Item == null) return;
         if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
         {
-            if (ev.Item.Type == ItemType.SCP500 && !ev.Item.IsCustomItem(out _))
+            if (ev.Item.Type == ItemType.SCP500 && !ev.Item.TryGetCustomItem(out _))
             {
                 if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.Scp207Level4))
                 {

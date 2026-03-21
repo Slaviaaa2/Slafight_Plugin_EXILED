@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using Exiled.API.Features;
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.CustomRoles;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 

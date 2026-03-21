@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
@@ -8,7 +7,6 @@ using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Warhead;
-using HintServiceMeow.Core.Enum;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;

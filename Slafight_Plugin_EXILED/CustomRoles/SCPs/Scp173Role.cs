@@ -1,21 +1,12 @@
-using System;
-using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Hazards;
-using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Player;
-using Exiled.Events.EventArgs.Scp106;
 using Exiled.Events.EventArgs.Scp173;
-using HintServiceMeow.Core.Utilities;
 using MEC;
-using Mirror;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
-using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;

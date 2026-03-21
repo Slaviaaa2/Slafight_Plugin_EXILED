@@ -7,22 +7,23 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Mirror;
+using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using Light = Exiled.API.Features.Toys.Light;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
-public class NvgNormal : CustomGoggles
+public class Veritas : CustomGoggles
 {
-    public override uint Id { get; set; } = 2033;
-    public override string Name { get; set; } = "ナイトビジョンゴーグル";
+    public override uint Id { get; set; } = 2037;
+    public override string Name { get; set; } = "VERITAS";
     public override string Description { get; set; } =
-        "遠くや暗い場所まで見えるようになる暗視ゴーグル。電池を消費する。";
+        "hogehoge";
     public override float Weight { get; set; } = 1f;
     public override bool CanBeRemoveSafely { get; set; } = true;
-    public override bool Remove1344Effect { get; set; } = true;
+    public override bool Remove1344Effect { get; set; } = false;
 
-    private readonly Color glowColor = Color.green;
+    private readonly Color glowColor = CustomColor.NinetailedBlue.ToUnityColor();
     private readonly Dictionary<Pickup, Light> _activeLights = new();
     public override SpawnProperties SpawnProperties { get; set; } = new SpawnProperties();
 
@@ -38,22 +39,6 @@ public class NvgNormal : CustomGoggles
         Exiled.Events.Handlers.Map.PickupAdded     -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
-    }
-
-    protected override void OnWornGoggles(Player player, Scp1344 goggles)
-    {
-        if (player == null) return;
-        Log.Debug($"[NVG_Normal] OnWornGoggles: {player.Nickname} serial={goggles.Serial}");
-        NvgManager.StartNvg(player, goggles.Serial);
-        base.OnWornGoggles(player, goggles);
-    }
-
-    protected override void OnRemovedGoggles(Player player, Scp1344 goggles)
-    {
-        if (player == null) return;
-        Log.Debug($"[NVG_Normal] OnRemovedGoggles: {player.Nickname} serial={goggles.Serial}");
-        NvgManager.StopNvg(player, goggles.Serial);
-        base.OnRemovedGoggles(player, goggles);
     }
 
     private void RemoveGlow(PickupDestroyedEventArgs ev)

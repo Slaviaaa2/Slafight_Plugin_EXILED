@@ -1,5 +1,4 @@
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.MainHandlers;
 
 namespace Slafight_Plugin_EXILED.API.Features.SpawnSystemDictionaries.Contexts;
 
@@ -21,8 +20,8 @@ public static class FacilityTerminationContexts
             // FoundationEnemyWaveWeights
             new() 
             { 
-                { SpawnTypeId.GOI_ChaosNormal, 40 },
-                { SpawnTypeId.GOI_GoCNormal,   60 },
+                { SpawnTypeId.GOI_ChaosNormal, 30 },
+                { SpawnTypeId.GOI_GoCNormal,   70 },
             },
             // FoundationStaffMiniWaveWeights
             new()
@@ -32,8 +31,8 @@ public static class FacilityTerminationContexts
             // FoundationEnemyMiniWaveWeights
             new()
             {
-                { SpawnTypeId.GOI_ChaosBackup, 40 },
-                { SpawnTypeId.GOI_GoCBackup,   60 },
+                { SpawnTypeId.GOI_ChaosBackup, 30 },
+                { SpawnTypeId.GOI_GoCBackup,   70 },
             },
             lastOpPack,
             gocPack,

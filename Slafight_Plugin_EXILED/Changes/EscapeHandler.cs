@@ -10,7 +10,6 @@ using ProjectMER.Events.Arguments;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using Exiled.Events.Handlers;
 using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.Changes;
@@ -80,7 +79,7 @@ public class EscapeHandler
 
     public void SetEscapePoint(SchematicSpawnedEventArgs ev)
     {
-        if (ev?.Schematic == null)
+        if (ev.Schematic == null)
             return;
 
         var schematic = ev.Schematic;

@@ -1,10 +1,10 @@
 using System;
-using System.Linq;
 using CommandSystem;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using Slafight_Plugin_EXILED.Extensions; // Assuming this has PrefabHelper if custom, or use standard if not
+
+// Assuming this has PrefabHelper if custom, or use standard if not
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 

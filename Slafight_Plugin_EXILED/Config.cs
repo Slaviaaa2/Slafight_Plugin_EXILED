@@ -1,9 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using Exiled.API.Interfaces;
-using Slafight_Plugin_EXILED.CustomItems;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 
 namespace Slafight_Plugin_EXILED;
 

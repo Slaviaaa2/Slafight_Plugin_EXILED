@@ -1,30 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using CustomPlayerEffects;
-using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.CustomStats;
-using Exiled.API.Features.DamageHandlers;
-using Exiled.API.Features.Items;
-using Exiled.API.Features.Roles;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Server;
-using InventorySystem;
-using InventorySystem.Items.Firearms.Modules.Scp127;
 using MEC;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.HumeShield;
-using PlayerStatsSystem;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomRoles.SCPs;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using DamageHandlerBase = Exiled.API.Features.DamageHandlers.DamageHandlerBase;
-using Light = Exiled.API.Features.Toys.Light;
-using Object = UnityEngine.Object;
 
 namespace Slafight_Plugin_EXILED.CustomRoles;
 

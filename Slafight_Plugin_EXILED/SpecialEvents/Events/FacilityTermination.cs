@@ -2,19 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using Exiled.Events.EventArgs.Map;
-using LightContainmentZoneDecontamination;
 using MEC;
 using PlayerRoles;
-using PlayerStatsSystem;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.Extensions;
-using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -42,10 +36,11 @@ public class FacilityTermination : SpecialEvent
         EventHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         EventHandler.DeadmanDisable = true;
+        EventHandler.DeconCancellFlag = true;
 
         if (KillEvent()) return;
 
-        RegisterCustomSpawnTable();
+        // ↓ これだけでOK。Bootstrap で登録済み
         SpawnContextRegistry.SetActive("FacilityTerminationCustom");
 
         Timing.KillCoroutines(_mainCoroutine);
@@ -167,14 +162,15 @@ public class FacilityTermination : SpecialEvent
         yield return Timing.WaitForSeconds(25f);
         if (KillEvent()) yield break;
         CassieHelper.AnnounceLastOperationArrival();
+        SpawnSystem.ReplaceNextSpawn(SpawnTypeId.GOI_GoCNormal);
 
-        yield return Timing.WaitForSeconds(555f);
+        yield return Timing.WaitForSeconds(1320f);
         Exiled.API.Features.Cassie.MessageTranslated(
-            "Attention, All personnel. Were decided Decontamination of the Facility. Please Evacuate to the Light Containment Zone for Delta Protocol.",
-            "全職員に通達。施設全体の<color=yellow>終了</color>が決定された為、これより地上～重度収容区画の<color=red>ロックダウン</color>及び<color=green>除染プロセス</color>を開始します。全職員は軽度収容区画に避難し、<color=green><b>DELTAプロトコル</b></color>を待機してください。");
-        yield return Timing.WaitForSeconds(20f);
+            "Attention, All personnel. Were decided Decontamination of the Facility. Please Evacuate to the Surface for Delta Protocol.",
+            "全職員に通達。施設全体の<color=yellow>終了</color>が決定された為、これより軽度収容区画～エントランス区画の<color=red>ロックダウン</color>及び<color=green>除染プロセス</color>を開始します。全職員は地上に避難し、<color=green><b>DELTAプロトコル</b></color>を待機してください。");
+        yield return Timing.WaitForSeconds(12.5f);
         if (KillEvent()) yield break;
-        SpawnSystem.Disable = true;
+        // SpawnSystem.Disable = true;
 
         // ここから避難フェーズ開始：全エレベーター＋LCZチェックポイント開放
         SetElevatorLockByZone(ZoneType.Surface, false);
@@ -197,42 +193,28 @@ public class FacilityTermination : SpecialEvent
 
         CreateAndPlayAudio("newdelta.ogg", "DeltaWarhead", Vector3.zero, true, null, false, 999999999f, 0f);
 
-        // ----- Surface -----
+        // ----- Lcz -----
         yield return Timing.WaitForSeconds(10f);
         if (KillEvent()) yield break;
         Exiled.API.Features.Cassie.MessageTranslated(
-            "Surface Zone Lockdown and Decontamination in T minus 80 Seconds.",
-            "地上区画のロックダウン及び除染まで残り: 80秒", false, false);
+            "Light Containment Zone Lockdown and Decontamination in T minus 80 Seconds.",
+            "軽度収容区画のロックダウン及び除染まで残り: 80秒", false, false);
 
         yield return Timing.WaitForSeconds(75f);
         if (KillEvent()) yield break;
 
-        LockdownAndDecon(ZoneType.Surface);
-        SetElevatorLockByZone(ZoneType.Surface, true);
+        LockdownAndDecon(ZoneType.LightContainment);
+        SetElevatorLockByZone(ZoneType.LightContainment, true);
         Exiled.API.Features.Cassie.MessageTranslated(
-            "Surface Zone is now Lockdowned and Started Decontamination Process.",
-            "地上区画がロックダウンされ、除染が開始されました。", false, false);
+            "Light Containment Zone is now Lockdowned and Started Decontamination Process.",
+            "軽度収容区画がロックダウンされ、除染が開始されました。", false, false);
 
-        // ----- Entrance -----
+        // ----- Hcz -----
         Exiled.API.Features.Cassie.MessageTranslated(
-            "Entrance Zone Lockdown and Decontamination in T minus 40 Seconds.",
-            "上層区画のロックダウン及び除染まで残り: 40秒", false, false);
+            "Heavy Containment Zone Lockdown and Decontamination in T minus 40 Seconds.",
+            "重度収容区画のロックダウン及び除染まで残り: 40秒", false, false);
 
         yield return Timing.WaitForSeconds(35f);
-        if (KillEvent()) yield break;
-
-        LockdownAndDecon(ZoneType.Entrance);
-        SetElevatorLockByZone(ZoneType.Entrance, true);
-        Exiled.API.Features.Cassie.MessageTranslated(
-            "Entrance Zone is now Lockdowned and Started Decontamination Process.",
-            "上層区画がロックダウンされ、除染が開始されました。", false, false);
-
-        // ----- Heavy Containment -----
-        Exiled.API.Features.Cassie.MessageTranslated(
-            "Heavy Containment Zone Lockdown and Decontamination in T minus 20 Seconds.",
-            "重度収容区画のロックダウン及び除染まで残り: 20秒", false, false);
-
-        yield return Timing.WaitForSeconds(15f);
         if (KillEvent()) yield break;
 
         LockdownAndDecon(ZoneType.HeavyContainment);
@@ -241,13 +223,27 @@ public class FacilityTermination : SpecialEvent
             "Heavy Containment Zone is now Lockdowned and Started Decontamination Process.",
             "重度収容区画がロックダウンされ、除染が開始されました。", false, false);
 
+        // ----- Entrance -----
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "Entrance Zone Lockdown and Decontamination in T minus 20 Seconds.",
+            "エントランス区画のロックダウン及び除染まで残り: 20秒", false, false);
+
+        yield return Timing.WaitForSeconds(15f);
+        if (KillEvent()) yield break;
+
+        LockdownAndDecon(ZoneType.Entrance);
+        SetElevatorLockByZone(ZoneType.Entrance, true);
+        Exiled.API.Features.Cassie.MessageTranslated(
+            "Entrance Zone is now Lockdowned and Started Decontamination Process.",
+            "エントランス区画がロックダウンされ、除染が開始されました。", false, false);
+
         // ----- DELTA PROTOCOL: LCZ爆破 -----
         Exiled.API.Features.Cassie.MessageTranslated(
-            "Attention, All personnel. Delta Protocol is started in Light Containment Zone and Detonate in T minus 100 seconds. Please Effect by Delta Protocol Warhead. See you human.",
-            "全職員に通達。<color=green><b>DELTAプロトコル</b></color>が軽度収容区画にて開始されました。100秒後に爆破される、<b><color=green>DELTA PROTOCOL</color> <color=red>\"WARHEAD\"</color></b>の影響を受け、人間性を<color=yellow>終了</color>してください。");
+            "Attention, All personnel. Delta Protocol is started in Surface and Detonate in T minus 100 seconds. Please Effect by Delta Protocol Warhead. See you human.",
+            "全職員に通達。<color=green><b>DELTAプロトコル</b></color>が地上にて開始されました。<split>100秒後に爆破される、<b><color=green>DELTA PROTOCOL</color> <color=red>\"WARHEAD\"</color></b>の影響を受け、人間性を<color=yellow>終了</color>してください。");
 
         // ここでLCZエレベーター＋LCZチェックポイントもロック
-        SetElevatorLockByZone(ZoneType.LightContainment, true);
+        SetElevatorLockByZone(ZoneType.Surface, true);
         SetCheckpointLock(true);
 
         yield return Timing.WaitForSeconds(130f);
@@ -272,52 +268,6 @@ public class FacilityTermination : SpecialEvent
         Player.List.Where(p => p.Zone == zone && p.IsAlive)
             .ToList()
             .ForEach(p => p.EnableEffect(EffectType.Decontaminating));
-    }
-
-    private void RegisterCustomSpawnTable()
-    {
-        UnitPackRegistry.TryGet("FT_LastOperation", out var lastOpPack);
-        UnitPackRegistry.TryGet("FT_GoC",          out var gocPack);
-        UnitPackRegistry.TryGet("FT_Chaos",        out var chaosPack);
-
-        var ctx = new SpawnContext(
-            "FacilityTerminationCustom",
-            // FoundationStaffWaveWeights
-            new() 
-            { 
-                { SpawnTypeId.MTF_LastOperationNormal, 100 },
-                { SpawnTypeId.MTF_HDNormal, 0 },
-                { SpawnTypeId.MTF_NtfNormal, 0 }
-            },
-            // FoundationEnemyWaveWeights
-            new() 
-            { 
-                { SpawnTypeId.GOI_ChaosNormal, 40 },
-                { SpawnTypeId.GOI_GoCNormal,   60 },
-                { SpawnTypeId.GOI_FifthistNormal, 0 }
-            },
-            // FoundationStaffMiniWaveWeights
-            new()
-            {
-                { SpawnTypeId.MTF_LastOperationBackup, 100 },
-                { SpawnTypeId.MTF_HDBackup, 0 },
-                { SpawnTypeId.MTF_NtfBackup, 0 }
-            },
-            // FoundationEnemyMiniWaveWeights
-            new()
-            {
-                { SpawnTypeId.GOI_ChaosBackup, 40 },
-                { SpawnTypeId.GOI_GoCBackup,   60 },
-                { SpawnTypeId.GOI_FifthistBackup, 0 }
-            },
-            // 使用する UnitPack 群
-            lastOpPack,
-            gocPack,
-            chaosPack
-        );
-
-        SpawnContextRegistry.Register(ctx);
-        Log.Debug("[FacilityTermination] Custom spawn context registered - Chaos/GoC/LastOp only");
     }
         
     private IEnumerator<float> HumanitistsCoroutine()
@@ -347,23 +297,5 @@ public class FacilityTermination : SpecialEvent
 
             yield return Timing.WaitForSeconds(1f);
         }
-    }
-
-    private void CancelDeconAnnounce(AnnouncingDecontaminationEventArgs ev)
-    {
-        if (KillEvent()) return;
-        Timing.CallDelayed(0.05f, Exiled.API.Features.Cassie.Clear);
-    }
-
-    public override void RegisterEvents()
-    {
-        Exiled.Events.Handlers.Map.AnnouncingDecontamination += CancelDeconAnnounce;
-        base.RegisterEvents();
-    }
-
-    public override void UnregisterEvents()
-    {
-        Exiled.Events.Handlers.Map.AnnouncingDecontamination -= CancelDeconAnnounce;
-        base.UnregisterEvents();
     }
 }

@@ -1,23 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Hazards;
-using Exiled.API.Features.Roles;
-using Exiled.Events.EventArgs.Player;
-using Hazards;
-using MEC;
-using Mirror;
 using PlayerRoles;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using UserSettings.ServerSpecific;
-using Object = System.Object;
 using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.Abilities;
@@ -46,6 +35,7 @@ public class TeleportRandomAbility : AbilityBase
             RoomType.Lcz173,
             RoomType.LczClassDSpawn,
             RoomType.Surface,
+            RoomType.EzCollapsedTunnel,
             RoomType.Lcz330,
             RoomType.LczArmory,
             RoomType.HczArmory,

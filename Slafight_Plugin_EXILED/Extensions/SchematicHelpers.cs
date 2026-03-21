@@ -12,7 +12,7 @@ public static class SchematicHelpers
     {
         position = default;
 
-        if (ev?.Schematic == null || ev.Schematic.gameObject == null)
+        if (ev.Schematic == null || ev.Schematic.gameObject == null)
             return false;
 
         try
@@ -30,7 +30,7 @@ public static class SchematicHelpers
 
     public static void DestroySafe(this SchematicSpawnedEventArgs ev, float delay = 0f)
     {
-        if (ev?.Schematic == null || ev.Schematic.gameObject == null)
+        if (ev.Schematic == null || ev.Schematic.gameObject == null)
             return;
 
         if (delay <= 0f)

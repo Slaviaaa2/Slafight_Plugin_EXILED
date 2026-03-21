@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.MainHandlers;
-using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
 

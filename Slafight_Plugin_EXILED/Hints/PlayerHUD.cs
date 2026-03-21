@@ -6,7 +6,6 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using HintServiceMeow.Core.Enum;
 using HintServiceMeow.Core.Utilities;
-using HintServiceMeow.UI.Utilities;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
@@ -1069,9 +1068,9 @@ public class PlayerHUD
         sb.AppendLine(
             $"<color=#aaaaaa>Elapsed:</color> {Round.ElapsedTime:mm\\:ss}  " +
             $"<color=#aaaaaa>UptimeRounds:</color> {Round.UptimeRounds}  " +
-            $"<color=#aaaaaa>All Players:</color> {Player.List.Count()} " +
-            $"<color=#aaaaaa>Connected Players:</color> {Player.List.Where(p => !p.IsNPC).ToList().Count()} " +
-            $"<color=#aaaaaa>Npcs:</color> {Npc.List.Count()} "
+            $"<color=#aaaaaa>All Players:</color> {Player.List.Count} " +
+            $"<color=#aaaaaa>Connected Players:</color> {Player.List.Count(p => !p.IsNPC)} " +
+            $"<color=#aaaaaa>Npcs:</color> {Npc.List.Count} "
         );
 
         // ── 核弾頭タイマー情報 ───────────────────────────────────────

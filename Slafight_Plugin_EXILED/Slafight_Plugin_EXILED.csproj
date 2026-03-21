@@ -108,6 +108,9 @@
         <Reference Include="ProjectMER">
             <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\ProjectMER.dll</HintPath>
         </Reference>
+        <Reference Include="Slafight">
+          <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\Slafight.dll</HintPath>
+        </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
@@ -223,10 +226,12 @@
         <Compile Include="Commands\DevTools\SpawnBuiltInPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
+        <Compile Include="CustomItems\exiledApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileCafeteriaNeeds.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileScientist_Samuels.cs" />
+        <Compile Include="CustomItems\exiledApiItems\Veritas.cs" />
         <Compile Include="CustomItems\NvgManager.cs" />
         <Compile Include="CustomItems\CustomItemsManager.cs" />
         <Compile Include="CustomItems\exiledApiItems\AdvancedMedkit.cs" />
@@ -336,12 +341,12 @@
         <Compile Include="CustomRoles\SCPs\Scp173Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
+        <Compile Include="CustomRoles\SCPs\ZombifiedRole.cs" />
         <Compile Include="Extensions\AbilityResetUtil.cs" />
         <Compile Include="Extensions\CustomItemExtensions.cs" />
         <Compile Include="Extensions\NetworkVisibilityExtensions.cs" />
         <Compile Include="Extensions\OnlyChecker.cs" />
         <Compile Include="Extensions\PlayerAbilityExtensions.cs" />
-        <Compile Include="Extensions\PlayerCustomItemExtensions.cs" />
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
         <Compile Include="Extensions\RoomSpawner.cs" />

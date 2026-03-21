@@ -7,12 +7,10 @@ using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
-using MEC;
 using Mirror;
 using Scp914;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;

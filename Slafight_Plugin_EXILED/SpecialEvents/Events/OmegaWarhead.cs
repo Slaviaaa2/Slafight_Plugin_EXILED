@@ -5,7 +5,6 @@ using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomMaps; // SpecialEvent 基底クラス
-using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
@@ -41,7 +40,7 @@ public class OmegaWarheadEvent : SpecialEvent
             return;
 
         // 30 秒後に ALPHA WARHEAD 通知
-        Timing.CallDelayed(30f, () =>
+        Timing.CallDelayed(60f, () =>
         {
             if (CancelIfOutdated()) return;
 
@@ -55,7 +54,7 @@ public class OmegaWarheadEvent : SpecialEvent
             }
 
             // さらに 35 秒後、OMEGA WARHEAD ステータス変更＋プロトコル開始
-            Timing.CallDelayed(35f, () =>
+            Timing.CallDelayed(60f, () =>
             {
                 if (CancelIfOutdated()) return;
 
@@ -72,7 +71,7 @@ public class OmegaWarheadEvent : SpecialEvent
                     false);
 
                 // OMEGA プロトコル開始（CurrentEventPid をそのまま渡す）
-                OmegaWarhead.StartProtocol(555f);
+                OmegaWarhead.StartProtocol(900f);
             });
         });
     }

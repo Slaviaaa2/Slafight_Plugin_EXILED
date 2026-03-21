@@ -1,21 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
-using Exiled.API.Features.Doors;
-using Exiled.API.Features.Pickups;
-using LightContainmentZoneDecontamination;
-using MEC;
-using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
-using Random = UnityEngine.Random;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
 

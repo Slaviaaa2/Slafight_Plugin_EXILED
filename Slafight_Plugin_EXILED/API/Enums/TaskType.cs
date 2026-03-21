@@ -1,5 +1,3 @@
-using System;
-
 namespace Slafight_Plugin_EXILED.API.Enums;
 
 public enum TaskType

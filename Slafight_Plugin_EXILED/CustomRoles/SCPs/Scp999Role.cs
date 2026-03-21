@@ -1,7 +1,6 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;

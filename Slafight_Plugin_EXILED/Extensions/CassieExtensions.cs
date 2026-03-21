@@ -1,7 +1,6 @@
 using System;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
-using MEC;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 

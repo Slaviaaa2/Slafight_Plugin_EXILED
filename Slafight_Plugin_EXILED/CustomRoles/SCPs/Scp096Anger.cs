@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
@@ -134,7 +132,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         Log.Debug("Scp096Anger: TargetAdded Triggered");
         InTryNotToCryAnim[ev.Player] = true;
         ev.Player.EnableEffect(EffectType.Slowness, 95);
-        ev.Player.EnableEffect(EffectType.DamageReduction, 170);
+        ev.Player.EnableEffect(EffectType.DamageReduction, 90);
         CreateAndPlayAudio("096Angered.ogg", "Scp096", ev.Player.Position, true, null, false, 80f, 0f);
         Timing.CallDelayed(35f, () =>
         {
