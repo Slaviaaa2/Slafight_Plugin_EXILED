@@ -245,7 +245,7 @@ public abstract class CRole
             : CTeam.Others;
     }
 
-    protected bool Check([CanBeNull] Player player)
+    protected bool Check(Player? player)
     {
         if (player == null) return false;
         return GetRoleIdFromUnique(player.UniqueRole) == CRoleTypeId;
@@ -275,13 +275,11 @@ public abstract class CRole
         RoleSpecificTextProvider.Clear(ev.Player);
     }
 
-    public virtual void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public virtual void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
-        if (player == null)
-        {
-            Log.Error("CRole: SpawnRole failed. Reason: Player is null");
-            return;
-        }
+        if (player == null) return;
+        
+        player.ShowHint(string.Empty);
 
         if (roleSpawnFlags == RoleSpawnFlags.None)
         {

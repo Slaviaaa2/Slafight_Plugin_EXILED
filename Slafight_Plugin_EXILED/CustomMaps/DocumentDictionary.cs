@@ -1,0 +1,99 @@
+using System;
+
+namespace Slafight_Plugin_EXILED.CustomMaps;
+
+public static class DocumentDictionary
+{
+    public static string Get(DocumentType type)
+    {
+        switch (type)
+        {
+            case DocumentType.Scp033:
+                return "<size=15>事案012-5-033\n" +
+                       "20■■年■月■日" +
+                       "の定期調査にて、SCP-012がSCP-033と思われる力に侵食されてしまっていることが判明した。\n" +
+                       "以前までは何事も無かったのに、急激にマゼンタ色を発し始め\n" +
+                       "周囲にSCP-012影響ではなく、SCP-033影響を与えてしまっている。\n" +
+                       "実に由々しき事態だ。\n" +
+                       "これについて、私は本件についての大規模な調査及び対処を、強く求める。\n" +
+                       "- Dr. Redheart</size>";
+            case DocumentType.Scp096:
+                return "<size=14>事案096-777-A\n" +
+                       "20■■年■月■日、定期観察の過程で、■■■■■■■博士がSCP-096に対するセンサー監視を実施していました。\n" +
+                       "観察中、SCP-096は一切の予兆なく激しい激昂行動を開始し、施設全域で感知可能なレベルの悲鳴を発しました。\n" +
+                       "■■■博士は直ちに緊急アラームを作動させましたが、警備要員が現場に到着した時点で確認されたのは、多量の血痕のみでした。\n" +
+                       "SCP-096はその場でうずくまった姿勢を維持しており、当該姿勢は既知の激昂行動時のものと一致していました。\n" +
+                       "本事案は形式上は収束していますが、既知のトリガー事象が一切確認されていないにもかかわらずSCP-096が不安定化した可能性が高く、\n" +
+                       "現行の収容・観察プロトコルが抜本的な見直しを要する段階に来ていると判断せざるを得ません。\n" +
+                       "ついては、Site-02への■■■■■■■■システムの早急な導入を含む、SCP-096関連プロトコルの全面的な再評価および是正措置について、\n" +
+                       "本書をもって強く要請すると同時に、これ以上の対応遅延が重大な人的・情報的損失を招くおそれがあることを、ここに重ねて申し上げます。\n" +
+                       "- Dr. ■■■, Dr. Redheart</size>";
+            case DocumentType.Scp3005:
+                return "<size=15>SCP-3005のSite-02への移管について\n" +
+                       "以前から予定されていた通り、当Site-55■■では手に負えない程\n" +
+                       "SCP-3005の反ミーム性質が強まってきてしまっています。\n" +
+                       "その為、先日のO5評議会にてSite-02への移管が決定されました。\n" +
+                       "収容コンテナの輸送は20■■年5月5日に完了する予定です。よろしくお願します。\n" +
+                       "- Site-55■■ Facility Manager</size>";
+            case DocumentType.Backrooms:
+                return "<b><size=55>何故あなたはここにいる？</size></b>";
+            case DocumentType.Cafeteria:
+                return "<size=15><b>補充申請書</b>\n" +
+                       "申請者：エージェント・ストーン\n" +
+                       "申請日：████/█/█\n" +
+                       "品目\n" +
+                       "- コーヒー豆　5袋\n" +
+                       "- オーストリア産ヤギミルク　3ガロン\n" +
+                       "- コーヒーミル　1台\n" +
+                       "\n" +
+                       "<b>申請は受理されました</b>\n" +
+                       "- LCZ需品管理責任者 シェルドン・カッツカツ</size>";
+            case DocumentType.DeltaWarhead:
+                return "<size=15>DELTA WARHEADについて\n" +
+                       "[このファイルの内容は全て■■評議会により削除されています]" +
+                       "- Dr. Killistes Humano</size>";
+            case DocumentType.OmegaWarhead:
+                return "<size=14>OMEGA WARHEAD取扱説明書\n" +
+                       "この度は私のOMEGA WARHEAD建造計画に賛同いただき、誠に...\n" +
+                       "ええい、こんな物に前書きなどいらん。そうだろう？\n" +
+                       "兎に角だな、この私の最高傑作の弾頭、<color=blue><b>OMEGA WARHEAD</b></color>を！\n" +
+                       "何処の馬の骨かもわからん奴に向けて説明する私の事を思って！\n" +
+                       "よーーーく読み込んでおくことだな！\n" +
+                       "この弾頭はまず、エンジニアの協力が作動には必要だ。\n" +
+                       "何故かって？そんなん、セキュリティ上の理由以外何がある！\n" +
+                       "えーそしたら、地上のOMEGA WARHEADサイロに行ってサイロを開けてもらえ。\n" +
+                       "...おっと、一番重要な奴も忘れていた。\n" +
+                       "O5評議会から承認を必ず取り付けるように。じゃないと制御ボタンが開かんからな！\n" +
+                       "承認があれば、弾頭の制御室でボタンを使ってようやく起動できるぞ！\n" +
+                       "ま、俺以外の職員に使わせる気なんてないけどな！！！！！\n" +
+                       "それじゃあ、グッドラック。\n" +
+                       "- Dr. Aqurista Ω Boom</size>";
+            case DocumentType.ScientistSamuels:
+                return "<size=15>新しい安全プロトコルSP-02-Nに従い、\n" +
+                       "個人アクセスコードはランダムな間隔\n" +
+                       "（2～4週間ごと、または必要に応じて)\n" +
+                       "で変更され、新しいセキュリティコードは\n" +
+                       "セクションCの個人ロッカーに封された封筒で届けられます。\n" +
+                       "氏名：クリストファー・サミュエルズ博士\n" +
+                       "新しい個人アクセスコード：\n" +
+                       "<b>1979</b>\n" +
+                       "封が破られている、または封筒が何らかの形で改竄していることに気づいた場合は、\n" +
+                       "<b>直ちにセキュリティ担当者にご連絡ください。</b>新しいコードをお送りします。\n" +
+                       "- 警備主任 スーザン・リプリー: \n" +
+                       "2137-1111-1121\n" +
+                       "- 当直警備員: \n" +
+                       "2137-1124-1211</size>";
+            case DocumentType.AboutSergey:
+                return "<size=24>セルゲイ・マカロフ施設管理官について\n" +
+                       "[このファイルの内容は全て倫理委員会の要請により削除されています]" +
+                       "- [要請により非公開], The Ethics Comittee, Dr. Redheart</size>";
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+    }
+}
+
+public enum DocumentType
+{
+    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey
+}

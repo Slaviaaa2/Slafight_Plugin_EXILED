@@ -63,6 +63,26 @@ public abstract class ObjectPrefab : IObjectPrefab
     protected virtual void OnCreate() { }
     protected virtual void OnDestroy() { }
 
+    /// <summary>
+    /// サブクラスが独自オプションを保存するときにoverrideする。
+    /// </summary>
+    public virtual Dictionary<string, string> CollectOptions() => new();
+
+    /// <summary>
+    /// サブクラスがロード時に独自オプションを復元するときにoverrideする。
+    /// </summary>
+    public virtual void ApplyOptions(Dictionary<string, string> options) { }
+
+    /// <summary>
+    /// modコマンドでサブクラス固有のサブコマンドを処理する。
+    /// 処理した場合はtrueを返す。未処理ならfalseを返す。
+    /// </summary>
+    public virtual bool HandleModCommand(ArraySegment<string> args, out string response)
+    {
+        response = string.Empty;
+        return false;
+    }
+
     protected virtual IEnumerator<float> AutoDestroy()
     {
         yield return Timing.WaitForSeconds(AutoDestroyTime);

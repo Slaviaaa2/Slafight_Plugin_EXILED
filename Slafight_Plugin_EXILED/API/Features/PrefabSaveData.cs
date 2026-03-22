@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Exiled.API.Enums;
 using UnityEngine;
@@ -29,4 +30,9 @@ public class PrefabSaveData
     public int MaxRooms = 1;
     public float AutoDestroyTime;
     public bool AutoDestroyEnabled;
+
+    /// <summary>
+    /// サブクラス固有のオプション。Save/Load時にObjectPrefab.CollectOptions/ApplyOptionsで読み書きされる。
+    /// </summary>
+    public Dictionary<string, string> Options = new();
 }

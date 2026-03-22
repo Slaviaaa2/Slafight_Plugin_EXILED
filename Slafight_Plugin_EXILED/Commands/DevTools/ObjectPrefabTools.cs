@@ -21,7 +21,7 @@ public class SpawnObjectPrefab : ICommand
     public string Description => "RoomTypeローカル座標でObjectPrefabを編集・保存・ロードする開発用ツール";
 
     private static readonly Dictionary<Player, ObjectPrefab> Grabbing = new();
-    private static readonly Dictionary<Player, Vector3> GrabOffset = new();
+    private static readonly Dictionary<Player, float> GrabDistance = new();
     private static readonly Dictionary<Player, Quaternion> GrabRotationOffset = new();
     private static readonly Dictionary<Player, bool> GrabLockRotation = new();
     private static readonly Dictionary<Player, CoroutineHandle> GrabCoroutines = new();
@@ -101,7 +101,7 @@ public class SpawnObjectPrefab : ICommand
         "  .sl objprefab grab <InstanceID>\n" +
         "  .sl objprefab grabpos <InstanceID>\n" +
         "  .sl objprefab ungrab\n" +
-        "  .sl objprefab offset <dx> <dy> <dz>\n" +
+        "  .sl objprefab offset <distanceDelta>\n" +
         "  .sl objprefab grot <pitch> <yaw> <roll>\n" +
         "  .sl objprefab bring <InstanceID>\n" +
         "  .sl objprefab bringpos <InstanceID>\n" +
@@ -204,6 +204,7 @@ public class SpawnObjectPrefab : ICommand
                 MaxRooms = op?.MaxRooms ?? 1,
                 AutoDestroyTime = p.AutoDestroyTime,
                 AutoDestroyEnabled = p.AutoDestroyEnabled,
+                Options = p.CollectOptions(),
             });
         }
 
@@ -449,8 +450,9 @@ public class SpawnObjectPrefab : ICommand
             UngrabInternal(player);
 
         Grabbing[player] = prefab;
-        GrabOffset[player] = prefab.Position - player.Position;
-        GrabRotationOffset[player] = Quaternion.Inverse(player.Rotation) * prefab.Rotation;
+        float dist = Vector3.Distance(player.CameraTransform.position, prefab.Position);
+        GrabDistance[player] = dist > 0.5f ? dist : 2f;
+        GrabRotationOffset[player] = Quaternion.Inverse(Quaternion.Euler(0, player.CameraTransform.rotation.eulerAngles.y, 0)) * prefab.Rotation;
         GrabLockRotation[player] = false;
 
         var handle = Timing.RunCoroutine(GrabFollowCoroutine(player));
@@ -481,7 +483,8 @@ public class SpawnObjectPrefab : ICommand
             UngrabInternal(player);
 
         Grabbing[player] = prefab;
-        GrabOffset[player] = prefab.Position - player.Position;
+        float dist = Vector3.Distance(player.CameraTransform.position, prefab.Position);
+        GrabDistance[player] = dist > 0.5f ? dist : 2f;
         GrabRotationOffset[player] = Quaternion.identity;
         GrabLockRotation[player] = true;
 
@@ -514,7 +517,7 @@ public class SpawnObjectPrefab : ICommand
         }
 
         Grabbing.Remove(player);
-        GrabOffset.Remove(player);
+        GrabDistance.Remove(player);
         GrabRotationOffset.Remove(player);
         GrabLockRotation.Remove(player);
     }
@@ -526,14 +529,17 @@ public class SpawnObjectPrefab : ICommand
             if (!player.IsConnected || prefab == null)
                 break;
 
-            var offset = GrabOffset.TryGetValue(player, out var o) ? o : Vector3.zero;
+            var dist = GrabDistance.TryGetValue(player, out var d) ? d : 2f;
             var rotOffset = GrabRotationOffset.TryGetValue(player, out var ro) ? ro : Quaternion.identity;
             var lockRot = GrabLockRotation.TryGetValue(player, out var lr) && lr;
 
-            prefab.Position = player.Position + player.Rotation * offset;
+            prefab.Position = player.CameraTransform.position + player.CameraTransform.forward * dist;
 
             if (!lockRot)
-                prefab.Rotation = player.Rotation * rotOffset;
+            {
+                Quaternion playerYaw = Quaternion.Euler(0, player.CameraTransform.rotation.eulerAngles.y, 0);
+                prefab.Rotation = playerYaw * rotOffset;
+            }
 
             yield return Timing.WaitForSeconds(0.05f);
         }
@@ -550,22 +556,24 @@ public class SpawnObjectPrefab : ICommand
             return false;
         }
 
-        if (args.Count < 4)
+        if (args.Count < 2)
         {
-            response = "Usage: .sl objprefab offset <dx> <dy> <dz>";
+            response = "Usage: .sl objprefab offset <distanceDelta>";
             return false;
         }
 
-        if (!float.TryParse(args.At(1), out var dx) ||
-            !float.TryParse(args.At(2), out var dy) ||
-            !float.TryParse(args.At(3), out var dz))
+        if (!float.TryParse(args.At(1), out var delta))
         {
-            response = "dx, dy, dz must be numbers.";
+            response = "distanceDelta must be a number.";
             return false;
         }
+        
+        if (GrabDistance.TryGetValue(player, out var currDist))
+        {
+            GrabDistance[player] = Mathf.Max(0.5f, currDist + delta);
+        }
 
-        GrabOffset[player] = new Vector3(dx, dy, dz);
-        response = $"Set grab offset to ({dx}, {dy}, {dz}).";
+        response = $"Added {delta} to grab distance. Current: {GrabDistance[player]:F1}";
         return true;
     }
 
@@ -615,8 +623,8 @@ public class SpawnObjectPrefab : ICommand
             return false;
         }
 
-        prefab.Position = player.Position + player.Rotation * new Vector3(0f, 1.5f, 2f);
-        prefab.Rotation = player.Rotation;
+        prefab.Position = player.CameraTransform.position + player.CameraTransform.forward * 2f;
+        prefab.Rotation = Quaternion.Euler(0, player.CameraTransform.rotation.eulerAngles.y, 0);
 
         response = $"Brought prefab {id} to your position.";
         return true;
@@ -639,7 +647,7 @@ public class SpawnObjectPrefab : ICommand
             return false;
         }
 
-        prefab.Position = player.Position + player.Rotation * new Vector3(0f, 1.5f, 2f);
+        prefab.Position = player.CameraTransform.position + player.CameraTransform.forward * 2f;
         response = $"Brought (position only) prefab {id} to your position.";
         return true;
     }
@@ -733,6 +741,9 @@ public class SpawnObjectPrefab : ICommand
                     $" Scale: {prefab.Scale}\n" +
                     $" MaxRooms: {prefab.MaxRooms}\n" +
                     $" AutoDestroy: {(prefab.AutoDestroyEnabled ? prefab.AutoDestroyTime.ToString() : "disabled")}";
+                var options = prefab.CollectOptions();
+                if (options.Count > 0)
+                    response += "\n Options: " + string.Join(", ", options.Select(kv => $"{kv.Key}={kv.Value}"));
                 return true;
 
             case "pos":
@@ -754,6 +765,9 @@ public class SpawnObjectPrefab : ICommand
                 return ModBring(args, player, prefab, out response);
 
             default:
+                // サブクラス固有のmodサブコマンドを試行
+                if (prefab.HandleModCommand(args, out response))
+                    return true;
                 response = "Unknown subcommand. Use: info / pos / addpos / rot / max / autodestroy / bring";
                 return false;
         }
@@ -871,7 +885,7 @@ public class SpawnObjectPrefab : ICommand
 
     private bool ModBring(ArraySegment<string> args, Player player, ObjectPrefab prefab, out string response)
     {
-        prefab.Position = player.Position + player.Rotation * new Vector3(0f, 1.5f, 2f);
+        prefab.Position = player.CameraTransform.position + player.CameraTransform.forward * 2f;
         response = "Brought selected prefab to your front (position only).";
         return true;
     }
@@ -935,6 +949,9 @@ public static class ObjectPrefabLoader
                 prefab.AutoDestroyEnabled = data.AutoDestroyEnabled;
                 prefab.AutoDestroyTime = data.AutoDestroyTime;
                 prefab.MaxRooms = data.MaxRooms <= 0 ? 1 : data.MaxRooms;
+
+                if (data.Options != null && data.Options.Count > 0)
+                    prefab.ApplyOptions(data.Options);
 
                 prefab.Create();
                 totalSpawned++;

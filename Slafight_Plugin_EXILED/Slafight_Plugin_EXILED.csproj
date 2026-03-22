@@ -294,8 +294,10 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
         <Compile Include="CustomMaps\DailyCassieAnnounce.cs" />
+        <Compile Include="CustomMaps\DocumentDictionary.cs" />
         <Compile Include="CustomMaps\GateAEnding.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
+        <Compile Include="CustomMaps\ObjectPrefabs\Document.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Vent.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\WarheadBoomEffect.cs" />
