@@ -21,13 +21,11 @@ public static class GateAEnding
     public static void Register()
     {
         Exiled.Events.Handlers.Server.RoundStarted += SetupNpcs;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += OnSchematicSpawned;
     }
 
     public static void Unregister()
     {
         Exiled.Events.Handlers.Server.RoundStarted -= SetupNpcs;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= OnSchematicSpawned;
     }
 
     private static SchematicObject? _triggerObject;
@@ -42,20 +40,28 @@ public static class GateAEnding
 
     private static CoroutineHandle handle;
 
-    private static void OnSchematicSpawned(SchematicSpawnedEventArgs ev)
-    {
-        if (ev.Schematic.Name == "GateAEnding")
-        {
-            _triggerObject = ev.Schematic;
-            Timing.CallDelayed(1f, () =>
-            {
-                handle = Timing.RunCoroutine(Coroutine());
-            });
-        }
-    }
 
     private static void SetupNpcs()
     {
+        Timing.CallDelayed(1.5f, () =>
+        {
+            _triggerObject = null;
+            foreach (var map in MapUtils.LoadedMaps.Values)
+            {
+                if (map.SpawnedObjects == null) continue;
+                foreach (var meo in map.SpawnedObjects)
+                {
+                    if (meo is SchematicObject schematic && schematic.Name == "GateAEnding")
+                    {
+                        _triggerObject = schematic;
+                        handle = Timing.RunCoroutine(Coroutine());
+                        break;
+                    }
+                }
+                if (_triggerObject != null) break;
+            }
+        });
+
         NowPlayingSound = false;
         Timing.KillCoroutines(handle);
         npc1 = Npc.Spawn("???", RoleTypeId.ChaosRifleman, true, new Vector3(-14.742f, 295.5f, -6.453f));

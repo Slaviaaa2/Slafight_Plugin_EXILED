@@ -75,7 +75,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         MapHandler.SpawningTeamVehicle += ChaosAnimation;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionButton;
         LabApi.Events.Handlers.PlayerEvents.InteractedDoor += DoorInteracted;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += GetSchems;
+
     }
 
     ~CustomMapMainHandler()
@@ -86,7 +86,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         MapHandler.SpawningTeamVehicle -= ChaosAnimation;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionButton;
         LabApi.Events.Handlers.PlayerEvents.InteractedDoor -= DoorInteracted;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= GetSchems;
+
 
         // ★ コルーチンを全部 kill
         if (femurCoroutine.IsRunning)
@@ -193,124 +193,100 @@ public class CustomMapMainHandler : CustomEventsHandler
         if (femurCoroutine.IsRunning)
             Timing.KillCoroutines(femurCoroutine);
 
-        if (FBJoin != default && FBCP != default)
-            femurCoroutine = Timing.RunCoroutine(FemurBreaker());
-
-        if (STS != default && STC != default && STE != default)
-        {
-            Timing.CallDelayed(25f, () =>
-            {
-                if (!Round.InProgress) return; // ← これだけ追加
-                trainCoroutine = Timing.RunCoroutine(TrainComing.SpawnTrainAndAnim(STS, STC, STE));
-            });
-        }
-        else
-        {
-            Log.Error("Train Points not successfully spawned.");
-        }
-
         ObjectPrefabLoader.LoadMap("aaa");
+
+        Timing.CallDelayed(2.0f, () => 
+        {
+            GetSchematicsAndTriggerPoints();
+
+            if (FBJoin != default && FBCP != default)
+                femurCoroutine = Timing.RunCoroutine(FemurBreaker());
+
+            if (STS != default && STC != default && STE != default)
+            {
+                Timing.CallDelayed(25f, () =>
+                {
+                    if (!Round.InProgress) return;
+                    trainCoroutine = Timing.RunCoroutine(TrainComing.SpawnTrainAndAnim(STS, STC, STE));
+                });
+            }
+            else
+            {
+                Log.Error("Train Points not successfully spawned.");
+            }
+        });
     }
 
-    public void GetSchems(SchematicSpawnedEventArgs ev)
+    public void GetSchematicsAndTriggerPoints()
     {
-        if (ev.Schematic == null)
-            return;
-
-        var schematic = ev.Schematic;
-        var name = schematic.Name;
-
-        // 位置が欲しいケースだけ先に取る（失敗しても死なないように）
-        Vector3 pos = default;
-        bool hasPos = false;
-        try
-        {
-            pos = schematic.Position;
-            hasPos = true;
-        }
-        catch (Exception e)
-        {
-            Log.Error($"[GetSchems] Failed to get position for schematic {name}: {e}");
-        }
-
-        switch (name)
-        {
-            case "Surface_CarStopper_Bar":
-                ChaosBar = schematic;
-                if (hasPos)
-                    ChaosBarNormalPos = pos;
-                break;
-
-            case "FemurBreaker_JoinPoint":
-                if (hasPos)
-                    FBJoin = pos;
-                ev.DestroySafe(0.05f); // SchematicHelpers 拡張
-                break;
-
-            case "FemurBreaker_Door":
-                FBDoor = schematic;
-                break;
-
-            case "FemurBreakerButton":
-                FBButton = schematic;
-                break;
-
-            case "FemurBreaker_CapybaraPoint":
-                if (hasPos)
-                    FBCP = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "PDEX_JoinPoint":
-                if (hasPos)
-                    PDExJoin = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "PDEX_JoinPointKing":
-                if (hasPos)
-                    PDExJoinKing = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "OWB":
-                if (hasPos)
-                    OWB = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "OWJoin":
-                if (hasPos)
-                    OWJoin = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "ST_S":
-                if (hasPos)
-                    STS = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "ST_C":
-                if (hasPos)
-                    STC = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "ST_E":
-                if (hasPos)
-                    STE = pos;
-                ev.DestroySafe(0.05f);
-                break;
-
-            case "Scp012_ThetaPrimed":
-                Scp012_t = schematic;
-                break;
-        }
-
         FemurSetup = false;
         FemurBreaked = false;
         femuredPlayers.Clear();
+
+        foreach (var map in MapUtils.LoadedMaps.Values)
+        {
+            if (map.SpawnedObjects == null) continue;
+            foreach (var meo in map.SpawnedObjects)
+            {
+                if (meo is SchematicObject schematic)
+                {
+                    switch (schematic.Name)
+                    {
+                        case "Surface_CarStopper_Bar":
+                            ChaosBar = schematic;
+                            ChaosBarNormalPos = schematic.Position;
+                            break;
+                        case "FemurBreaker_Door":
+                            FBDoor = schematic;
+                            break;
+                        case "FemurBreakerButton":
+                            FBButton = schematic;
+                            break;
+                        case "Scp012_ThetaPrimed":
+                            Scp012_t = schematic;
+                            break;
+                    }
+                }
+            }
+        }
+
+        foreach (var point in TriggerPointManager.GetAll())
+        {
+            if (point.Base is not SerializableCustomTriggerPoint trig || string.IsNullOrEmpty(trig.Tag))
+                continue;
+
+            var pos = TriggerPointManager.GetWorldPosition(point);
+            switch (trig.Tag)
+            {
+                case "FemurBreaker_JoinPoint":
+                    FBJoin = pos;
+                    break;
+                case "FemurBreaker_CapybaraPoint":
+                    FBCP = pos;
+                    break;
+                case "PDEX_JoinPoint":
+                    PDExJoin = pos;
+                    break;
+                case "PDEX_JoinPointKing":
+                    PDExJoinKing = pos;
+                    break;
+                case "OWB":
+                    OWB = pos;
+                    break;
+                case "OWJoin":
+                    OWJoin = pos;
+                    break;
+                case "ST_S":
+                    STS = pos;
+                    break;
+                case "ST_C":
+                    STC = pos;
+                    break;
+                case "ST_E":
+                    STE = pos;
+                    break;
+            }
+        }
     }
 
     private void ResetInRestart()

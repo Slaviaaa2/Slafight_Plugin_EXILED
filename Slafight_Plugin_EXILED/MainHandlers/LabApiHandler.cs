@@ -27,7 +27,7 @@ public class LabApiHandler : CustomEventsHandler
         Exiled.Events.Handlers.Player.Dying += DiedCassie;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy += InteractionEvent;
         LabApi.Events.Handlers.ServerEvents.RoundStarted += Init;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += PickupSetupBySchemPoint;
+        LabApi.Events.Handlers.ServerEvents.RoundStarted += Init;
     }
 
     ~LabApiHandler()
@@ -36,7 +36,7 @@ public class LabApiHandler : CustomEventsHandler
         Exiled.Events.Handlers.Player.Dying -= DiedCassie;
         LabApi.Events.Handlers.PlayerEvents.SearchedToy -= InteractionEvent;
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= Init;
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= PickupSetupBySchemPoint;
+        LabApi.Events.Handlers.ServerEvents.RoundStarted -= Init;
     }
 
     public bool activatedAntiMemeProtocol = false;
@@ -139,57 +139,56 @@ public class LabApiHandler : CustomEventsHandler
             CustomItemExtensions.TrySpawn<FileCafeteriaNeeds>(StaticUtils.GetWorldFromRoomLocal(RoomType.EzCollapsedTunnel, new Vector3(-4.085f, 18.05f, -2.562f),new Vector3(0f, 180f, 0f)).worldPosition, out var cafe);
             Log.Debug($"cf: {cafe?.Position}");
         });
+        Timing.CallDelayed(2.0f, PickupSetupTriggerPoints);
     }
        
-    public void PickupSetupBySchemPoint(SchematicSpawnedEventArgs ev)
+    public void PickupSetupTriggerPoints()
     {
-        if (!ev.TryGetPosition(out var pos))
-            return;
-
-        var schematic = ev.Schematic;
-
-        try
+        var points = TriggerPointManager.GetAll();
+        foreach (var point in points)
         {
-            switch (schematic.Name)
+            if (point.Base is not SerializableCustomTriggerPoint trig || string.IsNullOrEmpty(trig.Tag))
+                continue;
+
+            var pos = TriggerPointManager.GetWorldPosition(point);
+
+            try
             {
-                case "CISR_GoCRailgun":
-                    CustomItemExtensions.TrySpawn<GunGoCRailgun>(pos, out _);
-                    break;
+                switch (trig.Tag)
+                {
+                    case "CISR_GoCRailgun":
+                        CustomItemExtensions.TrySpawn<GunGoCRailgun>(pos, out _);
+                        break;
 
-                case "CISR_OldPrivateCard":
-                    if (CustomItemExtensions.TrySpawn<KeycardOld_Cadet>(pos, out var privateCard))
-                        privateCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-                    break;
+                    case "CISR_OldPrivateCard":
+                        if (CustomItemExtensions.TrySpawn<KeycardOld_Cadet>(pos, out var privateCard))
+                            privateCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                        break;
 
-                case "CISR_OldCECard":
-                    if (CustomItemExtensions.TrySpawn<KeycardOld_ContainmentEngineer>(pos, out var ceCard))
-                        ceCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-                    break;
+                    case "CISR_OldCECard":
+                        if (CustomItemExtensions.TrySpawn<KeycardOld_ContainmentEngineer>(pos, out var ceCard))
+                            ceCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                        break;
 
-                case "CISR_Scp1425":
-                    if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))
-                        scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-                    break;
+                    case "CISR_Scp1425":
+                        if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))
+                            scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                        break;
 
-                case "CISR_SNAV300":
-                    CustomItemExtensions.TrySpawn<SNAV300>(pos, out _);
-                    break;
+                    case "CISR_SNAV300":
+                        CustomItemExtensions.TrySpawn<SNAV300>(pos, out _);
+                        break;
 
-                case "CISR_MFP":
-                    CustomItemExtensions.TrySpawn<ClassXMemoryForcePil>(pos, out _);
-                    break;
-
-                default:
-                    return;
+                    case "CISR_MFP":
+                        CustomItemExtensions.TrySpawn<ClassXMemoryForcePil>(pos, out _);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[PickupSetupTriggerPoints] Error while spawning CustomItem at trigger point {trig.Tag}: {e}");
             }
         }
-        catch (Exception e)
-        {
-            Log.Error($"[PickupSetupBySchemPoint] Error while spawning CustomItem at schematic {schematic.Name}: {e}");
-        }
-
-        // ここだけで座標用Schematicを片付ける
-        ev.DestroySafe(0.05f); // 即時なら 0f
     }
 
     /// <summary>

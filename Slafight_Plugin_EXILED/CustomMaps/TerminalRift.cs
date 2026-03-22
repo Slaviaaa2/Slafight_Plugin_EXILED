@@ -40,7 +40,7 @@ public static class TerminalRift
 
         Log.Debug("[TerminalRift] Registering...");
 
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SchematicsSetup;
+        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
         Exiled.Events.Handlers.Server.RestartingRound += Cleanup;
         Exiled.Events.Handlers.Player.ReceivingEffect += CancelDeath;
         Exiled.Events.Handlers.Player.ChangingRole += OnChanging;
@@ -61,7 +61,7 @@ public static class TerminalRift
 
         KillAllCoroutines();
 
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SchematicsSetup;
+        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
         Exiled.Events.Handlers.Server.RestartingRound -= Cleanup;
         Exiled.Events.Handlers.Player.ReceivingEffect -= CancelDeath;
         Exiled.Events.Handlers.Player.ChangingRole -= OnChanging;
@@ -85,18 +85,31 @@ public static class TerminalRift
         _timeoutHandle = default;
     }
 
-    private static void SchematicsSetup(SchematicSpawnedEventArgs ev)
+    private static void OnRoundStarted()
     {
-        switch (ev.Schematic.Name)
+        Timing.CallDelayed(1.5f, () => 
         {
-            case "Rift":
-                RiftObject = ev.Schematic;
-                RiftObjectPosition = ev.Schematic.Position;
-                break;
-            case "TerminalControl":
-                ControlObjects.Add(ev.Schematic);
-                break;
-        }
+            ControlObjects.Clear();
+            foreach (var map in MapUtils.LoadedMaps.Values)
+            {
+                if (map.SpawnedObjects == null) continue;
+                foreach (var meo in map.SpawnedObjects)
+                {
+                    if (meo is SchematicObject schematic)
+                    {
+                        if (schematic.Name == "Rift")
+                        {
+                            RiftObject = schematic;
+                            RiftObjectPosition = schematic.Position;
+                        }
+                        else if (schematic.Name == "TerminalControl")
+                        {
+                            ControlObjects.Add(schematic);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private static void Cleanup()

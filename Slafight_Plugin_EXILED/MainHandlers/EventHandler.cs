@@ -47,7 +47,7 @@ public class EventHandler
         WarheadHandler.Starting += AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
 
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SetupSpawnPoints;
+
     }
 
     ~EventHandler()
@@ -67,7 +67,7 @@ public class EventHandler
         WarheadHandler.Starting -= AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
 
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SetupSpawnPoints;
+
     }
 
     private readonly Config cfg = Plugin.Singleton.Config;
@@ -190,32 +190,26 @@ public class EventHandler
 
     public static Vector3 Scp173SpawnPoint = Vector3.zero;
 
-    private void SetupSpawnPoints(SchematicSpawnedEventArgs ev)
+    private void SetupSpawnPoints()
     {
-        if (ev.Schematic == null)
-            return;
-
-        var schematic = ev.Schematic;
-
-        if (schematic.Name != "Scp173SpawnPoint")
-            return;
-
-        try
+        if (TriggerPointManager.TryGetByTag("Scp173SpawnPoint", out var points) && points.Count > 0)
         {
-            Scp173SpawnPoint = schematic.Position;
+            try
+            {
+                Scp173SpawnPoint = TriggerPointManager.GetWorldPosition(points[0]);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[SetupSpawnPoints] Failed to get position for Scp173SpawnPoint: {e}");
+            }
         }
-        catch (Exception e)
-        {
-            Log.Error($"[SetupSpawnPoints] Failed to get position for {schematic.Name}: {e}");
-            return;
-        }
-
-        ev.DestroySafe(0.05f);
     }
 
     private void OnRoundStarted()
     {
         SpecificFlagsManager.ClearAll();
+
+        Timing.CallDelayed(2.0f, SetupSpawnPoints);
 
         foreach (var player in Player.List.ToList().Where(IsPlayerValid))
         {

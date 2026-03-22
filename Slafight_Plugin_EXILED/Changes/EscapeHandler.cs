@@ -34,14 +34,14 @@ public class EscapeHandler
 
     public EscapeHandler()
     {
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned += SetEscapePoint;
+
         Exiled.Events.Handlers.Player.Escaping += CancelDefaultEscape;
         Exiled.Events.Handlers.Server.RoundStarted += AddEscapeCoroutine;
     }
 
     ~EscapeHandler()
     {
-        ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= SetEscapePoint;
+
         Exiled.Events.Handlers.Player.Escaping -= CancelDefaultEscape;
         Exiled.Events.Handlers.Server.RoundStarted -= AddEscapeCoroutine;
     }
@@ -76,29 +76,6 @@ public class EscapeHandler
             : null);
 
     // =====================
-
-    public void SetEscapePoint(SchematicSpawnedEventArgs ev)
-    {
-        if (ev.Schematic == null)
-            return;
-
-        var schematic = ev.Schematic;
-
-        if (schematic.Name != "EscapePoint")
-            return;
-
-        try
-        {
-            EscapePoints.Add(schematic.Position);
-        }
-        catch (Exception e)
-        {
-            Log.Error($"[SetEscapePoint] Failed to get position for {schematic.Name}: {e}");
-            return;
-        }
-
-        ev.DestroySafe(0.05f);
-    }
 
     public void SaveItems(Player player)
     {
@@ -251,7 +228,19 @@ public class EscapeHandler
         if (_escapeCoroutine.IsRunning)
             Timing.KillCoroutines(_escapeCoroutine);
 
-        _escapeCoroutine = Timing.RunCoroutine(EscapeCoroutine());
+        Timing.CallDelayed(2.0f, () => 
+        {
+            EscapePoints.Clear();
+            if (TriggerPointManager.TryGetByTag("EscapePoint", out var points))
+            {
+                foreach (var point in points)
+                {
+                    EscapePoints.Add(TriggerPointManager.GetWorldPosition(point));
+                }
+            }
+
+            _escapeCoroutine = Timing.RunCoroutine(EscapeCoroutine());
+        });
     }
 
     private IEnumerator<float> EscapeCoroutine()
