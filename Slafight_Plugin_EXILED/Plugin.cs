@@ -45,7 +45,7 @@ public class Plugin : Plugin<Config>
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 1);
 
     public Harmony HarmonyInstance { get; private set; }
-        
+    
     public EventHandler EventHandler { get; set; }
     public SpecialEventsHandler SpecialEventsHandler { get; set; }
     public CustomMapMainHandler CustomMapMainHandler { get; set; }
