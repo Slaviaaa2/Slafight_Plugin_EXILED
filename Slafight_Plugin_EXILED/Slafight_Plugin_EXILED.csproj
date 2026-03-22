@@ -106,7 +106,7 @@
             <HintPath>..\..\..\Tools\depBuild\references\Pooling-Publicized.dll</HintPath>
         </Reference>
         <Reference Include="ProjectMER">
-            <HintPath>C:\Users\zeros\AppData\Roaming\SCP Secret Laboratory\LabAPI\plugins\7777\ProjectMER.dll</HintPath>
+          <HintPath>..\..\SL_References\ProjectMER.dll</HintPath>
         </Reference>
         <Reference Include="Slafight">
           <HintPath>C:\Users\zeros\AppData\Roaming\EXILED\Plugins\7777\Slafight.dll</HintPath>

@@ -8,6 +8,7 @@ using MEC;
 using NetworkManagerUtils.Dummies;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;
+using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
@@ -51,7 +52,7 @@ public static class GateAEnding
                 if (map.SpawnedObjects == null) continue;
                 foreach (var meo in map.SpawnedObjects)
                 {
-                    if (meo is SchematicObject schematic && schematic.Name == "GateAEnding")
+                    if (meo.TryGetComponent(out SchematicObject schematic) && schematic.Name == "GateAEnding")
                     {
                         _triggerObject = schematic;
                         handle = Timing.RunCoroutine(Coroutine());

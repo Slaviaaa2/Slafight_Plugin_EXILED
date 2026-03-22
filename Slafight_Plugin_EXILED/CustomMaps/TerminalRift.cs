@@ -10,6 +10,7 @@ using LabApi.Events.CustomHandlers;
 using MapGeneration;
 using MEC;
 using ProjectMER.Events.Arguments;
+using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -95,7 +96,7 @@ public static class TerminalRift
                 if (map.SpawnedObjects == null) continue;
                 foreach (var meo in map.SpawnedObjects)
                 {
-                    if (meo is SchematicObject schematic)
+                    if (meo.TryGetComponent(out SchematicObject schematic))
                     {
                         if (schematic.Name == "Rift")
                         {

@@ -14,6 +14,7 @@ using PlayerRoles;
 using ProjectMER.Events.Arguments;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
+using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Commands.DevTools;
 using Slafight_Plugin_EXILED.Extensions;
@@ -228,7 +229,7 @@ public class CustomMapMainHandler : CustomEventsHandler
             if (map.SpawnedObjects == null) continue;
             foreach (var meo in map.SpawnedObjects)
             {
-                if (meo is SchematicObject schematic)
+                if (meo.TryGetComponent(out SchematicObject schematic))
                 {
                     switch (schematic.Name)
                     {
