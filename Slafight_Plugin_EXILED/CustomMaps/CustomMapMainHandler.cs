@@ -396,9 +396,20 @@ public class CustomMapMainHandler : CustomEventsHandler
                 Timing.CallDelayed(28f, () =>
                 {
                     if (!FemurSetup || !FemurBreaked) return;
-                    Exiled.API.Features.Cassie.MessageTranslated(
-                        "SCP 1 0 6 recontained successfully by femur breaker",
-                        "<color=red>SCP-106</color>のFEMUR BREAKERによる再収容に成功しました。");
+                    if (Player.List.Any(p => p?.IsConnected == true &&
+                                             (p.GetCustomRole() == CRoleTypeId.Scp106 ||
+                                              (p.GetCustomRole() == CRoleTypeId.None && p.Role.Type == RoleTypeId.Scp106))))
+                    {
+                        Exiled.API.Features.Cassie.MessageTranslated(
+                            "SCP 1 0 6 recontained successfully by femur breaker",
+                            "<color=red>SCP-106</color>のFEMUR BREAKERによる再収容に成功しました。");
+                    }
+                    else
+                    {
+                        Exiled.API.Features.Cassie.MessageTranslated(
+                            "Femur Breaker Process Successfully Completed. but no effect for containment breach.",
+                            "FEMUR BREAKERプロセスが正常に完了しましたが、収容違反への影響が確認されませんでした。");
+                    }
                 });
             }
             else
