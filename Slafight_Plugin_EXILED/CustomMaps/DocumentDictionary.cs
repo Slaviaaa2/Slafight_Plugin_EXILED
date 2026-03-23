@@ -18,7 +18,7 @@ public static class DocumentDictionary
                        "これについて、私は本件についての大規模な調査及び対処を、強く求める。\n" +
                        "- Dr. Redheart</size>";
             case DocumentType.Scp096:
-                return "<size=14>事案096-777-A\n" +
+                return "<size=15>事案096-777-A\n" +
                        "20■■年■月■日、定期観察の過程で、■■■■■■■博士がSCP-096に対するセンサー監視を実施していました。\n" +
                        "観察中、SCP-096は一切の予兆なく激しい激昂行動を開始し、施設全域で感知可能なレベルの悲鳴を発しました。\n" +
                        "■■■博士は直ちに緊急アラームを作動させましたが、警備要員が現場に到着した時点で確認されたのは、多量の血痕のみでした。\n" +
@@ -53,7 +53,7 @@ public static class DocumentDictionary
                        "[このファイルの内容は全て■■評議会により削除されています]" +
                        "- Dr. Killistes Humano</size>";
             case DocumentType.OmegaWarhead:
-                return "<size=14>OMEGA WARHEAD取扱説明書\n" +
+                return "<size=17>OMEGA WARHEAD取扱説明書\n" +
                        "この度は私のOMEGA WARHEAD建造計画に賛同いただき、誠に...\n" +
                        "ええい、こんな物に前書きなどいらん。そうだろう？\n" +
                        "兎に角だな、この私の最高傑作の弾頭、<color=blue><b>OMEGA WARHEAD</b></color>を！\n" +
@@ -84,7 +84,7 @@ public static class DocumentDictionary
                        "- 当直警備員: \n" +
                        "2137-1124-1211</size>";
             case DocumentType.AboutSergey:
-                return "<size=24>セルゲイ・マカロフ施設管理官について\n" +
+                return "<size=17>セルゲイ・マカロフ施設管理官について\n" +
                        "[このファイルの内容は全て倫理委員会の要請により削除されています]" +
                        "- [要請により非公開], The Ethics Comittee, Dr. Redheart</size>";
             default:
@@ -95,5 +95,5 @@ public static class DocumentDictionary
 
 public enum DocumentType
 {
-    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey
+    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey,AntiAntiMeme
 }

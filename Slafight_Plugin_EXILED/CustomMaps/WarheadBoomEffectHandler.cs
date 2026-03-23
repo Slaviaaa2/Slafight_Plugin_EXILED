@@ -123,8 +123,8 @@ public static class WarheadBoomEffectHandler
     // ================================================================
     private static IEnumerator<float> FlashCoroutine(Vector3 position)
     {
-        const float expandDuration = 0.08f;
-        const float fadeDuration   = 0.22f;
+        const float expandDuration = 0.35f;
+        const float fadeDuration   = 5.55f;
         const float maxIntensity   = 20000000f;
         const float maxRange       = 120f;
         const float tickInterval   = 0.016f; // ~60fps

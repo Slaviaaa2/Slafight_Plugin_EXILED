@@ -58,7 +58,7 @@ public class LabApiHandler : CustomEventsHandler
         {
             foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
             {
-                if (player.UniqueRole == "SCP-3005")
+                if (player.GetCustomRole() == CRoleTypeId.Scp3005)
                 {
                     if (!_activatedAntiMemeProtocolInPast)
                         player.Health = 10000;
@@ -130,15 +130,8 @@ public class LabApiHandler : CustomEventsHandler
 
         Timing.CallDelayed(1.05f, () =>
         {
-            CustomItemExtensions.TrySpawn<HIDTurret>(new Vector3(134.94f,300.65f,-65f),out Pickup _);
-            CustomItemExtensions.TrySpawn<File012_5_033>(new Vector3(-31.42325f, 253f, -102.171f), out Pickup _);
-            CustomItemExtensions.TrySpawn<File096_777_A>(Room.Get(RoomType.Hcz096).WorldPosition(new Vector3(0f, 1f, 0f)), out Pickup _);
-            CustomItemExtensions.TrySpawn<File3005_Contain>(Room.Get(RoomType.LczPlants).WorldPosition(new Vector3(0f, 7.35f, 0f)), out Pickup _);
+            CustomItemExtensions.TrySpawn<HIDTurret>(new Vector3(134.94f,300.65f,-65f),out _);
             CustomItemExtensions.TrySpawn<NvgNormal>(Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up*1.5f), out _);
-            CustomItemExtensions.TrySpawn<FileScientist_Samuels>(StaticUtils.GetWorldFromRoomLocal(RoomType.LczCafe, new Vector3(7.148f, 1f, -2.631f),new Vector3(0f, 270f, 0f)).worldPosition, out var fs);
-            Log.Debug($"fs: {fs?.Position}");
-            CustomItemExtensions.TrySpawn<FileCafeteriaNeeds>(StaticUtils.GetWorldFromRoomLocal(RoomType.EzCollapsedTunnel, new Vector3(-4.085f, 18.05f, -2.562f),new Vector3(0f, 180f, 0f)).worldPosition, out var cafe);
-            Log.Debug($"cf: {cafe?.Position}");
         });
         Timing.CallDelayed(2.0f, PickupSetupTriggerPoints);
     }
