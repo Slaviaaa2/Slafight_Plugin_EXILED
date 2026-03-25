@@ -87,6 +87,12 @@ public static class DocumentDictionary
                 return "<size=17>セルゲイ・マカロフ施設管理官について\n" +
                        "[このファイルの内容は全て倫理委員会の要請により削除されています]" +
                        "- [要請により非公開], The Ethics Comittee, Dr. Redheart</size>";
+            case DocumentType.AntiAntiMeme:
+                return "<size=18>Project | Anti: Anti-Meme\n" +
+                       "Project Leader | Dr. Maynard\n" +
+                       "Senior Researcher | Dr. Clef\n" +
+                       "Researcher | Dr. Killistes Humano\n" +
+                       "Researcher | Dr. Redheart</size>";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }

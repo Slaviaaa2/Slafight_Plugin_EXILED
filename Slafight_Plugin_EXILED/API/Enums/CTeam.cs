@@ -2,6 +2,7 @@ namespace Slafight_Plugin_EXILED.API.Enums;
 
 public enum CTeam
 {
+    Null,
     FoundationForces,
     Scientists,
     ClassD,
@@ -13,10 +14,9 @@ public enum CTeam
     SerpentsHand,
     SCPs,
     Others,
-    Null,
     BrokenGodChurch,
     O5,
-    Sarkicism,
+    Sarkic,
     AWCY,
     BlackQueen
 }
