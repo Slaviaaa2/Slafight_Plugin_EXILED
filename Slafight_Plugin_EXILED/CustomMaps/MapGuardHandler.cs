@@ -10,24 +10,26 @@ using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomMaps;
 
-public class MapGuardHandler
+public static class MapGuardHandler
 {
-    public MapGuardHandler()
+    public static void Register()
     {
         Exiled.Events.Handlers.Player.DamagingDoor += OnExplodingDoor;
         Exiled.Events.Handlers.Warhead.Starting += OnWarheadDoor;
     }
 
-    ~MapGuardHandler()
+    public static void Unregister()
     {
         Exiled.Events.Handlers.Player.DamagingDoor -= OnExplodingDoor;
         Exiled.Events.Handlers.Warhead.Starting -= OnWarheadDoor;
     }
 
-    private void OnExplodingDoor(DamagingDoorEventArgs ev)
+    private static void OnExplodingDoor(DamagingDoorEventArgs ev)
     {
         if (ev.DamageType != DoorDamageType.ServerCommand)
         {
+            if (ev.Door == null) return;
+            
             if (!(Vector3.SqrMagnitude(ev.Door.Position - CustomMapMainHandler.OWJoin) > 0.75 * 0.75))
             {
                 ev.IsAllowed = false;
@@ -44,13 +46,13 @@ public class MapGuardHandler
         }
     }
 
-    private void OnWarheadDoor(StartingEventArgs ev)
+    private static void OnWarheadDoor(StartingEventArgs ev)
     {
         Timing.CallDelayed(30f, () =>
         {
-            Log.Debug("abbabbabbaba");
             foreach (var door in Door.List)
             {
+                if (door == null) continue;
                 if (!(Vector3.SqrMagnitude(door.Position - CustomMapMainHandler.OWJoin) > 0.75 * 0.75))
                 {
                     door.Unlock();
@@ -79,8 +81,8 @@ public class MapGuardHandler
         });
     }
 
-    private void Message(Player player)
+    private static void Message(Player? player)
     {
-        player.ShowHint("この扉は特殊な素材で守られているようだ・・・");
+        player?.ShowHint("この扉は特殊な素材で守られているようだ・・・");
     }
 }

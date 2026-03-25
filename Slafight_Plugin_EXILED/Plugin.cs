@@ -66,10 +66,8 @@ public class Plugin : Plugin<Config>
     public Sinkhole Sinkhole { get; set; }
     public PDEx PDEx { get; set; }
     public Engineer EngineerRole { get; private set; }
-    public MapGuardHandler MapGuardHandler { get; set; }
     public Scp1509Handler Scp1509Handler { get; set; }
     public Scp012_033 Scp012_033 { get; set; }
-    public TerminalRiftLabHandler TerminalRiftLabHandler { get; set; }
     public ObjectPrefabHandler ObjectPrefabHandler { get; set; }
     // Enable & Disable
     public override void OnEnabled()
@@ -92,17 +90,12 @@ public class Plugin : Plugin<Config>
         AbilityInputHandler = new();
         Sinkhole = new();
         PDEx = new();
-        MapGuardHandler = new();
         Scp1509Handler = new();
         Scp012_033 = new();
         ObjectPrefabHandler = new();
         CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
         CustomHandlersManager.RegisterEventsHandler(CustomMapMainHandler);
         CustomHandlersManager.RegisterEventsHandler(ObjectPrefabHandler);
-
-        TerminalRift.Register();
-            
-        VentControl.Register();
 
         EngineerRole = new Engineer();
         EngineerRole.RegisterEvents();
@@ -118,6 +111,9 @@ public class Plugin : Plugin<Config>
         CustomRole.RegisterRoles(false);
         CustomItemsManager.RegisterAllItems();
             
+        MapGuardHandler.Register();
+        TerminalRift.Register();
+        VentControl.Register();
         FacilityLightHandler.Register();
         // GateAEnding.Register(); SCRAPPED
         WarheadBoomEffectHandler.Register();
@@ -171,10 +167,6 @@ public class Plugin : Plugin<Config>
         CustomHandlersManager.UnregisterEventsHandler(CustomMapMainHandler);
         CustomHandlersManager.UnregisterEventsHandler(ObjectPrefabHandler);
             
-        TerminalRift.Unregister();
-            
-        VentControl.Unregister();
-            
         // DailyCassieAnnounce.Unregister(); -- 何か微妙だったので没
             
         EngineerRole.UnregisterEvents();
@@ -189,6 +181,9 @@ public class Plugin : Plugin<Config>
         CustomItem.UnregisterItems();
         CustomRole.UnregisterRoles();
             
+        MapGuardHandler.Unregister();
+        TerminalRift.Unregister();
+        VentControl.Unregister();
         FacilityLightHandler.Unregister();
         // GateAEnding.Unregister(); SCRAPPED
         WarheadBoomEffectHandler.Unregister();
