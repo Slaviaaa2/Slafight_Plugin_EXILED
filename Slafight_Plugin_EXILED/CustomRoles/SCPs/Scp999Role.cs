@@ -6,7 +6,9 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -44,8 +46,15 @@ public class Scp999Role : CRole
         player.SetCustomInfo("SCP-999");
 
         player.Position = Door.Get(DoorType.Scp173NewGate).Position + new Vector3(0f, 1f, 0f);
-        
-        Plugin.Singleton.LabApiHandler.Schem999(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+
+        if (MapFlags.GetSeason() == SeasonTypeId.April)
+        {
+            player.Wear("Scp999Model");
+        }
+        else
+        {
+            LabApiHandler.Schem999(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+        }
         
         Timing.CallDelayed(0.05f, () =>
         {

@@ -1,0 +1,60 @@
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using InventorySystem.Items.Usables.Scp330;
+using MEC;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MainHandlers;
+
+namespace Slafight_Plugin_EXILED.CustomRoles.Others;
+
+public class CandyWarrierApril : CRole
+{
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.CandyWarrierApril;
+    protected override CTeam Team { get; set; } = CTeam.Others;
+    protected override string UniqueRoleKey { get; set; } = "CandyWarrierApril";
+
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    {
+        base.SpawnRole(player, roleSpawnFlags);
+
+        player!.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
+        player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
+        player.UniqueRole = UniqueRoleKey;
+        LabApiHandler.SchemCandyWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+
+        int maxHealth = 1000;
+
+        Timing.CallDelayed(0.05f, () =>
+        {
+            player.SetCustomInfo("<color=#ff8cd9>CANDY WARRIER</color>");
+            player.MaxHealth = maxHealth;
+            player.Health = maxHealth;
+            player.EnableEffect(EffectType.Slowness, 10);
+
+            player.ShowHint(
+                "<size=24><color=#ff8cd9>CANDY WARRIER</color>\n非常に<color=#ff8cd9>お菓子的</color>である。そうは思わんかね？",
+                10);
+
+            player.ClearInventory();
+            player.AddItem(ItemType.SCP1509);
+            player.AddItem(ItemType.GunCOM18);
+            player.AddItem(ItemType.ArmorHeavy);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.SCP500);
+            player.AddItem(ItemType.KeycardO5);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+            player.TryAddCandy(CandyKindID.Pink);
+
+            player.AddAmmo(AmmoType.Nato9, 50);
+        });
+    }
+}

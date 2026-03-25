@@ -16,6 +16,7 @@ using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.Commands.DevTools;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
@@ -115,9 +116,31 @@ public class CustomMapMainHandler : CustomEventsHandler
         SetupMaps();
         HolidaySeasonMapLoader();
         TeleportClassD();
+        SetCandyState();
     }
 
-    private void TeleportClassD()
+    private static void SetCandyState()
+    {
+        Timing.CallDelayed(3f, () =>
+        {
+            if (!CandyChanges.CandyChances.ContainsKey("Default"))
+                CandyChanges.Init();
+            
+            if (MapFlags.GetSeason() == SeasonTypeId.April)
+            {
+                CandyChanges.CandyChances.TryGetValue("Default", out var result);
+                result.MostRareChance = 0.22f;
+                result.RareCandiesChance = 0.5f;
+                CandyChanges.TryAddDictionary("April", result);
+                CandyChanges.TrySetActiveDictionary("April", out _);
+                return;
+            }
+
+            CandyChanges.TrySetActiveDictionary("Default", out _);
+        });
+    }
+
+    private static void TeleportClassD()
     {
         Timing.CallDelayed(1f, () =>
         {
@@ -290,7 +313,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         }
     }
 
-    private void ResetInRestart()
+    private static void ResetInRestart()
     {
         WarheadBoomEffectUtil.StopAllEffects();
     }
@@ -306,7 +329,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         });
     }
 
-    private IEnumerator<float> PlayBarAnim(SchematicObject schem, float waitTime)
+    private IEnumerator<float> PlayBarAnim(SchematicObject? schem, float waitTime)
     {
         if (schem is null)
             yield break;
@@ -328,7 +351,7 @@ public class CustomMapMainHandler : CustomEventsHandler
         yield return Timing.WaitUntilDone(Anim(schem, ChaosBarNormalPos + new Vector3(0f, 4f, 0f), new Vector3(0, -4f, 0), 1.5f));
     }
 
-    private IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos, Vector3 offset, float duration)
+    private static IEnumerator<float> Anim(SchematicObject schem, Vector3 startpos, Vector3 offset, float duration)
     {
         if (schem is null || schem.transform == null || duration <= 0f)
             yield break;
@@ -521,11 +544,10 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     public void HolidaySeasonMapLoader()
     {
-        switch (Plugin.Singleton.Config.Season)
+        switch (MapFlags.GetSeason())
         {
-            case 0: return;
-            case 1: MapUtils.LoadMap("Holiday_HalloweenMap"); break;
-            case 2: MapUtils.LoadMap("Holiday_ChristmasMap"); break;
+            case SeasonTypeId.Halloween: MapUtils.LoadMap("Holiday_HalloweenMap"); break;
+            case SeasonTypeId.Christmas: MapUtils.LoadMap("Holiday_ChristmasMap"); break;
         }
     }
 }

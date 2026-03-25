@@ -28,7 +28,6 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
     // ===== 内部状態 =====
     private bool _teslaDisabled = false;
-    private int _eventPidGlobal = 0;
 
     private EventHandler EventHandler => Plugin.Singleton.EventHandler;
 
@@ -38,7 +37,6 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
     // ===== 実行エントリポイント =====
     protected override void OnExecute(int eventPID)
     {
-        _eventPidGlobal = eventPID;
         _teslaDisabled = false;
 
         if (CancelIfOutdated()) return;
@@ -55,9 +53,6 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
     {
         Exiled.Events.Handlers.Player.TriggeringTesla -= DisableTesla;
     }
-
-    private bool CancelIfOutdated()
-        => _eventPidGlobal != Plugin.Singleton.SpecialEventsHandler.EventPID;
 
     // ===== メイン処理 =====
     private IEnumerator<float> RaidCoroutine()

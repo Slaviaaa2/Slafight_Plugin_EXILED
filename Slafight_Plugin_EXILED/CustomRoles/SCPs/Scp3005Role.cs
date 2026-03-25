@@ -11,6 +11,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -53,7 +54,7 @@ public class Scp3005Role : CRole
         player.Rotation = spawnRoom.Rotation;
 
         // ★ Scale は触らない
-        Plugin.Singleton.LabApiHandler.Schem3005(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+        LabApiHandler.Schem3005(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
         player.AddAbility(new MagicMissileAbility(player));
         player.AddAbility(new SoundOfFifthAbility(player));

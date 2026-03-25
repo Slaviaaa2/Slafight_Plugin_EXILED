@@ -283,7 +283,7 @@ public abstract class CRole
 
         if (roleSpawnFlags == RoleSpawnFlags.None)
         {
-            Vector3 savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
+            var savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
             var items = player.Items.ToList();
             var ammos = player.Ammo.ToList();
 

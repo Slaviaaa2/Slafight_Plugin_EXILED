@@ -4,7 +4,8 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using MEC;
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.API.Features; // SpecialEvent 基底クラス
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps; // SpecialEvent 基底クラス
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
@@ -15,8 +16,8 @@ public class SpeedUpEvent : SpecialEvent
     // ===== メタ情報 =====
     public override SpecialEventType EventType => SpecialEventType.SpeedUpEvent;
     public override int MinPlayersRequired => 0; // 誰もいなくても可なら 0
-    public override string LocalizedName => "255倍速SL";
-    public override string TriggerRequirement => "無し";
+    public override string LocalizedName => "- ULTIMATE SPEED EX -";
+    public override string TriggerRequirement => "Only available in April fools.";
 
     // ===== ショートカット =====
     private EventHandler EventHandler => Plugin.Singleton.EventHandler;
@@ -27,7 +28,7 @@ public class SpeedUpEvent : SpecialEvent
     // ===== 実行本体 =====
     public override bool IsReadyToExecute()
     {
-        return false;
+        return MapFlags.GetSeason() == SeasonTypeId.April;
     }
 
     protected override void OnExecute(int eventPid)
@@ -36,6 +37,9 @@ public class SpeedUpEvent : SpecialEvent
         {
             if (player == null) continue;
             player.EnableEffect(EffectType.MovementBoost, 255);
+            player.EnableEffect(EffectType.Scp207, 255);
+            SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.Scp207Resistance);
+            player.IsUsingStamina = false;
         }
 
         Timing.RunCoroutine(SpeedUpCoroutine());
@@ -48,8 +52,11 @@ public class SpeedUpEvent : SpecialEvent
             if (CancelIfOutdated()) yield break;
             foreach (var player in Player.List)
             {
-                if (player == null) continue; 
+                if (player == null) continue;
                 player.EnableEffect(EffectType.MovementBoost, 255);
+                player.EnableEffect(EffectType.Scp207, 255);
+                SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.Scp207Resistance);
+                player.IsUsingStamina = false;
             }
             yield return Timing.WaitForSeconds(5f);
         }

@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.MainHandlers;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Others;
 
@@ -20,7 +21,7 @@ public class SnowWarrier : CRole
         player.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
         player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
         player.UniqueRole = UniqueRoleKey;
-        Plugin.Singleton.LabApiHandler.SchemSnowWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
+        LabApiHandler.SchemSnowWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
         int maxHealth = 1000;
 

@@ -6,6 +6,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -27,10 +28,10 @@ public class Scp106Role : CRole
         base.UnregisterEvents();
     }
     
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.Scp106);
+        player!.Role.Set(RoleTypeId.Scp106);
         player.UniqueRole = UniqueRoleKey;
         //player.MaxHealth = 1400;
         //player.Health = player.MaxHealth;
@@ -38,10 +39,21 @@ public class Scp106Role : CRole
         player.ClearInventory();
         player.SetCustomInfo("SCP-106");
 
-        player.AddAbility(new CreateSinkholeAbility(player));
+        if (MapFlags.GetSeason() == SeasonTypeId.April)
+        {
+            player.AddAbility(new DropBiggerShitAbility(player));
+        }
+        else
+        {
+            player.AddAbility(new CreateSinkholeAbility(player));
+        }
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=24><color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで陥没穴を創り出せるぞ！陥没穴は中に\n人を引き込めるから沢山作れ！",10f);
+            player.ShowHint(
+                MapFlags.GetSeason() == SeasonTypeId.April
+                    ? "<size=22><color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで糞まみれの爺街道を創り出せるぞ！\n施設中に糞を垂れ流す奴二号機になりましょう！"
+                    : "<size=24><color=red>SCP-106</color>\n若者の叫び声大好き爺。いっぱいPDに送り込もう！\nアビリティで陥没穴を創り出せるぞ！陥没穴は中に\n人を引き込めるから沢山作れ！",
+                10f);
         });
     }
 

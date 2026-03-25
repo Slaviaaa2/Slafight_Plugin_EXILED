@@ -7,10 +7,10 @@ using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
 
-public class Scp096CryFuckEvent : SpecialEvent
+public class EndlessCryEvent : SpecialEvent
 {
     // ==== メタ情報 ====
-    public override SpecialEventType EventType => SpecialEventType.Scp096CryFuck;
+    public override SpecialEventType EventType => SpecialEventType.EndlessCry;
 
     // 4人以上のプレイヤーで有効
     public override int MinPlayersRequired => 4;

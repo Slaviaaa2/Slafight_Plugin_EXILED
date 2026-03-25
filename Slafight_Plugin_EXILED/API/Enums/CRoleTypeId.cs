@@ -72,6 +72,8 @@ public enum CRoleTypeId
     
     // ==== Others ====
     SnowWarrier,
+    CandyWarrierApril,
+    CandyWarrierHalloween,
     Zombified,
     Sculpture,
     SergeyMakarov,

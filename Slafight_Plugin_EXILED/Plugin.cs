@@ -40,7 +40,7 @@ public class Plugin : Plugin<Config>
     public override string Name => "Slafight_Plugin_EXILED";
     public override string Author => "Slaviaaa_2";
     public override string Prefix => "Slafight_Plugin_EXILED";
-    public override Version Version => new Version(1,7,2,1);
+    public override Version Version => new Version(1,7,3,0);
         
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 1);
 
@@ -53,7 +53,6 @@ public class Plugin : Plugin<Config>
     public LabApiHandler LabApiHandler { get; set; }
     public EasterEggsHandler EasterEggsHandler { get; set; }
     public PlayerHUD PlayerHUD { get; set; }
-    public CandyChanges CandyChanges { get; set; }
     public ActivateHandler ProximityChatActiveHandler { get; set; }
     public RPNameSetter RolePlayNameSetter { get; set; }
     public FirstRolesHandler FirstRolesHandler { get; set; }
@@ -81,7 +80,6 @@ public class Plugin : Plugin<Config>
         EasterEggsHandler = new();
         PlayerHUD = new();
         EscapeHandler = new();
-        CandyChanges = new();
         ProximityChat.Handler.RegisterEvents();
         ProximityChatActiveHandler = new();
         RolePlayNameSetter = new();
@@ -111,6 +109,7 @@ public class Plugin : Plugin<Config>
         CustomRole.RegisterRoles(false);
         CustomItemsManager.RegisterAllItems();
             
+        CandyChanges.Register();
         MapGuardHandler.Register();
         TerminalRift.Register();
         VentControl.Register();
@@ -180,7 +179,8 @@ public class Plugin : Plugin<Config>
         AbilityManager.UnregisterEvents();
         CustomItem.UnregisterItems();
         CustomRole.UnregisterRoles();
-            
+           
+        CandyChanges.Unregister();
         MapGuardHandler.Unregister();
         TerminalRift.Unregister();
         VentControl.Unregister();

@@ -7,6 +7,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -47,7 +48,7 @@ public class CustomRolesHandler
         {
             Timing.RunCoroutine(FifthistWinCoroutine());
             Timing.RunCoroutine(NewAICoroutine());
-            if (Plugin.Singleton.Config.Season == 2)
+            if (MapFlags.GetSeason() == SeasonTypeId.Christmas)
                 Timing.RunCoroutine(SnowWarrierWinCoroutine());
         });
     }

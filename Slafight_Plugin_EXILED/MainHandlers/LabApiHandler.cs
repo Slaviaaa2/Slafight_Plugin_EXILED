@@ -188,7 +188,7 @@ public class LabApiHandler : CustomEventsHandler
     /// <summary>
     /// SCP-3005 用 schematic 生成（見た目は昔のまま、ロール監視は WearsHandler に任せる）
     /// </summary>
-    public void Schem3005(Player labPlayer)
+    public static void Schem3005(Player labPlayer)
     {
         Timing.CallDelayed(1.5f, () =>
         {
@@ -236,7 +236,7 @@ public class LabApiHandler : CustomEventsHandler
         });
     }
 
-    public void Schem999(Player labPlayer)
+    public static void Schem999(Player labPlayer)
     {
         Timing.CallDelayed(1.5f, () =>
         {
@@ -260,7 +260,7 @@ public class LabApiHandler : CustomEventsHandler
             }
 
             labPlayer.Scale = new Vector3(0.35f, 0.2f, 0.35f);
-            schem.transform.SetParent(labPlayer.GameObject.transform);
+            schem.transform.SetParent(labPlayer.GameObject?.transform);
 
             WearsHandler.RegisterExternal(exiledPlayer, schem);
 
@@ -269,9 +269,10 @@ public class LabApiHandler : CustomEventsHandler
                 if (schem == null || schem.transform == null)
                     return;
 
-                schem.transform.position = labPlayer.GameObject.transform.position + new Vector3(0f, 0f, 0.05f);
+                if (labPlayer.GameObject != null)
+                    schem.transform.position = labPlayer.GameObject.transform.position + new Vector3(0f, 0f, 0.05f);
 
-                for (int i = 0; i < schem.transform.childCount; i++)
+                for (var i = 0; i < schem.transform.childCount; i++)
                 {
                     var child = schem.transform.GetChild(i);
                     Logger.Info($"[Scp999Model] Child {i}: {child.name}, localScale={child.localScale}");
@@ -282,7 +283,7 @@ public class LabApiHandler : CustomEventsHandler
         });
     }
 
-    public void SchemSnowWarrier(Player labPlayer)
+    public static void SchemSnowWarrier(Player labPlayer)
     {
         Timing.CallDelayed(1.5f, () =>
         {
@@ -305,7 +306,7 @@ public class LabApiHandler : CustomEventsHandler
                 return;
             }
 
-            schem.transform.SetParent(labPlayer.GameObject.transform);
+            schem.transform.SetParent(labPlayer.GameObject?.transform);
 
             WearsHandler.RegisterExternal(exiledPlayer, schem);
 
@@ -314,7 +315,7 @@ public class LabApiHandler : CustomEventsHandler
                 if (schem == null || schem.transform == null)
                     return;
 
-                schem.transform.position = labPlayer.GameObject.transform.position;
+                if (labPlayer.GameObject != null) schem.transform.position = labPlayer.GameObject.transform.position;
 
                 var light = Light.Create(Vector3.zero);
                 light.Position = schem.transform.position + new Vector3(0f, -0.08f, 0f);
@@ -326,8 +327,45 @@ public class LabApiHandler : CustomEventsHandler
             });
         });
     }
+    
+    public static void SchemCandyWarrier(Player labPlayer)
+    {
+        Timing.CallDelayed(1.5f, () =>
+        {
+            var exiledPlayer = Exiled.API.Features.Player.Get(labPlayer.NetworkId);
+            Logger.Info($"[DEBUG] SCW ExiledPlayer={(exiledPlayer != null ? exiledPlayer.Nickname : "null")}");
+            if (exiledPlayer == null)
+            {
+                Logger.Warn("[LabApiHandler] SchemCandyWarrier: Exiled player not found.");
+                return;
+            }
 
-    public void DiedCassie(Exiled.Events.EventArgs.Player.DyingEventArgs ev)
+            SchematicObject schem;
+            try
+            {
+                schem = ObjectSpawner.SpawnSchematic("CandyWarrier", Vector3.zero);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("[LabApiHandler] SchemCandyWarrier: Spawn error " + ex);
+                return;
+            }
+
+            schem.transform.SetParent(labPlayer.GameObject?.transform);
+
+            WearsHandler.RegisterExternal(exiledPlayer, schem);
+
+            Timing.CallDelayed(0.5f, () =>
+            {
+                if (schem == null || schem.transform == null)
+                    return;
+
+                if (labPlayer.GameObject != null) schem.transform.position = labPlayer.GameObject.transform.position;
+            });
+        });
+    }
+
+    private static void DiedCassie(Exiled.Events.EventArgs.Player.DyingEventArgs ev)
     {
         if (ev.Player.GetCustomRole() == CRoleTypeId.Scp3005)
         {

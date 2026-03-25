@@ -11,8 +11,8 @@ namespace Slafight_Plugin_EXILED.Abilities;
 public class CreateSinkholeAbility : AbilityBase
 {
     // AbilityBase の抽象プロパティを実装
-    protected override float DefaultCooldown => 30f;
-    protected override int DefaultMaxUses => 3;
+    protected override float DefaultCooldown => 60f;
+    protected override int DefaultMaxUses => -1;
 
     // 完全デフォルト
     public CreateSinkholeAbility(Player owner)

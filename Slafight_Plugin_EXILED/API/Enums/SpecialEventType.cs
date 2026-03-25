@@ -17,7 +17,7 @@ public enum SpecialEventType
     OldDeltaWarhead,
     
     /// <summary>CRYYYYYYYYYYY</summary>
-    Scp096CryFuck,
+    EndlessCry,
     
     /// <summary>BattleField 4</summary>
     Scp1509BattleField,
@@ -46,9 +46,12 @@ public enum SpecialEventType
     /// <summary>セルゲーーーーーイ</summary>
     SergeyMakarovReturns,
     
-    /// <summary>4倍速SL</summary>
+    /// <summary>255倍速 & 255本コーラ lmao</summary>
     SpeedUpEvent,
     
-    /// <summary></summary>
+    /// <summary>何かに使う予定だったような何か</summary>
     DailyFoundation,
+    
+    /// <summary>Candyyyyyy!!! AprilとHalloweenで仕様が異なる</summary>
+    CandyWarriersAttack,
 }

@@ -15,6 +15,7 @@ public static class AbilityLocalization
         ["PlaceTantrumAbility"] = "汚物作戦",
         ["Scp035TentacleAbility"] = "触手",
         ["Scp966SpeedAbility"] = "這いよる混沌",
+        ["DropBiggerShitAbility"] = "爺街道",
     };
     private static readonly Dictionary<string, string> JaNamesSergey = new()
     {
@@ -26,6 +27,7 @@ public static class AbilityLocalization
         ["PlaceTantrumAbility"] = "精神破壊幻覚の顕現",
         ["Scp035TentacleAbility"] = "冥界からの呼び声",
         ["Scp966SpeedAbility"] = "背後からの一突き",
+        ["DropBiggerShitAbility"] = "怨念大肛爆発",
     };
 
     public static string GetDisplayName(string key, Exiled.API.Features.Player player)

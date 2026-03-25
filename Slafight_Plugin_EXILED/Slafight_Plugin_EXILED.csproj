@@ -161,6 +161,7 @@
     <ItemGroup>
         <Compile Include="Abilities\AllowEscapeAbility.cs" />
         <Compile Include="Abilities\CreateSinkholeAbility.cs" />
+        <Compile Include="Abilities\DropBiggerShitAbility.cs" />
         <Compile Include="Abilities\MagicMissileAbility.cs" />
         <Compile Include="Abilities\PlaceTantrumAbility.cs" />
         <Compile Include="Abilities\Scp035TentacleAbility.cs" />
@@ -328,6 +329,8 @@
         <Compile Include="CustomRoles\Guards\Chamber Guard.cs" />
         <Compile Include="CustomRoles\Guards\EvacuationGuard.cs" />
         <Compile Include="CustomRoles\Guards\SecurityChief.cs" />
+        <Compile Include="CustomRoles\Others\CandyWarrierApril.cs" />
+        <Compile Include="CustomRoles\Others\CandyWarrierHalloween.cs" />
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovAwakenRole.cs" />
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovExtensionAndUtils.cs" />
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovRole.cs" />
@@ -404,6 +407,7 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ProximityChat\ActivateHandler.cs" />
         <Compile Include="ProximityChat\Handler.cs" />
+        <Compile Include="SpecialEvents\Events\CandyWarriersAttack.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />
         <Compile Include="SpecialEvents\Events\ClassicEvent.cs" />
         <Compile Include="SpecialEvents\Events\DailyFoundation.cs" />
@@ -414,7 +418,7 @@
         <Compile Include="SpecialEvents\Events\OmegaWarhead.cs" />
         <Compile Include="SpecialEvents\Events\OperationBlackout.cs" />
         <Compile Include="SpecialEvents\Events\RevolverBattles.cs" />
-        <Compile Include="SpecialEvents\Events\Scp096CryFuckEvent.cs" />
+        <Compile Include="SpecialEvents\Events\EndlessCryEvent.cs" />
         <Compile Include="SpecialEvents\Events\Scp1509BattleField.cs" />
         <Compile Include="SpecialEvents\Events\SergeyMakarovReturns.cs" />
         <Compile Include="SpecialEvents\Events\SnowWarriersAttack.cs" />

@@ -44,6 +44,7 @@ public class EventHandler
         PlayerHandler.ChangingRole += OnChangingRole;
         PlayerHandler.InteractingDoor += DoorGet;
         PlayerHandler.UsedItem += OnUsed;
+        PlayerHandler.Hurting += OnHurting;
 
         WarheadHandler.Starting += AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
@@ -64,6 +65,7 @@ public class EventHandler
         PlayerHandler.ChangingRole -= OnChangingRole;
         PlayerHandler.InteractingDoor -= DoorGet;
         PlayerHandler.UsedItem -= OnUsed;
+        PlayerHandler.Hurting -= OnHurting;
 
         WarheadHandler.Starting -= AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
@@ -382,7 +384,7 @@ public class EventHandler
 
     private void OnUsed(UsedItemEventArgs ev)
     {
-        if (ev?.Player == null || ev.Item == null) return;
+        if (ev.Player == null || ev.Item == null) return;
         if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
         {
             if (ev.Item.Type == ItemType.SCP500 && !ev.Item.TryGetCustomItem(out _))
@@ -392,6 +394,18 @@ public class EventHandler
                     ev.Player.EnableEffect(EffectType.Scp207, 4);
                     ev.Player.EnableEffect(EffectType.Invigorated, 60);
                 }
+            }
+        }
+    }
+
+    private void OnHurting(HurtingEventArgs ev)
+    {
+        if (ev.Player == null) return;
+        if (ev.DamageHandler.Type == DamageType.Scp207)
+        {
+            if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.Scp207Resistance))
+            {
+                ev.IsAllowed = false;
             }
         }
     }
