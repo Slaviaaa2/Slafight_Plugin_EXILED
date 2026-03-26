@@ -63,12 +63,12 @@ public class Scp1509BattleFieldEvent : SpecialEvent
         SpawnSystem.Disable = true;
 
         // 回復系以外のピックアップ削除
-        List<ItemType> keepPickups = new()
-        {
+        List<ItemType> keepPickups =
+        [
             ItemType.Painkillers,
             ItemType.Medkit,
             ItemType.Adrenaline
-        };
+        ];
 
         foreach (Pickup pickup in Pickup.List)
         {
@@ -131,7 +131,7 @@ public class Scp1509BattleFieldEvent : SpecialEvent
             else if (battlefield_map == 2)
             {
                 // Entrance
-                List<DoorType> closeDoor = new() { DoorType.CheckpointGateA, DoorType.CheckpointGateB };
+                List<DoorType> closeDoor = [DoorType.CheckpointGateA, DoorType.CheckpointGateB];
                 foreach (Door door in Door.List)
                 {
                     if (closeDoor.Contains(door.Type))
@@ -163,7 +163,7 @@ public class Scp1509BattleFieldEvent : SpecialEvent
             else if (battlefield_map == 3)
             {
                 // Heavy Containment
-                List<DoorType> closeDoor = new() { DoorType.CheckpointGateA, DoorType.CheckpointGateB };
+                List<DoorType> closeDoor = [DoorType.CheckpointGateA, DoorType.CheckpointGateB];
                 foreach (Door door in Door.List)
                 {
                     if (closeDoor.Contains(door.Type))
@@ -194,7 +194,7 @@ public class Scp1509BattleFieldEvent : SpecialEvent
             else if (battlefield_map == 4)
             {
                 // Light Containment
-                List<DoorType> closeDoor = new() { DoorType.Scp914Door, DoorType.Scp914Gate };
+                List<DoorType> closeDoor = [DoorType.Scp914Door, DoorType.Scp914Gate];
                 foreach (Door door in Door.List)
                 {
                     if (closeDoor.Contains(door.Type))
@@ -225,13 +225,13 @@ public class Scp1509BattleFieldEvent : SpecialEvent
         });
         
         // メインエレベーター停止（戦場閉じ込め）
-        List<ElevatorType> lockEvTypes = new()
-        {
+        List<ElevatorType> lockEvTypes =
+        [
             ElevatorType.GateA,
             ElevatorType.GateB,
             ElevatorType.LczA,
             ElevatorType.LczB
-        };
+        ];
 
         foreach (Lift lift in Lift.List)
         {

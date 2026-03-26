@@ -23,8 +23,8 @@ public class Sinkhole
         Exiled.Events.Handlers.Server.RoundStarted -= RoundStartHole;
     }
     
-    private readonly List<Vector3> Sinkholes = new();
-    private readonly List<Player> JoiningPlayers = new();
+    private readonly List<Vector3> Sinkholes = [];
+    private readonly List<Player> JoiningPlayers = [];
     private CoroutineHandle _sinkholeHandle;
 
     private readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio 

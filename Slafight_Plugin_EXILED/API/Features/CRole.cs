@@ -20,7 +20,7 @@ namespace Slafight_Plugin_EXILED.API.Features;
 public abstract class CRole
 {
     // 全インスタンスを追跡（主に自動生成分）
-    private static readonly HashSet<CRole> RegisteredInstances = new();
+    private static readonly HashSet<CRole> RegisteredInstances = [];
 
     // 全Roleタイプ
     private static readonly List<Type> RoleTypes;

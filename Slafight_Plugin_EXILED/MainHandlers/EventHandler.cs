@@ -9,12 +9,14 @@ using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Warhead;
+using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;
 using ProjectMER.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
@@ -91,7 +93,7 @@ public class EventHandler
     public bool IsScpAutoSpawnLocked = false;
     private bool _pluginLoaded = false;
 
-    private static bool IsPlayerValid(Player p)
+    private static bool IsPlayerValid(Player? p)
     {
         try
         {
@@ -112,7 +114,7 @@ public class EventHandler
         }
     }
 
-    private void OnVerified(VerifiedEventArgs ev)
+    private static void OnVerified(VerifiedEventArgs ev)
     {
         if (ev?.Player == null) return;
         SpecificFlagsManager.InitPlayerFlags(ev.Player);
@@ -129,7 +131,7 @@ public class EventHandler
         });
     }
 
-    private void OnLeft(LeftEventArgs ev)
+    private static void OnLeft(LeftEventArgs ev)
     {
         if (ev?.Player == null) return;
         DebugModeHandler.RemovePlayer(ev.Player);
@@ -151,8 +153,7 @@ public class EventHandler
         }
         else
         {
-            Debug.Assert(roleInfo.Custom != null, "roleInfo.Custom != null");
-            candidate.SetRole((CRoleTypeId)roleInfo.Custom);
+            candidate.SetRole(roleInfo.Custom);
         }
 
         candidate.ShowHint("※SCPプレイヤーが切断したため代わりにスポーンしました");
@@ -277,27 +278,56 @@ public class EventHandler
             });
         });
     }
+    
+    private readonly List<CandyKindID> _candies =
+    [
+        CandyKindID.Black,
+        CandyKindID.Brown,
+        CandyKindID.Gray,
+        CandyKindID.Orange,
+        CandyKindID.White,
+        CandyKindID.Evil,
+        CandyKindID.Red,
+        CandyKindID.Blue,
+        CandyKindID.Green,
+        CandyKindID.Purple,
+        CandyKindID.Rainbow,
+        CandyKindID.Yellow,
+        CandyKindID.Pink,
+    ];
 
-    public void OnChangingRole(ChangingRoleEventArgs ev)
+    private void OnChangingRole(ChangingRoleEventArgs ev)
     {
-        if (ev?.Player == null) return;
-
+        if (ev.Player is null) return;
         Timing.CallDelayed(1.05f, () =>
         {
             if (!IsPlayerValid(ev.Player)) return;
             if (!Round.InProgress) return;
-
             RoleTypeId role = ev.Player.Role;
-            var allowed = PlayerRolesUtils.GetTeam(role);
-
+            var allowed = role.GetTeam();
             if (allowed == Team.SCPs) return;
-            if (ev.Player.HasItem(ItemType.Flashlight)) return;
-            if (ev.Player.IsInventoryFull) return;
-            if (ev.NewRole == RoleTypeId.Spectator) return;
-            if (ev.Player.Inventory == null) return;
+            
+            // Add Process
+            if (MapFlags.GetSeason() == SeasonTypeId.April)
+            {
+                if (ev.Player.HasItem(ItemType.SCP330)) return;
+                if (ev.Player.IsInventoryFull) return;
+                if (ev.NewRole == RoleTypeId.Spectator) return;
+                if (ev.Player.Inventory == null) return;
 
-            Log.Debug("Giving Flashlight to " + ev.Player.Nickname);
-            ev.Player.GiveOrDrop(ItemType.Flashlight);
+                Log.Debug("Giving Random candy to " + ev.Player.Nickname);
+                ev.Player.TryAddCandy(_candies.RandomItem());
+            }
+            else
+            {
+                if (ev.Player.HasItem(ItemType.Flashlight)) return;
+                if (ev.Player.IsInventoryFull) return;
+                if (ev.NewRole == RoleTypeId.Spectator) return;
+                if (ev.Player.Inventory == null) return;
+
+                Log.Debug("Giving Flashlight to " + ev.Player.Nickname);
+                ev.Player.GiveOrDrop(ItemType.Flashlight);
+            }
         });
     }
 
@@ -329,16 +359,16 @@ public class EventHandler
     {
     }
 
-    private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs ev)
+    private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs? ev)
     {
-        if (ev == null) return;
+        if (ev is null) return;
         if (DeadmanDisable)
             ev.IsAllowed = false;
     }
 
-    private void DeconCancell(DecontaminatingEventArgs ev)
+    private void DeconCancell(DecontaminatingEventArgs? ev)
     {
-        if (ev == null) return;
+        if (ev is null) return;
         if (!DeconCancellFlag) return;
         ev.IsAllowed = false;
         Log.Debug("Decon Cancell called.");
@@ -348,7 +378,7 @@ public class EventHandler
     /// ドアに触ったとき、デバッグモード ON なら情報を DebugModeHandler に記録する。
     /// それ以外のプレイヤーにはゲートロックのヒントを出す。
     /// </summary>
-    private void DoorGet(InteractingDoorEventArgs ev)
+    private static void DoorGet(InteractingDoorEventArgs? ev)
     {
         if (ev?.Player == null || ev.Door == null) return;
 

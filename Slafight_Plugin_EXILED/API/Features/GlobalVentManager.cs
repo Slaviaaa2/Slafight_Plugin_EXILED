@@ -42,7 +42,7 @@ public struct VentPoint
 
 public static class GlobalVentManager
 {
-    public static readonly List<VentPoint> VentPoints = new();
+    public static readonly List<VentPoint> VentPoints = [];
 
     public static void RegisterVentPoint(VentPoint ventPoint) => VentPoints.Add(ventPoint);
 

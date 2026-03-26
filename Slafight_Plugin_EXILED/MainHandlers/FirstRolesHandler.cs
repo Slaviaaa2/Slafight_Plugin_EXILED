@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Toys;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Objects;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -31,7 +34,7 @@ public class FirstRolesHandler
         Exiled.Events.Handlers.Server.RoundStarted -= RoundUnlocker;
     }
 
-    private void RoundLocker()
+    private static void RoundLocker()
     {
         Round.IsLocked = true;
     }
@@ -44,18 +47,19 @@ public class FirstRolesHandler
         }
     }
 
-    private void AssignRole(Player player, List<object> table, RoleSpawnFlags flags)
+    private static void AssignRole(Player player, List<WeightedRoleEntry> table, RoleSpawnFlags flags)
     {
         const int maxTries = 20;
-        object choice = null;
+        object? choice = null;
 
         for (int i = 0; i < maxTries; i++)
         {
-            choice = table.RandomItem();
+            choice = WeightedRole.Choose(table);
+            if (choice == null)
+                continue;
+
             if (RoleLimitManager.CanAssign(choice))
                 break;
-
-            choice = null;
         }
 
         if (choice == null)
@@ -79,36 +83,24 @@ public class FirstRolesHandler
         Log.Debug($"[FirstRoles] Assigned {choice} to {player.Nickname}");
     }
 
-    private void _LimitChecker()
+    private static void _LimitChecker()
     {
-        RoleLimitManager.ClearAll();
-
-        // Limits
-        RoleLimitManager.SetLimit(CRoleTypeId.Janitor, 3);
-        RoleLimitManager.SetLimit(CRoleTypeId.ChaosUndercoverAgent, 1);
-            
-        RoleLimitManager.SetLimit(CRoleTypeId.ZoneManager, 2);
-        RoleLimitManager.SetLimit(CRoleTypeId.FacilityManager, 1);
-        RoleLimitManager.SetLimit(CRoleTypeId.ObjectObserver, 1);
-            
-        RoleLimitManager.SetLimit(CRoleTypeId.EvacuationGuard, 1);
-        RoleLimitManager.SetLimit(CRoleTypeId.SecurityChief, 1);
-        RoleLimitManager.SetLimit(CRoleTypeId.ChamberGuard, 1);
-            
-        RoleLimitManager.SetLimit(CRoleTypeId.Scp682, 1);
-
-        // Logs
         Log.Debug("[FirstRoles] _LimitChecker called");
+
+        // 現在のモードに応じたロール上限を一括適用
+        RoleLimitManager.ApplyPool(RoleTables.GetCurrentLimitPool());
     }
 
-    public void SetupRandomRoles()
+    private static void SetupRandomRoles()
     {
         Log.Debug("[FirstRoles] SetupRandomRoles called");
-        
+
         _LimitChecker();
 
-        // RoundStartをキャンセルしている前提なので、接続プレイヤー全員を対象
-        var players = Player.List.Where(p => p != null && p.IsConnected && p.IsRoleUnassigned()).ToList();
+        var players = Player.List
+            .Where(p => p != null && p.IsConnected && p.IsRoleUnassigned())
+            .ToList();
+
         int playerCount = players.Count;
         if (playerCount == 0)
         {
@@ -118,25 +110,28 @@ public class FirstRolesHandler
 
         var shuffledPlayers = players.OrderBy(_ => Random.value).ToList();
 
-        // ===== 1) SCP人数（5人に1人、最低1人） =====
-        int scpCount = Mathf.Max(1, playerCount / 5);
+        // 1) SCP 人数（5人に1人、最低1人）
+        var scpCount = Mathf.Max(1, playerCount / 5);
 
         var scpPlayers   = shuffledPlayers.Take(scpCount).ToList();
         var humanPlayers = shuffledPlayers.Skip(scpCount).ToList();
 
-        // SCP
+        // OnAssign
+        OnAssign();
+        
+        // SCP ロール
         foreach (var pl in scpPlayers)
-            AssignRole(pl, RoleTables.ScpRoles, RoleSpawnFlags.All);
+            AssignRole(pl, RoleTables.GetScpRoles(), RoleSpawnFlags.All);
 
-        // 人間 3人に一人
-        for (int i = 0; i < humanPlayers.Count; i++)
+        // 人間：3人に1人
+        for (var i = 0; i < humanPlayers.Count; i++)
         {
             var pl = humanPlayers[i];
             var table = (i % 3) switch
             {
-                0 => RoleTables.ClassDRoles,
-                1 => RoleTables.ScientistRoles,
-                _ => RoleTables.GuardRoles,
+                0 => RoleTables.GetClassDRoles(),
+                1 => RoleTables.GetScientistRoles(),
+                _ => RoleTables.GetGuardRoles(),
             };
             AssignRole(pl, table, RoleSpawnFlags.All);
         }
@@ -144,11 +139,23 @@ public class FirstRolesHandler
         Round.IsLocked = false;
     }
 
-    public void RoundUnlocker()
+    private static void RoundUnlocker()
     {
         Timing.CallDelayed(5f, () =>
         {
             Round.IsLocked = false;
         });
+    }
+
+    private static void OnAssign()
+    {
+        if (MapFlags.GetSeason() is SeasonTypeId.April)
+        {
+            RoleTables.SetCurrentMode("April");
+        }
+        else
+        {
+            RoleTables.SetCurrentMode("Normal");
+        }
     }
 }

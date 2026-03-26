@@ -46,13 +46,13 @@ public class SpecialEventsHandler
     //  イベントキューと状態
     // =====================
 
-    public readonly List<SpecialEventType> EventQueue = new();
+    public readonly List<SpecialEventType> EventQueue = [];
 
     /// <summary>
     /// 発火済みイベントの履歴（古い順）。
     /// 直近 EventCooldownCount 件に含まれるイベントは抽選から除外される。
     /// </summary>
-    public readonly List<SpecialEventType> HappenedEvents = new();
+    public readonly List<SpecialEventType> HappenedEvents = [];
 
     /// <summary>
     /// 同一イベントが再抽選されるまでの抽選スキップ回数。

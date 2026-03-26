@@ -71,8 +71,8 @@ public class SNAV300 : CustomItem
     }
 
     private RadioRange mode;
-    private List<RoomType> uniques = new()
-    {
+    private List<RoomType> uniques =
+    [
         RoomType.Lcz914,
         RoomType.Hcz127,
         RoomType.HczCrossRoomWater,
@@ -81,7 +81,7 @@ public class SNAV300 : CustomItem
         RoomType.EzIntercom,
         RoomType.EzGateA,
         RoomType.EzGateB
-    };
+    ];
     private void ChangeMode(ChangingRadioPresetEventArgs ev)
     {
         if (ev.Radio.BatteryLevel < 10) return;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Objects;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
@@ -12,7 +13,6 @@ public static class RoleLimitManager
 
     public static void Reset()
     {
-        // Keys を配列にコピーしてから回す
         foreach (var key in VanillaLimits.Keys.ToArray())
         {
             var entry = VanillaLimits[key];
@@ -38,7 +38,25 @@ public static class RoleLimitManager
     public static void SetLimit(CRoleTypeId role, int max)
         => CustomLimits[role] = (CustomLimits.TryGetValue(role, out var v) ? v.Current : 0, max);
 
-    // チェックのみ（カウントは進めない）
+    // ここから追加
+    public static void ApplyPool(RoleLimitPool pool)
+    {
+        ClearAll();
+
+        foreach (var entry in pool.Limits)
+        {
+            switch (entry.Role)
+            {
+                case RoleTypeId r:
+                    SetLimit(r, entry.Limit);
+                    break;
+                case CRoleTypeId cr:
+                    SetLimit(cr, entry.Limit);
+                    break;
+            }
+        }
+    }
+
     public static bool CanAssign(object choice) =>
         choice switch
         {
@@ -47,7 +65,6 @@ public static class RoleLimitManager
             _              => false,
         };
 
-    // 実際に割り当てるときに呼び、カウントを+1する
     public static void Consume(object choice)
     {
         switch (choice)

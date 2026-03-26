@@ -11,7 +11,7 @@ namespace Slafight_Plugin_EXILED.API.Features;
 public abstract class SpecialEvent
 {
     // 全インスタンスを追跡（重複登録防止）
-    private static readonly HashSet<SpecialEvent> RegisteredInstances = new();
+    private static readonly HashSet<SpecialEvent> RegisteredInstances = [];
     private static readonly List<Type> EventTypes;
     private static readonly Dictionary<SpecialEventType, SpecialEvent> EventTypeToInstance = new();
     private static readonly Dictionary<SpecialEventType, int> MinPlayersCache = new();  // ★静的キャッシュ追加

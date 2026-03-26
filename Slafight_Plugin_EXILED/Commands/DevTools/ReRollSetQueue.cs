@@ -7,7 +7,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class ReRollSetQueue : ICommand
 {
     public string Command => "rerollqueue";
-    public string[] Aliases { get; } = { "rerollspq","rrspq","rrq",".0" };
+    public string[] Aliases { get; } = ["rerollspq","rrspq","rrq",".0"];
     public string Description => "Reroll Position Zero Queue Event.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

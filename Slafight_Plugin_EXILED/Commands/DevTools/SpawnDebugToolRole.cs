@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class SpawnDebugToolRole : ICommand
 {
     public string Command => "debugmode";
-    public string[] Aliases { get; } = { "debug","spawndebug" };
+    public string[] Aliases { get; } = ["debug","spawndebug"];
     public string Description => "Debugging Mode. You can know Interacted Door Info and Coin Flipping Pos Info.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

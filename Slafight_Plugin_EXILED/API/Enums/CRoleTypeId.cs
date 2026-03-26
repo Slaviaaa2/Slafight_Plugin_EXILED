@@ -57,9 +57,11 @@ public enum CRoleTypeId
     Engineer,
     ObjectObserver,
     Surveillance,
+    CandyResearcher,
     
     // ==== Class-D ====
     Janitor,
+    CandySubject,
     
     // ==== GoC ====
     GoCSquadLeader,

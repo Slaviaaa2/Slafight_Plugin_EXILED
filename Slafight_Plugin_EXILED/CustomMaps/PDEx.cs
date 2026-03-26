@@ -28,7 +28,7 @@ public class PDEx
         Exiled.Events.Handlers.Player.FailingEscapePocketDimension -= JoinPDEx;
     }
 
-    public static List<Player> PDExPlayers = new();
+    public static List<Player> PDExPlayers = [];
     private CoroutineHandle handle;
 
     private void Setup()

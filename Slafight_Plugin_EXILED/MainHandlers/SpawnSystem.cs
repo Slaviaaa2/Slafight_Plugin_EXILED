@@ -587,19 +587,19 @@ public class SpawnSystem
     // Cassie用(NATO_Aなど)と表示用(ALPHA-05)を両方返す
     private (string cassie, string display) GenerateNatoCallsignFull()
     {
-        List<string> NatoForce = new()
-        {
-            "NATO_A","NATO_B","NATO_C","NATO_D","NATO_E","NATO_F","NATO_G","NATO_H","NATO_I","NATO_J",
-            "NATO_K","NATO_L","NATO_M","NATO_N","NATO_O","NATO_P","NATO_Q","NATO_R","NATO_S","NATO_T",
-            "NATO_U","NATO_V","NATO_W","NATO_X","NATO_Y","NATO_Z"
-        };
+        List<string> NatoForce =
+        [
+            "NATO_A", "NATO_B", "NATO_C", "NATO_D", "NATO_E", "NATO_F", "NATO_G", "NATO_H", "NATO_I", "NATO_J",
+            "NATO_K", "NATO_L", "NATO_M", "NATO_N", "NATO_O", "NATO_P", "NATO_Q", "NATO_R", "NATO_S", "NATO_T",
+            "NATO_U", "NATO_V", "NATO_W", "NATO_X", "NATO_Y", "NATO_Z"
+        ];
 
-        List<string> NatoForceL = new()
-        {
-            "ALPHA","BRAVO","CHARLIE","DELTA","ECHO","FOXTROT","GOLF","HOTEL","INDIA","JULIETT",
-            "KILO","LIMA","MIKE","NOVEMBER","OSCAR","PAPA","QUEBEC","ROMEO","SIERRA","TANGO",
-            "UNIFORM","VICTOR","WHISKEY","XRAY","YANKEE","ZULU"
-        };
+        List<string> NatoForceL =
+        [
+            "ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO", "FOXTROT", "GOLF", "HOTEL", "INDIA", "JULIETT",
+            "KILO", "LIMA", "MIKE", "NOVEMBER", "OSCAR", "PAPA", "QUEBEC", "ROMEO", "SIERRA", "TANGO",
+            "UNIFORM", "VICTOR", "WHISKEY", "XRAY", "YANKEE", "ZULU"
+        ];
 
         string natoForce  = NatoForce.RandomItem();
         string natoForceL = NatoForceL[NatoForce.IndexOf(natoForce)];

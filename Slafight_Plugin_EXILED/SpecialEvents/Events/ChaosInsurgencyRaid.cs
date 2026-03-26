@@ -12,6 +12,7 @@ using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -35,6 +36,11 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         EventHandler.CreateAndPlayAudio;
 
     // ===== 実行エントリポイント =====
+    public override bool IsReadyToExecute()
+    {
+        return MapFlags.GetSeason() == SeasonTypeId.None;
+    }
+
     protected override void OnExecute(int eventPID)
     {
         _teslaDisabled = false;

@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class GetQueue : ICommand
 {
     public string Command => "getqueue";
-    public string[] Aliases { get; } = { "getq", "gq", "showq", ".3" };
+    public string[] Aliases { get; } = ["getq", "gq", "showq", ".3"];
     public string Description => "Get Queued Events.";
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

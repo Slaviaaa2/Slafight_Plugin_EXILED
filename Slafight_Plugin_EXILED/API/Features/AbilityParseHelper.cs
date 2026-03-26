@@ -17,7 +17,7 @@ public static class AbilityParseHelper
     {
         return FindAllAbilityTypes()
             .Select(t => t.Name)
-            .Concat(new[] { "sh", "sinkhole", "magicmissile" }); // ショートエイリアスも追加
+            .Concat(["sh", "sinkhole", "magicmissile"]); // ショートエイリアスも追加
     }
 
     /// <summary>

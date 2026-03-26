@@ -17,7 +17,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class SpawnObjectPrefab : ICommand
 {
     public string Command => "objprefab";
-    public string[] Aliases { get; } = { "opf" };
+    public string[] Aliases { get; } = ["opf"];
     public string Description => "RoomTypeローカル座標でObjectPrefabを編集・保存・ロードする開発用ツール";
 
     private static readonly Dictionary<Player, ObjectPrefab> Grabbing = new();
@@ -964,7 +964,7 @@ public static class ObjectPrefabLoader
 }
 public class ObjectPrefabConfig
 {
-    public List<PrefabSaveData> Prefabs { get; set; } = new();
+    public List<PrefabSaveData> Prefabs { get; set; } = [];
 
     public static string DirectoryPath =>
         Path.Combine(Paths.Configs, "Slafight_Plugin_Exiled", "Maps");

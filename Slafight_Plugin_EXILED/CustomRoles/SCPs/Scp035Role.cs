@@ -30,7 +30,7 @@ public class Scp035Role : CRole
     private static readonly Dictionary<int, int> GlobalScpTeamSystemNpc = new();
 
     // 完全覚醒などで「自動遷移させない」プレイヤー
-    private static readonly HashSet<int> FrozenPlayers = new();
+    private static readonly HashSet<int> FrozenPlayers = [];
 
     public struct Scp035State
     {

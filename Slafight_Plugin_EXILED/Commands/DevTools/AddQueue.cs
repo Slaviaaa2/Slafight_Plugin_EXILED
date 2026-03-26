@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class AddQueue : ICommand
 {
     public string Command => "addqueue";
-    public string[] Aliases { get; } = { "addq","aq","nextq",".2" };
+    public string[] Aliases { get; } = ["addq","aq","nextq",".2"];
     public string Description => "Add new Queue Event.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

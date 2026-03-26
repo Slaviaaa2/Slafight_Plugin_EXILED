@@ -50,7 +50,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     private readonly Dictionary<Vector3, DoorConfig> specialDoors = new();
 
-    private readonly List<Player> femuredPlayers = new();
+    private readonly List<Player> femuredPlayers = [];
     private CoroutineHandle femurCoroutine;
     private CoroutineHandle trainCoroutine;
 

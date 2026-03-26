@@ -31,29 +31,23 @@ public static class Handler
 
         Exiled.Events.Handlers.Player.ChangingRole -= OnPlayerChangingRole;
     }
-    public static List<Player> ActivatedPlayers = new List<Player>();
-    public static List<Player> CanUsePlayers = new List<Player>();
+    public static List<Player> ActivatedPlayers = [];
+    public static List<Player> CanUsePlayers = [];
     
-    public static List<CRoleTypeId> AllowedUniqueRoles = new()
-    {
+    public static List<CRoleTypeId> AllowedUniqueRoles =
+    [
         CRoleTypeId.Zombified,
         CRoleTypeId.Scp3114
-    };
-    public static List<CRoleTypeId> OnlyProximityUnique = new()
-    {
-        CRoleTypeId.Zombified
-    };
+    ];
+    public static List<CRoleTypeId> OnlyProximityUnique = [CRoleTypeId.Zombified];
     
-    public static List<RoleTypeId> AllowedRoleTypes = new List<RoleTypeId>()
-    {
+    public static List<RoleTypeId> AllowedRoleTypes =
+    [
         RoleTypeId.Scp049,
         RoleTypeId.Scp939,
         RoleTypeId.Scp3114
-    };
-    public static List<RoleTypeId> OnlyProximity = new List<RoleTypeId>()
-    {
-        
-    };
+    ];
+    public static List<RoleTypeId> OnlyProximity = [];
 
     private static void OnPlayerChangingRole(ChangingRoleEventArgs ev)
     {
@@ -93,7 +87,7 @@ public static class Handler
     }
     
     // Handler クラス内のどこかに追加
-    private static readonly List<(int NetId, long Ticks)> ResentMessages = new();
+    private static readonly List<(int NetId, long Ticks)> ResentMessages = [];
 
     // 古いエントリを捨てるための有効時間（ms）
     private const int SignatureLifetimeMs = 2000;
@@ -134,7 +128,7 @@ public static class Handler
 
     
     private static int _resendId = 1;
-    private static readonly HashSet<int> ResentIds = new();
+    private static readonly HashSet<int> ResentIds = [];
 
     private static void SendProximityMessage(VoiceMessage msg, float maxRange = 5f)
     {

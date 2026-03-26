@@ -142,7 +142,7 @@ public static class NetworkVisibilityExtensions
         if (_showPlayers.ContainsKey(netId))
             _showPlayers[netId].Clear();
         else
-            _showPlayers[netId] = new List<int>();
+            _showPlayers[netId] = [];
 
         _identityCache[netId] = identity;
         RefreshAll(netId, identity);
@@ -164,7 +164,7 @@ public static class NetworkVisibilityExtensions
 
         if (!_showPlayers.ContainsKey(netId))
         {
-            _showPlayers[netId] = new List<int>();
+            _showPlayers[netId] = [];
             _identityCache[netId] = identity;
         }
 

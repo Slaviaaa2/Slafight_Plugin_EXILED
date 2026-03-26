@@ -15,7 +15,7 @@ public static class WarheadBoomEffectUtil
     private const float ScaleMin = 0.9f;
     private const float ScaleMax = 1.1f;
 
-    private static readonly List<CoroutineHandle> CoroutineHandles = new();
+    private static readonly List<CoroutineHandle> CoroutineHandles = [];
     private static readonly System.Random         Rng              = new();
 
     /// <summary>

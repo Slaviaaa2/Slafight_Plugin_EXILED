@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class SetQueue : ICommand
 {
     public string Command => "setqueue";
-    public string[] Aliases { get; } = { "spq","seq","q",".1" };
+    public string[] Aliases { get; } = ["spq","seq","q",".1"];
     public string Description => "Set Position Zero Queue Event.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

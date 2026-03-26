@@ -7,7 +7,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class PlayOmegaWarhead : ICommand
 {
     public string Command => "playomega";
-    public string[] Aliases { get; } = { "omega","p_ow","p_1" };
+    public string[] Aliases { get; } = ["omega","p_ow","p_1"];
     public string Description => "Play Omega Warhead Scene";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

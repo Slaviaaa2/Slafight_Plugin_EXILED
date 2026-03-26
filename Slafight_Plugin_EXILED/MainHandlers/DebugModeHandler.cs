@@ -23,7 +23,7 @@ public static class DebugModeHandler
     //  デバッグモード管理
     // =====================
 
-    private static readonly HashSet<Player> DebugModePlayers = new();
+    private static readonly HashSet<Player> DebugModePlayers = [];
 
     /// <summary>指定プレイヤーのデバッグモードが ON かどうか。</summary>
     public static bool IsDebugMode(Player player)

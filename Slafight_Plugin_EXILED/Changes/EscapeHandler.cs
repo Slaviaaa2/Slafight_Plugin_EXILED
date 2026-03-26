@@ -52,13 +52,13 @@ public class EscapeHandler
     private const float ItemPickupRadius = 1.05f;
     private const float ItemPickupRadiusSqr = ItemPickupRadius * ItemPickupRadius;
 
-    public readonly List<Vector3> EscapePoints = new();
+    public readonly List<Vector3> EscapePoints = [];
 
     // =====================
     //  動的オーバーライド
     // =====================
 
-    public static readonly List<Func<Player, EscapeTargetRole?>> DynamicOverrides = new();
+    public static readonly List<Func<Player, EscapeTargetRole?>> DynamicOverrides = [];
 
     public static void AddEscapeOverride(Func<Player, EscapeTargetRole?> rule)
         => DynamicOverrides.Add(rule);

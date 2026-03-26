@@ -76,25 +76,25 @@ public class ChristmasChanges
                 if (!player.IsInventoryFull || player.HasItem(ItemType.SCP330))
                 {
                     float random = UnityEngine.Random.Range(0f, 1f);
-                    List<CandyKindID> rareCandies = new()
-                    {
+                    List<CandyKindID> rareCandies =
+                    [
                         CandyKindID.Black,
                         CandyKindID.Brown,
                         CandyKindID.Gray,
                         CandyKindID.Orange,
                         CandyKindID.White,
                         CandyKindID.Evil
-                    };
+                    ];
         
-                    List<CandyKindID> normalCandies = new()
-                    {
+                    List<CandyKindID> normalCandies =
+                    [
                         CandyKindID.Red,
                         CandyKindID.Blue,
                         CandyKindID.Green,
                         CandyKindID.Purple,
                         CandyKindID.Rainbow,
                         CandyKindID.Yellow
-                    };
+                    ];
 
                     if (random <= 0.1f)
                     {

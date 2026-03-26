@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class SpawnMapEditRole : ICommand
 {
     public string Command => "mapeditmode";
-    public string[] Aliases { get; } = { "map","pmer","mer","editmap","mp","spawnmap" };
+    public string[] Aliases { get; } = ["map","pmer","mer","editmap","mp","spawnmap"];
     public string Description => "<color=red>It's Command doesnt working! please disable hsm plugin!</color>";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

@@ -7,7 +7,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class ReRollSpecial : ICommand
 {
     public string Command => "rerollspecial";
-    public string[] Aliases { get; } = { "rerollsp","rrsp" };
+    public string[] Aliases { get; } = ["rerollsp","rrsp"];
     public string Description => "Reroll Special Events.\n<color=red>(Attention)If you use this command, now running events with a few exceptions will be cancelled!!!</color>";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

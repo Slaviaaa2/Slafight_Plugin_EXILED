@@ -119,8 +119,8 @@ public class CustomRolesHandler
             int chaosCount = 0;
             int otherCount = 0;       // Fifthists, GoC, UIU, SerpentsHand など
 
-            List<Player> scps = new();
-            List<Player> scp079s = new();
+            List<Player> scps = [];
+            List<Player> scp079s = [];
 
             foreach (Player player in Player.List)
             {
@@ -187,8 +187,8 @@ public class CustomRolesHandler
         }
     }
         
-    List<CRoleTypeId> uniques = new()
-    {
+    List<CRoleTypeId> uniques =
+    [
         CRoleTypeId.FifthistRescure,
         CRoleTypeId.FifthistPriest,
         CRoleTypeId.FifthistConvert,
@@ -200,7 +200,7 @@ public class CustomRolesHandler
         CRoleTypeId.GoCCommunications,
         CRoleTypeId.GoCOperative,
         CRoleTypeId.SnowWarrier
-    };
+    ];
 
     public void CancelEnd(EndingRoundEventArgs ev)
     {

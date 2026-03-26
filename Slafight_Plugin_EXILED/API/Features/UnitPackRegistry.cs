@@ -29,7 +29,7 @@ public static class UnitPackRegistry
         {
             if (!PacksBySpawnType.TryGetValue(spawnType, out var list))
             {
-                list = new List<UnitPack>();
+                list = [];
                 PacksBySpawnType[spawnType] = list;
             }
 
@@ -69,7 +69,7 @@ public static class UnitPackRegistry
         if (PacksBySpawnType.TryGetValue(spawnType, out var list))
             return list;
 
-        return Enumerable.Empty<UnitPack>();
+        return [];
     }
 
     public static void Clear()

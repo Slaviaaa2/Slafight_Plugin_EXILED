@@ -17,11 +17,11 @@ public static class CandyPatch
         // ここで一度だけ Exiled 側のキャンディを全部集める
         DetectedCandies = FixCandies();
 
-        return new CodeInstruction[]
-        {
+        return
+        [
             new (OpCodes.Ldsfld, AccessTools.Field(typeof(CandyPatch), nameof(DetectedCandies))),
-            new (OpCodes.Ret),
-        };
+            new (OpCodes.Ret)
+        ];
     }
 
     private static ICandy[] FixCandies()

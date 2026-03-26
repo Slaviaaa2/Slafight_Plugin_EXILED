@@ -73,8 +73,8 @@ public class SNAVUltimate : CustomItem
     }
 
     private RadioRange mode;
-    private List<RoomType> uniques = new()
-    {
+    private List<RoomType> uniques =
+    [
         RoomType.Lcz914,
         RoomType.Lcz330,
         RoomType.LczGlassBox,
@@ -99,7 +99,7 @@ public class SNAVUltimate : CustomItem
         RoomType.EzSmallrooms,
         RoomType.EzGateA,
         RoomType.EzGateB
-    };
+    ];
     private void ChangeMode(ChangingRadioPresetEventArgs ev)
     {
         if (!Check(ev.Item)) return;
@@ -167,7 +167,7 @@ public class SNAVUltimate : CustomItem
         };
 
         if (range <= 0f)
-            return new List<Exiled.API.Features.Player>();
+            return [];
 
         return Exiled.API.Features.Player.List
             .Where(p =>

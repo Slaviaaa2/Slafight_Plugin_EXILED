@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class DebugStart : ICommand
 {
     public string Command => "debugstart";
-    public string[] Aliases { get; } = { "debug2","dmode","startd","ds" };
+    public string[] Aliases { get; } = ["debug2","dmode","startd","ds"];
     public string Description => "Start Round Debug Mode.";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

@@ -95,11 +95,11 @@ public class DeltaWarheadEvent : SpecialEvent
                         Log.Debug("Delta Passed EventPID Checker");
 
                         // LCZ エレベーター停止
-                        List<ElevatorType> lockEvTypes = new()
-                        {
+                        List<ElevatorType> lockEvTypes =
+                        [
                             ElevatorType.LczA,
                             ElevatorType.LczB
-                        };
+                        ];
 
                         foreach (Lift lift in Lift.List)
                         {
@@ -114,13 +114,13 @@ public class DeltaWarheadEvent : SpecialEvent
                         Log.Debug("Delta Passed TryStart Elevator Foreach.");
 
                         // チェックポイント / LCZ エレベーターをロック
-                        List<DoorType> lockEvDoorTypes = new()
-                        {
+                        List<DoorType> lockEvDoorTypes =
+                        [
                             DoorType.CheckpointGateA,
                             DoorType.CheckpointGateB,
                             DoorType.ElevatorLczA,
                             DoorType.ElevatorLczB
-                        };
+                        ];
 
                         foreach (Door door in Door.List)
                         {

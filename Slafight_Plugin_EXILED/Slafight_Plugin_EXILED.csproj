@@ -306,6 +306,7 @@
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosTacticalUnit.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosUndercoverAgent.cs" />
+        <Compile Include="CustomRoles\ClassD\CandySubject.cs" />
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistGuidance.cs" />
@@ -333,6 +334,7 @@
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeyMakarovRole.cs" />
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeySharedContents.cs" />
         <Compile Include="CustomRoles\Others\SnowWarrier.cs" />
+        <Compile Include="CustomRoles\Scientist\CandyResearcher.cs" />
         <Compile Include="CustomRoles\Scientist\Object Observer.cs" />
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />
         <Compile Include="CustomRoles\Scientist\Surveillance.cs" />

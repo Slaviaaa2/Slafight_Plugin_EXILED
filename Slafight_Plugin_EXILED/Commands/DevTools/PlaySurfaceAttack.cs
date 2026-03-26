@@ -7,7 +7,7 @@ namespace Slafight_Plugin_EXILED.Commands.DevTools;
 public class PlaySurfaceAttack : ICommand
 {
     public string Command => "playsurfaceattack";
-    public string[] Aliases { get; } = { "playsurfaceattack","p_SfAtk","p_0" };
+    public string[] Aliases { get; } = ["playsurfaceattack","p_SfAtk","p_0"];
     public string Description => "Play Surface Attack Nuke Scene";
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

@@ -29,7 +29,7 @@ public static class TerminalRift
     
     public static SchematicObject RiftObject;
     public static Vector3 RiftObjectPosition;
-    public static readonly List<SchematicObject> ControlObjects = new();
+    public static readonly List<SchematicObject> ControlObjects = [];
 
     public static bool Invoking { get; private set; } = false;
     private static readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio
