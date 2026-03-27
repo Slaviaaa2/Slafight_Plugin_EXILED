@@ -271,14 +271,26 @@ public static class PlayerExtensions
             case CRoleTypeId.Surveillance:
                 new Surveillance().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.CandyResearcher:
+                new CandyResearcher().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Class-D ====
             case CRoleTypeId.Janitor:
                 new Janitor().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.CandySubject:
+                new CandySubject().SpawnRole(player, roleSpawnFlags);
                 break;
             // ==== Flamingos ====
             // ==== Others ====
             case CRoleTypeId.SnowWarrier:
                 new SnowWarrier().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.CandyWarrierApril:
+                new CandyWarrierApril().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.CandyWarrierHalloween:
+                new CandyWarrierHalloween().SpawnRole(player, roleSpawnFlags);
                 break;
             // ==== Specials ====
             case CRoleTypeId.Sculpture:

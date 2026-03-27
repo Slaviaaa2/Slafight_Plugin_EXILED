@@ -40,7 +40,7 @@ public class Plugin : Plugin<Config>
     public override string Name => "Slafight_Plugin_EXILED";
     public override string Author => "Slaviaaa_2";
     public override string Prefix => "Slafight_Plugin_EXILED";
-    public override Version Version => new Version(1,7,3,2);
+    public override Version Version => new Version(1,7,3,3);
         
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 3);
 
@@ -66,7 +66,6 @@ public class Plugin : Plugin<Config>
     public PDEx PDEx { get; set; }
     public Engineer EngineerRole { get; private set; }
     public Scp1509Handler Scp1509Handler { get; set; }
-    public Scp012_033 Scp012_033 { get; set; }
     public ObjectPrefabHandler ObjectPrefabHandler { get; set; }
     // Enable & Disable
     public override void OnEnabled()
@@ -89,7 +88,6 @@ public class Plugin : Plugin<Config>
         Sinkhole = new();
         PDEx = new();
         Scp1509Handler = new();
-        Scp012_033 = new();
         ObjectPrefabHandler = new();
         CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
         CustomHandlersManager.RegisterEventsHandler(CustomMapMainHandler);
@@ -109,6 +107,7 @@ public class Plugin : Plugin<Config>
         CustomRole.RegisterRoles(false);
         CustomItemsManager.RegisterAllItems();
             
+        Scp012_033.Register();
         CandyChanges.Register();
         MapGuardHandler.Register();
         TerminalRift.Register();
@@ -180,6 +179,7 @@ public class Plugin : Plugin<Config>
         CustomItem.UnregisterItems();
         CustomRole.UnregisterRoles();
            
+        Scp012_033.Unregister();
         CandyChanges.Unregister();
         MapGuardHandler.Unregister();
         TerminalRift.Unregister();
