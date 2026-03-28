@@ -41,8 +41,8 @@ public class LabApiHandler : CustomEventsHandler
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= Init;
     }
 
-    public bool ActivatedAntiMemeProtocol = false;
-    public bool ActivatedAntiMemeProtocolInPast = false;
+    public bool ActivatedAntiMemeProtocol;
+    public bool ActivatedAntiMemeProtocolInPast;
 
     private void Init()
     {
