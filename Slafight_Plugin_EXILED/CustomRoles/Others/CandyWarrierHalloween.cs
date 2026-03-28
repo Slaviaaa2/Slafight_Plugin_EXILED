@@ -26,17 +26,17 @@ public class CandyWarrierHalloween : CRole
         player.UniqueRole = UniqueRoleKey;
         LabApiHandler.SchemCandyWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
-        int maxHealth = 1000;
+        const int maxHealth = 1000;
 
         Timing.CallDelayed(0.05f, () =>
         {
-            player.SetCustomInfo("<color=#ff9633>CANDY WARRIER</color>");
+            player.SetCustomInfo("<color=#EE7600>CANDY WARRIER</color>");
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
             player.EnableEffect(EffectType.Slowness, 10);
 
             player.ShowHint(
-                "<size=24><color=#ff9633>CANDY WARRIER</color>\n非常に<color=#ff9633>お菓子的</color>である。そうは思わんかね？",
+                "<size=24><color=#EE7600>CANDY WARRIER</color>\n非常に<color=#EE7600>お菓子的</color>である。そうは思わんかね？",
                 10);
 
             player.ClearInventory();
@@ -46,7 +46,7 @@ public class CandyWarrierHalloween : CRole
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.KeycardO5);
-            List<CandyKindID> RareCandies =
+            List<CandyKindID> rareCandies =
             [
                 CandyKindID.Black,
                 CandyKindID.Brown,
@@ -56,7 +56,7 @@ public class CandyWarrierHalloween : CRole
             ];
             for (var i = 0; i < 8; i++)
             {
-                player.TryAddCandy(RareCandies.RandomItem()); 
+                player.TryAddCandy(rareCandies.RandomItem()); 
             }
 
             player.AddAmmo(AmmoType.Nato9, 50);

@@ -25,17 +25,17 @@ public class CandyWarrierApril : CRole
         player.UniqueRole = UniqueRoleKey;
         LabApiHandler.SchemCandyWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
-        int maxHealth = 1000;
+        const int maxHealth = 1000;
 
         Timing.CallDelayed(0.05f, () =>
         {
-            player.SetCustomInfo("<color=#ff8cd9>CANDY WARRIER</color>");
+            player.SetCustomInfo("<color=#FF96DE>CANDY WARRIER</color>");
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
             player.EnableEffect(EffectType.Slowness, 10);
 
             player.ShowHint(
-                "<size=24><color=#ff8cd9>CANDY WARRIER</color>\n非常に<color=#ff8cd9>お菓子的</color>である。そうは思わんかね？",
+                "<size=24><color=#FF96DE>CANDY WARRIER</color>\n非常に<color=#FF96DE>お菓子的</color>である。そうは思わんかね？",
                 10);
 
             player.ClearInventory();

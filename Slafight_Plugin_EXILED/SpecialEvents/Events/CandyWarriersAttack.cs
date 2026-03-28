@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
@@ -149,18 +150,12 @@ public class CandyWarriersAttackEvent : SpecialEvent
                         });
                     });
 
-                    float testingDelayedInt = 400f;
+                    var testingDelayedInt = 400f;
                     Timing.CallDelayed(testingDelayedInt, () =>
                     {
                         if (CancelIfOutdated()) return;
 
-                        int candyCount = 0;
-                        foreach (Player player in Player.List)
-                        {
-                            if (player == null) continue;
-                            if (player.GetCustomRole() is CRoleTypeId.CandyWarrierApril or CRoleTypeId.CandyWarrierHalloween)
-                                candyCount++;
-                        }
+                        var candyCount = Player.List.OfType<Player>().Count(player => player.GetCustomRole() is CRoleTypeId.CandyWarrierApril or CRoleTypeId.CandyWarrierHalloween);
 
                         if (candyCount != 0)
                         {
