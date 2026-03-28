@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
@@ -40,49 +41,44 @@ public class LabApiHandler : CustomEventsHandler
         LabApi.Events.Handlers.ServerEvents.RoundStarted -= Init;
     }
 
-    public bool activatedAntiMemeProtocol = false;
-    public bool _activatedAntiMemeProtocolInPast = false;
+    public bool ActivatedAntiMemeProtocol = false;
+    public bool ActivatedAntiMemeProtocolInPast = false;
 
-    public void Init()
+    private void Init()
     {
-        activatedAntiMemeProtocol = false;
-        _activatedAntiMemeProtocolInPast = false;
+        ActivatedAntiMemeProtocol = false;
+        ActivatedAntiMemeProtocolInPast = false;
     }
 
-    public void InteractionEvent(PlayerSearchedToyEventArgs ev)
+    private void InteractionEvent(PlayerSearchedToyEventArgs ev)
     {
         if (ev.Interactable.Position != new Vector3(107.921f, 296.313f, -68.748f))
             return;
 
-        if (!activatedAntiMemeProtocol)
+        if (!ActivatedAntiMemeProtocol)
         {
-            foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
+            foreach (var player in Exiled.API.Features.Player.List)
             {
-                if (player.GetCustomRole() == CRoleTypeId.Scp3005)
-                {
-                    if (!_activatedAntiMemeProtocolInPast)
-                        player.Health = 10000;
+                if (player.GetCustomRole() != CRoleTypeId.Scp3005) continue;
+                if (!ActivatedAntiMemeProtocolInPast)
+                    player.Health = 10000;
 
-                    player.EnableEffect(EffectType.Poisoned, 255);
-                    player.EnableEffect(EffectType.Decontaminating, 255);
-                }
+                player.EnableEffect(EffectType.Poisoned, 255);
+                player.EnableEffect(EffectType.Decontaminating, 255);
             }
 
-            int count = 0;
-            foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
+            var count = 0;
+            if (Exiled.API.Features.Player.List.Any(player => player.GetCustomRole() == CRoleTypeId.Scp3005))
             {
-                if (player.GetCustomRole() != CRoleTypeId.Scp3005)
-                    continue;
-
                 count++;
-                if (!_activatedAntiMemeProtocolInPast)
+                if (!ActivatedAntiMemeProtocolInPast)
                 {
                     Exiled.API.Features.Cassie.MessageTranslated(
                         "By order of Facility Manager Control Room , $pitch_.85 Anti- $pitch_1 Me mu Protocol Activated .",
                         "<color=#ff0087>施設管理者制御室</color>からの命令により、<color=#ff00fa>アンチミームプロトコロル</color>が有効化されました。エージェントにより反ミーム性物体の非活性化が開始されます。",
                         true,
                         false);
-                    _activatedAntiMemeProtocolInPast = true;
+                    ActivatedAntiMemeProtocolInPast = true;
                 }
                 else
                 {
@@ -93,8 +89,7 @@ public class LabApiHandler : CustomEventsHandler
                         false);
                 }
 
-                activatedAntiMemeProtocol = true;
-                break;
+                ActivatedAntiMemeProtocol = true;
             }
 
             if (count <= 0)
@@ -102,25 +97,20 @@ public class LabApiHandler : CustomEventsHandler
         }
         else
         {
-            foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
+            foreach (var player in Exiled.API.Features.Player.List)
             {
-                if (player.GetCustomRole() == CRoleTypeId.Scp3005)
-                {
-                    player.DisableEffect(EffectType.Poisoned);
-                    player.DisableEffect(EffectType.Decontaminating);
-                }
+                if (player.GetCustomRole() != CRoleTypeId.Scp3005) continue;
+                player.DisableEffect(EffectType.Poisoned);
+                player.DisableEffect(EffectType.Decontaminating);
             }
 
-            foreach (Exiled.API.Features.Player _ in Exiled.API.Features.Player.List)
-            {
-                Exiled.API.Features.Cassie.MessageTranslated(
-                    "$pitch_.85 Anti- $pitch_1 Me mu Protocol Stopped .",
-                    "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",
-                    false,
-                    false);
-                activatedAntiMemeProtocol = false;
-                break;
-            }
+            if (!Exiled.API.Features.Player.List.Any()) return;
+            Exiled.API.Features.Cassie.MessageTranslated(
+                "$pitch_.85 Anti- $pitch_1 Me mu Protocol Stopped .",
+                "<color=#ff00fa>アンチミームプロトコル</color>が停止されました。",
+                false,
+                false);
+            ActivatedAntiMemeProtocol = false;
         }
     }
 
@@ -135,8 +125,8 @@ public class LabApiHandler : CustomEventsHandler
         });
         Timing.CallDelayed(2.0f, PickupSetupTriggerPoints);
     }
-       
-    public void PickupSetupTriggerPoints()
+
+    private void PickupSetupTriggerPoints()
     {
         var points = TriggerPointManager.GetAll();
         foreach (var point in points)
@@ -212,7 +202,7 @@ public class LabApiHandler : CustomEventsHandler
             }
 
             labPlayer.Scale = new Vector3(0.001f, 1f, 0.001f);
-            schem.transform.SetParent(labPlayer.GameObject.transform);
+            schem.transform.SetParent(labPlayer.GameObject?.transform);
 
             // ロール監視用に WearsHandler に登録
             WearsHandler.RegisterExternal(exiledPlayer, schem);
@@ -223,7 +213,7 @@ public class LabApiHandler : CustomEventsHandler
                     return;
 
                 schem.transform.GetChild(0).localScale = Vector3.one;
-                schem.transform.position = labPlayer.GameObject.transform.position;
+                if (labPlayer.GameObject != null) schem.transform.position = labPlayer.GameObject.transform.position;
 
                 var light = Light.Create(Vector3.zero);
                 light.Position = schem.transform.position + new Vector3(0f, -0.08f, 0f);

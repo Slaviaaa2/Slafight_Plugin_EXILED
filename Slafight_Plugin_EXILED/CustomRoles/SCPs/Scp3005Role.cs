@@ -121,7 +121,7 @@ public class Scp3005Role : CRole
                 }
             }
 
-            if (Plugin.Singleton.LabApiHandler._activatedAntiMemeProtocolInPast)
+            if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocolInPast)
             {
                 player.DisableEffect(EffectType.Slowness);
                 player.EnableEffect(EffectType.MovementBoost, 25);
@@ -132,7 +132,7 @@ public class Scp3005Role : CRole
                 player.EnableEffect(EffectType.Slowness, 25);
             }
 
-            if (Plugin.Singleton.LabApiHandler.activatedAntiMemeProtocol)
+            if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol)
                 player.Hurt(100f, "<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
 
             yield return Timing.WaitForSeconds(1.5f);
