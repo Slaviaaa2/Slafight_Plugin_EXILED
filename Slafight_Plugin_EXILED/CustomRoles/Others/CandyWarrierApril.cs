@@ -23,7 +23,6 @@ public class CandyWarrierApril : CRole
         player!.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
         player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
         player.UniqueRole = UniqueRoleKey;
-        LabApiHandler.SchemCandyWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
         const int maxHealth = 1000;
 
@@ -59,6 +58,7 @@ public class CandyWarrierApril : CRole
             });
 
             player.AddAmmo(AmmoType.Nato9, 50);
+            LabApiHandler.SchemCandyWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
         });
     }
 }

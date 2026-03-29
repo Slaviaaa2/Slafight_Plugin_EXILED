@@ -341,6 +341,7 @@ public class LabApiHandler : CustomEventsHandler
                 return;
             }
 
+            labPlayer.Scale = Vector3.one;
             schem.transform.SetParent(labPlayer.GameObject?.transform);
 
             WearsHandler.RegisterExternal(exiledPlayer, schem);
