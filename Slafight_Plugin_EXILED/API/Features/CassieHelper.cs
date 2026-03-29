@@ -106,13 +106,15 @@ public static class CassieHelper
             var info = CustomTeamUtils.GetTeamInfo(ev.Attacker.GetTeam());
             Exiled.API.Features.Cassie.MessageTranslated(
                 $"{targetCassie} contained successfully by {info.CassieString}", 
-                $"{targetTranslated} は、<color={info.TeamColor}>{info.TeamName}</color>によって正常に収容されました。");
+                $"{targetTranslated} は、<color={info.TeamColor}>{info.TeamName}</color>によって正常に収容されました。",
+                true);
         }
         else
         {
             Exiled.API.Features.Cassie.MessageTranslated(
                 $"{targetCassie} successfully terminated. Termination cause unspecified.", 
-                $"{targetTranslated} は、不明な原因によって終了されました。");
+                $"{targetTranslated} は、不明な原因によって終了されました。",
+                true);
         }
     }
 }
