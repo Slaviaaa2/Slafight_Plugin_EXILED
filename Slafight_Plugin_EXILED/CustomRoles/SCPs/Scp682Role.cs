@@ -36,7 +36,7 @@ public class Scp682Role : CRole
     public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player!.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
+        player!.Role.Set(RoleTypeId.Scp939);
 
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 999;
@@ -45,8 +45,6 @@ public class Scp682Role : CRole
         player.HumeShieldRegenerationMultiplier = 15f;
         player.ClearInventory();
 
-        player.Position = MapFlags.Scp682SpawnPoint;
-
         SpeedLevels[player] = 1f;
         player.SetScale(new Vector3(0.7f, 0.65f, 1.2f));
 
@@ -54,6 +52,7 @@ public class Scp682Role : CRole
         
         Timing.CallDelayed(0.05f, () =>
         {
+            player.Position = MapFlags.Scp682SpawnPoint;
             player.ShowHint("<size=24><color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
         });
         Timing.RunCoroutine(Coroutine(player));

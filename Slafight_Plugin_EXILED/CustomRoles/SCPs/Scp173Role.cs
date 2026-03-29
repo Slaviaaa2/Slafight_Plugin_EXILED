@@ -42,14 +42,14 @@ public class Scp173Role : CRole
         player.HumeShield = player.MaxHumeShield;
         player.ClearInventory();
         player.SetCustomInfo("SCP-173");
-
-        player.Position = EventHandler.Scp173SpawnPoint;
+        
         player.EnableEffect(EffectType.Slowness, 95, 60f);
         
         player.AddAbility(new TeleportRandomAbility(player));
         player.AddAbility(new PlaceTantrumAbility(player));
         Timing.CallDelayed(0.05f, () =>
         {
+            player.Position = EventHandler.Scp173SpawnPoint;
             player.ShowHint("<size=24><color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
         });
     }
