@@ -213,6 +213,7 @@ public abstract class CRole
     public virtual void UnregisterEvents() { }
 
     // ==== メタ情報 ====
+    protected virtual string RoleName { get; set; } = string.Empty;
 
     protected abstract CRoleTypeId CRoleTypeId { get; set; }
 

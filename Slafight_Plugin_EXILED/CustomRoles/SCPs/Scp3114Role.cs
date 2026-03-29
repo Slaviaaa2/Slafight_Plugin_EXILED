@@ -1,15 +1,18 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp3114Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-3114";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3114;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp3114";
@@ -51,5 +54,11 @@ public class Scp3114Role : CRole
     private void ExtendTime(Exiled.Events.EventArgs.Scp3114.DisguisedEventArgs ev)
     {
         ev.Scp3114.DisguiseDuration = 300f;
+    }
+
+    protected override void OnDying(DyingEventArgs ev)
+    {
+        CassieHelper.AnnounceTermination(ev, "SCP 3 1 1 4", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        base.OnDying(ev);
     }
 }

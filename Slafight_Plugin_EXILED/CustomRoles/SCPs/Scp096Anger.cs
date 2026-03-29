@@ -19,6 +19,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp096Anger : CRole  // 属性なしで自動登録
 {
+    protected override string RoleName { get; set; } = "SCP-096";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp096Anger;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp096_Anger";
@@ -47,14 +48,15 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         Exiled.Events.Handlers.Player.Hurting -= OnTouchedEnemy;
         base.UnregisterEvents();
     }
-
+    
     protected override void OnDying(DyingEventArgs ev)
     {
-        if (ev?.Player != null)
+        if (ev.Player != null)
         {
             ShyGuyPositions.Remove(ev.Player);
             InTryNotToCryAnim.Remove(ev.Player);  // ★安全クリーンアップ
         }
+        CassieHelper.AnnounceTermination(ev, "SCP 0 9 6", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 

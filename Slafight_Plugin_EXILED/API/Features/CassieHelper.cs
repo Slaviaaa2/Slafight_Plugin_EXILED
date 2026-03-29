@@ -1,3 +1,6 @@
+using Exiled.Events.EventArgs.Player;
+using Slafight_Plugin_EXILED.Extensions;
+
 namespace Slafight_Plugin_EXILED.API.Features;
 
 public static class CassieHelper
@@ -35,7 +38,7 @@ public static class CassieHelper
             true);
     }
     
-    public static void AnnounceSNEArrival()
+    public static void AnnounceSneArrival()
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             $"MtfUnit Eta 10 designated See no E be l HasEntered AllRemaining . This forces work for the anti- me mu termination",
@@ -44,7 +47,7 @@ public static class CassieHelper
             true);
     }
 
-    public static void AnnounceSNEBackup()
+    public static void AnnounceSneBackup()
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             "See no E be l Backup unit has entered the facility .",
@@ -90,5 +93,26 @@ public static class CassieHelper
             $"Attention All personnel . Detected {count} G o C Forces in Gate B . Please Terminate Them",
             $"全職員に通達。Gate Bに{count}人の<b><color=#0000c8>世界オカルト連合</color></b>部隊が検出されました。<split>見つけ次第終了してください。",
             true);
+    }
+    
+    // =================================== //
+
+    public static void AnnounceTermination(DyingEventArgs ev, string targetCassie, string targetTranslated, bool clearCassie = false)
+    {
+        if (ev.Player == null) return;
+        if (clearCassie) Exiled.API.Features.Cassie.Clear();
+        if (ev.Attacker != null)
+        {
+            var info = CustomTeamUtils.GetTeamInfo(ev.Attacker.GetTeam());
+            Exiled.API.Features.Cassie.MessageTranslated(
+                $"{targetCassie} contained successfully by {info.CassieString}", 
+                $"{targetTranslated} は、<color={info.TeamColor}>{info.TeamName}</color>によって正常に収容されました。");
+        }
+        else
+        {
+            Exiled.API.Features.Cassie.MessageTranslated(
+                $"{targetCassie} successfully terminated. Termination cause unspecified.", 
+                $"{targetTranslated} は、不明な原因によって終了されました。");
+        }
     }
 }

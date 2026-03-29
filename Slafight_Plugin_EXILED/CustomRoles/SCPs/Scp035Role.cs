@@ -21,6 +21,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp035Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-035";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp035;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp035";
@@ -108,9 +109,7 @@ public class Scp035Role : CRole
     protected override void OnDying(DyingEventArgs ev)
     {
         Cleanup(ev.Player);
-        Exiled.API.Features.Cassie.MessageTranslated(
-            "SCP 0 3 5 Recontained successfully .",
-            "<color=red>SCP-035</color>の再収容に成功しました。");
+        CassieHelper.AnnounceTermination(ev, "SCP 0 3 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 
@@ -150,9 +149,9 @@ public class Scp035Role : CRole
     }
 
     private bool IsScp035(Player player) =>
-        player != null && player.IsAlive && player.UniqueRole == UniqueRoleKey;
+        player.IsAlive && player.UniqueRole == UniqueRoleKey;
 
-    private void CreateNpc(Player player)
+    private static void CreateNpc(Player player)
     {
         // 既に登録されている場合は一旦破壊して作り直し
         if (GlobalScpTeamSystemNpc.TryGetValue(player.Id, out var oldId))
@@ -184,8 +183,6 @@ public class Scp035Role : CRole
 
     public void Cleanup(Player player)
     {
-        if (player == null) return;
-
         states.Remove(player.Id, out _);
         GlobalStates.Remove(player.Id, out _);
         FrozenPlayers.Remove(player.Id);
@@ -194,11 +191,9 @@ public class Scp035Role : CRole
         if (AbilityBase.HasAbility<Scp035TentacleAbility>(player))
             player.RemoveAbility<Scp035TentacleAbility>();
 
-        if (GlobalScpTeamSystemNpc.TryGetValue(player.Id, out var npcId))
-        {
-            Npc.Get(npcId)?.Destroy();
-            GlobalScpTeamSystemNpc.Remove(player.Id);
-        }
+        if (!GlobalScpTeamSystemNpc.TryGetValue(player.Id, out var npcId)) return;
+        Npc.Get(npcId)?.Destroy();
+        GlobalScpTeamSystemNpc.Remove(player.Id);
     }
 
     public bool TryChangeState(Player player, Scp035StateType newState)
@@ -219,8 +214,6 @@ public class Scp035Role : CRole
     {
         try
         {
-            if (player == null) return false;
-
             states[player.Id] = newState;
             GlobalStates[player.Id] = newState;
             return true;
@@ -234,8 +227,6 @@ public class Scp035Role : CRole
 
     public Scp035State GetState(Player player)
     {
-        if (player == null) return default;
-
         if (states.TryGetValue(player.Id, out var local))
             return local;
 
@@ -257,10 +248,8 @@ public class Scp035Role : CRole
         };
     }
 
-    private bool Trigger(Player player, Scp035StateType stateType)
+    private static bool Trigger(Player player, Scp035StateType stateType)
     {
-        if (player == null) return false;
-
         switch (stateType)
         {
             case Scp035StateType.Stable:
@@ -298,6 +287,8 @@ public class Scp035Role : CRole
                 player.ChangeAppearance(RoleTypeId.Tutorial);
                 player.ShowHint($"<color=red><b>完全覚醒</b></color>状態へと移行しました！\n現在精神は完全に支配されており、もはや受け入れるしかないでしょう！\nアビリティ「触手」が利用可能になりました！");
                 return true;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stateType), stateType, null);
         }
 
         return false;
@@ -398,7 +389,6 @@ public class Scp035Role : CRole
     }
 
     private bool IsValid(Player player) =>
-        player != null &&
         player.IsAlive &&
         player.GetCustomRole() == CRoleTypeId.Scp035 &&
         Round.InProgress;

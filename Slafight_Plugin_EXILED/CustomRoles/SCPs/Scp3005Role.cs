@@ -18,6 +18,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp3005Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-3005";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3005;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "SCP-3005";
@@ -83,7 +84,7 @@ public class Scp3005Role : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 contained successfully by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", "<color=red>SCP-3005</color> は、アンチミームプロトコルにより再収用されました", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 

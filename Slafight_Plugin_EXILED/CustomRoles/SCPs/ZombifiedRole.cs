@@ -22,6 +22,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class ZombifiedRole : CRole
 {
+    protected override string RoleName { get; set; } = "Zombified Subject";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Zombified;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Zombified";

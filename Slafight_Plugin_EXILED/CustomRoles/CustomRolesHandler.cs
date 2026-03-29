@@ -183,10 +183,11 @@ public class CustomRolesHandler
         foreach (var p in scp079s)
         {
             p.Kill(
-                "Terminated by C.A.S.S.I.E.",
-                "SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies."
+                "Terminated by C.A.S.S.I.E."
             );
         }
+        
+        Exiled.API.Features.Cassie.MessageTranslated("SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.", "<color=red>SCP-079</color>は<color=yellow>C.A.S.S.I.E</color>により終了されました。");
     }
 
     private void CancelEnd(EndingRoundEventArgs ev)

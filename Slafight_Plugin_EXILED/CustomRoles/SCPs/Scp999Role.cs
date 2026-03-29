@@ -15,6 +15,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp999Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-999";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp999;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp999";
@@ -70,9 +71,7 @@ public class Scp999Role : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        Exiled.API.Features.Cassie.MessageTranslated(
-            "SCP 9 9 9 Successfully Terminated .",
-            "<color=red>SCP-999</color>の終了に成功しました。", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 9 9 9", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 }

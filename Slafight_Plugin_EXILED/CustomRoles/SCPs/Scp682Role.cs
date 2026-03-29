@@ -14,6 +14,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp682Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-682";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp682;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp682";
@@ -100,8 +101,7 @@ public class Scp682Role : CRole
     protected override void OnDying(DyingEventArgs ev)
     {
         SpeedLevels.Remove(ev.Player);
-        Exiled.API.Features.Cassie.Clear();
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 6 8 2 Successfully Neutralized .", "<color=red>SCP-682</color>の無力化に成功しました。", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 6 8 2", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 }

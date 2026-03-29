@@ -1,5 +1,6 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp173;
 using MEC;
 using PlayerRoles;
@@ -13,6 +14,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp173Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-173";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp173;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp173";
@@ -59,5 +61,11 @@ public class Scp173Role : CRole
         {
             ev.Scp173.BlinkReady = false;
         }
+    }
+    
+    protected override void OnDying(DyingEventArgs ev)
+    {
+        CassieHelper.AnnounceTermination(ev, "SCP 1 7 3", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        base.OnDying(ev);
     }
 }

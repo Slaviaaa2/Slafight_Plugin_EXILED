@@ -14,6 +14,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp966Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-966";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp966;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp966";
@@ -60,7 +61,7 @@ public class Scp966Role : CRole
         Timing.RunCoroutine(Coroutine(player));
     }
 
-    private IEnumerator<float> Coroutine(Player player)
+    private static IEnumerator<float> Coroutine(Player player)
     {
         for (;;)
         {
@@ -145,9 +146,8 @@ public class Scp966Role : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        Exiled.API.Features.Cassie.Clear();
-        Exiled.API.Features.Cassie.MessageTranslated("SCP 9 6 6 Successfully Terminated .", "<color=red>SCP-966</color>の終了に成功しました。", true);
         SpeedLevels.Remove(ev.Player);
+        CassieHelper.AnnounceTermination(ev, "SCP 9 6 6", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 }

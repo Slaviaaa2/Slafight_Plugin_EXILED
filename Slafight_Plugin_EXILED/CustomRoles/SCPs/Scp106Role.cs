@@ -1,5 +1,6 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -14,6 +15,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
 public class Scp106Role : CRole
 {
+    protected override string RoleName { get; set; } = "SCP-173";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp106;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp106";
@@ -79,5 +81,11 @@ public class Scp106Role : CRole
         {
             Log.Error($"Sinkhole Prefabスポーン失敗: {ex.Message}");
         }
+    }
+    
+    protected override void OnDying(DyingEventArgs ev)
+    {
+        CassieHelper.AnnounceTermination(ev, "SCP 1 0 6", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        base.OnDying(ev);
     }
 }

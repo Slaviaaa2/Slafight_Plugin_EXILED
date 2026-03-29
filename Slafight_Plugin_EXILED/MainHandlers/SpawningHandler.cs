@@ -148,11 +148,11 @@ public class SpawningHandler
             
             case SpawnTypeId.MTF_SneNormal:
                 CreateAndPlayAudio("_w_sne.ogg", "WaveTheme", Vector3.zero, true, null, false, 999999999, 0);
-                CassieHelper.AnnounceSNEArrival();
+                CassieHelper.AnnounceSneArrival();
                 break;
             case SpawnTypeId.MTF_SneBackup:
                 CreateAndPlayAudio("_w_sne.ogg", "WaveTheme", Vector3.zero, true, null, false, 999999999, 0);
-                CassieHelper.AnnounceSNEBackup();
+                CassieHelper.AnnounceSneBackup();
                 break;
 
             // ==== Groups of Interests ====

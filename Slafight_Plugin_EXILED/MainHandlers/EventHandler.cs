@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
@@ -48,6 +49,7 @@ public class EventHandler
         PlayerHandler.InteractingDoor += DoorGet;
         PlayerHandler.UsedItem += OnUsed;
         PlayerHandler.Hurting += OnHurting;
+        PlayerHandler.Dying += OnDying;
 
         WarheadHandler.Starting += AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
@@ -69,6 +71,7 @@ public class EventHandler
         PlayerHandler.InteractingDoor -= DoorGet;
         PlayerHandler.UsedItem -= OnUsed;
         PlayerHandler.Hurting -= OnHurting;
+        PlayerHandler.Dying -= OnDying;
 
         WarheadHandler.Starting -= AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
@@ -444,5 +447,15 @@ public class EventHandler
                 ev.IsAllowed = false;
             }
         }
+    }
+
+    private static void OnDying(DyingEventArgs ev)
+    {
+        if (ev.Player == null) return;
+        if (ev.Player.GetCustomRole() != CRoleTypeId.None) return;
+        if (ev.Player.Role.Team != Team.SCPs) return;
+        if (ev.Player.Role.Type == RoleTypeId.Scp0492) return;
+        Exiled.API.Features.Cassie.Clear();
+        CassieHelper.AnnounceTermination(ev, "SCP "+string.Join(" ", Regex.Replace(ev.Player.Role.Name, @"[^0-9]", "").ToCharArray()), $"<color={CustomTeamUtils.GetTeamColor(CTeam.SCPs)}>{ev.Player.Role.Name}</color>");
     }
 }
