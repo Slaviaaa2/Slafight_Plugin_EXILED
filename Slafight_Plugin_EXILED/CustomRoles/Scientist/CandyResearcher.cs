@@ -27,18 +27,26 @@ public class CandyResearcher : CRole
         player.Health = player.MaxHealth;
         player.ClearInventory();
         player.AddItem(ItemType.KeycardScientist);
-        List<CandyKindID> rareCandies =
-        [
-            CandyKindID.Black,
-            CandyKindID.Brown,
-            CandyKindID.Gray,
-            CandyKindID.Orange,
-            CandyKindID.White,
-        ];
-        for (var i = 0; i < 8; i++)
+        player.AddItem(ItemType.SCP330);  // 明示的にバッグ追加
+
+        Timing.CallDelayed(0.02f, () =>
         {
-            player.TryAddCandy(rareCandies.RandomItem()); 
-        }
+            if (Scp330Bag.TryGetBag(player.ReferenceHub, out var bag))
+            {
+                bag.Candies.Clear();
+                var rareCandies = new List<CandyKindID>
+                {
+                    CandyKindID.Black,
+                    CandyKindID.Brown,
+                    CandyKindID.Gray,
+                    CandyKindID.Orange,
+                    CandyKindID.White,
+                };
+                for (int i = 0; i < 6; i++)
+                    bag.TryAddSpecific(rareCandies.RandomItem());
+                bag.ServerRefreshBag();
+            }
+        });
         
         Door.Get(DoorType.Scp330).IsOpen = true;
         player.Position = Door.Get(DoorType.Scp330).Position + (Vector3.up * 0.8f);
