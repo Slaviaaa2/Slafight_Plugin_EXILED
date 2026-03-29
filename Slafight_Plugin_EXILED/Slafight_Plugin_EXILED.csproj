@@ -181,6 +181,7 @@
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\GlobalVentManager.cs" />
+        <Compile Include="API\Features\NvgGogglesBase.cs" />
         <Compile Include="API\Features\ObjectPrefab.cs" />
         <Compile Include="API\Features\PrefabSaveData.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
@@ -228,6 +229,8 @@
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileCafeteriaNeeds.cs" />
         <Compile Include="CustomItems\exiledApiItems\FileScientist_Samuels.cs" />
+        <Compile Include="CustomItems\exiledApiItems\NvgBlue.cs" />
+        <Compile Include="CustomItems\exiledApiItems\NvgRed.cs" />
         <Compile Include="CustomItems\exiledApiItems\Veritas.cs" />
         <Compile Include="CustomItems\NvgManager.cs" />
         <Compile Include="CustomItems\CustomItemsManager.cs" />

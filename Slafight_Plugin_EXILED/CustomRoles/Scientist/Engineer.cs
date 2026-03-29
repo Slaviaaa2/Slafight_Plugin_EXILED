@@ -41,7 +41,7 @@ public class Engineer : CRole
         [TaskType.CollectScpItems] = "SCPアイテムを回収する",
         [TaskType.SetupWarhead] = "ALPHA WARHEADレバーを準備する",
         [TaskType.CloseKeycardDoor] = "キーカードが必要なドアを閉める",
-        [TaskType.CollectKeycard] = "キーカードを改修する",
+        [TaskType.CollectKeycard] = "キーカードを回収する",
         [TaskType.MaintenanceIntercom] = "放送室で点検放送をする",
         [TaskType.None] = "タスク完了！"
     };

@@ -12,6 +12,48 @@ using Light = Exiled.API.Features.Toys.Light;
 
 namespace Slafight_Plugin_EXILED.CustomItems;
 
+// ============================================================
+// NVG プロファイル（CustomItem 側で定義して StartNvg に渡す）
+// ============================================================
+
+/// <summary>
+/// NVG ライトの挙動をアイテムごとに定義するプロファイル。
+/// CustomItem 側で new して StartNvg() に渡す。
+/// </summary>
+public readonly struct NvgProfile
+{
+    // --- 電池 ---
+    /// <summary>
+    /// 1秒あたりの電池消費量（%）。0 以下で無限。
+    /// </summary>
+    public float DrainPerSecond { get; init; }
+
+    // --- ライト ---
+    public Color  LightColor     { get; init; }
+    public float  LightRange     { get; init; }
+    public float  LightIntensity { get; init; }
+
+    // --- ブラックアウト ---
+    /// <summary>
+    /// true のとき、電池切れで黒いキューブを被せて視界を塞ぐ。
+    /// </summary>
+    public bool UseBlackout { get; init; }
+
+    // --- デフォルト値（標準 NVG と同じ挙動） ---
+    public static NvgProfile Default => new()
+    {
+        DrainPerSecond = 5f,                        // 20秒で空
+        LightColor     = new Color(0.6f, 1f, 0.6f), // 緑
+        LightRange     = 30f,
+        LightIntensity = 10000f,
+        UseBlackout    = true,
+    };
+}
+
+// ============================================================
+// NvgManager
+// ============================================================
+
 /// <summary>
 /// NVG のライト・ブラックアウトとバッテリー管理を行うマネージャ.
 /// NetworkVisibilityExtensions を使って「所有者とその観戦者だけ」に見えるよう制御する。
@@ -19,11 +61,14 @@ namespace Slafight_Plugin_EXILED.CustomItems;
 public static class NvgManager
 {
     private const float MaxBattery   = 100f;
-    private const float DrainPerTick = 0.5f * TickInterval;
     private const float TickInterval = 0.1f;
 
     private static readonly Dictionary<ushort, NvgRuntimeData> ActiveData  = new();
     private static readonly Dictionary<ushort, float>          BatteryData = new();
+
+    // --------------------------------------------------------
+    // イベント登録 / 解除
+    // --------------------------------------------------------
 
     public static void Register()
     {
@@ -42,6 +87,10 @@ public static class NvgManager
         Exiled.Events.Handlers.Player.ChangingRole            -= OnChangingRole;
         Exiled.Events.Handlers.Player.Died                    -= OnDied;
     }
+
+    // --------------------------------------------------------
+    // イベントハンドラ
+    // --------------------------------------------------------
 
     private static void OnRoundStarted()
     {
@@ -103,13 +152,19 @@ public static class NvgManager
     // 公開 API
     // --------------------------------------------------------
 
-    public static void StartNvg(Player player, ushort serial)
+    /// <summary>
+    /// NVG を起動する。プロファイル未指定時は NvgProfile.Default を使用。
+    /// </summary>
+    public static void StartNvg(Player player, ushort serial, NvgProfile? profile = null)
     {
         if (player == null) return;
-        Log.Debug($"[NvgManager] StartNvg: {player.Nickname} serial={serial}");
 
-        // ★電池0%なら起動しない
-        if (BatteryData.TryGetValue(serial, out var savedBattery) && savedBattery <= 0f)
+        var prof = profile ?? NvgProfile.Default;
+        Log.Debug($"[NvgManager] StartNvg: {player.Nickname} serial={serial} drain={prof.DrainPerSecond}/s");
+
+        // 電池0%なら起動しない（無限電池アイテムは DrainPerSecond<=0 なので常に起動可）
+        bool isInfinite = prof.DrainPerSecond <= 0f;
+        if (!isInfinite && BatteryData.TryGetValue(serial, out var savedBattery) && savedBattery <= 0f)
         {
             player.ShowHint("このNVGの電池は完全に切れています。", 3f);
             Log.Debug($"[NvgManager] StartNvg拒否: 電池切れ serial={serial}");
@@ -118,9 +173,10 @@ public static class NvgManager
 
         StopNvgBySerial(serial);
 
-        float battery = BatteryData.TryGetValue(serial, out var saved) ? saved : MaxBattery;
+        float battery = isInfinite ? MaxBattery
+                      : BatteryData.TryGetValue(serial, out var saved) ? saved : MaxBattery;
 
-        var light = CreateNvgLight(player);
+        var light = CreateNvgLight(player, prof);
         if (light == null)
         {
             Log.Error($"[NvgManager] StartNvg: NVGライト生成失敗 ({player.Nickname})");
@@ -132,6 +188,7 @@ public static class NvgManager
             Serial   = serial,
             OwnerId  = player.Id,
             NvgLight = light,
+            Profile  = prof,
         };
 
         BatteryData[serial]  = battery;
@@ -158,8 +215,6 @@ public static class NvgManager
 
         ActiveData.Remove(serial);
         KillRuntimeData(data);
-
-        // ★アイテム破棄時は電池データもクリア（再取得時は満タン）
         BatteryData.Remove(serial);
 
         RefreshVisibilityForAll();
@@ -194,9 +249,9 @@ public static class NvgManager
 
         foreach (var kv in ActiveData)
         {
-            var data   = kv.Value;
-            var light  = data.NvgLight;
-            var ident  = light?.Base?.netIdentity;
+            var data  = kv.Value;
+            var light = data.NvgLight;
+            var ident = light?.Base?.netIdentity;
             if (ident == null) continue;
 
             bool shouldShow =
@@ -220,7 +275,7 @@ public static class NvgManager
     // ライト生成
     // --------------------------------------------------------
 
-    private static Light? CreateNvgLight(Player player)
+    private static Light? CreateNvgLight(Player player, NvgProfile prof)
     {
         try
         {
@@ -236,14 +291,15 @@ public static class NvgManager
                 return null;
             }
 
-            light.Range     = 30f;
-            light.Intensity = 10000f;
-            light.Color     = new Color(0.6f, 1f, 0.6f);
+            // プロファイルの値を適用
+            light.Range     = prof.LightRange;
+            light.Intensity = prof.LightIntensity;
+            light.Color     = prof.LightColor;
 
             light.Transform.SetParent(player.Transform, true);
 
             var identity = light.Base.netIdentity;
-            identity.InitShowState();          // 全員 Hide
+            identity.InitShowState();
             identity.SetShowState(player, true);
 
             foreach (var spectator in Player.List)
@@ -309,19 +365,25 @@ public static class NvgManager
         {
             yield return Timing.WaitForSeconds(TickInterval);
 
-            if (player == null || !player.IsConnected)
-                yield break;
+            if (player == null || !player.IsConnected) yield break;
+            if (!ActiveData.TryGetValue(serial, out var data)) yield break;
 
-            if (!ActiveData.TryGetValue(serial, out var data))
-                yield break;
+            var prof       = data.Profile;
+            bool isInfinite = prof.DrainPerSecond <= 0f;
+
+            // 無限電池: 強度そのままで電池表示なし
+            if (isInfinite)
+            {
+                // 強度は常にプロファイル値のまま（変化なし）
+                continue;
+            }
 
             float battery = BatteryData.TryGetValue(serial, out var b) ? b : 0f;
 
             if (battery <= 0f)
             {
-                // 電池切れ → 完全終了
-                BatteryData[serial] = 0f;  // 明示的に0保存
-            
+                BatteryData[serial] = 0f;
+
                 // ライト破棄
                 if (data.NvgLight != null)
                 {
@@ -338,24 +400,27 @@ public static class NvgManager
                     data.NvgLight = null;
                 }
 
-                EnsureBlackout(player, data);
+                // プロファイルに応じてブラックアウト
+                if (prof.UseBlackout)
+                    EnsureBlackout(player, data);
+
                 player.ShowHint("NVGの電池が切れた…視界が真っ暗になった。", 5f);
                 RefreshVisibilityForAll();
 
-                // ★重要: ここでループを終了し、ActiveDataから削除
                 StopNvgBySerial(serial);
                 yield break;
             }
 
-            // 通常の電池消費処理
-            battery -= DrainPerTick;
-            if (battery < 0f) battery = 0f;
+            // 電池消費（TickInterval 分だけ減らす）
+            float drain = prof.DrainPerSecond * TickInterval;
+            battery = Math.Max(0f, battery - drain);
             BatteryData[serial] = battery;
 
+            // 残量に応じて輝度を落とす
             if (data.NvgLight?.Base != null)
             {
                 float ratio = battery / MaxBattery;
-                data.NvgLight.Intensity = 10000f * (0.4f + 0.6f * ratio);
+                data.NvgLight.Intensity = prof.LightIntensity * (0.4f + 0.6f * ratio);
             }
 
             player.ShowHint($"NVG電池: {(int)battery}%", 1f);
@@ -390,7 +455,7 @@ public static class NvgManager
             {
                 if (!player.IsConnected || blackout.Base == null || identity == null) return;
 
-                identity.InitShowState();          // 全員 Hide
+                identity.InitShowState();
                 identity.SetShowState(player, true);
 
                 foreach (var spectator in Player.List)
@@ -414,12 +479,17 @@ public static class NvgManager
         }
     }
 
+    // --------------------------------------------------------
+    // 内部データ
+    // --------------------------------------------------------
+
     private class NvgRuntimeData
     {
-        public ushort Serial { get; set; }
-        public int OwnerId { get; set; }
-        public Light? NvgLight { get; set; }
-        public Primitive? Blackout { get; set; }
+        public ushort          Serial          { get; set; }
+        public int             OwnerId         { get; set; }
+        public Light?          NvgLight        { get; set; }
+        public Primitive?      Blackout        { get; set; }
         public CoroutineHandle CoroutineHandle { get; set; }
+        public NvgProfile      Profile         { get; set; }  // ★追加
     }
 }

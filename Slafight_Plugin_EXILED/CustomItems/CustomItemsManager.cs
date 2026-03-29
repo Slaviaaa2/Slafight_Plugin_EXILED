@@ -71,6 +71,8 @@ public static class CustomItemsManager
             new FileCafeteriaNeeds().Register();
             new Veritas().Register();
             new CloakGenerator().Register();
+            new NvgRed().Register();
+            new NvgBlue().Register();
             
             new DninoueMissile().Register();
     }

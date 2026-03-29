@@ -14,6 +14,7 @@ using MEC;
 using PlayerRoles;
 using ProjectMER.Events.Arguments;
 using ProjectMER.Features;
+using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomMaps;
@@ -196,16 +197,21 @@ public class EventHandler
 
     private void SetupSpawnPoints()
     {
-        if (TriggerPointManager.TryGetByTag("Scp173SpawnPoint", out var points) && points.Count > 0)
+        var tagToField = new Dictionary<string, Action<Vector3>>
         {
-            try
-            {
-                Scp173SpawnPoint = TriggerPointManager.GetWorldPosition(points[0]);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"[SetupSpawnPoints] Failed to get position for Scp173SpawnPoint: {e}");
-            }
+            { "Scp173SpawnPoint", pos => Scp173SpawnPoint = pos },
+            { "Scp682SpawnPoint", pos => MapFlags.Scp682SpawnPoint = pos },
+        };
+
+        foreach (var point in TriggerPointManager.GetAll())
+        {
+            if (point.Base is not SerializableCustomTriggerPoint trig || string.IsNullOrEmpty(trig.Tag))
+                continue;
+
+            if (!tagToField.TryGetValue(trig.Tag, out var setter))
+                continue;
+
+            setter(TriggerPointManager.GetWorldPosition(point));
         }
     }
 

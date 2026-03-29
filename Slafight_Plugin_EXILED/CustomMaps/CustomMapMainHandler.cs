@@ -309,9 +309,6 @@ public class CustomMapMainHandler : CustomEventsHandler
                 case "ST_E":
                     STE = pos;
                     break;
-                case "Scp682SpawnPoint":
-                    MapFlags.Scp682SpawnPoint = pos;
-                    break;
             }
         }
     }

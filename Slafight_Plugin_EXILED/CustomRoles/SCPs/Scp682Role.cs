@@ -6,6 +6,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -34,8 +35,7 @@ public class Scp682Role : CRole
     public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player!.Role.Set(RoleTypeId.Scp173);
-        player.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
+        player!.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
 
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 999;
@@ -43,6 +43,8 @@ public class Scp682Role : CRole
         player.MaxHumeShield = 1800;
         player.HumeShieldRegenerationMultiplier = 15f;
         player.ClearInventory();
+
+        player.Position = MapFlags.Scp682SpawnPoint;
 
         SpeedLevels[player] = 1f;
         player.SetScale(new Vector3(0.7f, 0.65f, 1.2f));
