@@ -19,11 +19,11 @@ public class NvgBlue : NvgGogglesBase
 
     protected override NvgProfile NvgProfile => new()
     {
-        DrainPerSecond = 10f,        // 無限電池
+        DrainPerSecond = 3f,        
         LightColor     = Color.blue,
-        LightRange     = 50f,
-        LightIntensity = 10200f,
-        UseBlackout    = true,     // 電池切れしないので不要だが念のため
+        LightRange     = 180f,
+        LightIntensity = 10000f,
+        UseBlackout    = true,
     };
 
     protected override Color GlowColor => Color.blue;
