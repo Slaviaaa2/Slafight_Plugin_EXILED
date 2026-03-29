@@ -14,16 +14,16 @@ public class SnowWarrier : CRole
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "SnowWarrier";
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
 
-        player.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
+        player!.Role.Set(RoleTypeId.ChaosRifleman, RoleSpawnFlags.All);
         player.Role.Set(RoleTypeId.Tutorial, RoleSpawnFlags.AssignInventory);
         player.UniqueRole = UniqueRoleKey;
         LabApiHandler.SchemSnowWarrier(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
 
-        int maxHealth = 1000;
+        const int maxHealth = 1000;
 
         Timing.CallDelayed(0.05f, () =>
         {

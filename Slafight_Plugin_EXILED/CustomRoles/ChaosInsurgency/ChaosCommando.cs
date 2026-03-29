@@ -17,10 +17,10 @@ public class ChaosCommando : CRole
     protected override CTeam Team { get; set; }  = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "CI_Commando";
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.ChaosRepressor);
+        player!.Role.Set(RoleTypeId.ChaosRepressor);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 120;
         player.Health = player.MaxHealth;

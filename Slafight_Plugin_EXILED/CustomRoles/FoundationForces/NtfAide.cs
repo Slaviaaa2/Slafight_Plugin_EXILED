@@ -12,10 +12,10 @@ public class NtfAide : CRole
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "NtfAide";
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfSergeant);
+        player!.Role.Set(RoleTypeId.NtfSergeant);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;

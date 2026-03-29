@@ -16,10 +16,10 @@ public class Janitor : CRole
     protected override CTeam Team { get; set; } = CTeam.ClassD;
     protected override string UniqueRoleKey { get; set; } = "Janitor";
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.ClassD);
+        player!.Role.Set(RoleTypeId.ClassD);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;

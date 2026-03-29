@@ -57,11 +57,11 @@ public class Scp035Role : CRole
         base.UnregisterEvents();
     }
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
 
-        player.Role.Set(RoleTypeId.Tutorial);
+        player!.Role.Set(RoleTypeId.Tutorial);
         player.ChangeAppearance(RoleTypeId.Scientist);
         player.MaxHealth = 2500f;
         player.Health = player.MaxHealth;

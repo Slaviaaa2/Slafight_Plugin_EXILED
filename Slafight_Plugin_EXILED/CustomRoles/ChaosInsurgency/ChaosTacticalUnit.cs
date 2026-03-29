@@ -14,10 +14,10 @@ public class ChaosTacticalUnit : CRole
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosTacticalUnit";
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.ChaosMarauder);
+        player!.Role.Set(RoleTypeId.ChaosMarauder);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;

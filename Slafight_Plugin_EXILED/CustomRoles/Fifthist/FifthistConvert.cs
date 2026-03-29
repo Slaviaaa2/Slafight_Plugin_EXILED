@@ -14,10 +14,10 @@ public class FifthistConvert : CRole
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "FifthistConvert";
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.Tutorial);
+        player!.Role.Set(RoleTypeId.Tutorial);
         Vector3 offset;
         int maxHealth = 150;
 

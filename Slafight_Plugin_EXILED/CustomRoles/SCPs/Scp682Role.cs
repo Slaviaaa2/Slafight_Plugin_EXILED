@@ -31,10 +31,10 @@ public class Scp682Role : CRole
         base.UnregisterEvents();
     }
     
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.Scp173);
+        player!.Role.Set(RoleTypeId.Scp173);
         player.Role.Set(RoleTypeId.Scp939, RoleSpawnFlags.None);
 
         player.UniqueRole = UniqueRoleKey;

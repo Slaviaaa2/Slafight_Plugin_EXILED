@@ -26,11 +26,11 @@ public class ZombifiedRole : CRole
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Zombified";
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
 
-        player.Role.Set(RoleTypeId.Scp0492, RoleSpawnFlags.AssignInventory);
+        player!.Role.Set(RoleTypeId.Scp0492, RoleSpawnFlags.AssignInventory);
         player.MaxHealth = 125f;
         player.Health = player.MaxHealth;
         player.UniqueRole = UniqueRoleKey;

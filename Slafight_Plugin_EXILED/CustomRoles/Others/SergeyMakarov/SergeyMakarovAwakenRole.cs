@@ -23,10 +23,10 @@ public class SergeyMakarovAwakenRole : CRole
     private readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio
         = EventHandler.CreateAndPlayAudio;
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.Scp0492);
+        player!.Role.Set(RoleTypeId.Scp0492);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 5000;
         player.Health = player.MaxHealth;

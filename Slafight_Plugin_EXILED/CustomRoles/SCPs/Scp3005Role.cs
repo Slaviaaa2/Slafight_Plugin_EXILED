@@ -36,11 +36,11 @@ public class Scp3005Role : CRole
         base.UnregisterEvents();
     }
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
 
-        player.Role.Set(RoleTypeId.Scp0492);
+        player!.Role.Set(RoleTypeId.Scp0492);
         player.UniqueRole = "SCP-3005";
         player.SetCustomInfo("SCP-3005");
         const int maxHealth = 55555;

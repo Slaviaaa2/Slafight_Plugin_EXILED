@@ -18,10 +18,10 @@ public class GoCDeputy : CRole
     protected override CTeam Team { get; set; } = CTeam.GoC;
     protected override string UniqueRoleKey { get; set; } = "GoCDeputy";
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfSergeant);
+        player!.Role.Set(RoleTypeId.NtfSergeant);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;

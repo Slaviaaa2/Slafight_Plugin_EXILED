@@ -26,10 +26,10 @@ public class Scp3114Role : CRole
         base.UnregisterEvents();
     }
     
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.Scp3114);
+        player!.Role.Set(RoleTypeId.Scp3114);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 3114;
         player.Health = player.MaxHealth;

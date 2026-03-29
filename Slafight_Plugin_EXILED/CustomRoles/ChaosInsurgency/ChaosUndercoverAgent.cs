@@ -27,10 +27,10 @@ public class ChaosUndercoverAgent : CRole
         base.UnregisterEvents();
     }
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.ChaosMarauder);
+        player!.Role.Set(RoleTypeId.ChaosMarauder);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 100;
         player.Health = player.MaxHealth;

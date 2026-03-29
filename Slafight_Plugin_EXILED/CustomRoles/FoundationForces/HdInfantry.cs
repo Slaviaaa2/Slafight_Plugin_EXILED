@@ -14,10 +14,10 @@ public class HdInfantry : CRole
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "HdInfantry";
 
-    public override void SpawnRole(Player player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player,RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        player.Role.Set(RoleTypeId.NtfPrivate);
+        player!.Role.Set(RoleTypeId.NtfPrivate);
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 110;
         player.Health = player.MaxHealth;

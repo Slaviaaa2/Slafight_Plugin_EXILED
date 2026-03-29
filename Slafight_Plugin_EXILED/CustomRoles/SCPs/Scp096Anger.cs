@@ -92,12 +92,12 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         }
     }
 
-    public override void SpawnRole(Player player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
         base.SpawnRole(player, roleSpawnFlags);
-        InTryNotToCryAnim[player] = false;  // ★セット
+        InTryNotToCryAnim[player!] = false;  // ★セット
         
-        player.Role.Set(RoleTypeId.Scp096);
+        player!.Role.Set(RoleTypeId.Scp096);
         player.UniqueRole = UniqueRoleKey;
         player.SetCustomInfo("SCP-096: ANGER");
         player.MaxArtificialHealth = 1000;
@@ -126,7 +126,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         if (!Check(ev.Player)) return;
         
         // ★TryGetValueで完全安全（例外ゼロ）
-        bool isInAnim = InTryNotToCryAnim.TryGetValue(ev.Player, out bool animValue) ? animValue : false;
+        var isInAnim = InTryNotToCryAnim.TryGetValue(ev.Player, out bool animValue) ? animValue : false;
         if (ev.Scp096.RageManager.IsEnraged || isInAnim) return;
         
         Log.Debug("Scp096Anger: TargetAdded Triggered");

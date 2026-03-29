@@ -74,10 +74,11 @@ public class Engineer : CRole
         base.UnregisterEvents();
     }
 
-    public override void SpawnRole(Player player, RoleSpawnFlags flags = RoleSpawnFlags.All)
+    public override void SpawnRole(Player? player, RoleSpawnFlags flags = RoleSpawnFlags.All)
     {
         Cleanup(player);
 
+        if (player == null) return;
         player.Role.Set(RoleTypeId.Scientist);
         base.SpawnRole(player, flags);
 
@@ -122,7 +123,7 @@ public class Engineer : CRole
         return _states.TryGetValue(player.Id, out var st) ? st : null;
     }
 
-    private void Cleanup(Player player)
+    private void Cleanup(Player? player)
     {
         if (_states.TryGetValue(player.Id, out var st))
         {
