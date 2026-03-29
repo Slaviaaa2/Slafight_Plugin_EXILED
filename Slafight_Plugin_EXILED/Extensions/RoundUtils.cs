@@ -1,4 +1,5 @@
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.CustomRoles;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 
@@ -10,7 +11,6 @@ public static class RoundUtils
     /// </summary>
     public static void EndRound(this CTeam team, string specificReason = null)
     {
-        var handler = Plugin.Singleton?.CustomRolesHandler;
-        handler?.EndRound(team, specificReason);
+        CustomRolesHandler.EndRound(team, specificReason);
     }
 }

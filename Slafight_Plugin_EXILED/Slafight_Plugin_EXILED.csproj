@@ -224,6 +224,7 @@
         <Compile Include="Commands\DevTools\SpawnBuiltInPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
+        <Compile Include="CustomItems\exiledApiItems\CapybaraMissile.cs" />
         <Compile Include="CustomItems\exiledApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />

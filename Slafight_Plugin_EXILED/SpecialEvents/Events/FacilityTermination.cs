@@ -8,6 +8,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
@@ -283,14 +284,14 @@ public class FacilityTermination : SpecialEvent
             if (players.IsOnlyTeam(CTeam.GoC, "humanity"))
             {
                 Log.Debug("[Humanitists] Triggered");
-                Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");
+                CustomRolesHandler.EndRound(CTeam.GoC, "SavedHumanity");
                 SpawnContextRegistry.SetActive("Default");
                 yield break;
             }
             else if (players.IsOnlyTeam(CTeam.FoundationForces, "nohumanity"))
             {
                 Log.Debug("[NotHumanitists] Triggered");
-                Plugin.Singleton.CustomRolesHandler.EndRound(CTeam.FoundationForces, "NoHumanityAllowed");
+                CustomRolesHandler.EndRound(CTeam.FoundationForces, "NoHumanityAllowed");
                 SpawnContextRegistry.SetActive("Default");
                 yield break;
             }

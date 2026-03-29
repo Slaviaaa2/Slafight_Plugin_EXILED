@@ -190,16 +190,22 @@ public static class StaticUtils
     // チーム判定 (Player? 拡張)
     // ───────────────────────────────
 
-    public static bool IsFifthist([CanBeNull] this Player? player)
+    public static bool IsFifthist(this Player? player)
     {
         if (player == null) return false;
         return player.GetTeam() == CTeam.Fifthists || player.GetCustomRole() == CRoleTypeId.Scp3005;
     }
 
-    public static bool IsHumanitist([CanBeNull] this Player? player)
+    public static bool IsHumanitist(this Player? player)
     {
         if (player == null) return false;
         return player.GetTeam() != CTeam.FoundationForces && player.GetTeam() != CTeam.Guards;
+    }
+
+    public static bool IsCandyWarrier(this Player? player)
+    {
+        if (player == null) return false;
+        return player.GetCustomRole() is CRoleTypeId.CandyWarrierApril or CRoleTypeId.CandyWarrierHalloween;
     }
 
     public static uint GetNetId([CanBeNull] this Player? player)

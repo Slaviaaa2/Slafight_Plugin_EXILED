@@ -73,6 +73,7 @@ public static class CustomItemsManager
             new CloakGenerator().Register();
             new NvgRed().Register();
             new NvgBlue().Register();
+            new CapybaraMissile().Register();
             
             new DninoueMissile().Register();
     }

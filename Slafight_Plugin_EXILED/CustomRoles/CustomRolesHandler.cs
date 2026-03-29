@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
@@ -13,14 +14,83 @@ using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles;
 
+public sealed class WinCondition(
+    CTeam team,
+    string debugName,
+    Func<List<Player>, bool> checkFunc,
+    Action executeAction,
+    Func<bool>? enableCondition = null)
+{
+    public CTeam Team { get; } = team;
+    public string DebugName { get; } = debugName;
+    private Func<List<Player>, bool> CheckFunc { get; } = checkFunc;
+    public Action ExecuteAction { get; } = executeAction;
+    public Func<bool>? EnableCondition { get; } = enableCondition;
+
+    public bool IsEnabled => EnableCondition?.Invoke() ?? true;
+
+    public bool Check(List<Player> players) => CheckFunc(players);
+}
+
 public class CustomRolesHandler
 {
+    private readonly List<WinCondition> _winConditions;
+
+    private readonly HashSet<CRoleTypeId> _uniques =
+    [
+        CRoleTypeId.FifthistRescure,
+        CRoleTypeId.FifthistPriest,
+        CRoleTypeId.FifthistConvert,
+        CRoleTypeId.FifthistGuidance,
+        CRoleTypeId.GoCOperative,
+        CRoleTypeId.GoCDeputy,
+        CRoleTypeId.GoCMedic,
+        CRoleTypeId.GoCThaumaturgist,
+        CRoleTypeId.GoCCommunications,
+        CRoleTypeId.SnowWarrier
+    ];
+
     public CustomRolesHandler()
     {
+        _winConditions =
+        [
+            new(
+                CTeam.Fifthists,
+                "FifthistWin",
+                players => players.IsOnlyTeam(CTeam.Fifthists),
+                () => EndRound(CTeam.Fifthists)
+            ),
+
+
+            new(
+                CTeam.Others,
+                "SnowWarrierWin",
+                players => players.IsOnlyTeam(CTeam.Others, "snow"),
+                () => EndRound(CTeam.Others, "SW_WIN"),
+                () => MapFlags.GetSeason() == SeasonTypeId.Christmas
+            ),
+
+
+            new(
+                CTeam.Others,
+                "CandyWarrierWin",
+                players => players.IsOnlyTeam(CTeam.Others, "candy"),
+                () => EndRound(CTeam.Others, "CANDY_WIN"),
+                () => MapFlags.GetSeason() is SeasonTypeId.April or SeasonTypeId.Halloween
+            ),
+
+
+            new(
+                CTeam.SCPs,
+                "AIWin",
+                CheckAIWinCondition,
+                ExecuteAIWin
+            )
+        ];
+
         Exiled.Events.Handlers.Player.Hurting += OnHurting;
         Exiled.Events.Handlers.Player.ChangingRole += CustomRoleRemover;
         Exiled.Events.Handlers.Server.RoundStarted += RoundCoroutine;
-
         Exiled.Events.Handlers.Server.EndingRound += CancelEnd;
         Exiled.Events.Handlers.Server.WaitingForPlayers += ResetAbilities;
         Exiled.Events.Handlers.Server.RestartingRound += AbilityResetInRoundRestarting;
@@ -28,10 +98,9 @@ public class CustomRolesHandler
 
     ~CustomRolesHandler()
     {
-        Exiled.Events.Handlers.Player.Hurting += OnHurting;
+        Exiled.Events.Handlers.Player.Hurting -= OnHurting;
         Exiled.Events.Handlers.Player.ChangingRole -= CustomRoleRemover;
         Exiled.Events.Handlers.Server.RoundStarted -= RoundCoroutine;
-
         Exiled.Events.Handlers.Server.EndingRound -= CancelEnd;
         Exiled.Events.Handlers.Server.WaitingForPlayers -= ResetAbilities;
         Exiled.Events.Handlers.Server.RestartingRound -= AbilityResetInRoundRestarting;
@@ -46,169 +115,87 @@ public class CustomRolesHandler
     {
         Timing.CallDelayed(10f, () =>
         {
-            Timing.RunCoroutine(FifthistWinCoroutine());
-            Timing.RunCoroutine(NewAICoroutine());
-            if (MapFlags.GetSeason() == SeasonTypeId.Christmas)
-                Timing.RunCoroutine(SnowWarrierWinCoroutine());
+            Timing.RunCoroutine(UniversalWinCoroutine());
         });
     }
 
-    private IEnumerator<float> FifthistWinCoroutine()
+    private IEnumerator<float> UniversalWinCoroutine()
     {
         for (;;)
         {
             if (!Round.IsStarted || Round.IsLobby)
                 yield break;
 
-            var players = Player.List
+            var alivePlayers = Player.List
                 .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
                 .ToList();
 
-            //Log.Debug($"[FifthistWin] AliveNonSpec={players.Count}");
-
-            if (players.IsOnlyTeam(CTeam.Fifthists))
+            foreach (var condition in _winConditions.Where(c => c.IsEnabled))
             {
-                Log.Debug("[FifthistWin] Triggered");
-                Round.IsLocked = false;
-                EndRound(CTeam.Fifthists);  // 自分のEndRound呼び出しに修正
-                yield break;
+                if (condition.Check(alivePlayers))
+                {
+                    Log.Debug($"[WinCondition] {condition.DebugName} triggered");
+                    Round.IsLocked = false;
+                    condition.ExecuteAction();
+                    yield break;
+                }
             }
 
             yield return Timing.WaitForSeconds(1f);
         }
     }
 
-    private IEnumerator<float> SnowWarrierWinCoroutine()
+    private static bool CheckAIWinCondition(List<Player> players)
     {
-        for (;;)
+        int scpCount = 0;
+        bool only079 = true;
+        List<Player> scp079s = [];
+
+        foreach (var player in players)
         {
-            if (!Round.IsStarted || Round.IsLobby)
-                yield break;
+            if (player.GetTeam() != CTeam.SCPs)
+                continue;
 
-            var players = Player.List
-                .Where(p => p != null && p.IsAlive && p.Role.Type != RoleTypeId.Spectator)
-                .ToList();
+            scpCount++;
 
-            //Log.Debug($"[SnowWarrierWin] AliveNonSpec={players.Count}");
-
-            if (players.IsOnlyTeam(CTeam.Others, "snow"))
-            {
-                Log.Debug("[SnowWarrierWin] Triggered");
-                Round.IsLocked = false;
-                EndRound(CTeam.Others, "SW_WIN");  // 自分のEndRound呼び出しに修正
-                yield break;
-            }
-
-            yield return Timing.WaitForSeconds(1f);
+            if (player.Role.Type == RoleTypeId.Scp079)
+                scp079s.Add(player);
+            else
+                only079 = false;
         }
+
+        bool scpSideIsOnly079 = scpCount > 0 && only079 && scp079s.Count == scpCount;
+
+        var nonScpTeams = players
+            .Where(p => p.GetTeam() != CTeam.SCPs)
+            .GroupBy(p => p.GetTeam())
+            .Count();
+
+        return scpSideIsOnly079 && nonScpTeams == 1;
     }
-        
-    private IEnumerator<float> NewAICoroutine()
+
+    private static void ExecuteAIWin()
     {
-        for (;;)
+        var scp079s = Player.List
+            .Where(p => p != null && p.IsAlive && p.Role.Type == RoleTypeId.Scp079)
+            .ToList();
+
+        foreach (var p in scp079s)
         {
-            if (Round.IsLobby)
-                yield break;
-
-            int scpCount = 0;
-            bool only079 = true;
-
-            // CTeamごとのカウント
-            int foundationCount = 0;  // FoundationForces + Scientists + Guards をまとめて「財団側」として扱うならここ
-            int classDCount = 0;
-            int chaosCount = 0;
-            int otherCount = 0;       // Fifthists, GoC, UIU, SerpentsHand など
-
-            List<Player> scps = [];
-            List<Player> scp079s = [];
-
-            foreach (Player player in Player.List)
-            {
-                if (player == null || !player.IsAlive)
-                    continue;
-
-                var team = player.GetTeam();  // CTeam
-                var roleType = player.Role.Type;
-
-                if (team == CTeam.SCPs)
-                {
-                    scpCount++;
-                    scps.Add(player);
-
-                    if (roleType == RoleTypeId.Scp079)
-                        scp079s.Add(player);
-                    else
-                        only079 = false;
-                }
-                else if (team == CTeam.FoundationForces || team == CTeam.Scientists || team == CTeam.Guards)
-                {
-                    foundationCount++;
-                }
-                else if (team == CTeam.ClassD)
-                {
-                    classDCount++;
-                }
-                else if (team == CTeam.ChaosInsurgency)
-                {
-                    chaosCount++;
-                }
-                else
-                {
-                    otherCount++;
-                }
-            }
-
-            // 「SCP陣営がSCP-079のみ」
-            bool scpSideIsOnly079 = scpCount > 0 && only079 && scp079s.Count == scpCount;
-
-            // 「SCP以外のCTeamが一つだけ」
-            int nonScpTeamsAlive = 0;
-            if (foundationCount > 0) nonScpTeamsAlive++;
-            if (classDCount > 0)     nonScpTeamsAlive++;
-            if (chaosCount > 0)      nonScpTeamsAlive++;
-            if (otherCount > 0)      nonScpTeamsAlive++;
-
-            bool onlyOneNonScpTeam = nonScpTeamsAlive == 1;
-
-            if (scpSideIsOnly079 && onlyOneNonScpTeam)
-            {
-                // ここで079をkill
-                foreach (var p in scp079s)
-                {
-                    // 好きなダメージ種別でOK
-                    p.Kill("Terminated by C.A.S.S.I.E.","SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.");
-                }
-
-                // 条件一度満たしたらこのコルーチンは終了
-                yield break;
-            }
-
-            yield return Timing.WaitForSeconds(1f);
+            p.Kill(
+                "Terminated by C.A.S.S.I.E.",
+                "SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies."
+            );
         }
     }
-        
-    List<CRoleTypeId> uniques =
-    [
-        CRoleTypeId.FifthistRescure,
-        CRoleTypeId.FifthistPriest,
-        CRoleTypeId.FifthistConvert,
-        CRoleTypeId.FifthistGuidance,
-        CRoleTypeId.GoCOperative,
-        CRoleTypeId.GoCDeputy,
-        CRoleTypeId.GoCMedic,
-        CRoleTypeId.GoCThaumaturgist,
-        CRoleTypeId.GoCCommunications,
-        CRoleTypeId.GoCOperative,
-        CRoleTypeId.SnowWarrier
-    ];
 
-    public void CancelEnd(EndingRoundEventArgs ev)
+    private void CancelEnd(EndingRoundEventArgs ev)
     {
         int count = 0;
 
         foreach (Player player in Player.List)
         {
-            if (uniques.Contains(player.GetCustomRole()))
+            if (player != null && _uniques.Contains(player.GetCustomRole()))
                 count++;
         }
 
@@ -228,7 +215,7 @@ public class CustomRolesHandler
 
             foreach (Player player in Player.List)
             {
-                if (uniques.Contains(player.GetCustomRole()))
+                if (player != null && _uniques.Contains(player.GetCustomRole()))
                     count++;
             }
 
@@ -241,17 +228,17 @@ public class CustomRolesHandler
             yield return Timing.WaitForSeconds(1f);
         }
     }
-        
+
     private void OnHurting(HurtingEventArgs ev)
     {
-        if (ev.Player == null) return;
+        if (ev.Player == null)
+            return;
+
         if (ev.Attacker?.GetCustomRole() == CRoleTypeId.Scp3005 ||
             ev.Attacker?.GetCustomRole() == CRoleTypeId.FifthistPriest)
         {
             if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
-            {
                 ev.IsAllowed = false;
-            }
         }
     }
 
@@ -262,13 +249,10 @@ public class CustomRolesHandler
         ev.Player!.UniqueRole = null;
         ev.Player.CustomInfo = null;
         ev.Player.Scale = new Vector3(1f, 1f, 1f);
-            
         ev.Player.ClearCustomInfo();
 
         var player = ev.Player;
-
         SpecificFlagsManager.Clear(player);
-            
         AbilityManager.ClearSlots(player);
         AbilityBase.RevokeAbility(player.Id);
 
@@ -276,24 +260,38 @@ public class CustomRolesHandler
         {
             try
             {
-                if (Plugin.Singleton?.PlayerHUD != null && player != null && player.IsConnected)
+                if (Plugin.Singleton?.PlayerHUD != null && player.IsConnected)
                     Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, string.Empty, player);
+
                 RoleSpecificTextProvider.Clear(player);
             }
             catch
             {
-                // 無視してOK
+                // ignore
             }
         });
     }
 
-    public void AbilityResetInRoundRestarting()
+    public static void AbilityResetInRoundRestarting()
     {
         AbilityManager.Loadouts.Clear();
         AbilityBase.RevokeAllPlayers();
     }
 
-    public void EndRound(CTeam winnerTeam = CTeam.SCPs, string specificReason = null)
+    private WinCondition? GetCondition(string debugName)
+    {
+        return _winConditions.FirstOrDefault(x => x.DebugName == debugName);
+    }
+
+    public void UpdateWinConditionStates()
+    {
+        foreach (var condition in _winConditions.Where(condition => condition.DebugName is not ("FifthistWin" or "AIWin")).Where(condition => condition.EnableCondition == null))
+        {
+            continue;
+        }
+    }
+
+    public static void EndRound(CTeam winnerTeam = CTeam.SCPs, string specificReason = null)
     {
         switch (winnerTeam)
         {
@@ -304,23 +302,20 @@ public class CustomRolesHandler
 
             case CTeam.Fifthists:
                 Round.KillsByScp = 555;
-                foreach (Player player in Player.List){
+                foreach (Player player in Player.List)
+                {
                     player.ShowHint("<b><size=80><color=#ff00fa>第五教会</color>の勝利</size></b>", 555f);
                     Intercom.TrySetOverride(player, true);
                 }
 
                 Timing.CallDelayed(10f, () =>
                 {
-                    if (Round.IsLobby) return;
-                    StaticUtils.TryRestart();
+                    if (!Round.IsLobby)
+                        StaticUtils.TryRestart();
                 });
                 break;
 
             case CTeam.ChaosInsurgency:
-                Round.EscapedDClasses = 999;
-                Round.EndRound(true);
-                break;
-
             case CTeam.ClassD:
                 Round.EscapedDClasses = 999;
                 Round.EndRound(true);
@@ -328,19 +323,21 @@ public class CustomRolesHandler
 
             case CTeam.FoundationForces:
             case CTeam.Scientists:
-            case CTeam.Guards:    
+            case CTeam.Guards:
                 Round.EscapedScientists = 999;
+
                 if (specificReason == "NoHumanityAllowed")
                 {
-                    foreach (var player in Player.List){
+                    foreach (var player in Player.List)
+                    {
                         player.ShowHint("<b><size=80><color=red>正常性</color>の勝利</size></b>", 555f);
                         Intercom.TrySetOverride(player, true);
                     }
 
                     Timing.CallDelayed(10f, () =>
                     {
-                        if (Round.IsLobby) return;
-                        StaticUtils.TryRestart();
+                        if (!Round.IsLobby)
+                            StaticUtils.TryRestart();
                     });
                 }
                 else
@@ -351,66 +348,106 @@ public class CustomRolesHandler
 
             case CTeam.Others:
                 Round.EscapedDClasses = 999;
-                if (specificReason == "SW_WIN")
-                {
-                    foreach (var player in Player.List){
-                        player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>", 555f);
-                        Intercom.TrySetOverride(player, true);
-                    }
 
-                    Timing.CallDelayed(10f, () =>
-                    {
-                        if (Round.IsLobby) return;
-                        StaticUtils.TryRestart();
-                    });
-                }
-                else
+                switch (specificReason)
                 {
-                    foreach (var player in Player.List){
-                        player.ShowHint("<b><size=80><color=#ffffff>UNKNOWN TEAM</color>の勝利</size></b>", 555f);
-                        Intercom.TrySetOverride(player, true);
-                    }
+                    case "SW_WIN":
+                        foreach (var player in Player.List)
+                        {
+                            player.ShowHint("<b><size=80><color=#ffffff>雪の戦士達</color>の勝利</size></b>", 555f);
+                            Intercom.TrySetOverride(player, true);
+                        }
 
-                    Timing.CallDelayed(10f, () =>
-                    {
-                        if (Round.IsLobby) return;
-                        StaticUtils.TryRestart();
-                    });
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (!Round.IsLobby)
+                                StaticUtils.TryRestart();
+                        });
+                        break;
+
+                    case "CANDY_WIN":
+                        foreach (var player in Player.List)
+                        {
+                            player.ShowHint("<b><size=80><color=#ff96de>お菓子の戦士達</color>の勝利</size></b>", 555f);
+                            Intercom.TrySetOverride(player, true);
+                        }
+
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (!Round.IsLobby)
+                                StaticUtils.TryRestart();
+                        });
+                        break;
+
+                    default:
+                        foreach (var player in Player.List)
+                        {
+                            player.ShowHint("<b><size=80><color=#ffffff>UNKNOWN TEAM</color>の勝利</size></b>", 555f);
+                            Intercom.TrySetOverride(player, true);
+                        }
+
+                        Timing.CallDelayed(10f, () =>
+                        {
+                            if (!Round.IsLobby)
+                                StaticUtils.TryRestart();
+                        });
+                        break;
                 }
                 break;
 
             case CTeam.GoC:
                 Round.EscapedDClasses = 999;
+
                 if (specificReason == "SavedHumanity")
                 {
-                    foreach (var player in Player.List){
+                    foreach (var player in Player.List)
+                    {
                         player.ShowHint("<b><size=80><color=#0000c8>人類</color>の勝利</size></b>", 555f);
                         Intercom.TrySetOverride(player, true);
                     }
 
                     Timing.CallDelayed(10f, () =>
                     {
-                        if (Round.IsLobby) return;
-                        StaticUtils.TryRestart();
+                        if (!Round.IsLobby)
+                            StaticUtils.TryRestart();
                     });
                 }
                 else
                 {
-                    foreach (var player in Player.List){
+                    foreach (var player in Player.List)
+                    {
                         player.ShowHint("<b><size=80><color=#0000c8>世界オカルト連合</color>の勝利</size></b>", 555f);
                         Intercom.TrySetOverride(player, true);
                     }
 
                     Timing.CallDelayed(10f, () =>
                     {
-                        if (Round.IsLobby) return;
-                        StaticUtils.TryRestart();
+                        if (!Round.IsLobby)
+                            StaticUtils.TryRestart();
                     });
                 }
                 break;
 
+            case CTeam.Null:
+            case CTeam.UIU:
+            case CTeam.SerpentsHand:
+            case CTeam.BrokenGodChurch:
+            case CTeam.O5:
+            case CTeam.Sarkic:
+            case CTeam.AWCY:
+            case CTeam.BlackQueen:
             default:
-                Round.EndRound(true);
+                foreach (var player in Player.List)
+                {
+                    player.ShowHint("<b><size=80><color=#ffffff>UNKNOWN TEAM</color>の勝利</size></b>", 555f);
+                    Intercom.TrySetOverride(player, true);
+                }
+
+                Timing.CallDelayed(10f, () =>
+                {
+                    if (!Round.IsLobby)
+                        StaticUtils.TryRestart();
+                });
                 break;
         }
     }
