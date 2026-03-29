@@ -349,6 +349,8 @@ public class LabApiHandler : CustomEventsHandler
             {
                 if (schem == null || schem.transform == null)
                     return;
+                
+                schem.AnimationController.Play("idle");
 
                 if (labPlayer.GameObject != null) schem.transform.position = labPlayer.GameObject.transform.position;
             });

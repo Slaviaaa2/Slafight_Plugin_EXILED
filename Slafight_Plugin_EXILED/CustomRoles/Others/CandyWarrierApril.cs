@@ -45,14 +45,18 @@ public class CandyWarrierApril : CRole
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.KeycardO5);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
-            player.TryAddCandy(CandyKindID.Pink);
+            player.AddItem(ItemType.SCP330);  // 明示的にバッグ追加
+
+            Timing.CallDelayed(0.02f, () =>
+            {
+                if (Scp330Bag.TryGetBag(player.ReferenceHub, out var bag))
+                {
+                    bag.Candies.Clear();
+                    for (int i = 0; i < 6; i++)
+                        bag.TryAddSpecific(CandyKindID.Pink);
+                    bag.ServerRefreshBag();
+                }
+            });
 
             player.AddAmmo(AmmoType.Nato9, 50);
         });

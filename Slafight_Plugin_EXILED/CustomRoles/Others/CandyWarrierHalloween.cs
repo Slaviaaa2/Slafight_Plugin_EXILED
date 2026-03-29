@@ -46,18 +46,26 @@ public class CandyWarrierHalloween : CRole
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.SCP500);
             player.AddItem(ItemType.KeycardO5);
-            List<CandyKindID> rareCandies =
-            [
-                CandyKindID.Black,
-                CandyKindID.Brown,
-                CandyKindID.Gray,
-                CandyKindID.Orange,
-                CandyKindID.White,
-            ];
-            for (var i = 0; i < 8; i++)
+            player.AddItem(ItemType.SCP330);  // 明示的にバッグ追加
+
+            Timing.CallDelayed(0.02f, () =>
             {
-                player.TryAddCandy(rareCandies.RandomItem()); 
-            }
+                if (Scp330Bag.TryGetBag(player.ReferenceHub, out var bag))
+                {
+                    bag.Candies.Clear();
+                    var rareCandies = new List<CandyKindID>
+                    {
+                        CandyKindID.Black,
+                        CandyKindID.Brown,
+                        CandyKindID.Gray,
+                        CandyKindID.Orange,
+                        CandyKindID.White,
+                    };
+                    for (int i = 0; i < 6; i++)
+                        bag.TryAddSpecific(rareCandies.RandomItem());
+                    bag.ServerRefreshBag();
+                }
+            });
 
             player.AddAmmo(AmmoType.Nato9, 50);
         });

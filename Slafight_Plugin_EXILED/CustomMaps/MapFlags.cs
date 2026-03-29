@@ -1,4 +1,5 @@
 using Slafight_Plugin_EXILED.API.Enums;
+using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomMaps;
 
@@ -8,6 +9,7 @@ public static class MapFlags
     public static bool FemurBreaked => CustomMapMainHandler._femurBreaked;
     public static bool IsOmegaStarted => OmegaWarhead.IsWarheadStarted;
     public static bool IsWarheadBooming => WarheadBoomEffectHandler.IsBooming;
+    public static Vector3 Scp682SpawnPoint;
 
     /// <summary>
     /// Get Season. Please look to 
