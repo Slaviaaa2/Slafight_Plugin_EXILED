@@ -13,7 +13,7 @@ namespace Slafight_Plugin_EXILED.Extensions;
 /// <summary>
 /// NetworkIdentity を持つ任意のオブジェクト（Primitive / Light / AdminToy / Schematic等）の
 /// 表示を特定プレイヤーだけに限定するヘルパー群。
-/// EXILED の MirrorExtensions.SendSpawnMessageMethodInfo 経由で SendSpawnMessage を呼ぶ。
+/// PublicizedされたMirrorを用いて実装。UnsafeBlockをAllowに設定すること。
 /// </summary>
 public static class NetworkVisibilityExtensions
 {

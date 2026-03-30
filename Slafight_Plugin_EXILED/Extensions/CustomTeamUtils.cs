@@ -6,23 +6,30 @@ namespace Slafight_Plugin_EXILED.Extensions;
 public struct CustomTeamInfo
 {
     public CTeam Team;
+    public bool IsGoI;
     public string TeamName;
     public string CassieString;
     public string TeamColor;
 }
 public static class CustomTeamUtils
 {
-    public static CustomTeamInfo GetTeamInfo(CTeam team)
+    public static CustomTeamInfo GetTeamInfo(this CTeam team)
     {
         return new CustomTeamInfo
         {
             Team = team,
+            IsGoI = IsGoI(team),
             TeamName = GetTeamName(team),
             CassieString = GetTeamCassie(team),
             TeamColor = GetTeamColor(team)
         };
     }
-    public static string GetTeamName(CTeam team)
+
+    public static bool IsGoI(this CTeam team)
+    {
+        return team is not CTeam.FoundationForces or CTeam.Guards or CTeam.Scientists;
+    }
+    public static string GetTeamName(this CTeam team)
     {
         return team switch
         {
@@ -46,7 +53,7 @@ public static class CustomTeamUtils
             _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
         };
     }
-    public static string GetTeamCassie(CTeam team)
+    public static string GetTeamCassie(this CTeam team)
     {
         return team switch
         {
@@ -70,7 +77,7 @@ public static class CustomTeamUtils
             _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
         };
     }
-    public static string GetTeamColor(CTeam team)
+    public static string GetTeamColor(this CTeam team)
     {
         return team switch
         {
@@ -94,4 +101,5 @@ public static class CustomTeamUtils
             _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
         };
     }
+    
 }

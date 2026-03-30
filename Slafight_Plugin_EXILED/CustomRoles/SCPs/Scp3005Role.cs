@@ -84,7 +84,14 @@ public class Scp3005Role : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol && ev.Attacker is null && ev.DamageHandler.Type is DamageType.Decontamination or DamageType.Poison)
+        {
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color> は<color={CustomTeamUtils.GetTeamColor(Team)}>アンチミームプロトコル</color>により正常に無効化されました。");
+        }
+        else
+        {
+            CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        }
         base.OnDying(ev);
     }
 
