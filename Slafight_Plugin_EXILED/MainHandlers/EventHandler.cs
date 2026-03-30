@@ -198,7 +198,7 @@ public class EventHandler
 
     public static Vector3 Scp173SpawnPoint = Vector3.zero;
 
-    private void SetupSpawnPoints()
+    private static void SetupSpawnPoints()
     {
         var tagToField = new Dictionary<string, Action<Vector3>>
         {
@@ -218,19 +218,16 @@ public class EventHandler
         }
     }
 
-    private void OnRoundStarted()
+    private static void OnRoundStarted()
     {
         SpecificFlagsManager.ClearAll();
-
-        Timing.CallDelayed(2.0f, SetupSpawnPoints);
-
+        SetupSpawnPoints();
         foreach (var player in Player.List.ToList().Where(IsPlayerValid))
         {
             player.ShowHint("");
             SpecificFlagsManager.InitPlayerFlags(player);
         }
-
-        foreach (Door door in Door.List)
+        foreach (var door in Door.List)
         {
             if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.NuclearAttack) break;
             if (door.Type == DoorType.GateA || door.Type == DoorType.GateB)

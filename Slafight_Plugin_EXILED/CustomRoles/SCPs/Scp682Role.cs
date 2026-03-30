@@ -50,12 +50,23 @@ public class Scp682Role : CRole
 
         player.SetCustomInfo("SCP-682");
         
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.Position = MapFlags.Scp682SpawnPoint;
-            player.ShowHint("<size=24><color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
-        });
+        Timing.RunCoroutine(WaitAndTeleport(player));
         Timing.RunCoroutine(Coroutine(player));
+    }
+
+    private IEnumerator<float> WaitAndTeleport(Player player)
+    {
+        // スポーンポイントが初期化されるまで待機（最大10秒）
+        float elapsed = 0f;
+        while (MapFlags.Scp682SpawnPoint == Vector3.zero && elapsed < 10f)
+        {
+            yield return Timing.WaitForSeconds(0.25f);
+            elapsed += 0.25f;
+        }
+
+        yield return Timing.WaitForSeconds(0.05f);
+        player.Position = MapFlags.Scp682SpawnPoint;
+        player.ShowHint("<size=24><color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
     }
 
     private IEnumerator<float> Coroutine(Player player)

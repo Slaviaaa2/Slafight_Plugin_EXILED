@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -8,6 +9,7 @@ using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
@@ -47,11 +49,22 @@ public class Scp173Role : CRole
         
         player.AddAbility(new TeleportRandomAbility(player));
         player.AddAbility(new PlaceTantrumAbility(player));
-        Timing.CallDelayed(0.05f, () =>
+        Timing.RunCoroutine(WaitAndTeleport(player));
+    }
+
+    private IEnumerator<float> WaitAndTeleport(Player player)
+    {
+        // スポーンポイントが初期化されるまで待機（最大10秒）
+        float elapsed = 0f;
+        while (EventHandler.Scp173SpawnPoint == Vector3.zero && elapsed < 10f)
         {
-            player.Position = EventHandler.Scp173SpawnPoint;
-            player.ShowHint("<size=24><color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
-        });
+            yield return Timing.WaitForSeconds(0.25f);
+            elapsed += 0.25f;
+        }
+
+        yield return Timing.WaitForSeconds(0.05f);
+        player.Position = EventHandler.Scp173SpawnPoint;
+        player.ShowHint("<size=24><color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
     }
 
     private void OnBlinking(BlinkingEventArgs ev)

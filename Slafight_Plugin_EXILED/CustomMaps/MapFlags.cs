@@ -9,7 +9,7 @@ public static class MapFlags
     public static bool FemurBreaked => CustomMapMainHandler._femurBreaked;
     public static bool IsOmegaStarted => OmegaWarhead.IsWarheadStarted;
     public static bool IsWarheadBooming => WarheadBoomEffectHandler.IsBooming;
-    public static Vector3 Scp682SpawnPoint;
+    public static Vector3 Scp682SpawnPoint = Vector3.zero;
 
     /// <summary>
     /// Get Season. Please look to 
