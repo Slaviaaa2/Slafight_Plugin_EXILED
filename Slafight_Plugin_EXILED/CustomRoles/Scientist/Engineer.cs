@@ -20,6 +20,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 [CRoleAutoRegisterIgnore]
 public class Engineer : CRole
 {
+    // TODO: need rework
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Engineer;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "Engineer";
