@@ -201,12 +201,7 @@ public static class DailyCassieAnnounce
         var selectable = new List<ScenarioType>();
         foreach (var s in allScenarios)
         {
-            if (s == ScenarioType.Experiment7777_Phase2_Progress ||
-                s == ScenarioType.Experiment7777_Phase3_Warning  ||
-                s == ScenarioType.Experiment7777_Phase4_Failure  ||
-                s == ScenarioType.Experiment7777_Phase5_Escape   ||
-                s == ScenarioType.Experiment7777_Phase6_StaffDeath ||
-                s == ScenarioType.Experiment7777_Phase7_Final)
+            if (s is ScenarioType.Experiment7777_Phase2_Progress or ScenarioType.Experiment7777_Phase3_Warning or ScenarioType.Experiment7777_Phase4_Failure or ScenarioType.Experiment7777_Phase5_Escape or ScenarioType.Experiment7777_Phase6_StaffDeath or ScenarioType.Experiment7777_Phase7_Final)
                 continue;
             selectable.Add(s);
         }

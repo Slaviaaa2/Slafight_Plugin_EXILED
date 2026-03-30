@@ -66,7 +66,6 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         var evHandler = EventHandler;
 
         // Warhead ロックなど
-        evHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         evHandler.DeadmanDisable = true;
 

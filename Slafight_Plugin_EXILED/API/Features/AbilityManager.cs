@@ -37,7 +37,7 @@ public static class AbilityManager
         if (!TryGetLoadout(player, out var loadout))
             return false;
 
-        if (slotIndex < 0 || slotIndex >= AbilityLoadout.MaxSlots)
+        if (slotIndex is < 0 or >= AbilityLoadout.MaxSlots)
             return false;
 
         loadout.ActiveIndex = slotIndex;

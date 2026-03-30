@@ -7,7 +7,6 @@ public static class CustomBooleans
 {
     public static bool IsRoleUnassigned(this Player player)
     {
-        return player.Role.Type == RoleTypeId.Spectator
-               || player.Role.Type == RoleTypeId.None;
+        return player.Role.Type is RoleTypeId.Spectator or RoleTypeId.None;
     }
 }

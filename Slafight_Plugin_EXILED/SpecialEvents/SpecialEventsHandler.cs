@@ -302,13 +302,8 @@ public class SpecialEventsHandler
     public void InitStats()
     {
         EventPID++;
-        Plugin.Singleton.EventHandler.CryFuckEnabled = false;
-        Plugin.Singleton.EventHandler.CryFuckSpawned = false;
         Plugin.Singleton.EventHandler.DeadmanDisable = false;
         Plugin.Singleton.EventHandler.DeconCancellFlag = false;
-        Plugin.Singleton.EventHandler.IsScpAutoSpawnLocked = false;
-        Plugin.Singleton.EventHandler.SkeletonSpawned = false;
-        Plugin.Singleton.EventHandler.SpecialWarhead = false;
         Warhead.IsLocked = false;
         EscapeHandler.ClearEscapeOverrides();
         SpawnSystem.Disable = false;

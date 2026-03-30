@@ -72,7 +72,6 @@ public class SnowWarriersAttackEvent : SpecialEvent
     {
         var eventHandler = Plugin.Singleton.EventHandler;
 
-        eventHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         eventHandler.DeadmanDisable = true;
 

@@ -46,7 +46,7 @@ public class AbilityUniversal : ICommand
         {
             var targetArg = arguments.At(1).ToLower();
             
-            if (targetArg == "@me" || targetArg == "me")
+            if (targetArg is "@me" or "me")
             {
                 target = executor;
             }

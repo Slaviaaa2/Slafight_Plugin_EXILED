@@ -211,7 +211,7 @@ public class DevToolFunctionHandler
 
         foreach (RoleTypeId roleId in Enum.GetValues(typeof(RoleTypeId)))
         {
-            if (roleId == RoleTypeId.None || roleId == RoleTypeId.Destroyed)
+            if (roleId is RoleTypeId.None or RoleTypeId.Destroyed)
                 continue;
 
             var npc = Npc.Spawn($"RTD: {roleId}", RoleTypeId.ClassD);

@@ -32,7 +32,6 @@ public class OmegaWarheadEvent : SpecialEvent
             return;
 
         // Warhead 関連フラグ
-        EventHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         EventHandler.DeadmanDisable = true;
 

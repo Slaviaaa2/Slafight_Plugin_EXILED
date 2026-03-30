@@ -37,7 +37,6 @@ public class DeltaWarheadEvent : SpecialEvent
             return;
 
         // Warhead 関連フラグ
-        EventHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         EventHandler.DeadmanDisable = true;
         // EventHandler.DeconCancellFlag = true; // 使うならここで
@@ -126,8 +125,7 @@ public class DeltaWarheadEvent : SpecialEvent
                         {
                             Log.Debug("lockforeach:" + door.Type);
 
-                            if (door.Type == DoorType.CheckpointGateA ||
-                                door.Type == DoorType.CheckpointGateB)
+                            if (door.Type is DoorType.CheckpointGateA or DoorType.CheckpointGateB)
                             {
                                 door.IsOpen = false;
                             }
@@ -146,8 +144,7 @@ public class DeltaWarheadEvent : SpecialEvent
                         {
                             Log.Debug("playerforeach:" + player.Zone);
 
-                            if (player.Zone == ZoneType.Entrance ||
-                                player.Zone == ZoneType.HeavyContainment)
+                            if (player.Zone is ZoneType.Entrance or ZoneType.HeavyContainment)
                             {
                                 player.ExplodeEffect(ProjectileType.FragGrenade);
                                 player.Kill("DELTA WARHEADに爆破された");

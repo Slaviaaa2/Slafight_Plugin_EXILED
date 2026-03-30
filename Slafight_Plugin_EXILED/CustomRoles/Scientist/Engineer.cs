@@ -285,10 +285,7 @@ public class Engineer : CRole
         if (ev.Player.GetCustomRole() != CRoleTypeId.Engineer) return;
         if (GetState(ev.Player) is { Level: < 5 })
         {
-            if (ev.Item.Type == ItemType.KeycardResearchCoordinator ||
-                ev.Item.Type == ItemType.KeycardContainmentEngineer ||
-                ev.Item.Type == ItemType.KeycardFacilityManager ||
-                ev.Item.Type == ItemType.KeycardO5)
+            if (ev.Item.Type is ItemType.KeycardResearchCoordinator or ItemType.KeycardContainmentEngineer or ItemType.KeycardFacilityManager or ItemType.KeycardO5)
             {
                 ev.IsAllowed = false;
             }

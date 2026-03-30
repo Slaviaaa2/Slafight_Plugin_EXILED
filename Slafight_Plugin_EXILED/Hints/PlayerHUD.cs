@@ -315,7 +315,7 @@ public class PlayerHUD
             {
                 var cteam = sourcePlayer.GetTeam();
 
-                if ((cteam == CTeam.FoundationForces || cteam == CTeam.Guards) &&
+                if (cteam is CTeam.FoundationForces or CTeam.Guards &&
                     sourcePlayer.GetCustomRole() != CRoleTypeId.Sculpture)
                 {
                     SyncTextRole = $"<color=#00b7eb>{sourcePlayer.Role.Name}</color>";

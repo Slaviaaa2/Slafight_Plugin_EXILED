@@ -34,7 +34,6 @@ public class FacilityTermination : SpecialEvent
     {
         if (KillEvent()) return;
 
-        EventHandler.SpecialWarhead = true;
         Warhead.IsLocked = true;
         EventHandler.DeadmanDisable = true;
         EventHandler.DeconCancellFlag = true;

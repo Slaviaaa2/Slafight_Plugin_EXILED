@@ -50,11 +50,8 @@ public class EventHandler
         PlayerHandler.UsedItem += OnUsed;
         PlayerHandler.Hurting += OnHurting;
         PlayerHandler.Dying += OnDying;
-
-        WarheadHandler.Starting += AlphaWarheadLock;
+        
         WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
-
-
     }
 
     ~EventHandler()
@@ -73,28 +70,11 @@ public class EventHandler
         PlayerHandler.Hurting -= OnHurting;
         PlayerHandler.Dying -= OnDying;
 
-        WarheadHandler.Starting -= AlphaWarheadLock;
         WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
-
-
     }
 
-    private readonly Config cfg = Plugin.Singleton.Config;
-
     public bool DeadmanDisable = false;
-    public bool SkeletonSpawned = false;
-    public float SpawnRoll = 1;
-    public float Funny = 0;
-
-    public bool SpecialWarhead = false;
-    public static int WarheadID = 0;
-
     public bool DeconCancellFlag = false;
-    public bool CryFuckEnabled = false;
-    public bool CryFuckSpawned = false;
-
-    private bool GateDoorLocked = false;
-    public bool IsScpAutoSpawnLocked = false;
     private bool _pluginLoaded = false;
 
     private static bool IsPlayerValid(Player? p)
@@ -185,14 +165,7 @@ public class EventHandler
         Timing.CallDelayed(0.1f, () =>
         {
             DeadmanDisable = false;
-            SkeletonSpawned = false;
             DeconCancellFlag = false;
-            SpecialWarhead = false;
-            WarheadID = 0;
-            CryFuckEnabled = false;
-            CryFuckSpawned = false;
-            GateDoorLocked = false;
-            IsScpAutoSpawnLocked = false;
         });
     }
 
@@ -230,7 +203,7 @@ public class EventHandler
         foreach (var door in Door.List)
         {
             if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.NuclearAttack) break;
-            if (door.Type == DoorType.GateA || door.Type == DoorType.GateB)
+            if (door.Type is DoorType.GateA or DoorType.GateB)
                 door.Lock(120f, DoorLockType.AdminCommand);
         }
 
@@ -263,7 +236,7 @@ public class EventHandler
                         "Attention, All personnel . Detected containment breach is currently started within the site. All personnel must immediately begin evacuation .",
                         "全職員へ通達。収容違反の発生を確認しました。全職員は警備隊の指示に従い、避難を開始してください。", true);
                 }
-                foreach (Room room in Room.List)
+                foreach (var room in Room.List)
                 {
                     room.RoomLightController.ServerFlickerLights(3f);
                 }
@@ -273,13 +246,11 @@ public class EventHandler
             {
                 if (!Round.InProgress) return;
 
-                foreach (Door door in Door.List)
+                foreach (var door in Door.List)
                 {
-                    if (door.Type == DoorType.Scp173Gate)
-                    {
-                        door.Unlock();
-                        door.IsOpen = true;
-                    }
+                    if (door.Type != DoorType.Scp173Gate) continue;
+                    door.Unlock();
+                    door.IsOpen = true;
                 }
             });
         });
@@ -341,7 +312,7 @@ public class EventHandler
     {
         var audioPlayer = AudioPlayer.CreateOrGet(audioPlayerName);
 
-        if (!audioPlayer.TryGetSpeaker(audioPlayerName, out Speaker speaker))
+        if (!audioPlayer.TryGetSpeaker(audioPlayerName, out var speaker))
         {
             speaker = audioPlayer.AddSpeaker(audioPlayerName, isSpatial: isSpatial, maxDistance: maxDistance, minDistance: minDistance);
         }
@@ -359,10 +330,6 @@ public class EventHandler
 
         AudioClipStorage.LoadClip(Path.Combine(Plugin.Singleton.Config.AudioReferences, fileName), fileName);
         audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
-    }
-
-    private void AlphaWarheadLock(StartingEventArgs ev)
-    {
     }
 
     private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs? ev)
@@ -408,7 +375,7 @@ public class EventHandler
         }
         else
         {
-            if (ev.Door.Type == DoorType.GateA || ev.Door.Type == DoorType.GateB)
+            if (ev.Door.Type is DoorType.GateA or DoorType.GateB)
             {
                 if (ev.Door.IsLocked && Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.None)
                 {
