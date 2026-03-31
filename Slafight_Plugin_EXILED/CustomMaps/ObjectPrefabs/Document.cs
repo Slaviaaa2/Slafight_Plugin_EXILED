@@ -75,10 +75,8 @@ public class Document : ObjectPrefab
     protected override void OnToySearchedNearby(PlayerSearchedToyEventArgs ev)
     {
         var player = Player.Get(ev.Player);
-        if (_schematicObject == null)
-            return;
-    
-        CreateAndPlayAudio("PickItem0.ogg", "Vent", _schematicObject.Position, true, null, false, 2.5f, 0f);
+        var pos = _schematicObject?.Position ?? Position;
+        CreateAndPlayAudio("PickItem0.ogg", "Vent", pos, true, null, false, 2.5f, 0f);
         
         player.ShowHint(DocumentDictionary.Get(DocumentType));
     }

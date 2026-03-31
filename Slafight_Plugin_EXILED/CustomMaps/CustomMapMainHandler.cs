@@ -18,6 +18,7 @@ using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.Commands.DevTools;
+using Slafight_Plugin_EXILED.CustomMaps.ObjectPrefabs;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.SpecialEvents;
@@ -180,7 +181,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     public void SetDoorState()
     {
-        foreach (Door door in Door.List)
+        foreach (var door in Door.List)
         {
             if (door is null)
                 continue;
@@ -197,13 +198,9 @@ public class CustomMapMainHandler : CustomEventsHandler
                     break;
 
                 default:
-                    foreach (var kvp in specialDoors)
+                    if (specialDoors.Any(kvp => Vector3.SqrMagnitude(door.Position - kvp.Key) <= PositionTolerance * PositionTolerance))
                     {
-                        if (Vector3.SqrMagnitude(door.Position - kvp.Key) <= PositionTolerance * PositionTolerance)
-                        {
-                            door.Lock(DoorLockType.AdminCommand);
-                            break;
-                        }
+                        door.Lock(DoorLockType.AdminCommand);
                     }
                     break;
             }
@@ -237,6 +234,14 @@ public class CustomMapMainHandler : CustomEventsHandler
             else
             {
                 Log.Error("Train Points not successfully spawned.");
+            }
+
+            if (MapFlags.AntiAntiMemeDocPoint != default)
+            {
+                var doc = new Document().Create() as Document;
+                doc?.DocumentType = DocumentType.AntiAntiMeme;
+                doc?.Position = MapFlags.AntiAntiMemeDocPoint;
+                doc?.ShowModel = false;
             }
         });
     }
@@ -308,6 +313,9 @@ public class CustomMapMainHandler : CustomEventsHandler
                     break;
                 case "ST_E":
                     STE = pos;
+                    break;
+                case "AntiAntiMemeDoc":
+                    MapFlags.AntiAntiMemeDocPoint = pos;
                     break;
             }
         }

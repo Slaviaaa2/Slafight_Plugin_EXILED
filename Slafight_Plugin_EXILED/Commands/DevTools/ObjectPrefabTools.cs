@@ -55,6 +55,7 @@ public class SpawnObjectPrefab : ICommand
         {
             case "spawn":   return Spawn(arguments, player, out response);
             case "save":    return Save(arguments, player, out response);
+            case "saveall": return SaveAll(arguments, player, out response);
             case "load":    return Load(arguments, player, out response);
             case "list":    return List(arguments, player, out response);
             case "remove":  return Remove(arguments, player, out response);
@@ -89,6 +90,7 @@ public class SpawnObjectPrefab : ICommand
         "Usage:\n" +
         "  .sl objprefab spawn <PrefabClass> [AutoDestroySeconds]\n" +
         "  .sl objprefab save <MapName>\n" +
+        "  .sl objprefab saveall <MapName> [BaseMapName]\n" +
         "  .sl objprefab load <MapName>\n" +
         "  .sl objprefab list\n" +
         "  .sl objprefab remove <InstanceID>\n" +
@@ -211,6 +213,95 @@ public class SpawnObjectPrefab : ICommand
         cfg.Save(mapName);
 
         response = $"Saved {cfg.Prefabs.Count} prefabs to map '{mapName}'.";
+        return true;
+    }
+
+    // ===== saveall =====
+    // ロード済みマップのファイルデータと現在のInstanceManagerオブジェクトをマージして保存する。
+    // Usage: .sl objprefab saveall <SaveMapName> [BaseMapName]
+    // BaseMapName省略時は最後にロードしたマップを使用。
+    private bool SaveAll(ArraySegment<string> args, Player player, out string response)
+    {
+        if (args.Count < 2)
+        {
+            response = "Usage: .sl objprefab saveall <SaveMapName> [BaseMapName]";
+            return false;
+        }
+
+        string saveMapName = args.At(1);
+        string? baseMapName = args.Count >= 3 ? args.At(2) : ObjectPrefabLoader.LastLoadedMapName;
+
+        // --- 1. 現在の InstanceManager のオブジェクトを PrefabSaveData に変換 ---
+        var currentPrefabs = InstanceManager.GetAll().ToList();
+        var currentSaveDataList = new List<PrefabSaveData>();
+
+        foreach (var p in currentPrefabs)
+        {
+            var closestRoom = Room.List
+                .OrderBy(r => Vector3.Distance(r.Position, p.Position))
+                .FirstOrDefault();
+
+            if (closestRoom == null)
+            {
+                Log.Warn($"[SaveAll] Skipping prefab {p.ObjectInstanceID}: No closest room found");
+                continue;
+            }
+
+            var room = closestRoom;
+            Quaternion inv = Quaternion.Inverse(room.Rotation);
+            Vector3 localPos = inv * (p.Position - room.Position);
+            Quaternion localRot = inv * p.Rotation;
+
+            var op = p as ObjectPrefab;
+
+            currentSaveDataList.Add(new PrefabSaveData
+            {
+                PrefabType = p.GetType().FullName,
+                RoomType = room.Type,
+                LocalPosition = localPos,
+                LocalRotationEuler = localRot.eulerAngles,
+                Scale = p.Scale,
+                MaxRooms = op?.MaxRooms ?? 1,
+                AutoDestroyTime = p.AutoDestroyTime,
+                AutoDestroyEnabled = p.AutoDestroyEnabled,
+                Options = p.CollectOptions(),
+            });
+        }
+
+        // --- 2. ベースマップのファイルデータを読み込み ---
+        var basePrefabs = new List<PrefabSaveData>();
+        if (!string.IsNullOrEmpty(baseMapName))
+        {
+            var baseCfg = ObjectPrefabConfig.Load(baseMapName);
+            basePrefabs = baseCfg.Prefabs;
+        }
+
+        // --- 3. マージ: ファイルのオブジェクトのうち、InstanceManager に存在しないものを追加 ---
+        // 同一判定: PrefabType + RoomType + LocalPosition が近い (距離 < 0.5f)
+        const float positionThreshold = 0.5f;
+        int mergedFromFile = 0;
+
+        foreach (var fileData in basePrefabs)
+        {
+            bool alreadyExists = currentSaveDataList.Any(c =>
+                c.PrefabType == fileData.PrefabType &&
+                c.RoomTypeName == fileData.RoomTypeName &&
+                Vector3.Distance(c.LocalPosition, fileData.LocalPosition) < positionThreshold);
+
+            if (!alreadyExists)
+            {
+                currentSaveDataList.Add(fileData);
+                mergedFromFile++;
+            }
+        }
+
+        // --- 4. 保存 ---
+        var cfg = new ObjectPrefabConfig { Prefabs = currentSaveDataList };
+        cfg.Save(saveMapName);
+
+        response = $"Saved {currentSaveDataList.Count} prefabs to map '{saveMapName}' " +
+                   $"(InstanceManager: {currentSaveDataList.Count - mergedFromFile}, " +
+                   $"Merged from '{baseMapName ?? "none"}': {mergedFromFile}).";
         return true;
     }
 
@@ -894,12 +985,18 @@ public class SpawnObjectPrefab : ICommand
 public static class ObjectPrefabLoader
 {
     /// <summary>
+    /// 最後にロードしたマップ名。saveall で参照される。
+    /// </summary>
+    public static string? LastLoadedMapName { get; private set; }
+
+    /// <summary>
     /// 指定マップ名のObjectPrefabマップファイルを読み込み、
     /// RoomType + Local座標 + MaxRooms に従ってPrefabをスポーンします。
     /// 既存のObjectPrefabは全クリアされます。
     /// </summary>
     public static int LoadMap(string mapName)
     {
+        LastLoadedMapName = mapName;
         var cfg = ObjectPrefabConfig.Load(mapName);
         InstanceManager.ClearAll();
         int totalSpawned = 0;

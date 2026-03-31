@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -31,12 +32,11 @@ public class SecurityChief : CRole
         player.TryAddCustomItem(1100);
         player.TryAddCustomItem(2000);
         player.AddAmmo(AmmoType.Nato9,180);
-        var pos = new Vector3(125f, 296f, -65f);
-        player.Position = pos;
             
         player.SetCustomInfo("Security Chief");
         Timing.CallDelayed(0.05f, () =>
         {
+            player.Position = Room.Get(RoomType.EzChef).WorldPosition(Vector3.up * 0.75f);
             player.ShowHint("<size=24><color=#00b7eb>警備主任</color>\n施設内の職員を外に脱出させよう！",10f);
         });
     }

@@ -177,6 +177,7 @@ public class EventHandler
         {
             { "Scp173SpawnPoint", pos => Scp173SpawnPoint = pos },
             { "Scp682SpawnPoint", pos => MapFlags.Scp682SpawnPoint = pos },
+            { "FacilityManagerSpawnPoint", pos => MapFlags.FacilityManagerSpawnPoint = pos }
         };
 
         foreach (var point in TriggerPointManager.GetAll())

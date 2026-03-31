@@ -27,7 +27,6 @@ public class HIDTurret : CustomItem
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.UsingMicroHIDEnergy += RightChargeDisable;
         Exiled.Events.Handlers.Player.ChangingMicroHIDState += disRight;
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
@@ -37,7 +36,6 @@ public class HIDTurret : CustomItem
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.UsingMicroHIDEnergy -= RightChargeDisable;
         Exiled.Events.Handlers.Player.ChangingMicroHIDState -= disRight;
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
@@ -50,16 +48,6 @@ public class HIDTurret : CustomItem
         if (!Check(ev.Item)) { return; }
         if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.ChargeFire && ev.NewPhase == MicroHidPhase.Firing)
         {
-            ev.IsAllowed = false;
-        }
-    }
-    
-    private void RightChargeDisable(UsingMicroHIDEnergyEventArgs ev)
-    {
-        if (!Check(ev.Item)) { return; }
-        if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.PrimaryFire)
-        {
-            Log.Debug(ev.MicroHID.LastFiringMode);
             ev.IsAllowed = false;
         }
     }

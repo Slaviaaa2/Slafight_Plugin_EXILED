@@ -88,11 +88,13 @@ public static class DocumentDictionary
                        "[このファイルの内容は全て倫理委員会の要請により削除されています]" +
                        "- [要請により非公開], The Ethics Comittee, Dr. Redheart</size>";
             case DocumentType.AntiAntiMeme:
-                return "<size=18>Project | Anti: Anti-Meme\n" +
+                return "<size=20>Project | Anti: Anti-Meme\n" +
                        "Project Leader | Dr. Maynard\n" +
                        "Senior Researcher | Dr. Clef\n" +
                        "Researcher | Dr. Killistes Humano\n" +
                        "Researcher | Dr. Redheart</size>";
+            case DocumentType.AprilWtf:
+                return "REDACTED";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
@@ -101,5 +103,5 @@ public static class DocumentDictionary
 
 public enum DocumentType
 {
-    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey,AntiAntiMeme
+    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey,AntiAntiMeme,AprilWtf
 }
