@@ -4,6 +4,7 @@ public enum SeasonTypeId
 {
     None,
     April,
+    Sergey,
     Halloween,
     Christmas,
 }

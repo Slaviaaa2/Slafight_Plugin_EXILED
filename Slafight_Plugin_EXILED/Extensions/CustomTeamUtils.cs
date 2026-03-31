@@ -27,7 +27,7 @@ public static class CustomTeamUtils
 
     public static bool IsGoI(this CTeam team)
     {
-        return team is not CTeam.FoundationForces or CTeam.Guards or CTeam.Scientists;
+        return team is not (CTeam.FoundationForces or CTeam.Guards or CTeam.Scientists);
     }
     public static string GetTeamName(this CTeam team)
     {

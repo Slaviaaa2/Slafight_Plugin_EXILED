@@ -149,7 +149,7 @@ public class CandyWarriersAttackEvent : SpecialEvent
                         });
                     });
 
-                    var testingDelayedInt = 400f;
+                    var testingDelayedInt = 1000f;
                     Timing.CallDelayed(testingDelayedInt, () =>
                     {
                         if (CancelIfOutdated()) return;

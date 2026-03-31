@@ -1,3 +1,5 @@
+using Exiled.API.Features;
+using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.CustomRoles;
 
@@ -12,5 +14,13 @@ public static class RoundUtils
     public static void EndRound(this CTeam team, string specificReason = null)
     {
         CustomRolesHandler.EndRound(team, specificReason);
+    }
+
+    public static bool HasSpecificWinMethod(this Player player)
+    {
+        var info = player.GetRoleInfo();
+        if (info is { Vanilla: RoleTypeId.Tutorial, Custom: CRoleTypeId.None }) return false;
+        return player.GetTeam() is not (CTeam.SCPs or CTeam.Null or CTeam.FoundationForces or CTeam.Guards
+            or CTeam.Scientists or CTeam.ChaosInsurgency or CTeam.ClassD);
     }
 }

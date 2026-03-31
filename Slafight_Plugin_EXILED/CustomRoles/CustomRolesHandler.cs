@@ -36,20 +36,6 @@ public class CustomRolesHandler
 {
     private readonly List<WinCondition> _winConditions;
 
-    private readonly HashSet<CRoleTypeId> _uniques =
-    [
-        CRoleTypeId.FifthistRescure,
-        CRoleTypeId.FifthistPriest,
-        CRoleTypeId.FifthistConvert,
-        CRoleTypeId.FifthistGuidance,
-        CRoleTypeId.GoCOperative,
-        CRoleTypeId.GoCDeputy,
-        CRoleTypeId.GoCMedic,
-        CRoleTypeId.GoCThaumaturgist,
-        CRoleTypeId.GoCCommunications,
-        CRoleTypeId.SnowWarrier
-    ];
-
     public CustomRolesHandler()
     {
         _winConditions =
@@ -194,9 +180,9 @@ public class CustomRolesHandler
     {
         int count = 0;
 
-        foreach (Player player in Player.List)
+        foreach (var player in Player.List)
         {
-            if (player != null && _uniques.Contains(player.GetCustomRole()))
+            if (player != null && player.HasSpecificWinMethod())
                 count++;
         }
 
@@ -216,7 +202,7 @@ public class CustomRolesHandler
 
             foreach (Player player in Player.List)
             {
-                if (player != null && _uniques.Contains(player.GetCustomRole()))
+                if (player != null && player.HasSpecificWinMethod())
                     count++;
             }
 

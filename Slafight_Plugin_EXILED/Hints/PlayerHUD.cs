@@ -532,6 +532,11 @@ public class PlayerHUD
                         SyncTextTeam = "<b><color=#ffffff>SNOW WARRIER's DIVISION</color></b>";
                         SyncTextObjective = "全施設にクリスマスと雪玉の正義を執行しろ";
                         break;
+                    case CRoleTypeId.CandyWarrierApril or CRoleTypeId.CandyWarrierHalloween:
+                        SyncTextRole = "<b><color=#ffffff>CANDY WARRIER</color></b>";
+                        SyncTextTeam = "<b><color=#ffffff>CANDY WARRIER's DIVISION</color></b>";
+                        SyncTextObjective = "全施設にFunnyなお菓子の正義を執行しろ";
+                        break;
 
                     // Special
                     case CRoleTypeId.Sculpture:

@@ -25,6 +25,7 @@ public static class MapFlags
             1 => SeasonTypeId.Halloween,
             2 => SeasonTypeId.Christmas,
             3 => SeasonTypeId.April,
+            4 => SeasonTypeId.Sergey,
             _ => SeasonTypeId.None
         };
     }

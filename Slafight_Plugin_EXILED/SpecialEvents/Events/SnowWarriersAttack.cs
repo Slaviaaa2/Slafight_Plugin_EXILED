@@ -144,7 +144,7 @@ public class SnowWarriersAttackEvent : SpecialEvent
                         });
                     });
 
-                    float testingDelayedInt = 400f;
+                    float testingDelayedInt = 1000f;
                     Timing.CallDelayed(testingDelayedInt, () =>
                     {
                         if (CancelIfOutdated()) return;
@@ -153,7 +153,7 @@ public class SnowWarriersAttackEvent : SpecialEvent
                         foreach (Player player in Player.List)
                         {
                             if (player == null) continue;
-                            if (player.UniqueRole == "SnowWarrier")
+                            if (player.GetCustomRole() is CRoleTypeId.SnowWarrier)
                                 snowCount++;
                         }
 

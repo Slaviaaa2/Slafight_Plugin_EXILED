@@ -64,7 +64,7 @@ public class SpecialEventsHandler
     public SpecialEventType NowEvent => CurrentEvent;
 
     public bool IsFifthistsRaidActive { get; set; }
-    float chance = 1f / 4f;
+    float chance = 1f / 2f;
 
     // =====================
     //  イベント操作
