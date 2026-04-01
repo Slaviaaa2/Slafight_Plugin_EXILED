@@ -20,6 +20,7 @@ public static class RoundUtils
     {
         var info = player.GetRoleInfo();
         if (info is { Vanilla: RoleTypeId.Tutorial, Custom: CRoleTypeId.None }) return false;
+        if (!player.IsAlive) return false;
         return player.GetTeam() is not (CTeam.SCPs or CTeam.Null or CTeam.FoundationForces or CTeam.Guards
             or CTeam.Scientists or CTeam.ChaosInsurgency or CTeam.ClassD);
     }

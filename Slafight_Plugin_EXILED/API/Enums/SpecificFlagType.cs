@@ -6,4 +6,9 @@ public enum SpecificFlagType
     RPNameDisabled,
     Scp207Level4,
     Scp207Resistance,
+    GunsDisabled,
+    SpecialWeaponsDisabled,
+    MedicalsDisabled,
+    DroppingDisabled,
+    PickingDisabled,
 }

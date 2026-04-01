@@ -27,6 +27,7 @@ public class SnowWarrier : CRole
 
         Timing.CallDelayed(0.05f, () =>
         {
+            player.TryAddFlag(SpecificFlagType.SpecialWeaponsDisabled);
             player.CustomInfo = "<color=#FFFFFF>SNOW WARRIER</color>";
             player.InfoArea |= PlayerInfoArea.Nickname;
             player.InfoArea &= ~PlayerInfoArea.Role;

@@ -198,13 +198,7 @@ public class CustomRolesHandler
     {
         for (;;)
         {
-            int count = 0;
-
-            foreach (Player player in Player.List)
-            {
-                if (player != null && player.HasSpecificWinMethod())
-                    count++;
-            }
+            var count = Player.List.OfType<Player>().Count(player => player.HasSpecificWinMethod());
 
             if (count == 0)
             {

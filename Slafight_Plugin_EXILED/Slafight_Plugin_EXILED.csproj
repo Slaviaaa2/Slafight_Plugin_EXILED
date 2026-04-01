@@ -370,6 +370,7 @@
         <Compile Include="MainHandlers\RPNameSetter.cs" />
         <Compile Include="MainHandlers\SpawningHandler.cs" />
         <Compile Include="MainHandlers\SpawnSystem.cs" />
+        <Compile Include="MainHandlers\SpecificFlagsHandler.cs" />
         <Compile Include="MainHandlers\WearsHandler.cs" />
         <Compile Include="CustomMaps\CustomMapMainHandler.cs" />
         <Compile Include="CustomMaps\MapFlags.cs" />

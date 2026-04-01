@@ -419,7 +419,7 @@ public class EventHandler
         if (ev.Player == null) return;
         if (ev.Player.GetCustomRole() != CRoleTypeId.None) return;
         if (ev.Player.Role.Team != Team.SCPs) return;
-        if (ev.Player.Role.Type == RoleTypeId.Scp0492) return;
+        if (ev.Player.Role.Type is RoleTypeId.Scp0492 or RoleTypeId.Scp079) return;
         Exiled.API.Features.Cassie.Clear();
         CassieHelper.AnnounceTermination(ev, "SCP "+string.Join(" ", Regex.Replace(ev.Player.Role.Name, @"[^0-9]", "").ToCharArray()), $"<color={CustomTeamUtils.GetTeamColor(CTeam.SCPs)}>{ev.Player.Role.Name}</color>");
     }

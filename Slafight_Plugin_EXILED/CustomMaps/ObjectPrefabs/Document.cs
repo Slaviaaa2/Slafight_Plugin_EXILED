@@ -78,7 +78,7 @@ public class Document : ObjectPrefab
         var pos = _schematicObject?.Position ?? Position;
         CreateAndPlayAudio("PickItem0.ogg", "Vent", pos, true, null, false, 2.5f, 0f);
         
-        player.ShowHint(DocumentDictionary.Get(DocumentType));
+        player.ShowHint(DocumentDictionary.Get(DocumentType), 10f);
     }
 
     // ===== Options (Save/Load) =====

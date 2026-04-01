@@ -40,7 +40,7 @@ public class Plugin : Plugin<Config>
     public override string Name => "Slafight_Plugin_EXILED";
     public override string Author => "Slaviaaa_2";
     public override string Prefix => "Slafight_Plugin_EXILED";
-    public override Version Version => new Version(1,7,4,0);
+    public override Version Version => new Version(1,7,4,1);
         
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 3);
 
@@ -99,6 +99,7 @@ public class Plugin : Plugin<Config>
             
         NetworkVisibilityExtensions.Register();
         NvgManager.Register();
+        SpecificFlagsHandler.Register();
             
         WearsHandler.Register();
         CRole.RegisterAllEvents();
@@ -171,6 +172,7 @@ public class Plugin : Plugin<Config>
             
         NetworkVisibilityExtensions.Unregister();
         NvgManager.Unregister();
+        SpecificFlagsHandler.Unregister();
             
         WearsHandler.Unregister();
         CRole.UnregisterAllEvents();

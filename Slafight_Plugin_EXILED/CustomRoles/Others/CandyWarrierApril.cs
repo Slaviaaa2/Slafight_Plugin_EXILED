@@ -28,6 +28,7 @@ public class CandyWarrierApril : CRole
 
         Timing.CallDelayed(0.05f, () =>
         {
+            player.TryAddFlag(SpecificFlagType.SpecialWeaponsDisabled);
             player.SetCustomInfo("<color=#FF96DE>CANDY WARRIER</color>");
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;

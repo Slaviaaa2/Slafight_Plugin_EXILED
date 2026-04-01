@@ -16,7 +16,7 @@ public static class SpecificFlagsManager
 
     // ===== 基本Init =====
 
-    public static void InitPlayerFlags(Player player)
+    public static void InitPlayerFlags(this Player player)
     {
         if (player == null) return;
         Flags[player.Id] = [];
@@ -27,7 +27,7 @@ public static class SpecificFlagsManager
     /// <summary>
     /// Flags/Coroutines が未初期化なら確実に作る。
     /// </summary>
-    private static void EnsurePlayerInitialized(Player player)
+    private static void EnsurePlayerInitialized(Player? player)
     {
         if (player == null) return;
 
@@ -40,7 +40,7 @@ public static class SpecificFlagsManager
 
     // ===== 取得系 =====
 
-    public static List<SpecificFlagType>? Get([CanBeNull] Player player)
+    public static List<SpecificFlagType>? Get(this Player? player)
     {
         if (player == null) return null;
         if (!Flags.TryGetValue(player.Id, out var list))
@@ -52,7 +52,7 @@ public static class SpecificFlagsManager
     /// プレイヤーが指定フラグを持っているかを安全に確認。
     /// player が null / 未初期化 / Clear 済みでも false。
     /// </summary>
-    public static bool HasFlag(Player player, SpecificFlagType flag)
+    public static bool HasFlag(this Player? player, SpecificFlagType flag)
     {
         if (player == null)
             return false;
@@ -65,7 +65,7 @@ public static class SpecificFlagsManager
 
     // ===== クリア系 =====
 
-    public static bool Clear(Player player)
+    public static bool Clear(this Player? player)
     {
         try
         {
@@ -96,7 +96,7 @@ public static class SpecificFlagsManager
 
     // ===== 変更系 =====
 
-    public static bool TryAddFlag(Player player, SpecificFlagType flag)
+    public static bool TryAddFlag(this Player? player, SpecificFlagType flag)
     {
         if (player == null) return false;
 
@@ -106,7 +106,7 @@ public static class SpecificFlagsManager
         return flags.AddIfNotContains(flag);
     }
 
-    public static bool TryRemoveFlag(Player player, SpecificFlagType flag)
+    public static bool TryRemoveFlag(this Player? player, SpecificFlagType flag)
     {
         if (player == null) return false;
 
@@ -116,7 +116,7 @@ public static class SpecificFlagsManager
         return flags.RemoveAll(f => f == flag) > 0;
     }
 
-    public static void WaitAndRemove(Player player, SpecificFlagType flag, float time)
+    public static void WaitAndRemove(this Player? player, SpecificFlagType flag, float time)
     {
         if (player == null) return;
 

@@ -88,27 +88,25 @@ public class Scp966Role : CRole
             }
             
             player.EnableEffect(EffectType.NightVision, 255);
-            if (speedLevel <= 0)
+            switch (speedLevel)
             {
-                player.EnableEffect(EffectType.Slowness, 30);
+                case <= 0:
+                    player.EnableEffect(EffectType.Slowness, 30);
+                    break;
+                case 1:
+                    player.EnableEffect(EffectType.Slowness, 20);
+                    break;
+                case 2:
+                    player.EnableEffect(EffectType.Slowness, 10);
+                    break;
+                case 3:
+                    player.EnableEffect(EffectType.MovementBoost, 0);
+                    break;
+                default:
+                    player.EnableEffect(EffectType.MovementBoost, 10);
+                    break;
             }
-            else if (speedLevel == 1)
-            {
-                player.EnableEffect(EffectType.Slowness, 20);
-            }
-            else if (speedLevel == 2)
-            {
-                player.EnableEffect(EffectType.Slowness, 10);
-            }
-            else if (speedLevel == 3)
-            {
-                player.EnableEffect(EffectType.MovementBoost, 0);
-            }
-            else if (speedLevel >= 4)
-            {
-                player.EnableEffect(EffectType.MovementBoost, 10);
-            }
-            
+
             // ★ 修正: RoleSpecificTextProvider を使用
             RoleSpecificTextProvider.Set(player, 
                 "Speed Level: " + (Math.Abs(speedLevel + 1)) + "/5");
