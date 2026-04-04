@@ -55,6 +55,7 @@ public class GoCHoundDog : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
+        ev.Player.IsBypassModeEnabled = false;
         var grenade = Pickup.CreateAndSpawn(ItemType.GrenadeHE, ev.Player.Position, Quaternion.identity);
         if (grenade is GrenadePickup grenadeBase)
         {

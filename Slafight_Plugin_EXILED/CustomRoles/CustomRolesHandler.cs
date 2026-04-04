@@ -176,7 +176,7 @@ public class CustomRolesHandler
         Exiled.API.Features.Cassie.MessageTranslated("SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.", "<color=red>SCP-079</color>は<color=yellow>C.A.S.S.I.E</color>により終了されました。");
     }
 
-    private void CancelEnd(EndingRoundEventArgs ev)
+    private static void CancelEnd(EndingRoundEventArgs ev)
     {
         int count = 0;
 
@@ -194,7 +194,7 @@ public class CustomRolesHandler
         Timing.RunCoroutine(RoundLocker());
     }
 
-    private IEnumerator<float> RoundLocker()
+    private static IEnumerator<float> RoundLocker()
     {
         for (;;)
         {
@@ -210,7 +210,7 @@ public class CustomRolesHandler
         }
     }
 
-    private void OnHurting(HurtingEventArgs ev)
+    private static void OnHurting(HurtingEventArgs ev)
     {
         if (ev.Player == null)
             return;
@@ -218,19 +218,21 @@ public class CustomRolesHandler
         if (ev.Attacker?.GetCustomRole() == CRoleTypeId.Scp3005 ||
             ev.Attacker?.GetCustomRole() == CRoleTypeId.FifthistPriest)
         {
-            if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+            if (ev.Player.HasFlag(SpecificFlagType.AntiMemeEffectDisabled))
                 ev.IsAllowed = false;
         }
     }
 
-    public void CustomRoleRemover(ChangingRoleEventArgs ev)
+    private static void CustomRoleRemover(ChangingRoleEventArgs ev)
     {
+        if (!ev.IsAllowed) return;
         Log.Debug($"[CustomRoleRemover] Reset ALL for {ev.Player?.Nickname} (role change {ev.Player?.Role} -> {ev.NewRole})");
 
         ev.Player!.UniqueRole = null;
         ev.Player.CustomInfo = null;
         ev.Player.Scale = new Vector3(1f, 1f, 1f);
         ev.Player.ClearCustomInfo();
+        ev.Player.DisableAllEffects();
 
         var player = ev.Player;
         SpecificFlagsManager.Clear(player);
@@ -241,7 +243,7 @@ public class CustomRolesHandler
         {
             try
             {
-                if (Plugin.Singleton?.PlayerHUD != null && player.IsConnected)
+                if (player.IsConnected)
                     Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, string.Empty, player);
 
                 RoleSpecificTextProvider.Clear(player);

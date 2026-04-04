@@ -281,6 +281,7 @@ public abstract class CRole
         if (player == null) return;
         
         player.ShowHint(string.Empty);
+        player.DisableAllEffects();
 
         switch (roleSpawnFlags)
         {
