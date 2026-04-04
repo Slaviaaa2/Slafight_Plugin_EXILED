@@ -42,7 +42,7 @@ public static class SpecificFlagsHandler
 
         if (!ev.IsAllowed)
         {
-            ev.Player?.ShowHint("<size=18>あなたはアイテムを拾うことができません！</size>");
+            ev.Player?.ShowHint("<size=18>あなたはこのアイテムを拾うことができません！</size>");
         }
     }
 
@@ -56,7 +56,7 @@ public static class SpecificFlagsHandler
         
         if (!ev.IsAllowed)
         {
-            ev.Player?.ShowHint("<size=18>あなたはアイテムを捨てることができません！</size>");
+            ev.Player?.ShowHint("<size=18>あなたはこのアイテムを捨てることができません！</size>");
         }
     }
 }

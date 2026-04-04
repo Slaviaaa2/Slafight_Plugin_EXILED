@@ -73,6 +73,7 @@ public class Scp035Role : CRole
         player.AddItem(ItemType.KeycardScientist);
         player.AddItem(ItemType.Painkillers);
         player.SetCustomInfo("<color=#C50000>SCP-035</color>");
+        player.TryAddFlag(SpecificFlagType.SpecialWeaponsDisabled);
 
         TryChangeState(player, new Scp035State
         {
