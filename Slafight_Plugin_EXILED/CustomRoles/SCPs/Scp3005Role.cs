@@ -47,9 +47,9 @@ public class Scp3005Role : CRole
         player!.Role.Set(RoleTypeId.Scp0492);
         player.UniqueRole = "SCP-3005";
         player.SetCustomInfo("SCP-3005");
-        const int maxHealth = 55555;
+        const int maxHealth = 55556;
         player.MaxHealth = maxHealth;
-        player.Health = maxHealth;
+        player.Health = maxHealth-1;
         player.EnableEffect(EffectType.MovementBoost, 50);
 
         var spawnRoom = Room.Get(RoomType.LczPlants);
@@ -101,6 +101,7 @@ public class Scp3005Role : CRole
     private void OnConsumed(ConsumedCorpseEventArgs ev)
     {
         if (!Check(ev.Player)) return;
+        ev.ConsumeHeal = 0f;
         var target = ev.Ragdoll.Owner;
         target?.SetRole(CRoleTypeId.FifthistMarionette);
         Timing.CallDelayed(0.1f, () => target?.Position = ev.Ragdoll.Position + Vector3.up * 0.15f);
