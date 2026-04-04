@@ -57,11 +57,11 @@ public class GunGoCRailgunFull : CustomWeapon
 
     private void Debug_HurtingDamage(HurtingEventArgs ev)
     {
-        if (Check(ev.Attacker?.CurrentItem))
-        {
-            ev.Player.ExplodeEffect(ProjectileType.FragGrenade);
-            ev.Player.Hurt(ev.Attacker, 5000f,DamageType.Explosion);
-        }
+        if (ev.Attacker is null) return;
+        if (!Check(ev.Attacker?.CurrentItem)) return;
+        ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
+        ev.Player?.Hurt(ev.Attacker, 5000f,DamageType.Explosion);
+        ev.Attacker?.ShowHitMarker();
     }
 
     private void LimitPatch(PickingUpItemEventArgs ev)
