@@ -23,12 +23,13 @@ public enum CRoleTypeId
     FifthistPriest,
     FifthistConvert,
     FifthistGuidance,
+    FifthistMarionette,
     
     // ==== Chaos ====
     ChaosCommando,
     ChaosSignal,
     ChaosTacticalUnit,
-    ChaosBreaker,
+    ChaosPenal,
     ChaosUndercoverAgent,
     
     // ==== NTF ====

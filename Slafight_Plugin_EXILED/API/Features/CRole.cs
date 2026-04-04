@@ -282,47 +282,53 @@ public abstract class CRole
         
         player.ShowHint(string.Empty);
 
-        if (roleSpawnFlags == RoleSpawnFlags.None)
+        switch (roleSpawnFlags)
         {
-            var savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
-            var items = player.Items.ToList();
-            var ammos = player.Ammo.ToList();
-
-            Timing.CallDelayed(1f, () =>
+            case RoleSpawnFlags.None:
             {
-                player.Position = savePosition;
-                player.ClearInventory();
+                var savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
+                var items = player.Items.ToList();
+                var ammos = player.Ammo.ToList();
 
-                foreach (var item in items)
-                    player.AddItem(item);
+                Timing.CallDelayed(1f, () =>
+                {
+                    player.Position = savePosition;
+                    player.ClearInventory();
 
-                foreach (var ammo in ammos)
-                    player.AddAmmo((AmmoType)ammo.Key, ammo.Value);
-            });
-        }
-        else if (roleSpawnFlags == RoleSpawnFlags.AssignInventory)
-        {
-            Vector3 savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
-            Timing.CallDelayed(1f, () =>
+                    foreach (var item in items)
+                        player.AddItem(item);
+
+                    foreach (var ammo in ammos)
+                        player.AddAmmo((AmmoType)ammo.Key, ammo.Value);
+                });
+                break;
+            }
+            case RoleSpawnFlags.AssignInventory:
             {
-                player.Position = savePosition;
-            });
-        }
-        else if (roleSpawnFlags == RoleSpawnFlags.UseSpawnpoint)
-        {
-            var items = player.Items.ToList();
-            var ammos = player.Ammo.ToList();
-
-            Timing.CallDelayed(1f, () =>
+                var savePosition = player.Position + new Vector3(0f, 0.1f, 0f);
+                Timing.CallDelayed(1f, () =>
+                {
+                    player.Position = savePosition;
+                });
+                break;
+            }
+            case RoleSpawnFlags.UseSpawnpoint:
             {
-                player.ClearInventory();
+                var items = player.Items.ToList();
+                var ammos = player.Ammo.ToList();
 
-                foreach (var item in items)
-                    player.AddItem(item);
+                Timing.CallDelayed(1f, () =>
+                {
+                    player.ClearInventory();
 
-                foreach (var ammo in ammos)
-                    player.AddAmmo((AmmoType)ammo.Key, ammo.Value);
-            });
+                    foreach (var item in items)
+                        player.AddItem(item);
+
+                    foreach (var ammo in ammos)
+                        player.AddAmmo((AmmoType)ammo.Key, ammo.Value);
+                });
+                break;
+            }
         }
     }
 }

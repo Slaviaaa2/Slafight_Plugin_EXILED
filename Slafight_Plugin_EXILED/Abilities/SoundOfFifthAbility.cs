@@ -1,3 +1,4 @@
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Slafight_Plugin_EXILED.API.Enums;
@@ -26,23 +27,23 @@ public class SoundOfFifthAbility : AbilityBase
 
     protected override void ExecuteAbility(Player player)
     {
-        foreach (Player targetPlayer in Player.List)
+        foreach (var targetPlayer in Player.List)
         {
             if (targetPlayer == null) continue;
-            if (targetPlayer != player)
+            if (targetPlayer == player) continue;
+            if (targetPlayer.HasFlag(SpecificFlagType.AntiMemeEffectDisabled)) continue;
+            if (!(Vector3.Distance(targetPlayer.Position, player.Position) <= 5f)) continue;
+            if (targetPlayer.GetTeam() != CTeam.Fifthists)
             {
-                if (SpecificFlagsManager.HasFlag(targetPlayer, SpecificFlagType.AntiMemeEffectDisabled)) continue;
-                if (Vector3.Distance(targetPlayer.Position, player.Position) <= 5f)
-                {
-                    if (targetPlayer.GetTeam() != CTeam.Fifthists)
-                    {
-                        targetPlayer.Explode(ProjectileType.Flashbang,player);
-                    }
-                    else
-                    {
-                        targetPlayer.EnableEffect(EffectType.Invigorated, 5f);
-                    }
-                }
+                targetPlayer.Explode(ProjectileType.Flashbang,player);
+                targetPlayer.EnableEffect<Deafened>(255);
+                targetPlayer.EnableEffect<Hemorrhage>(255);
+                targetPlayer.EnableEffect<Blindness>(40);
+                targetPlayer.EnableEffect<Blurred>(255);
+            }
+            else
+            {
+                targetPlayer.EnableEffect(EffectType.Invigorated, 5f);
             }
         }
     }

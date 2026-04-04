@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using MEC;
@@ -31,7 +32,7 @@ public class MagicMissileAbility : AbilityBase
 
     protected override void ExecuteAbility(Player player)
     {
-        Vector3 startPos = player.Position + new Vector3(0f, 0.5f, 0f);
+        var startPos = player.Position + new Vector3(0f, 0.5f, 0f);
         try
         {
             var schem = ObjectSpawner.SpawnSchematic("SCP3005", startPos, player.CameraTransform.forward);
@@ -59,7 +60,7 @@ public class MagicMissileAbility : AbilityBase
         Vector3 cameraForward = pushPlayer != null
             ? pushPlayer.CameraTransform.forward.normalized
             : Vector3.forward;
-        Vector3 endPos = startPos + cameraForward * 5f + new Vector3(0f, 0.15f, 0f);
+        Vector3 endPos = startPos + cameraForward * 25f + new Vector3(0f, 0.15f, 0f);
 
         while (elapsedTime < totalDuration)
         {
@@ -90,29 +91,28 @@ public class MagicMissileAbility : AbilityBase
                 if (player == null || !player.IsConnected || !player.IsAlive)
                     continue;
 
-                if (Vector3.Distance(schem.transform.position, player.Transform.position) <= 1f)
+                if (!(Vector3.Distance(schem.transform.position, player.Transform.position) <= 1f)) continue;
+                if (player == pushPlayer) continue;
+                try
                 {
-                    if (player != pushPlayer)
-                    {
-                        try
-                        {
-                            player.Hurt(pushPlayer, 10f, DamageType.Unknown, null,
-                                !pushPlayer.IsSergeyMarkov()
-                                    ? "<color=#ff00fa>第五的</color>な力による影響"
-                                    : "<color=red><b>怨念的</b></color>な力による影響");
-                            pushPlayer?.ShowHitMarker();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error($"[MagicMissileAbility] Hurt error: {ex}");
-                        }
-                    }
+                    player.EnableEffect<Burned>(255);
+                    player.EnableEffect<Concussed>(255);
+                    player.EnableEffect<Asphyxiated>(1);
+                    player.Hurt(pushPlayer, 10f, DamageType.Unknown, null,
+                        !pushPlayer.IsSergeyMarkov()
+                            ? "<color=#ff00fa>第五的</color>な力による影響"
+                            : "<color=red><b>怨念的</b></color>な力による影響");
+                    pushPlayer?.ShowHitMarker();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[MagicMissileAbility] Hurt error: {ex}");
                 }
             }
 
             // 移動
             elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / totalDuration;
+            var progress = elapsedTime / totalDuration;
             schem.transform.position = Vector3.Lerp(startPos, endPos, progress);
 
             yield return 0f;

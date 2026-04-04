@@ -186,6 +186,9 @@ public static class PlayerExtensions
             case CRoleTypeId.Scp035:
                 new Scp035Role().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.Zombified:
+                new ZombifiedRole().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Fifthists ====
             case CRoleTypeId.FifthistRescure:
                 new FifthistRescure().SpawnRole(player, roleSpawnFlags);
@@ -199,6 +202,9 @@ public static class PlayerExtensions
             case CRoleTypeId.FifthistGuidance:
                 new FifthistGuidance().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.FifthistMarionette:
+                new FifthistMarionetteRole().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Chaos ====
             case CRoleTypeId.ChaosCommando:
                 new ChaosCommando().SpawnRole(player, roleSpawnFlags);
@@ -209,8 +215,8 @@ public static class PlayerExtensions
             case CRoleTypeId.ChaosTacticalUnit:
                 new ChaosTacticalUnit().SpawnRole(player, roleSpawnFlags);
                 break;
-            case CRoleTypeId.ChaosBreaker:
-                new ChaosBreaker().SpawnRole(player, roleSpawnFlags);
+            case CRoleTypeId.ChaosPenal:
+                new ChaosPenal().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ChaosUndercoverAgent:
                 new ChaosUndercoverAgent().SpawnRole(player, roleSpawnFlags);

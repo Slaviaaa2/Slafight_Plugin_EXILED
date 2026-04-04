@@ -39,9 +39,9 @@ public class Sculpture : CRole
         player!.Role.Set(RoleTypeId.NtfPrivate);
         player.Role.Set(RoleTypeId.Scp173, RoleSpawnFlags.AssignInventory);
         player.UniqueRole = UniqueRoleKey;
-        player.MaxHealth = 300f;
+        player.MaxHealth = 500f;
         player.Health = player.MaxHealth;
-        player.MaxHumeShield = 200f;
+        player.MaxHumeShield = 300f;
         player.HumeShield = player.MaxHumeShield;
         player.SetScale(new Vector3(0.8f, 1f, 0.8f));
         player.ClearInventory();

@@ -305,7 +305,7 @@
         <Compile Include="CustomMaps\VentControl.cs" />
         <Compile Include="CustomMaps\WarheadBoomEffectHandler.cs" />
         <Compile Include="CustomMaps\WarheadBoomEffectUtil.cs" />
-        <Compile Include="CustomRoles\ChaosInsurgency\ChaosBreaker.cs" />
+        <Compile Include="CustomRoles\ChaosInsurgency\ChaosPenal.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosTacticalUnit.cs" />
@@ -314,6 +314,7 @@
         <Compile Include="CustomRoles\ClassD\Janitor.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistGuidance.cs" />
+        <Compile Include="CustomRoles\Fifthist\FifthistMarionetteRole.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\FoundationForces\Sculpture.cs" />

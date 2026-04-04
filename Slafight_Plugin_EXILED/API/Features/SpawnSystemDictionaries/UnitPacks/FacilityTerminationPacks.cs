@@ -45,6 +45,7 @@ public static class FacilityTerminationPacks
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCMedic),         (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCThaumaturgist), (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCCommunications),(1f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCHoundDog),      (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCOperative),     (99f, false)},
                     }
                 },
@@ -57,6 +58,7 @@ public static class FacilityTerminationPacks
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCMedic),         (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCThaumaturgist), (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCCommunications),(1f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCHoundDog),      (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.GoCOperative),     (99f, false)},
                     }
                 }
@@ -78,7 +80,7 @@ public static class FacilityTerminationPacks
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal),   (2f,  false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder),  (2f,  false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosTacticalUnit), (2f, false) },
-                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosBreaker), (2f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosPenal), (2f, false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman),  (99f, false) },
                     }
                 },
@@ -88,7 +90,7 @@ public static class FacilityTerminationPacks
                     {
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal),  (1f,  true)  },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f,  false) },
-                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosBreaker), (1f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosPenal), (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) },
                     }
                 }

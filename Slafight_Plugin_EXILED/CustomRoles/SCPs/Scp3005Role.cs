@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp0492;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
@@ -26,14 +27,16 @@ public class Scp3005Role : CRole
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Hurting += OnHurting;
-        Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
+        Exiled.Events.Handlers.Player.SpawningRagdoll += CancelRagdoll;
+        Exiled.Events.Handlers.Scp0492.ConsumedCorpse += OnConsumed;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
         Exiled.Events.Handlers.Player.Hurting -= OnHurting;
-        Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
+        Exiled.Events.Handlers.Player.SpawningRagdoll -= CancelRagdoll;
+        Exiled.Events.Handlers.Scp0492.ConsumedCorpse -= OnConsumed;
         base.UnregisterEvents();
     }
 
@@ -49,7 +52,7 @@ public class Scp3005Role : CRole
         player.Health = maxHealth;
         player.EnableEffect(EffectType.MovementBoost, 50);
 
-        Room spawnRoom = Room.Get(RoomType.LczPlants);
+        var spawnRoom = Room.Get(RoomType.LczPlants);
         Vector3 offset = new(0f, 7.35f, 0f);
         player.Position = spawnRoom.Position + spawnRoom.Rotation * offset;
         player.Rotation = spawnRoom.Rotation;
@@ -65,50 +68,58 @@ public class Scp3005Role : CRole
             "<size=24><color=red>SCP-3005</color>\n第五的な光を放つ存在。\n普通はダメージを受けることはなく、\nアビリティで第五的なミサイルや閃光を引き起こせる。\n<color=#ff00fa>第五教会に道を示せ</color>",
             10));
     }
-
-    private void OnHurting(HurtingEventArgs ev)
-    {
-        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp3005 && ev.Attacker != null && ev.Attacker?.GetCustomRole() != CRoleTypeId.Scp3005)
-        {
-            bool hasGoggles = ev.Attacker.Items
-                .OfType<Scp1344>()
-                .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
-            if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
-            ev.IsAllowed = false;
-            ev.Attacker.Hurt(ev.Player, 5f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
-
-            if (ev.Attacker.GetTeam() == CTeam.Fifthists)
-                ev.Attacker.ShowHint("第五的な存在に反逆するとは何事か！？");
-        }
-    }
-
+    
     protected override void OnDying(DyingEventArgs ev)
     {
-        if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol && ev.Attacker is null && ev.DamageHandler.Type is DamageType.Decontamination or DamageType.Poison)
+        if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol && ev.Attacker is null)
         {
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color> は<color={CustomTeamUtils.GetTeamColor(Team)}>アンチミームプロトコル</color>により正常に無効化されました。");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CustomTeamUtils.GetTeamColor(Team)}>アンチミームプロトコル</color>により正常に無効化されました。");
         }
         else
         {
-            CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+            CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         }
         base.OnDying(ev);
     }
 
-    private void CencellRagdoll(SpawningRagdollEventArgs ev)
+    private static void OnHurting(HurtingEventArgs ev)
+    {
+        if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp3005 && ev.Attacker != null && ev.Attacker?.GetCustomRole() != CRoleTypeId.Scp3005)
+        {
+            var hasGoggles = ev.Attacker != null && ev.Attacker.Items
+                .OfType<Scp1344>()
+                .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+            if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
+            ev.IsAllowed = false;
+            ev.Attacker?.Hurt(ev.Player, 5f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
+
+            if (ev.Attacker != null && ev.Attacker.GetTeam() == CTeam.Fifthists)
+                ev.Attacker.ShowHint("第五的な存在に反逆するとは何事か！？");
+        }
+    }
+
+    private void OnConsumed(ConsumedCorpseEventArgs ev)
+    {
+        if (!Check(ev.Player)) return;
+        var target = ev.Ragdoll.Owner;
+        target?.SetRole(CRoleTypeId.FifthistMarionette);
+        Timing.CallDelayed(0.1f, () => target?.Position = ev.Ragdoll.Position + Vector3.up * 0.15f);
+    }
+
+    private static void CancelRagdoll(SpawningRagdollEventArgs ev)
     {
         if (ev.Player?.GetCustomRole() == CRoleTypeId.Scp3005)
             ev.IsAllowed = false;
     }
 
-    private IEnumerator<float> Scp3005Coroutine(Player player)
+    private static IEnumerator<float> Scp3005Coroutine(Player player)
     {
         for (;;)
         {
             if (player.GetCustomRole() != CRoleTypeId.Scp3005)
                 yield break;
 
-            foreach (Player target in Player.List)
+            foreach (var target in Player.List)
             {
                 if (target == null || target == player || !target.IsAlive)
                     continue;
@@ -116,17 +127,15 @@ public class Scp3005Role : CRole
                 if (target.GetTeam() == CTeam.SCPs || target.GetTeam() == CTeam.Fifthists)
                     continue;
                     
-                bool hasGoggles = target.Items
+                var hasGoggles = target.Items
                     .OfType<Scp1344>()
                     .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
                 if (hasGoggles)  continue;
 
-                float distance = Vector3.Distance(player.Position, target.Position);
-                if (distance <= 2.75f)
-                {
-                    target.Hurt(player, 25f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
-                    player.ShowHitMarker();
-                }
+                var distance = Vector3.Distance(player.Position, target.Position);
+                if (!(distance <= 2.75f)) continue;
+                target.Hurt(player, 25f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
+                player.ShowHitMarker();
             }
 
             if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocolInPast)

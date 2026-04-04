@@ -401,9 +401,14 @@ public class PlayerHUD
                         SyncTextObjective = "あなたは第五教会の新入りだ。第五とは何かについて考え、理解し、そして従いなさい。";
                         break;
                     case CRoleTypeId.FifthistGuidance:
-                        SyncTextRole = "<color=#ff5ffa>Fifthist: Guidance</color>";
+                        SyncTextRole = "<color=#ff00fa>Fifthist: Guidance</color>";
                         SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
                         SyncTextObjective = "杖を用い、第五主義を施設に広めなさい。あなたの導きは教会にとって重要です！";
+                        break;
+                    case CRoleTypeId.FifthistMarionette:
+                        SyncTextRole = "<color=#ff5ffa>Fifthist: Marionette</color>";
+                        SyncTextTeam = "<color=#ff00fa>The Fifthists</color>";
+                        SyncTextObjective = "第五教会に従い、生存者どもを騙しながら第五しろ！";
                         break;
 
                     // Chaos
@@ -422,7 +427,7 @@ public class PlayerHUD
                         SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                         SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";
                         break;
-                    case CRoleTypeId.ChaosBreaker:
+                    case CRoleTypeId.ChaosPenal:
                         SyncTextRole = "<color=#228b22>Chaos Insurgency Breaker</color>";
                         SyncTextTeam = "<color=#228b22>Chaos Insurgency</color>";
                         SyncTextObjective = "Dクラス職員を救出し、施設を略奪せよ。";

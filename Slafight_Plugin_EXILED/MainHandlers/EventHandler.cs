@@ -101,7 +101,7 @@ public class EventHandler
     private static void OnVerified(VerifiedEventArgs ev)
     {
         if (ev?.Player == null) return;
-        SpecificFlagsManager.InitPlayerFlags(ev.Player);
+        ev.Player.InitPlayerFlags();
         ev.Player.Broadcast(6, "\n<size=28><color=#008cff>シャープ鯖</color>へようこそ！\\n本サーバーはRP鯖です。RPを念頭に置いておく以外の制約は無いので自由に楽しんでください！</size>", Broadcast.BroadcastFlags.Normal, true);
         if (Round.InProgress) return;
         Timing.CallDelayed(0.05f, () =>
@@ -199,7 +199,7 @@ public class EventHandler
         foreach (var player in Player.List.ToList().Where(IsPlayerValid))
         {
             player.ShowHint("");
-            SpecificFlagsManager.InitPlayerFlags(player);
+            player.InitPlayerFlags();
         }
         foreach (var door in Door.List)
         {
@@ -389,11 +389,11 @@ public class EventHandler
     private void OnUsed(UsedItemEventArgs ev)
     {
         if (ev.Player == null || ev.Item == null) return;
-        if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+        if (ev.Player.HasFlag(SpecificFlagType.AntiMemeEffectDisabled))
         {
             if (ev.Item.Type == ItemType.SCP500 && !ev.Item.TryGetCustomItem(out _))
             {
-                if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.Scp207Level4))
+                if (ev.Player.HasFlag(SpecificFlagType.Scp207Level4))
                 {
                     ev.Player.EnableEffect(EffectType.Scp207, 4);
                     ev.Player.EnableEffect(EffectType.Invigorated, 60);
@@ -402,15 +402,13 @@ public class EventHandler
         }
     }
 
-    private void OnHurting(HurtingEventArgs ev)
+    private static void OnHurting(HurtingEventArgs ev)
     {
         if (ev.Player == null) return;
-        if (ev.DamageHandler.Type == DamageType.Scp207)
+        if (ev.DamageHandler.Type != DamageType.Scp207) return;
+        if (ev.Player.HasFlag(SpecificFlagType.Scp207Resistance))
         {
-            if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.Scp207Resistance))
-            {
-                ev.IsAllowed = false;
-            }
+            ev.IsAllowed = false;
         }
     }
 
@@ -421,6 +419,6 @@ public class EventHandler
         if (ev.Player.Role.Team != Team.SCPs) return;
         if (ev.Player.Role.Type is RoleTypeId.Scp0492 or RoleTypeId.Scp079) return;
         Exiled.API.Features.Cassie.Clear();
-        CassieHelper.AnnounceTermination(ev, "SCP "+string.Join(" ", Regex.Replace(ev.Player.Role.Name, @"[^0-9]", "").ToCharArray()), $"<color={CustomTeamUtils.GetTeamColor(CTeam.SCPs)}>{ev.Player.Role.Name}</color>");
+        CassieHelper.AnnounceTermination(ev, "SCP "+string.Join(" ", Regex.Replace(ev.Player.Role.Name, @"[^0-9]", "").ToCharArray()), $"<color={CTeam.SCPs.GetTeamColor()}>{ev.Player.Role.Name}</color>");
     }
 }

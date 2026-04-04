@@ -31,8 +31,9 @@ public class GoCHoundDog : CRole
         player.UniqueRole = UniqueRoleKey;
         player.MaxHealth = 120;
         player.Health = player.MaxHealth;
-        player.CustomHumeShieldStat.MaxValue = 200;
+        player.CustomHumeShieldStat.MaxValue = 1500;
         player.CustomHumeShieldStat.CurValue = player.CustomHumeShieldStat.MaxValue;
+        player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 3.5f;
         player.ClearInventory();
         player.TryAddCustomItem<ArmorVip>();
         player.TryAddCustomItem<GunSuperLogicer>();

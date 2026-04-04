@@ -60,7 +60,7 @@ public class GunGoCRailgunFull : CustomWeapon
         if (Check(ev.Attacker?.CurrentItem))
         {
             ev.Player.ExplodeEffect(ProjectileType.FragGrenade);
-            ev.Player.Hurt(2000f,DamageType.Explosion);
+            ev.Player.Hurt(ev.Attacker, 5000f,DamageType.Explosion);
         }
     }
 

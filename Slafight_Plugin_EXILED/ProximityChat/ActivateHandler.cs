@@ -17,7 +17,8 @@ public class ActivateHandler
         {
             if (Handler.ActivatedPlayers.Contains(player))
             {
-                if (player.GetCustomRole() != CRoleTypeId.Zombified)
+                if (!(Handler.OnlyProximity.Contains(player.Role) ||
+                    Handler.OnlyProximityUnique.Contains(player.GetCustomRole())))
                 {
                     Handler.ActivatedPlayers.Remove(player);
                     player.ShowHint("近接チャットが<color=red>無効化</color>されました", 5f);

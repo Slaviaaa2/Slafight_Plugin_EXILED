@@ -31,23 +31,30 @@ public static class Handler
 
         Exiled.Events.Handlers.Player.ChangingRole -= OnPlayerChangingRole;
     }
-    public static List<Player> ActivatedPlayers = [];
-    public static List<Player> CanUsePlayers = [];
+    public static readonly List<Player> ActivatedPlayers = [];
+    public static readonly List<Player> CanUsePlayers = [];
     
-    public static List<CRoleTypeId> AllowedUniqueRoles =
+    public static readonly List<CRoleTypeId> AllowedUniqueRoles =
     [
         CRoleTypeId.Zombified,
-        CRoleTypeId.Scp3114
+        CRoleTypeId.Scp3114,
+        CRoleTypeId.FifthistMarionette,
     ];
-    public static List<CRoleTypeId> OnlyProximityUnique = [CRoleTypeId.Zombified];
+    public static readonly List<CRoleTypeId> OnlyProximityUnique = [
+        CRoleTypeId.Zombified,
+        CRoleTypeId.FifthistMarionette,
+    ];
     
-    public static List<RoleTypeId> AllowedRoleTypes =
+    public static readonly List<RoleTypeId> AllowedRoleTypes =
     [
         RoleTypeId.Scp049,
         RoleTypeId.Scp939,
         RoleTypeId.Scp3114
     ];
-    public static List<RoleTypeId> OnlyProximity = [];
+    public static readonly List<RoleTypeId> OnlyProximity = 
+    [
+    
+    ];
 
     private static void OnPlayerChangingRole(ChangingRoleEventArgs ev)
     {
@@ -132,7 +139,7 @@ public static class Handler
 
     private static void SendProximityMessage(VoiceMessage msg, float maxRange = 5f)
     {
-        foreach (ReferenceHub referenceHub in ReferenceHub.AllHubs)
+        foreach (var referenceHub in ReferenceHub.AllHubs)
         {
             if (referenceHub.roleManager.CurrentRole is SpectatorRole spectator
                 && !msg.Speaker.IsSpectatedBy(referenceHub))

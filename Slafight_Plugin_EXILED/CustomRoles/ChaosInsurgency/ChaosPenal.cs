@@ -1,15 +1,17 @@
 using Exiled.API.Features;
+using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
-public class ChaosBreaker : CRole
+public class ChaosPenal : CRole
 {
-    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosBreaker;
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosPenal;
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosBreaker";
 
@@ -24,17 +26,18 @@ public class ChaosBreaker : CRole
         player.ClearInventory();
         player.AddItem(ItemType.ArmorCombat);
         player.SetCategoryLimit(ItemCategory.Grenade, 4);
-        player.TryAddCustomItem(700); // Fake Grenade
-        player.TryAddCustomItem(700); // Fake Grenade
-        player.TryAddCustomItem(700); // Fake Grenade
-        player.TryAddCustomItem(700); // Fake Grenade
-        player.TryAddCustomItem(1101); // Conscripts Card
-        player.AddItem(ItemType.Painkillers);
+        player.AddItem(ItemType.GrenadeHE);
+        player.AddItem(ItemType.GrenadeHE);
+        player.AddItem(ItemType.GrenadeHE);
+        player.AddItem(ItemType.SCP207);
+        player.AddItem(ItemType.AntiSCP207);
+        player.TryAddCustomItem<KeycardConscripts>(); // Conscripts Card
+        player.TryAddCandy(CandyKindID.Pink);
             
-        player.SetCustomInfo("Chaos Insurgency Breaker");
+        player.SetCustomInfo("Chaos Insurgency Penal");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 現地工作員</color>\n貴方は何かの間違いでカオスに連れてこられてしまった哀れな現地住民だ。\n不良品かもしれないグレネードを用いて道を切り開け！",10f);
+            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 懲罰兵</color>\n貴方は問題を起こしてここに連れてこられてしまった哀れなカオスだ。\nとにかく大量に爆発物を持たされている。特攻しろ！",10f);
         });
     }
 }

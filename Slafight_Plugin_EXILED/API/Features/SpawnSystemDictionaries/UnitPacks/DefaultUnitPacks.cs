@@ -93,7 +93,7 @@ public static class DefaultUnitPacks
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal),   (2f,  false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder),  (2f,  false) },
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosTacticalUnit), (2f, false) },
-                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosBreaker), (2f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosPenal), (2f, false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman),  (99f, false) },
                     }
                 }
@@ -111,7 +111,7 @@ public static class DefaultUnitPacks
                     {
                         { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosSignal),  (1f,  true)  },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosMarauder), (2f,  false) },
-                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosBreaker), (1f, false) },
+                        { new SpawnSystem.SpawnRoleKey(CRoleTypeId.ChaosPenal), (1f, false) },
                         { new SpawnSystem.SpawnRoleKey(RoleTypeId.ChaosRifleman), (99f, false) },
                     }
                 }
