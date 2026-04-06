@@ -80,7 +80,8 @@ public class Scp966Role : CRole
             if (UnityEngine.Random.Range(0, 3) == 0)
             {
                 player.DisableEffect(EffectType.Invisible);
-                player.CurrentRoom.RoomLightController.ServerFlickerLights(0.5f);
+                if (player.CurrentRoom?.RoomLightController != null)
+                    player.CurrentRoom.RoomLightController.ServerFlickerLights(0.5f);
             }
             else
             {
