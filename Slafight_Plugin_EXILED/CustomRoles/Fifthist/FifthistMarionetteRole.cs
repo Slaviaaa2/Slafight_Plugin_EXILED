@@ -14,7 +14,7 @@ public class FifthistMarionetteRole : CRole
 {
     protected override string RoleName { get; set; } = "Fifthist Marionette";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FifthistMarionette;
-    protected override CTeam Team { get; set; } = CTeam.SCPs;
+    protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "FifthistMarionette";
 
     public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)

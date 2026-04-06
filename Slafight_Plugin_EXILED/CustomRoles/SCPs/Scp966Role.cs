@@ -48,11 +48,11 @@ public class Scp966Role : CRole
 
         player.SetCustomInfo("SCP-966");
             
-        Room SpawnRoom = Room.Get(RoomType.LczGlassBox);
-        Log.Debug(SpawnRoom.Position);
-        Vector3 offset = new Vector3(0f, 1.5f, 0f);
-        player.Position = SpawnRoom.Position + SpawnRoom.Rotation * offset;
-        player.Rotation = SpawnRoom.Rotation;
+        var spawnRoom = Room.Get(RoomType.LczGlassBox);
+        Log.Debug(spawnRoom.Position);
+        var offset = new Vector3(0f, 1.5f, 0f);
+        player.Position = spawnRoom.Position + spawnRoom.Rotation * offset;
+        player.Rotation = spawnRoom.Rotation;
         
         Timing.CallDelayed(0.05f, () =>
         {
