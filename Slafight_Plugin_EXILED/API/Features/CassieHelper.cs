@@ -103,7 +103,7 @@ public static class CassieHelper
         if (clearCassie) Exiled.API.Features.Cassie.Clear();
         if (ev.Attacker != null)
         {
-            var info = CustomTeamUtils.GetTeamInfo(ev.Attacker.GetTeam());
+            var info = ev.Attacker.GetTeam().GetTeamInfo();
             Exiled.API.Features.Cassie.MessageTranslated(
                 $"{targetCassie} contained successfully by {info.CassieString}", 
                 $"{targetTranslated} は、<color={info.TeamColor}>{info.TeamName}</color>によって正常に収容されました。",

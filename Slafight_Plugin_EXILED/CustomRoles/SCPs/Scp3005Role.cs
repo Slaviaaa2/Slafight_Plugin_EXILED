@@ -73,7 +73,7 @@ public class Scp3005Role : CRole
     {
         if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol && ev.Attacker is null)
         {
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CustomTeamUtils.GetTeamColor(Team)}>アンチミームプロトコル</color>により正常に無効化されました。");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CTeam.Fifthists.GetTeamColor()}>アンチミームプロトコル</color>により正常に無効化されました。");
         }
         else
         {
