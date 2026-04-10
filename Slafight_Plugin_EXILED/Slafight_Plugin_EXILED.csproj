@@ -179,6 +179,7 @@
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CRole.cs" />
+        <Compile Include="API\Features\CRoom.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\GlobalVentManager.cs" />
         <Compile Include="API\Features\NvgGogglesBase.cs" />
@@ -205,8 +206,11 @@
         <Compile Include="API\Features\SpawnSystemBootstrap.cs" />
         <Compile Include="API\Features\UnitPackRegistry.cs" />
         <Compile Include="API\Features\WearFollower.cs" />
+        <Compile Include="API\Interface\IControllableObject.cs" />
         <Compile Include="API\Interface\IObjectPrefab.cs" />
+        <Compile Include="API\Interface\ISpawnableObject.cs" />
         <Compile Include="API\Objects\RoleTables.cs" />
+        <Compile Include="API\Structs\WObjectInfo.cs" />
         <Compile Include="Changes\CandyChanges.cs" />
         <Compile Include="Changes\ChristmasChanges.cs" />
         <Compile Include="Changes\EasterEggsHandler.cs" />
@@ -294,6 +298,7 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomMaps\Communications.cs" />
         <Compile Include="CustomMaps\DailyCassieAnnounce.cs" />
         <Compile Include="CustomMaps\DocumentDictionary.cs" />
         <Compile Include="CustomMaps\GateAEnding.cs" />
@@ -434,6 +439,9 @@
     <ItemGroup>
         <None Include="App.config" />
         <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="CustomMaps\CRoom\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />

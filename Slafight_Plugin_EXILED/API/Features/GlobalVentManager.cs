@@ -11,6 +11,7 @@ public enum CRoomType
 {
     None,
     LczExClassD,
+    HczEx
 }
 
 public struct VentPoint
