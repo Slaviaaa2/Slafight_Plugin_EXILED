@@ -24,14 +24,13 @@ public static class Communications
     }
     
     public static InteractableToy? InteractableToy { get; private set; }
+    public static Text? TextToy { get; private set; }
 
     public static string MonitorText
     {
-        get => GetText();
-        set => UpdateText(value);
+        get => TextToy?.TextFormat ?? string.Empty; 
+        set => TextToy?.TextFormat = value;
     }
-
-    public static WObjectInfo? ObjectInfo { get; private set; }
 
     private static void Setup()
     {
@@ -67,23 +66,6 @@ public static class Communications
         textToy.Position = point.transform.position;
         textToy.Rotation = point.transform.rotation;
         textToy.Scale = new Vector3(1f, 1f, 1f);
-        ObjectInfo = new WObjectInfo(@object: textToy, position: textToy.Position, rotation: textToy.Rotation,
-            scale: textToy.Scale);
-    }
-
-    private static string GetText()
-    {
-        if (ObjectInfo?.Object is Text txt)
-        {
-            return txt.TextFormat;
-        }
-        return string.Empty;
-    }
-
-    private static string UpdateText(string text)
-    {
-        if (ObjectInfo?.Object is not Text textToy) return string.Empty;
-        textToy.TextFormat = text;
-        return textToy.TextFormat;
+        TextToy = textToy;
     }
 }
