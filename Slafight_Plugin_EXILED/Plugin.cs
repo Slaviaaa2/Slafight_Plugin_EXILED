@@ -100,6 +100,7 @@ public class Plugin : Plugin<Config>
         NetworkVisibilityExtensions.Register();
         NvgManager.Register();
         SpecificFlagsHandler.Register();
+        Scp096Extensions.Register();
             
         WearsHandler.Register();
         CRole.RegisterAllEvents();
@@ -174,6 +175,7 @@ public class Plugin : Plugin<Config>
         NetworkVisibilityExtensions.Unregister();
         NvgManager.Unregister();
         SpecificFlagsHandler.Unregister();
+        Scp096Extensions.Unregister();
             
         WearsHandler.Unregister();
         CRole.UnregisterAllEvents();

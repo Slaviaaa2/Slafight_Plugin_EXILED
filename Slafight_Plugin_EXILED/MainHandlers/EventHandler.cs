@@ -414,7 +414,7 @@ public class EventHandler
 
     private static void OnDying(DyingEventArgs ev)
     {
-        if (ev.Player == null) return;
+        if (ev.Player is null) return;
         if (ev.Player.GetCustomRole() != CRoleTypeId.None) return;
         if (ev.Player.Role.Team != Team.SCPs) return;
         if (ev.Player.Role.Type is RoleTypeId.Scp0492 or RoleTypeId.Scp079) return;

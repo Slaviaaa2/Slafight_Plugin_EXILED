@@ -30,6 +30,7 @@ public class GunGoCRailgun : CustomWeapon
 
     public Color glowColor = CustomColor.Gold.ToUnityColor();
     private Dictionary<Exiled.API.Features.Pickups.Pickup, Exiled.API.Features.Toys.Light> ActiveLights = [];
+    private bool _isProcessing = false;
 
     protected override void SubscribeEvents()
     {
@@ -59,11 +60,22 @@ public class GunGoCRailgun : CustomWeapon
 
     private void Debug_HurtingDamage(HurtingEventArgs ev)
     {
+        if (_isProcessing) return;
         if (ev.Attacker is null) return;
         if (!Check(ev.Attacker?.CurrentItem)) return;
-        ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
-        ev.Player?.Hurt(ev.Attacker, 2000f,DamageType.Explosion);
-        ev.Attacker?.ShowHitMarker();
+
+        _isProcessing = true;
+        try
+        {
+            ev.Amount = 0f;
+            ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
+            ev.Player?.Hurt(ev.Attacker, 2000f, DamageType.Explosion);
+            ev.Attacker?.ShowHitMarker();
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
     }
 
     private void LimitPatch(PickingUpItemEventArgs ev)

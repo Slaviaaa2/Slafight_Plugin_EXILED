@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdminToys;
+using Exiled.API.Enums;
+using Exiled.API.Features;
 using Exiled.API.Features.Toys;
 using MEC;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Structs;
+using Slafight_Plugin_EXILED.Extensions;
 using Slafight.API.Strcuts;
 using UnityEngine;
 
@@ -32,6 +35,11 @@ public static class Communications
         set => TextToy?.TextFormat = value;
     }
 
+    private static readonly List<string> MonitorTexts = 
+    [
+        "Scanning...","Calling Mobile Task Force...","Reporting to Overseer Council...","Updating Defence Model...","ERROR: 0x55555\nDESC: UNKNOWN ERROR"
+    ];
+
     private static void Setup()
     {
         Timing.CallDelayed(1f, () =>
@@ -39,7 +47,9 @@ public static class Communications
             SetupInteractable();
             SetupText();
 
-            MonitorText = "Scanning...";
+            MonitorText = $"<size=16>{MonitorTexts.RandomItem()}</size>";
+            InteractableToy?.Base.OnSearched +=
+                p => Player.Get(p).ShowHint("[アクセス拒否]", 10f);
         });
     }
     
@@ -63,9 +73,12 @@ public static class Communications
         var point = list.FirstOrDefault();
         if (point is null) return;
         var textToy = Text.Create();
+        textToy.Scale = new Vector3(0.95f, 1f, 1f);
         textToy.Position = point.transform.position;
         textToy.Rotation = point.transform.rotation;
-        textToy.Scale = new Vector3(1f, 1f, 1f);
+        textToy.Rotation = StaticUtils
+            .GetWorldFromRoomLocal(RoomType.EzDownstairsPcs, Vector3.zero, new Vector3(-10f, 0f, 0f)).worldRotation;
+        textToy.DisplaySize = new Vector2(200f, 20f);
         TextToy = textToy;
     }
 }
