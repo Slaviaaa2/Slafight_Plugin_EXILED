@@ -553,13 +553,27 @@ public abstract class CItem
 
     private static void OnAnyChangingItem(PlayerEvents.ChangingItemEventArgs ev)
     {
-        if (ev?.Item == null) return;
+        if (ev?.Player == null) return;
+
+        // 旧アイテム: ChangingItem は「変更前」に発火するので Player.CurrentItem が旧側。
+        // CItem を手放す瞬間なら Hint を空文字で上書きして掃除する。
+        var oldItem = ev.Player.CurrentItem;
+        if (oldItem != null
+            && SerialToItem.TryGetValue(oldItem.Serial, out var oldCi)
+            && oldCi != null)
+        {
+            try { ev.Player.ShowHint(string.Empty, 0.1f); }
+            catch (Exception e) { Log.Error($"CItem.ChangingItem(clear hint) error in {oldCi.GetType().Name}: {e}"); }
+        }
+
+        // 新アイテム側: CItem なら派生フック + selected hint
+        if (ev.Item == null) return;
         if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
 
         try { ci.OnChangingItem(ev); }
         catch (Exception e) { Log.Error($"CItem.OnChangingItem error in {ci.GetType().Name}: {e}"); }
 
-        if (ev.IsAllowed && ci.ShowSelectedHint && ev.Player != null)
+        if (ev.IsAllowed && ci.ShowSelectedHint)
         {
             try { ci.ShowSelectedMessage(ev.Player); }
             catch (Exception e) { Log.Error($"CItem.ShowSelectedMessage error in {ci.GetType().Name}: {e}"); }
