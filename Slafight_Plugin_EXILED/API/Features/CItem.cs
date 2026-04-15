@@ -5,6 +5,7 @@ using System.Linq;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
+using MEC;
 using UnityEngine;
 
 using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -203,6 +204,12 @@ public abstract class CItem
     {
         if (player == null) return;
         player.ShowHint(BuildPickedUpMessage(), PickedUpHintDuration);
+        var captured = player;
+        Timing.CallDelayed(PickedUpHintDuration, () =>
+        {
+            try { OnPickedUpHintFinished(captured); }
+            catch (Exception e) { Log.Error($"CItem.OnPickedUpHintFinished error in {GetType().Name}: {e}"); }
+        });
     }
 
     /// <summary>選択した時の Hint を実際に表示する。派生でまるごと差し替え可能。</summary>
@@ -210,7 +217,25 @@ public abstract class CItem
     {
         if (player == null) return;
         player.ShowHint(BuildSelectedMessage(), SelectedHintDuration);
+        var captured = player;
+        Timing.CallDelayed(SelectedHintDuration, () =>
+        {
+            try { OnSelectedHintFinished(captured); }
+            catch (Exception e) { Log.Error($"CItem.OnSelectedHintFinished error in {GetType().Name}: {e}"); }
+        });
     }
+
+    /// <summary>
+    /// 拾得 Hint の表示時間が終わった直後に呼ばれる。
+    /// ShowPickedUpHint が false の場合は発火しない。
+    /// </summary>
+    protected virtual void OnPickedUpHintFinished(Player player) { }
+
+    /// <summary>
+    /// 選択 Hint の表示時間が終わった直後に呼ばれる。
+    /// ShowSelectedHint が false の場合は発火しない。
+    /// </summary>
+    protected virtual void OnSelectedHintFinished(Player player) { }
 
     // ==== インスタンス管理 ====
 

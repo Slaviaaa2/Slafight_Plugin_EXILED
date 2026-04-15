@@ -16,7 +16,7 @@ public class Toolbox : CItem
     public override string Description { get; } = "様々な作業を行うことができる便利な工具箱。\nTキーで使う機能を切り替えられる。";
     protected override string UniqueKey { get; } = "Toolbox";
     protected override ItemType BaseItem { get; } = ItemType.Coin;
-    
+
     public enum UtilType
     {
         Work,MaintenanceLock
@@ -28,6 +28,7 @@ public class Toolbox : CItem
         public bool IsAwaitingCooldown => AwaitingCooldownDuration > 0;
     }
     private static readonly Dictionary<Player, ToolboxStats> ToolboxStatsMap = [];
+    private static readonly Dictionary<Player, CoroutineHandle> HintLoopHandles = [];
 
     public override void RegisterEvents()
     {
@@ -47,12 +48,16 @@ public class Toolbox : CItem
 
     protected override void OnWaitingForPlayers()
     {
+        foreach (var h in HintLoopHandles.Values) Timing.KillCoroutines(h);
+        HintLoopHandles.Clear();
         ToolboxStatsMap.Clear();
     }
 
     private static void OnPlayerLeft(LeftEventArgs ev)
     {
-        if (ev?.Player == null) return;
+        if (ev.Player == null) return;
+        if (HintLoopHandles.TryGetValue(ev.Player, out var h)) Timing.KillCoroutines(h);
+        HintLoopHandles.Remove(ev.Player);
         ToolboxStatsMap.Remove(ev.Player);
     }
 
@@ -60,6 +65,18 @@ public class Toolbox : CItem
     {
         ToolboxStatsMap.TryAdd(ev.Player, new ToolboxStats { SelectedUtilType = UtilType.Work, AwaitingCooldownDuration = 0f });
         base.OnAcquired(ev, displayMessage);
+    }
+
+    protected override void OnSelectedHintFinished(Player player)
+    {
+        // PickedUp / Selected の両 Hint が流れ終わったあとにループ起動。
+        // (PickedUp は 4s、Selected は 3s で、Selected は Pickup 中に上書きされるため、
+        //  Selected 終了 = 両方流れ切ったタイミングとみなして良い)
+        if (!CheckHeld(player)) return;
+        ToolboxStatsMap.TryAdd(player, new ToolboxStats { SelectedUtilType = UtilType.Work, AwaitingCooldownDuration = 0f });
+
+        if (HintLoopHandles.TryGetValue(player, out var running) && running.IsRunning) return;
+        HintLoopHandles[player] = Timing.RunCoroutine(HintLoopCoroutine(player));
     }
 
     protected override void OnDropping(DroppingItemEventArgs ev)
@@ -75,11 +92,7 @@ public class Toolbox : CItem
             _ => throw new ArgumentOutOfRangeException()
         };
         ToolboxStatsMap[ev.Player] = stats;
-
-        ev.Player.ShowHint(
-            $"<size=24>現在選択されている機能：{GetTranslatedText(stats.SelectedUtilType)}</size>\n" +
-            $"<size=22>{GetTranslatedText(stats.SelectedUtilType, true)}\n{TryGetExternalCooldownText(ev.Player)}</size>",
-            4f);
+        // Hint はループ側が次 tick で反映
     }
 
     private void OnInteractingDoor(InteractingDoorEventArgs ev)
@@ -124,6 +137,23 @@ public class Toolbox : CItem
         Timing.RunCoroutine(CooldownCoroutine(ev.Player));
     }
 
+    private IEnumerator<float> HintLoopCoroutine(Player player)
+    {
+        while (true)
+        {
+            if (Round.IsLobby) yield break;
+            if (!CheckHeld(player)) yield break;
+            if (!ToolboxStatsMap.TryGetValue(player, out var stats)) yield break;
+
+            player.ShowHint(
+                $"<size=24>現在選択されている機能：{GetTranslatedText(stats.SelectedUtilType)}</size>\n" +
+                $"<size=22>{GetTranslatedText(stats.SelectedUtilType, true)}\n{TryGetExternalCooldownText(player)}</size>",
+                1.2f);
+
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+
     private static IEnumerator<float> CooldownCoroutine(Player player, float cooldownTime = 60f)
     {
         if (!ToolboxStatsMap.TryGetValue(player, out var stats)) yield break;
@@ -134,7 +164,7 @@ public class Toolbox : CItem
 
         while (true)
         {
-            if (player is null || Round.IsLobby || ToolboxStatsMap.IsEmpty()) yield break;
+            if (Round.IsLobby || ToolboxStatsMap.IsEmpty()) yield break;
             if (!ToolboxStatsMap.TryGetValue(player, out stats)) yield break;
             if (stats.AwaitingCooldownDuration <= 0f) yield break;
 
