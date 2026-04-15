@@ -178,6 +178,7 @@
         <Compile Include="API\Features\AbilityManager.cs" />
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
+        <Compile Include="API\Features\CItem.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CRoom.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
@@ -415,6 +416,7 @@
         <Compile Include="Extensions\CassieExtensions.cs" />
         <Compile Include="Hints\PlayerHUD.cs" />
         <Compile Include="Patches\CandyPatch.cs" />
+        <Compile Include="Patches\Scp914ProcessorFix.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ProximityChat\ActivateHandler.cs" />

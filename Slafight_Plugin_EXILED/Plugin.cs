@@ -20,6 +20,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.LabApiBridgeHandlers;
 using Slafight_Plugin_EXILED.MainHandlers;
+using Slafight_Plugin_EXILED.Patches;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UserSettings.ServerSpecific;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -104,6 +105,8 @@ public class Plugin : Plugin<Config>
             
         WearsHandler.Register();
         CRole.RegisterAllEvents();
+        CItem.RegisterAllItems();
+        Scp914ProcessorFix.Register();
         AbilityBase.RegisterEvents();
         AbilityManager.RegisterEvents();
         CustomRole.RegisterRoles(false);
@@ -179,6 +182,8 @@ public class Plugin : Plugin<Config>
             
         WearsHandler.Unregister();
         CRole.UnregisterAllEvents();
+        CItem.UnregisterAllItems();
+        Scp914ProcessorFix.Unregister();
         AbilityBase.UnregisterEvents();
         AbilityManager.UnregisterEvents();
         CustomItem.UnregisterItems();
