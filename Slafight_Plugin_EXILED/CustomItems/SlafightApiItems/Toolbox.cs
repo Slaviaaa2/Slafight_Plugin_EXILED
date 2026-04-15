@@ -97,6 +97,7 @@ public class Toolbox : CItem
 
     private void OnInteractingDoor(InteractingDoorEventArgs ev)
     {
+        // Log.Debug($"{ev.Player}: Interacting Door\nCheckHold: {CheckHeld(ev.Player)}, ToolboxStstsTryGet: {ToolboxStatsMap.TryGetValue(ev.Player, out _)}");
         if (!CheckHeld(ev.Player)) return;
         if (!ToolboxStatsMap.TryGetValue(ev.Player, out var stats)) return;
         if (stats.IsAwaitingCooldown) return;
@@ -116,7 +117,8 @@ public class Toolbox : CItem
         else
         {
             if (ev.Door.IsLocked) return;
-            ev.Door.Lock(30f, DoorLockType.Regular079);
+            ev.Door.IsOpen = false;
+            ev.Door.Lock(30f, DoorLockType.Lockdown079);
         }
 
         Timing.RunCoroutine(CooldownCoroutine(ev.Player));

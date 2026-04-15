@@ -97,7 +97,7 @@ public class Engineer : CRole
         player.AddItem(ItemType.KeycardContainmentEngineer);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Medkit);
-        new Toolbox().Give(player, false);
+        CItem.Get<Toolbox>()?.Give(player);
 
         var room = Room.Get(RoomType.HczTestRoom);
         var pos = room != null ? room.WorldPosition(new Vector3(0f, 1f, 0f)) : player.Position;
