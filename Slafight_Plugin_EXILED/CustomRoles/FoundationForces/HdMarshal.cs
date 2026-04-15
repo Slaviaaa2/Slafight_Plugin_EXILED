@@ -1,10 +1,10 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -25,13 +25,13 @@ public class HdMarshal : CRole
         player.ClearInventory();
         Log.Debug("Giving Items to HdMarshal");
         player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem(2010);
-        player.TryAddCustomItem(2009);
+        player.TryAddCustomItem<SerumC>();
+        player.TryAddCustomItem<AdvancedMedkit>();
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        CustomItem.TryGive(player, 12,false);
-        CustomItem.TryGive(player, 2011, false);
+        player.TryAddCustomItem<ArmorVip>();
+        player.TryAddCustomItem<GunN7Weltkrieg>();
             
         player.AddAmmo(AmmoType.Nato556,250);
 

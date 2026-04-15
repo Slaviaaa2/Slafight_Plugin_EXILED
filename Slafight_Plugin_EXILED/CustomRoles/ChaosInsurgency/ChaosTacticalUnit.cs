@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
@@ -23,7 +24,7 @@ public class ChaosTacticalUnit : CRole
         player.Health = player.MaxHealth;
         
         player.ClearInventory();
-        player.TryAddCustomItem(2032); // Tactical Revolver
+        player.TryAddCustomItem<GunTacticalRevolver>();
         player.AddItem(ItemType.KeycardChaosInsurgency);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Painkillers);

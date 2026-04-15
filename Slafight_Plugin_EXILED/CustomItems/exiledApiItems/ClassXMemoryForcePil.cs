@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
@@ -11,6 +12,7 @@ using Mirror;
 using Scp914;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
@@ -54,7 +56,7 @@ public class ClassXMemoryForcePil : CustomItem
     private void OnUsing(UsingItemEventArgs ev)
     {
         if (!Check(ev.Item) || ev.Player == null) return;
-        if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+        if (ev.Player.HasFlag(SpecificFlagType.AntiMemeEffectDisabled))
         {
             ev.IsAllowed = false;
             ev.Player.ShowHint("既に耐性を得ている為、使用できません。");
@@ -65,19 +67,22 @@ public class ClassXMemoryForcePil : CustomItem
     {
         if (!Check(ev.Item) || ev.Player == null) return;
         ev.Player.EnableEffect(EffectType.Invigorated, 60);
-        SpecificFlagsManager.TryAddFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled);
-        SpecificFlagsManager.WaitAndRemove(ev.Player, SpecificFlagType.AntiMemeEffectDisabled, 60f);
+        ev.Player.TryAddFlag(SpecificFlagType.AntiMemeEffectDisabled);
+        ev.Player.WaitAndRemove(SpecificFlagType.AntiMemeEffectDisabled, 60f);
     }
     
     protected override void OnUpgrading(UpgradingEventArgs ev)
     {
         switch (ev.KnobSetting)
         {
+            case Scp914KnobSetting.Coarse:
+                Pickup.CreateAndSpawn(ItemType.SCP500, ev.OutputPosition);
+                break;
             case Scp914KnobSetting.OneToOne:
                 return;
             case Scp914KnobSetting.Fine:
             case Scp914KnobSetting.VeryFine:
-                CustomItem.TrySpawn(2029, ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<ClassZMemoryForcePil>(ev.OutputPosition, out _);
                 break;
         }
 

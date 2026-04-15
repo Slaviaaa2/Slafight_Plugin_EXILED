@@ -2,11 +2,15 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Mirror;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
@@ -43,6 +47,28 @@ public class SerumD : CustomItem
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
+    }
+    
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        switch (ev.KnobSetting)
+        {
+            case Scp914KnobSetting.Rough:
+                break;
+            case Scp914KnobSetting.Coarse:
+                Pickup.CreateAndSpawn(ItemType.Adrenaline, ev.OutputPosition);
+                break;
+            case Scp914KnobSetting.OneToOne:
+                return;
+            case Scp914KnobSetting.Fine:
+            case Scp914KnobSetting.VeryFine:    
+                CustomItemExtensions.TrySpawn<SerumC>(ev.OutputPosition, out _);
+                break;
+        }
+
+        ev.IsAllowed = false;
+        ev.Item.DestroySelf();
+        base.OnUpgrading(ev);
     }
     
     private void OnUsed(UsedItemEventArgs ev)

@@ -1,10 +1,11 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
@@ -29,8 +30,8 @@ public class HdCommander : CRole
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        CustomItem.TryGive(player, 12,false);
-        CustomItem.TryGive(player, 11, false);
+        player.TryAddCustomItem<ArmorVip>();
+        player.TryAddCustomItem<GunN7CR>();
             
         player.AddAmmo(AmmoType.Nato556,200);
 

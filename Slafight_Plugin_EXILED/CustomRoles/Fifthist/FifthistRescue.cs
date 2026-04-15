@@ -3,8 +3,9 @@ using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using Exiled.CustomItems.API.Features;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
@@ -41,7 +42,7 @@ public class FifthistRescure : CRole
         Log.Debug("Giving Items to Fifthist");
         player.AddItem(ItemType.GunSCP127);
         player.AddItem(ItemType.ArmorHeavy);
-        CustomItem.TryGive(player, 5, false);
+        player.TryAddCustomItem<KeycardFifthist>();
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.SCP500);

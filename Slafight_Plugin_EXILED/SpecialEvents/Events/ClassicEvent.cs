@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using Exiled.API.Features.Pickups;
-using Exiled.CustomItems.API.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
@@ -48,61 +49,61 @@ public class ClassicEvent : SpecialEvent
             if (pickup.Type == ItemType.KeycardJanitor)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(101, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Janitor>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f, 0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardScientist)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(102, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Scientist>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardGuard)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(103, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Guard>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardMTFPrivate)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(104, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Cadet>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardMTFOperative)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(105, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Lieutenant>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardMTFCaptain)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(106, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_Commander>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardResearchCoordinator)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(107, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_ResearchSupervisor>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardZoneManager)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(108, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_ZoneManager>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardFacilityManager)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(109, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_FacilityManager>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
             if (pickup.Type == ItemType.KeycardO5)
             {
                 pickup.Destroy();
-                CustomItem.TrySpawn(110, pickup.Position,out var pickup_);
+                CustomItemExtensions.TrySpawn<KeycardOld_O5>(pickup.Position, out var pickup_);
                 pickup_.Rotation *= Quaternion.Euler(180f,0f, 0f);
             }
         }

@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -29,8 +30,8 @@ public class SecurityChief : CRole
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.ArmorCombat);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem(1100);
-        player.TryAddCustomItem(2000);
+        player.TryAddCustomItem<KeycardSecurityChief>();
+        player.TryAddCustomItem<GunFSP18>();
         player.AddAmmo(AmmoType.Nato9,180);
             
         player.SetCustomInfo("Security Chief");

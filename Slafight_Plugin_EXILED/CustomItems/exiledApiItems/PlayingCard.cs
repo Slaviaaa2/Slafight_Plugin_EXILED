@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Mirror;
 using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -56,17 +59,29 @@ public class PlayingCard : CustomKeycard
     
     protected override void OnUpgrading(UpgradingEventArgs ev)
     {
-        if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
+        switch (ev.KnobSetting)
         {
-            CustomItem.TrySpawn(2012, ev.OutputPosition, out _);
-        }
-        else if (ev.KnobSetting == Scp914KnobSetting.Fine)
-        {
-            CustomItem.TrySpawn(2013, ev.OutputPosition, out _);
-        }
-        else if (ev.KnobSetting == Scp914KnobSetting.VeryFine)
-        {
-            CustomItem.TrySpawn(2014, ev.OutputPosition, out _);
+            case Scp914KnobSetting.Rough:
+                break;
+            case Scp914KnobSetting.Coarse:
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                break;
+            case Scp914KnobSetting.OneToOne:
+                CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                break;
+            case Scp914KnobSetting.Fine:
+                Pickup.CreateAndSpawn(ItemType.KeycardScientist, ev.OutputPosition);
+                break;
+            case Scp914KnobSetting.VeryFine:
+                Pickup.CreateAndSpawn(ItemType.KeycardResearchCoordinator, ev.OutputPosition);
+                break;
         }
 
         ev.IsAllowed = false;

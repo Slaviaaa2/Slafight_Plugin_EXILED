@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -26,14 +26,14 @@ public class GoCSquadLeader : CRole
         player.Health = player.MaxHealth;
         player.ClearInventory();
         player.AddItem(ItemType.GunFRMG0);
-        player.TryAddCustomItem(50);
+        player.TryAddCustomItem<GunGoCRailgun>();
         player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem(2010);
+        player.TryAddCustomItem<SerumC>();
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        
-        CustomItem.TryGive(player, 12,false);
+
+        player.TryAddCustomItem<ArmorVip>();
             
         player.AddAmmo(AmmoType.Nato556,140);
 

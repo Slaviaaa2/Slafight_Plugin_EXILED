@@ -2,10 +2,14 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Mirror;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -59,10 +63,30 @@ public class KeycardSecurityChief : CustomKeycard
         base.UnsubscribeEvents();
     }
 
-    //private void PickMessage(PickingUpItemEventArgs ev)
-    //{
-    //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
-    //}
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        switch (ev.KnobSetting)
+        {
+            case Scp914KnobSetting.Rough:
+                break;
+            case Scp914KnobSetting.Coarse:
+                Pickup.CreateAndSpawn(ItemType.KeycardGuard, ev.OutputPosition);
+                break;
+            case Scp914KnobSetting.OneToOne:
+                CustomItemExtensions.TrySpawn<KeycardSecurityChief>(ev.OutputPosition, out _);
+                break;
+            case Scp914KnobSetting.Fine:
+                Pickup.CreateAndSpawn(ItemType.KeycardMTFOperative, ev.OutputPosition);
+                break;
+            case Scp914KnobSetting.VeryFine:    
+                Pickup.CreateAndSpawn(ItemType.KeycardMTFCaptain, ev.OutputPosition);
+                break;
+        }
+
+        ev.IsAllowed = false;
+        ev.Item.DestroySelf();
+        base.OnUpgrading(ev);
+    }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {

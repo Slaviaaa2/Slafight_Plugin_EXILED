@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -24,10 +25,10 @@ public class SneOperator : CRole
         player.ClearInventory();
         player.AddItem(ItemType.GunFRMG0);
         player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem(2010);
-        player.TryAddCustomItem(2026);
-        player.TryAddCustomItem(2027);
-        player.TryAddCustomItem(2027);
+        player.TryAddCustomItem<SerumC>();
+        player.TryAddCustomItem<AntiMemeGoggle>();
+        player.TryAddCustomItem<NeutralizeGrenade>();
+        player.TryAddCustomItem<NeutralizeGrenade>();
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorHeavy);
             

@@ -1,10 +1,11 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
@@ -30,7 +31,7 @@ public class HdInfantry : CRole
         player.AddItem(ItemType.GrenadeFlash);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        CustomItem.TryGive(player, 10,false);
+        player.TryAddCustomItem<ArmorInfantry>();
             
         player.AddAmmo(AmmoType.Nato9,140);
 

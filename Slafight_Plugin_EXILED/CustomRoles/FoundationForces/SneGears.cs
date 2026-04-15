@@ -4,6 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -24,9 +25,9 @@ public class SneGears : CRole
         player.ClearInventory();
         player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem(2010);
+        player.TryAddCustomItem<SerumC>();
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem(2026);
+        player.TryAddCustomItem<AntiMemeGoggle>();
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorHeavy);
             

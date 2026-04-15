@@ -1,11 +1,12 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using Exiled.CustomItems.API.Features;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.ClassD;
@@ -25,12 +26,12 @@ public class Janitor : CRole
         player.Health = player.MaxHealth;
         player.ClearInventory();
         Log.Debug("Giving Items to Janitor");
-        CustomItem.TryGive(player, 700,false);
-        CustomItem.TryGive(player, 700,false);
-        CustomItem.TryGive(player, 700,false);
-        CustomItem.TryGive(player, 700,false);
-        CustomItem.TryGive(player, 700,false);
-        CustomItem.TryGive(player, 700,false);
+        player.TryAddCustomItem<FakeGrenade>();
+        player.TryAddCustomItem<FakeGrenade>();
+        player.TryAddCustomItem<FakeGrenade>();
+        player.TryAddCustomItem<FakeGrenade>();
+        player.TryAddCustomItem<FakeGrenade>();
+        player.TryAddCustomItem<FakeGrenade>();
         player.AddItem(ItemType.KeycardJanitor);
         player.AddItem(ItemType.Radio);
         var pos = Door.Get(DoorType.Scp173Connector).Position;

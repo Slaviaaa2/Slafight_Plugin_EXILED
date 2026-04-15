@@ -11,6 +11,7 @@ using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Mirror;
 using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Item = Exiled.API.Features.Items.Item;
 
@@ -54,15 +55,15 @@ public class SNAV300 : CustomItem
     {
         if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
         {
-            CustomItem.TrySpawn(2012, ev.OutputPosition, out _);
+            CustomItemExtensions.TrySpawn<SNAV300>(ev.OutputPosition, out _);
         }
         else if (ev.KnobSetting == Scp914KnobSetting.Fine)
         {
-            CustomItem.TrySpawn(2013, ev.OutputPosition, out _);
+            CustomItemExtensions.TrySpawn<SNAV310>(ev.OutputPosition, out _);
         }
         else if (ev.KnobSetting == Scp914KnobSetting.VeryFine)
         {
-            CustomItem.TrySpawn(2014, ev.OutputPosition, out _);
+            CustomItemExtensions.TrySpawn<SNAVUltimate>(ev.OutputPosition, out _);
         }
 
         ev.IsAllowed = false;

@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.MicroHID.Modules;
 using Mirror;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
@@ -27,7 +31,7 @@ public class HIDTurret : CustomItem
 
     protected override void SubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.ChangingMicroHIDState += disRight;
+        Exiled.Events.Handlers.Player.ChangingMicroHIDState += DisRight;
         Exiled.Events.Handlers.Map.PickupAdded += AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed += RemoveGlow;
         
@@ -36,14 +40,34 @@ public class HIDTurret : CustomItem
 
     protected override void UnsubscribeEvents()
     {
-        Exiled.Events.Handlers.Player.ChangingMicroHIDState -= disRight;
+        Exiled.Events.Handlers.Player.ChangingMicroHIDState -= DisRight;
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         
         base.UnsubscribeEvents();
     }
+    
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        switch (ev.KnobSetting)
+        {
+            case Scp914KnobSetting.OneToOne:
+                CustomItemExtensions.TrySpawn<HIDTurret>(ev.OutputPosition, out _);
+                break;
+            case Scp914KnobSetting.Fine:
+                Pickup.CreateAndSpawn(ItemType.MicroHID, ev.OutputPosition);
+                break;
+            case Scp914KnobSetting.VeryFine:    
+                CustomItemExtensions.TrySpawn<GunGoCTurret>(ev.OutputPosition, out _);
+                break;
+        }
 
-    private void disRight(ChangingMicroHIDStateEventArgs ev)
+        ev.IsAllowed = false;
+        ev.Item.DestroySelf();
+        base.OnUpgrading(ev);
+    }
+
+    private void DisRight(ChangingMicroHIDStateEventArgs ev)
     {
         if (!Check(ev.Item)) { return; }
         if (ev.MicroHID.LastFiringMode == MicroHidFiringMode.ChargeFire && ev.NewPhase == MicroHidPhase.Firing)

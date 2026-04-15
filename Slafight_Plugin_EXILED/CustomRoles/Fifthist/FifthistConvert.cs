@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -39,8 +40,8 @@ public class FifthistConvert : CRole
         //player.AddItem(ItemType.KeycardFacilityManager);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.ArmorCombat);
-        player.TryAddCustomItem(5); // Fifthist Keycard
-        player.TryAddCustomItem(1102); // Scp1425
+        player.TryAddCustomItem<KeycardFifthist>();
+        player.TryAddCustomItem<Scp1425>();
         player.AddAmmo(AmmoType.Nato9,170);
     }
 }

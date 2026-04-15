@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Mirror;
+using Scp914;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
@@ -35,6 +39,23 @@ public class Quarter : CustomItem
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
+    }
+    
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        switch (ev.KnobSetting)
+        {
+            case Scp914KnobSetting.Fine:
+                Pickup.Create(ItemType.Coin).Position = ev.OutputPosition;
+                break;
+            case Scp914KnobSetting.VeryFine:
+                Pickup.Create(ItemType.KeycardScientist).Position = ev.OutputPosition;
+                break;
+        }
+
+        ev.IsAllowed = false;
+        ev.Item.DestroySelf();
+        base.OnUpgrading(ev);
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)

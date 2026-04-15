@@ -3,9 +3,9 @@ using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
-using Exiled.CustomItems.API.Features;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
@@ -37,9 +37,9 @@ public class FifthistGuidance : CRole
         // player.Rotation = spawnRoom.Rotation;
 
         player.ClearInventory();
-        player.TryAddCustomItem(2020);
+        player.TryAddCustomItem<CaneOfTheStars>();
         player.AddItem(ItemType.ArmorHeavy);
-        CustomItem.TryGive(player, 5, false);
+        player.TryAddCustomItem<KeycardFifthist>();
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.SCP500);
