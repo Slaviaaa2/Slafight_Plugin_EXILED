@@ -11,6 +11,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Random = System.Random;
@@ -90,25 +91,25 @@ public class Engineer : CRole
         var state = new EngineerState();
         _states[player.Id] = state;
 
-        AssignNewTask(player, state);
+        // AssignNewTask(player, state);
 
         player.ClearInventory();
-        player.AddItem(ItemType.KeycardResearchCoordinator);
+        player.AddItem(ItemType.KeycardContainmentEngineer);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Medkit);
+        new Toolbox().Give(player, false);
 
         var room = Room.Get(RoomType.HczTestRoom);
         var pos = room != null ? room.WorldPosition(new Vector3(0f, 1f, 0f)) : player.Position;
         player.Position = pos;
 
-        player.CustomInfo = "Engineer";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
+        player.SetCustomInfo("Engineer");
 
         Timing.CallDelayed(0.1f, () =>
         {
-            player.ShowHint("<size=24><color=#00ffff>エンジニア</color>\nタスク達成で権限アップグレード。\n発電機に権限無視してアクセスできる", 8f);
+            player.ShowHint("<size=24><color=#00ffff>エンジニア</color>\nToolboxを用いて施設中を駆け巡れ！", 8f);
 
+            return;
             if (state.HudRoutine != default)
             {
                 Timing.KillCoroutines(state.HudRoutine);
