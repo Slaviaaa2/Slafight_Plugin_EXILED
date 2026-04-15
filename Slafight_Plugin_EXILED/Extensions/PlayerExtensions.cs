@@ -26,7 +26,7 @@ public static class PlayerExtensions
         {
             // ==== SCP ====
             case RoleTypeId.Scp173:
-                player.SetRole(CRoleTypeId.Scp173);
+                player.SetRole(CRoleTypeId.Scp173, roleSpawnFlags);
                 break;
 
             case RoleTypeId.Scp049:
@@ -34,7 +34,7 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp079:
-                player.Role.Set(RoleTypeId.Scp079, roleSpawnFlags);
+                player.SetRole(CRoleTypeId.Scp079, roleSpawnFlags);
                 break;
 
             case RoleTypeId.Scp096:
@@ -42,7 +42,7 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp106:
-                player.SetRole(CRoleTypeId.Scp106);
+                player.SetRole(CRoleTypeId.Scp106, roleSpawnFlags);
                 break;
 
             case RoleTypeId.Scp0492:
@@ -54,8 +54,7 @@ public static class PlayerExtensions
                 break;
 
             case RoleTypeId.Scp3114:
-                // Cast to SetRole(Custom)
-                player.SetRole(CRoleTypeId.Scp3114);
+                player.SetRole(CRoleTypeId.Scp3114, roleSpawnFlags);
                 break;
 
             // ==== Neutrals ====
@@ -185,6 +184,9 @@ public static class PlayerExtensions
                 break;
             case CRoleTypeId.Scp035:
                 new Scp035Role().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.Scp079:
+                new Scp079Role().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Zombified:
                 new ZombifiedRole().SpawnRole(player, roleSpawnFlags);

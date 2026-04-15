@@ -9,6 +9,7 @@ public static class MapFlags
     public static bool FemurBreaked => CustomMapMainHandler._femurBreaked;
     public static bool IsOmegaStarted => OmegaWarhead.IsWarheadStarted;
     public static bool IsWarheadBooming => WarheadBoomEffectHandler.IsBooming;
+    public static bool IsOverrideActivated = false;
     public static Vector3 Scp682SpawnPoint = Vector3.zero;
     public static Vector3 FacilityManagerSpawnPoint = Vector3.zero;
     public static Vector3 AntiAntiMemeDocPoint = Vector3.zero;

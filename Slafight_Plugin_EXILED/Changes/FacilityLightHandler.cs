@@ -84,14 +84,14 @@ public static class FacilityLightHandler
         }
     }
 
-    private static void OnWarhead(StartingEventArgs ev)
+    public static void OnWarhead(StartingEventArgs ev)
     {
         if (!ev.IsAllowed) return;
         ColorUtility.TryParseHtmlString("#ff1500", out var color);
         Room.List.ToList().ForEach(room => room.Color = color);
     }
 
-    private static void OnStopping(StoppingEventArgs ev)
+    public static void OnStopping(StoppingEventArgs ev)
     {
         if (!ev.IsAllowed) return;
         InitLight();

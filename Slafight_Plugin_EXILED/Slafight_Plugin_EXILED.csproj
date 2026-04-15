@@ -157,6 +157,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Abilities\AllowEscapeAbility.cs" />
+        <Compile Include="Abilities\AlphaWarheadOverride.cs" />
         <Compile Include="Abilities\CreateSinkholeAbility.cs" />
         <Compile Include="Abilities\DropBiggerShitAbility.cs" />
         <Compile Include="Abilities\MagicMissileAbility.cs" />
@@ -351,6 +352,7 @@
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />
         <Compile Include="CustomRoles\Scientist\Surveillance.cs" />
         <Compile Include="CustomRoles\SCPs\Scp035Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp079Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp096Anger.cs" />
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp173Role.cs" />

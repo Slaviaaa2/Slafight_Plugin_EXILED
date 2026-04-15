@@ -32,15 +32,15 @@ public static class Scp914Changes
 
     private static void Normal(UpgradingPickupEventArgs ev)
     {
-        var item = Item.Get(ev.Pickup.Serial);
-        if (item.TryGetCustomItem(out var customItem))
+        if (ev.Pickup == null) return;
+        if (ev.Pickup.TryGetCustomItem(out var customItem))
         {
             // CUSTOM ITEM UPGRADES
         }
         else
         {
             // VANILLA ITEM UPGRADES
-            switch (item.Type)
+            switch (ev.Pickup.Type)
             {
                 case ItemType.Adrenaline:
                     CustomItemExtensions.TrySpawn<SerumD>(ev.OutputPosition, out _);

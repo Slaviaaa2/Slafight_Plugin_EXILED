@@ -89,7 +89,7 @@ public static class CustomItemExtensions
     }
 
     // ───────────────────────────────
-    // TryGetCustomItem (Item 拡張)
+    // TryGetCustomItem (Item & Pickup 拡張)
     // ───────────────────────────────
 
     /// <summary>カスタムアイテムの取得を試みます。取得できた場合は customItem に格納します。</summary>
@@ -98,6 +98,12 @@ public static class CustomItemExtensions
         var result = CustomItem.TryGet(item, out var ci);
         customItem = ci;
         return result;
+    }
+    
+    /// <summary>Pickup が持つカスタムアイテムを取得します。</summary>
+    public static bool TryGetCustomItem(this Pickup pickup, out CustomItem? customItem)
+    {
+        return CustomItem.TryGet(pickup, out customItem);
     }
 
     // ───────────────────────────────
