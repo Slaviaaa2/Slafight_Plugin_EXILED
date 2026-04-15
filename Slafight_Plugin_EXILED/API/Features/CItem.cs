@@ -62,6 +62,8 @@ public abstract class CItem
         if (!_eventsSubscribed)
         {
             PlayerHandlers.PickingUpItem += OnAnyPickingUpItem;
+            PlayerHandlers.ItemAdded += OnAnyItemAdded;
+            PlayerHandlers.ItemRemoved += OnAnyItemRemoved;
             PlayerHandlers.DroppingItem += OnAnyDroppingItem;
             PlayerHandlers.UsingItem += OnAnyUsingItem;
             PlayerHandlers.UsedItem += OnAnyUsedItem;
@@ -123,6 +125,8 @@ public abstract class CItem
         if (_eventsSubscribed)
         {
             PlayerHandlers.PickingUpItem -= OnAnyPickingUpItem;
+            PlayerHandlers.ItemAdded -= OnAnyItemAdded;
+            PlayerHandlers.ItemRemoved -= OnAnyItemRemoved;
             PlayerHandlers.DroppingItem -= OnAnyDroppingItem;
             PlayerHandlers.UsingItem -= OnAnyUsingItem;
             PlayerHandlers.UsedItem -= OnAnyUsedItem;
@@ -247,30 +251,47 @@ public abstract class CItem
 
     // ==== 付与/生成 ====
 
+    // Give() が実行中に走る AddItem → ItemAdded イベントに対し、
+    // 「この ItemAdded は Give() 由来」だと伝えるための一時マーカー。
+    // ゲームロジックは単一スレッドなので static で競合しない。
+    private static CItem? _pendingGiveCItem;
+    private static bool _pendingGiveDisplayMessage;
+
     /// <summary>
     /// プレイヤーにこの CItem を付与する。
+    /// Exiled CustomItem と同じく、既定で PickedUp 相当の Hint を表示する。
     /// </summary>
-    public virtual Item? Give(Player? player, bool showHint = false)
+    /// <param name="player">付与先プレイヤー。</param>
+    /// <param name="displayMessage">true なら ShowPickedUpHint に従い Hint を表示する。</param>
+    public virtual Item? Give(Player? player, bool displayMessage = true)
     {
         if (player == null) return null;
 
         try
         {
+            _pendingGiveCItem = this;
+            _pendingGiveDisplayMessage = displayMessage;
+
             var item = player.AddItem(BaseItem);
             if (item == null) return null;
 
-            SerialToItem[item.Serial] = this;
+            // AddItem 同期で ItemAdded が発火し OnAnyItemAdded 側で
+            // SerialToItem 登録と OnAcquired ディスパッチが済むのが正常系。
+            // 何らかの理由で ItemAdded を拾えていなかった場合に備えて保険でここでも登録。
+            if (!SerialToItem.ContainsKey(item.Serial))
+                SerialToItem[item.Serial] = this;
 
-            if (showHint)
-                player.ShowHint($"<color=#ffcc00>{DisplayName}</color> を入手した", 3f);
-
-            OnGiven(player, item);
             return item;
         }
         catch (Exception ex)
         {
             Log.Error($"CItem.Give failed ({GetType().Name}): {ex}");
             return null;
+        }
+        finally
+        {
+            _pendingGiveCItem = null;
+            _pendingGiveDisplayMessage = false;
         }
     }
 
@@ -359,7 +380,17 @@ public abstract class CItem
 
     // ==== 派生クラス向けイベントフック ====
 
-    protected virtual void OnGiven(Player player, Item item) { }
+    /// <summary>
+    /// プレイヤーのインベントリにこの CItem が入った瞬間（経路問わず）発火する
+    /// 汎用フック。Give / 床からのピックアップ / ロードアウト / SCP-914 /
+    /// 他プラグイン経由の AddItem など全ての経路で一度だけ呼ばれる。
+    /// </summary>
+    /// <param name="ev">Exiled の ItemAddedEventArgs。Pickup が床由来の場合は ev.Pickup に元ピックアップが入る。</param>
+    /// <param name="displayMessage">Give(displayMessage:false) が明示されなければ true。</param>
+    protected virtual void OnAcquired(PlayerEvents.ItemAddedEventArgs ev, bool displayMessage) { }
+
+    protected virtual void OnReleased(PlayerEvents.ItemRemovedEventArgs ev) { }
+
     protected virtual void OnSpawned(Pickup pickup) { }
 
     protected virtual void OnPickingUp(PlayerEvents.PickingUpItemEventArgs ev) { }
@@ -408,17 +439,62 @@ public abstract class CItem
 
     private static void OnAnyPickingUpItem(PlayerEvents.PickingUpItemEventArgs ev)
     {
+        // 床からの手動ピックアップ特有のキャンセル用フック。
+        // Hint 表示は OnAnyItemAdded 側に集約したのでここでは扱わない。
         if (ev?.Pickup == null) return;
-        if (!SerialToItem.TryGetValue(ev.Pickup.Serial, out var ci) || ci == null) return;
+        Dispatch(ev.Pickup.Serial, ci => ci.OnPickingUp(ev), nameof(OnPickingUp));
+    }
 
-        try { ci.OnPickingUp(ev); }
-        catch (Exception e) { Log.Error($"CItem.OnPickingUp error in {ci.GetType().Name}: {e}"); }
+    /// <summary>
+    /// 全ての経路で「プレイヤーのインベントリに ItemBase が足された瞬間」を拾う。
+    /// Give() 由来 / 床拾い / ロードアウト / SCP-914 / 他プラグイン AddItem すべて。
+    /// </summary>
+    private static void OnAnyItemAdded(PlayerEvents.ItemAddedEventArgs ev)
+    {
+        if (ev?.Player == null || ev.Item == null) return;
 
-        if (ev.IsAllowed && ci.ShowPickedUpHint && ev.Player != null)
+        CItem? ci;
+        bool displayMessage;
+
+        // 1. Give() からの呼び出し: pending marker で CItem を決定し、即 tracking
+        if (_pendingGiveCItem != null)
+        {
+            ci = _pendingGiveCItem;
+            displayMessage = _pendingGiveDisplayMessage;
+            SerialToItem[ev.Item.Serial] = ci;
+            _pendingGiveCItem = null;
+            _pendingGiveDisplayMessage = false;
+        }
+        // 2. それ以外 (床拾い / 914 / 他プラグインの AddItem): 既にシリアル追跡済みなら CItem
+        else if (SerialToItem.TryGetValue(ev.Item.Serial, out var existing) && existing != null)
+        {
+            ci = existing;
+            displayMessage = true;
+        }
+        else
+        {
+            return;
+        }
+
+        try { ci.OnAcquired(ev, displayMessage); }
+        catch (Exception e) { Log.Error($"CItem.OnAcquired error in {ci.GetType().Name}: {e}"); }
+
+        if (displayMessage && ci.ShowPickedUpHint)
         {
             try { ci.ShowPickedUpMessage(ev.Player); }
             catch (Exception e) { Log.Error($"CItem.ShowPickedUpMessage error in {ci.GetType().Name}: {e}"); }
         }
+    }
+
+    private static void OnAnyItemRemoved(PlayerEvents.ItemRemovedEventArgs ev)
+    {
+        if (ev?.Item == null) return;
+        // ItemRemoved は「インベントリから抜けた」時点の通知。
+        // 対応する Pickup に遷移している可能性があるので SerialToItem は掃除しない。
+        // 本当に消滅したときは OnAnyPickupDestroyed 側で掃除する。
+        if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
+        try { ci.OnReleased(ev); }
+        catch (Exception e) { Log.Error($"CItem.OnReleased error in {ci.GetType().Name}: {e}"); }
     }
 
     private static void OnAnyDroppingItem(PlayerEvents.DroppingItemEventArgs ev)
@@ -512,7 +588,9 @@ public abstract class CItem
         try { ci.OnPickupDestroyed(ev); }
         catch (Exception ex) { Log.Error($"CItem.OnPickupDestroyed error in {ci.GetType().Name}: {ex}"); }
 
-        SerialToItem.Remove(ev.Pickup.Serial);
+        // PickupDestroyed は「プレイヤーが拾って pickup が消えた」時にも発火するため、
+        // ここで SerialToItem を即削除すると同じ CItem が拾われた瞬間に追跡が切れる。
+        // シリアル再利用は round 毎なので WaitingForPlayers 側で一括掃除に任せる。
     }
 
     private static void OnAnyUpgradingPickup(Scp914Events.UpgradingPickupEventArgs ev)
