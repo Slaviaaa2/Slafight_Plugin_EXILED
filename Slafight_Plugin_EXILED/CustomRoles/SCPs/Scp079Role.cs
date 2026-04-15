@@ -53,7 +53,7 @@ public class Scp079Role : CRole
             role.Scp2176LostTime = 5f;
         }
         
-        player.ShowHint("<size=22><color=red>SCP-079</color>\n制御システムを操り、施設に混沌を引き起こす。\n発電機が全て起動完了すると<color=red>ALPHA WARHEAD OVERRIDE</color>が使用可能になる。",10f);
+        player.ShowHint("<size=22><color=red>SCP-079</color>\n制御システムを操り、施設に混沌を引き起こす。",10f);
     }
     
     protected override void OnDying(DyingEventArgs ev)
@@ -70,24 +70,29 @@ public class Scp079Role : CRole
 
     private static void OnGenerated(GeneratorActivatingEventArgs ev)
     {
-        if (!ev.IsAllowed) return;
-        if (Generator.List.Where(g => !g.IsEngaged).ToList().Count is 0)
+        return;
+        Timing.CallDelayed(1f, () =>
         {
-            var list = Player.List.Where(p => p.GetCustomRole() is CRoleTypeId.Scp079).ToList();
-            foreach (var player in list)
+            if (Generator.List.Where(g => !g.IsEngaged).ToList().Count is 0)
             {
-                player.ShowHint("<size=23><color=red>!!!!!発電機が全て起動されました!!!!!\n最終手段を確立しています・・・</color></size>");
-            }
-
-            Timing.CallDelayed(60f, () =>
-            {
+                var list = Player.List.Where(p => p.GetCustomRole() is CRoleTypeId.Scp079).ToList();
                 foreach (var player in list)
                 {
-                    if (player is null || Round.IsLobby || player.GetCustomRole() is not CRoleTypeId.Scp079 || Generator.List.Where(g => !g.IsEngaged).ToList().Count is not 0) return;
-                    player.AddAbility<AlphaWarheadOverride>();
-                    player.ShowHint("<color=red><b>ALPHA WARHEAD OVERRIDEが使用可能になりました！</b></color>\nアビリティ使用キーを押して施設を破壊しましょう！");
+                    player.ShowHint("<size=23><color=red>!!!!!発電機が全て起動されました!!!!!\n最終手段を確立しています・・・</color></size>");
                 }
-            });
-        }
+
+                Timing.CallDelayed(60f, () =>
+                {
+                    foreach (var player in list)
+                    {
+                        if (player is null || Round.IsLobby || player.GetCustomRole() is not CRoleTypeId.Scp079 ||
+                            Generator.List.Where(g => !g.IsEngaged).ToList().Count is not 0) return;
+                        player.AddAbility<AlphaWarheadOverride>();
+                        player.ShowHint(
+                            "<color=red><b>ALPHA WARHEAD OVERRIDEが使用可能になりました！</b></color>\nアビリティ使用キーを押して施設を破壊しましょう！");
+                    }
+                });
+            }
+        });
     }
 }

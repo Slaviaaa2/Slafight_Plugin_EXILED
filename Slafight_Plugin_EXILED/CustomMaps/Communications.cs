@@ -47,7 +47,7 @@ public static class Communications
             SetupInteractable();
             SetupText();
 
-            MonitorText = $"<size=16>{MonitorTexts.RandomItem()}</size>";
+            MonitorText = $"<size=10>{MonitorTexts.RandomItem()}</size>";
             InteractableToy?.Base.OnSearched +=
                 p => Player.Get(p).ShowHint("[アクセス拒否]", 10f);
         });
@@ -73,12 +73,12 @@ public static class Communications
         var point = list.FirstOrDefault();
         if (point is null) return;
         var textToy = Text.Create();
-        textToy.Scale = new Vector3(0.95f, 1f, 1f);
+        textToy.Scale = new Vector3(0.55f, 0.65f, 1f);
         textToy.Position = point.transform.position;
         textToy.Rotation = point.transform.rotation;
         textToy.Rotation = StaticUtils
             .GetWorldFromRoomLocal(RoomType.EzDownstairsPcs, Vector3.zero, new Vector3(-10f, 0f, 0f)).worldRotation;
-        textToy.DisplaySize = new Vector2(200f, 20f);
+        textToy.DisplaySize = new Vector2(120f, 20f);
         TextToy = textToy;
     }
 }

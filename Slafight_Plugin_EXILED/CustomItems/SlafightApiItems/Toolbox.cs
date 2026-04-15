@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -7,6 +8,7 @@ using Exiled.API.Features.Doors;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using Slafight_Plugin_EXILED.API.Features;
+using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 
@@ -35,6 +37,7 @@ public class Toolbox : CItem
         Exiled.Events.Handlers.Player.Left += OnPlayerLeft;
         Exiled.Events.Handlers.Player.InteractingDoor += OnInteractingDoor;
         Exiled.Events.Handlers.Player.UnlockingGenerator += OnInteractingGenerator;
+        Exiled.Events.Handlers.Player.FlippingCoin += OnCoin;
         base.RegisterEvents();
     }
 
@@ -43,6 +46,7 @@ public class Toolbox : CItem
         Exiled.Events.Handlers.Player.Left -= OnPlayerLeft;
         Exiled.Events.Handlers.Player.InteractingDoor -= OnInteractingDoor;
         Exiled.Events.Handlers.Player.UnlockingGenerator -= OnInteractingGenerator;
+        Exiled.Events.Handlers.Player.FlippingCoin -= OnCoin;
         base.UnregisterEvents();
     }
 
@@ -124,6 +128,33 @@ public class Toolbox : CItem
         Timing.RunCoroutine(CooldownCoroutine(ev.Player));
     }
 
+    private void OnCoin(FlippingCoinEventArgs ev)
+    {
+        if (!CheckHeld(ev.Player)) return;
+        if (!ToolboxStatsMap.TryGetValue(ev.Player, out var stats)) return;
+        if (stats.IsAwaitingCooldown) return;
+        if (stats.SelectedUtilType is UtilType.Work)
+        {
+            var list = Door.List.Where(d => Vector3.Distance(d.Position, ev.Player.Position) <= 3f).ToList();
+            if (list.Count >= 1)
+            {
+                var door = list.First();
+                if (door is not BreakableDoor breakableDoor) return;
+                if (!breakableDoor.IsBreakable) return;
+                if (breakableDoor.IsDestroyed)
+                {
+                    breakableDoor.Repair();
+                }
+                else
+                {
+                    breakableDoor.Break();
+                }
+
+                Timing.RunCoroutine(CooldownCoroutine(ev.Player));
+            }
+        }
+    }
+
     private void OnInteractingGenerator(UnlockingGeneratorEventArgs ev)
     {
         if (!CheckHeld(ev.Player)) return;
@@ -192,7 +223,7 @@ public class Toolbox : CItem
         {
             result = utilType switch
             {
-                UtilType.Work => "ドアに向かってインタラクトすることで破壊・修理を行うことができる。\n発電機に対してインタラクトした場合は強制的に開けることができる。",
+                UtilType.Work => "ドアに向かってインタラクトすることで破壊、近くでコイン使用で修理出来る。\n発電機に対してインタラクトした場合は強制的に開けることができる。",
                 UtilType.MaintenanceLock => "ドアに向かってインタラクトすることでドアをメンテナンスモードにでき、一定時間閉じた状態でロックできる。",
                 _ => throw new ArgumentOutOfRangeException()
             };

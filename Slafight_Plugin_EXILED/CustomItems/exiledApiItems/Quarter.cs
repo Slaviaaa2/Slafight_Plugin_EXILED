@@ -46,10 +46,10 @@ public class Quarter : CustomItem
         switch (ev.KnobSetting)
         {
             case Scp914KnobSetting.Fine:
-                Pickup.Create(ItemType.Coin).Position = ev.OutputPosition;
+                Pickup.CreateAndSpawn(ItemType.Coin, ev.OutputPosition);
                 break;
             case Scp914KnobSetting.VeryFine:
-                Pickup.Create(ItemType.KeycardScientist).Position = ev.OutputPosition;
+                Pickup.CreateAndSpawn(ItemType.KeycardScientist, ev.OutputPosition);
                 break;
         }
 
