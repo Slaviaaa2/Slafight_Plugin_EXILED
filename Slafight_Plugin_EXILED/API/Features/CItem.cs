@@ -167,7 +167,46 @@ public abstract class CItem
     /// <summary>表示名。ログと Hint 用。</summary>
     public virtual string DisplayName => UniqueKey;
 
+    /// <summary>アイテムの説明。ピックアップ/選択 Broadcast に差し込まれる。</summary>
+    public virtual string Description => string.Empty;
+
     public string UniqueKeyName => UniqueKey;
+
+    // ==== ヒント表示 (Exiled CustomItem の PickedUpHint / SelectedHint に書式を合わせる) ====
+
+    private const string PickedUpHintFormat = "<size=24>あなたは{0}を拾いました！\n{1}</size>";
+    private const float PickedUpHintDuration = 4f;
+
+    private const string SelectedHintFormat = "<size=24>あなたは{0}を選択しました！\n{1}</size>";
+    private const float SelectedHintDuration = 3f;
+
+    /// <summary>拾ったときに Hint を自動表示するか。</summary>
+    protected virtual bool ShowPickedUpHint => true;
+
+    /// <summary>選択（手に持つ）したときに Hint を自動表示するか。</summary>
+    protected virtual bool ShowSelectedHint => true;
+
+    /// <summary>拾った瞬間に出す Hint メッセージを生成。</summary>
+    protected virtual string BuildPickedUpMessage()
+        => string.Format(PickedUpHintFormat, DisplayName, Description);
+
+    /// <summary>選択（手に持った）時に出す Hint メッセージを生成。</summary>
+    protected virtual string BuildSelectedMessage()
+        => string.Format(SelectedHintFormat, DisplayName, Description);
+
+    /// <summary>拾った時の Hint を実際に表示する。派生でまるごと差し替え可能。</summary>
+    protected virtual void ShowPickedUpMessage(Player player)
+    {
+        if (player == null) return;
+        player.ShowHint(BuildPickedUpMessage(), PickedUpHintDuration);
+    }
+
+    /// <summary>選択した時の Hint を実際に表示する。派生でまるごと差し替え可能。</summary>
+    protected virtual void ShowSelectedMessage(Player player)
+    {
+        if (player == null) return;
+        player.ShowHint(BuildSelectedMessage(), SelectedHintDuration);
+    }
 
     // ==== インスタンス管理 ====
 
@@ -370,7 +409,16 @@ public abstract class CItem
     private static void OnAnyPickingUpItem(PlayerEvents.PickingUpItemEventArgs ev)
     {
         if (ev?.Pickup == null) return;
-        Dispatch(ev.Pickup.Serial, ci => ci.OnPickingUp(ev), nameof(OnPickingUp));
+        if (!SerialToItem.TryGetValue(ev.Pickup.Serial, out var ci) || ci == null) return;
+
+        try { ci.OnPickingUp(ev); }
+        catch (Exception e) { Log.Error($"CItem.OnPickingUp error in {ci.GetType().Name}: {e}"); }
+
+        if (ev.IsAllowed && ci.ShowPickedUpHint && ev.Player != null)
+        {
+            try { ci.ShowPickedUpMessage(ev.Player); }
+            catch (Exception e) { Log.Error($"CItem.ShowPickedUpMessage error in {ci.GetType().Name}: {e}"); }
+        }
     }
 
     private static void OnAnyDroppingItem(PlayerEvents.DroppingItemEventArgs ev)
@@ -430,7 +478,16 @@ public abstract class CItem
     private static void OnAnyChangingItem(PlayerEvents.ChangingItemEventArgs ev)
     {
         if (ev?.Item == null) return;
-        Dispatch(ev.Item.Serial, ci => ci.OnChangingItem(ev), nameof(OnChangingItem));
+        if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
+
+        try { ci.OnChangingItem(ev); }
+        catch (Exception e) { Log.Error($"CItem.OnChangingItem error in {ci.GetType().Name}: {e}"); }
+
+        if (ev.IsAllowed && ci.ShowSelectedHint && ev.Player != null)
+        {
+            try { ci.ShowSelectedMessage(ev.Player); }
+            catch (Exception e) { Log.Error($"CItem.ShowSelectedMessage error in {ci.GetType().Name}: {e}"); }
+        }
     }
 
     private static void OnAnyThrowingRequest(PlayerEvents.ThrowingRequestEventArgs ev)
