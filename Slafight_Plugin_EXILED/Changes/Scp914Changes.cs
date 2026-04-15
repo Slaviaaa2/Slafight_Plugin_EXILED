@@ -55,26 +55,92 @@ public static class Scp914Changes
                 case ItemType.None:
                     break;
                 case ItemType.KeycardJanitor:
+                    if (Random.Next(0, 6) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardScientist:
+                    if (Random.Next(0, 5) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardResearchCoordinator:
+                    if (Random.Next(0, 4) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardZoneManager:
+                    if (Random.Next(0, 4) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardGuard:
+                    if (Random.Next(0, 4) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardMTFPrivate:
+                    if (Random.Next(0, 3) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardContainmentEngineer:
+                    if (Random.Next(0, 3) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardMTFOperative:
+                    if (Random.Next(0, 2) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardMTFCaptain:
+                    if (Random.Next(0, 2) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardFacilityManager:
+                    if (Random.Next(0, 2) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardChaosInsurgency:
+                    if (Random.Next(0, 2) is 0)
+                    {
+                        CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.KeycardO5:
                     break;
