@@ -16,9 +16,10 @@ public class ClassicEvent : SpecialEvent
         throw new NotImplementedException();
     }
 
-    public override SpecialEventType EventType { get; } = SpecialEventType.ClassicEvent;
-    public override string LocalizedName { get; } = "ClassicEvent";
-    public override string TriggerRequirement { get; } = "不可";
+    public override SpecialEventType EventType => SpecialEventType.ClassicEvent;
+    public override string LocalizedName => "ClassicEvent";
+    public override string TriggerRequirement => "不可";
+
     public override bool IsReadyToExecute()
     {
         return false;

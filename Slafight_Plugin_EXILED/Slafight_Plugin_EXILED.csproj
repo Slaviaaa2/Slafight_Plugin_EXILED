@@ -224,6 +224,7 @@
         <Compile Include="Commands\DevTools\AddQueue.cs" />
         <Compile Include="Commands\DevTools\DebugStart.cs" />
         <Compile Include="Commands\DevTools\GetQueue.cs" />
+        <Compile Include="Commands\DevTools\GiveItem.cs" />
         <Compile Include="Commands\DevTools\ObjectPrefabTools.cs" />
         <Compile Include="Commands\DevTools\RunEvent.cs" />
         <Compile Include="Commands\DevTools\SetQueue.cs" />
@@ -300,6 +301,7 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\ThrowableScp244.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Toolbox.cs" />
         <Compile Include="CustomMaps\Communications.cs" />
         <Compile Include="CustomMaps\DailyCassieAnnounce.cs" />

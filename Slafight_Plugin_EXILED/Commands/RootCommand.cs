@@ -25,6 +25,7 @@ public class RootCommand : ParentCommand
         RegisterCommand(new RunEvent());
         RegisterCommand(new SpawnUniversal());
         RegisterCommand(new AbilityUniversal());
+        RegisterCommand(new GiveItem());
         RegisterCommand(new SpawnBuiltInPrefab());
         RegisterCommand(new SpawnObjectPrefab());
         RegisterCommand(new SpawnWave());

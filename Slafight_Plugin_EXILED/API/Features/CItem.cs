@@ -160,6 +160,10 @@ public abstract class CItem
         UniqueKeyToItem[uniqueKey] = instance;
         Log.Debug($"CItem.OverrideItemInstance: {uniqueKey} -> {instance.GetType().Name}");
     }
+    
+    /// <summary>登録済みすべての CItem インスタンスを readonly で返す。</summary>
+    public static IReadOnlyCollection<CItem> GetAllInstances()
+        => RegisteredInstances;
 
     // ==== 派生クラスが実装/上書きするメタ情報 ====
 

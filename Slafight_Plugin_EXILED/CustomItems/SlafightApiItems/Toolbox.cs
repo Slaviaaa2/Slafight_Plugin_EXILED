@@ -14,10 +14,10 @@ namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 
 public class Toolbox : CItem
 {
-    public override string DisplayName { get; } = "Toolbox";
-    public override string Description { get; } = "様々な作業を行うことができる便利な工具箱。\nTキーで使う機能を切り替えられる。";
-    protected override string UniqueKey { get; } = "Toolbox";
-    protected override ItemType BaseItem { get; } = ItemType.Coin;
+    public override string DisplayName => "Toolbox";
+    public override string Description => "様々な作業を行うことができる便利な工具箱。\nTキーで使う機能を切り替えられる。";
+    protected override string UniqueKey => "Toolbox";
+    protected override ItemType BaseItem => ItemType.Coin;
 
     public enum UtilType
     {
