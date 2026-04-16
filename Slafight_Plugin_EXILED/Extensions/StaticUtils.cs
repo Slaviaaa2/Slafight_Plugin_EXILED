@@ -283,4 +283,15 @@ public static class StaticUtils
 
         return (localPos, localRot.eulerAngles);
     }
+    
+    public static void LogHierarchy(Transform parent, int level)
+    {
+        string indent = new string(' ', level * 2);  // インデント作成
+        Log.Debug($"{indent + parent.name}, {parent.gameObject}");
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            LogHierarchy(parent.GetChild(i), level + 1);
+        }
+    }
 }
