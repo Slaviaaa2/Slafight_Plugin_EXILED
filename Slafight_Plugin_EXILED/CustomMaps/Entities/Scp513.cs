@@ -4,6 +4,7 @@ using MEC;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using UnityEngine;
+using Utils.NonAllocLINQ;
 
 namespace Slafight_Plugin_EXILED.CustomMaps.Entities;
 
@@ -32,26 +33,35 @@ public static class Scp513
     public static void AddTarget(Player? player)
     {
         if (player == null) return;
-        StalkingTargets.Add(player);
+        StalkingTargets.AddIfNotContains(player);
     }
 
     private static IEnumerator<float> Scp513Coroutine()
     {
-        List<SchematicObject> _instances = [];
+        List<SchematicObject> instances = [];
+
         while (true)
         {
-            if (Round.IsLobby)
+            if (RoundSummary.SummaryActive)
                 yield break;
-            
-            _instances.ForEach(instance => instance.Destroy());
-            _instances.Clear();
+
+            // 既存インスタンス破棄
+            instances.ForEach(instance =>
+            {
+                if (instance != null)
+                    instance.Destroy();
+            });
+            instances.Clear();
+            yield return Timing.WaitForSeconds(Random.Range(8f, 15f));
             foreach (var player in StalkingTargets.ToArray())
             {
                 if (player == null || !player.IsConnected || !player.IsAlive)
                     continue;
 
-                Vector3 spawnPos = player.Position - player.Transform.forward * 10f;
+                // プレイヤーの前方10m
+                Vector3 spawnPos = player.Position + player.Transform.forward * 7.5f;
 
+                // プレイヤーの方を向く（Y回転のみ）
                 Vector3 lookDir = player.Position - spawnPos;
                 lookDir.y = 0f;
 
@@ -61,11 +71,14 @@ public static class Scp513
                 Quaternion playerLookRotation = Quaternion.LookRotation(lookDir.normalized, Vector3.up);
 
                 var obj = ObjectSpawner.SpawnSchematic("SCP513", spawnPos, playerLookRotation);
+                if (obj == null)
+                    continue;
+
                 obj.transform.SetParent(player.Transform, true);
-                _instances.Add(obj);
+                instances.Add(obj);
             }
 
-            yield return Timing.WaitForSeconds(Random.Range(8f, 15f));
+            yield return Timing.WaitForSeconds(Random.Range(2f, 7f));
         }
     }
 }

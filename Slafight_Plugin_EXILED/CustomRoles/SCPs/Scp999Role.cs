@@ -22,13 +22,13 @@ public class Scp999Role : CRole
 
     public override void RegisterEvents()
     {
-        Exiled.Events.Handlers.Player.SpawningRagdoll += CencellRagdoll;
+        Exiled.Events.Handlers.Player.SpawningRagdoll += CancelRagdoll;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
-        Exiled.Events.Handlers.Player.SpawningRagdoll -= CencellRagdoll;
+        Exiled.Events.Handlers.Player.SpawningRagdoll -= CancelRagdoll;
         base.UnregisterEvents();
     }
 
@@ -48,14 +48,14 @@ public class Scp999Role : CRole
 
         player.Position = Door.Get(DoorType.Scp173NewGate).Position + new Vector3(0f, 1f, 0f);
         
-        Timing.CallDelayed(0.05f, () =>
+        Timing.CallDelayed(0.045f, () =>
         {
             LabApiHandler.Schem999(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
             player.ShowHint("<size=24><color=#FF1493>SCP-999</color>\n全員とたわむれましょう！\n※勝敗には影響しません。可愛いペット的にふるまって\n攻撃してきた奴らに痛い一撃を喰らわせてやりましょう。", 10f);
         });
     }
     
-    private void CencellRagdoll(SpawningRagdollEventArgs ev)
+    private void CancelRagdoll(SpawningRagdollEventArgs ev)
     {
         if (Check(ev.Player))
             ev.IsAllowed = false;
@@ -63,7 +63,7 @@ public class Scp999Role : CRole
 
     protected override void OnDying(DyingEventArgs ev)
     {
-        CassieHelper.AnnounceTermination(ev, "SCP 9 9 9", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 9 9 9", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 }

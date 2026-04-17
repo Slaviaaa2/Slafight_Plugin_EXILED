@@ -64,6 +64,8 @@ public class Toolbox : CItem
     {
         var schem = ObjectSpawner.SpawnSchematic("ToolboxModel", ev.Pickup.Position, ev.Pickup.Rotation);
         schem.transform.SetParent(ev.Pickup.Transform);
+        schem.transform.localPosition = Vector3.zero;
+        schem.transform.localRotation = Quaternion.identity;
         base.OnPickupAdded(ev);
     }
 
@@ -125,24 +127,17 @@ public class Toolbox : CItem
         if (stats.SelectedUtilType is UtilType.Work)
         {
             if (ev.Door is not BreakableDoor breakableDoor) return;
-            if (!breakableDoor.IsBreakable) return;
-            if (breakableDoor.IsDestroyed)
-            {
-                breakableDoor.Repair();
-            }
-            else
-            {
-                breakableDoor.Break();
-            }
+            if (breakableDoor.IsDestroyed) return;
+            breakableDoor.Break();
+            Timing.RunCoroutine(CooldownCoroutine(ev.Player));
         }
         else
         {
             if (ev.Door.IsLocked) return;
             ev.Door.IsOpen = false;
             ev.Door.Lock(30f, DoorLockType.Lockdown079);
+            Timing.RunCoroutine(CooldownCoroutine(ev.Player));
         }
-
-        Timing.RunCoroutine(CooldownCoroutine(ev.Player));
     }
 
     private void OnCoin(FlippingCoinEventArgs ev)
@@ -157,16 +152,8 @@ public class Toolbox : CItem
             {
                 var door = list.First();
                 if (door is not BreakableDoor breakableDoor) return;
-                if (!breakableDoor.IsBreakable) return;
-                if (breakableDoor.IsDestroyed)
-                {
-                    breakableDoor.Repair();
-                }
-                else
-                {
-                    breakableDoor.Break();
-                }
-
+                if (!breakableDoor.IsDestroyed) return;
+                breakableDoor.Repair();
                 Timing.RunCoroutine(CooldownCoroutine(ev.Player));
             }
         }

@@ -42,7 +42,7 @@ public class Scp513Item : CItem
 
     protected override void OnWaitingForPlayers()
     {
-        Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up * 0.75f));
+        // Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up * 0.75f));
         base.OnWaitingForPlayers();
     }
 
@@ -50,6 +50,8 @@ public class Scp513Item : CItem
     {
         var schem = ObjectSpawner.SpawnSchematic("SCP513ItemModel", ev.Pickup.Position, ev.Pickup.Rotation);
         schem.transform.SetParent(ev.Pickup.Transform);
+        schem.transform.localPosition = Vector3.zero;
+        schem.transform.localRotation = Quaternion.identity;
         base.OnPickupAdded(ev);
     }
 

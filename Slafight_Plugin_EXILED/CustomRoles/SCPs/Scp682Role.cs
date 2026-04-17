@@ -62,6 +62,7 @@ public class Scp682Role : CRole
         {
             yield return Timing.WaitForSeconds(0.25f);
             elapsed += 0.25f;
+            if (!Check(player)) yield break;
         }
 
         yield return Timing.WaitForSeconds(0.05f);

@@ -50,7 +50,7 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
-        Spawn(Locker.Random(ZoneType.HeavyContainment)!.Position + Vector3.up * 0.75f);
+        // Spawn(Locker.Random(ZoneType.HeavyContainment)!.Position + Vector3.up * 0.75f);
         base.OnWaitingForPlayers();
     }
 
