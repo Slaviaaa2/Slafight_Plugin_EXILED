@@ -1,6 +1,6 @@
 # Slafight_Plugin_EXILED
 
-**Version:** `v1.7.2.1` | **Framework:** `EXILED v9.13.1` 
+**Version:** `v1.7.5.2` | **Framework:** `EXILED v9.13.3` 
 
 SCP: Secret LaboratoryのEXILEDフレームワークで動作する、自サーバー向けの大型拡張プラグインです。
 
