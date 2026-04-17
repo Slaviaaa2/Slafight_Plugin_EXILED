@@ -301,20 +301,27 @@
         <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
         <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\Scp513Item.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ThrowableScp244.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Toolbox.cs" />
         <Compile Include="CustomMaps\Communications.cs" />
-        <Compile Include="CustomMaps\DailyCassieAnnounce.cs" />
-        <Compile Include="CustomMaps\DocumentDictionary.cs" />
+        <Compile Include="CustomMaps\Entities\Scp513.cs" />
+        <Compile Include="CustomMaps\Features\DailyCassieAnnounce.cs" />
+        <Compile Include="CustomMaps\Features\DocumentDictionary.cs" />
+        <Compile Include="CustomMaps\Features\OmegaWarhead.cs" />
+        <Compile Include="CustomMaps\Features\Scp012_033.cs" />
+        <Compile Include="CustomMaps\Features\Sinkhole.cs" />
+        <Compile Include="CustomMaps\Features\TerminalRift.cs" />
+        <Compile Include="CustomMaps\Features\TrainComing.cs" />
+        <Compile Include="CustomMaps\Features\VentControl.cs" />
+        <Compile Include="CustomMaps\Features\WarheadBoomEffectHandler.cs" />
+        <Compile Include="CustomMaps\Features\WarheadBoomEffectUtil.cs" />
         <Compile Include="CustomMaps\GateAEnding.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Document.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Vent.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\WarheadBoomEffect.cs" />
-        <Compile Include="CustomMaps\VentControl.cs" />
-        <Compile Include="CustomMaps\WarheadBoomEffectHandler.cs" />
-        <Compile Include="CustomMaps\WarheadBoomEffectUtil.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosPenal.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosCommando.cs" />
         <Compile Include="CustomRoles\ChaosInsurgency\ChaosSignal.cs" />
@@ -388,12 +395,7 @@
         <Compile Include="CustomMaps\CustomMapMainHandler.cs" />
         <Compile Include="CustomMaps\MapFlags.cs" />
         <Compile Include="CustomMaps\MapGuardHandler.cs" />
-        <Compile Include="CustomMaps\OmegaWarhead.cs" />
         <Compile Include="CustomMaps\PDEx.cs" />
-        <Compile Include="CustomMaps\Scp012_033.cs" />
-        <Compile Include="CustomMaps\Sinkhole.cs" />
-        <Compile Include="CustomMaps\TerminalRift.cs" />
-        <Compile Include="CustomMaps\TrainComing.cs" />
         <Compile Include="API\Enums\CRoleTypeId.cs" />
         <Compile Include="API\Enums\SpawnTypeId.cs" />
         <Compile Include="API\Enums\SpecialEventType.cs" />
@@ -447,9 +449,6 @@
     <ItemGroup>
         <None Include="App.config" />
         <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="CustomMaps\CRoom\" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />

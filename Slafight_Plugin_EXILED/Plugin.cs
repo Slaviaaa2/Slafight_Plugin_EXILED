@@ -15,6 +15,8 @@ using HarmonyLib;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.CustomMaps;
+using Slafight_Plugin_EXILED.CustomMaps.Entities;
+using Slafight_Plugin_EXILED.CustomMaps.Features;
 using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.Hints;
@@ -122,6 +124,7 @@ public class Plugin : Plugin<Config>
         WarheadBoomEffectHandler.Register();
         Communications.Register();
         Scp914Changes.Register();
+        Scp513.Register();
             
         UnitPackBootstrap.RegisterAllPacks();
         SpawnContextBootstrap.RegisterAllContexts(SpawnSystem.Config);
@@ -200,6 +203,7 @@ public class Plugin : Plugin<Config>
         WarheadBoomEffectHandler.Unregister();
         Communications.Unregister();
         Scp914Changes.Unregister();
+        Scp513.Unregister();
         
         DebugModeHandler.Unregister();
             

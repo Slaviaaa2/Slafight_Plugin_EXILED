@@ -245,7 +245,7 @@ public class EventHandler
 
             Timing.CallDelayed(5f, () =>
             {
-                if (!Round.InProgress) return;
+                if (Round.IsLobby) return;
 
                 foreach (var door in Door.List)
                 {

@@ -5,8 +5,11 @@ using System.Text;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using MEC;
+using ProjectMER.Features;
+using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 
@@ -55,6 +58,20 @@ public class Toolbox : CItem
         foreach (var h in HintLoopHandles.Values) Timing.KillCoroutines(h);
         HintLoopHandles.Clear();
         ToolboxStatsMap.Clear();
+    }
+
+    protected override void OnPickupAdded(PickupAddedEventArgs ev)
+    {
+        var schem = ObjectSpawner.SpawnSchematic("ToolboxModel", ev.Pickup.Position, ev.Pickup.Rotation);
+        schem.transform.SetParent(ev.Pickup.Transform);
+        base.OnPickupAdded(ev);
+    }
+
+    protected override void OnPickupDestroyed(PickupDestroyedEventArgs ev)
+    {
+        var schem = ev.Pickup.GameObject.GetComponentInChildren<SchematicObject>();
+        schem.Destroy();
+        base.OnPickupDestroyed(ev);
     }
 
     private static void OnPlayerLeft(LeftEventArgs ev)

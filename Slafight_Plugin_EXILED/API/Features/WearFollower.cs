@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.MainHandlers;
+namespace Slafight_Plugin_EXILED.API.Features;
 
 /// <summary>
 /// Schematic をプレイヤーに追従させる MonoBehaviour。

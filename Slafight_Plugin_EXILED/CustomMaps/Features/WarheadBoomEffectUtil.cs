@@ -4,7 +4,7 @@ using MEC;
 using Slafight_Plugin_EXILED.CustomMaps.ObjectPrefabs;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.CustomMaps;
+namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
 public static class WarheadBoomEffectUtil
 {

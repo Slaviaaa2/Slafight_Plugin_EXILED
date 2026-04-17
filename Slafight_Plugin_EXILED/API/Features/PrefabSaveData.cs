@@ -4,6 +4,8 @@ using System.Text.Json.Serialization;
 using Exiled.API.Enums;
 using UnityEngine;
 
+namespace Slafight_Plugin_EXILED.API.Features;
+
 [Serializable]
 public class PrefabSaveData
 {

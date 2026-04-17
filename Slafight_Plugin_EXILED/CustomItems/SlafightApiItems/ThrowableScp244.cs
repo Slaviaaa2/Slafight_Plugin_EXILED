@@ -4,12 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Lockers;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp914;
 using InventorySystem.Items.Usables.Scp244;
 using MEC;
+using Scp914;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -47,7 +50,24 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
+        Spawn(Locker.Random(ZoneType.HeavyContainment)!.Position + Vector3.up * 0.75f);
         base.OnWaitingForPlayers();
+    }
+
+    protected override void OnUpgradingPickup(UpgradingPickupEventArgs ev)
+    {
+        if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+        {
+            Pickup.CreateAndSpawn(Random.Range(0, 2) is 0 ? ItemType.SCP244a : ItemType.SCP244b, ev.OutputPosition);
+            ev.IsAllowed = false;
+            ev.Pickup.Destroy();
+        }
+        else if (ev.KnobSetting is not Scp914KnobSetting.OneToOne)
+        {
+            ev.IsAllowed = false;
+            ev.Pickup.Destroy();
+        }
+        base.OnUpgradingPickup(ev);
     }
 
     private void OnThrown(ThrownProjectileEventArgs ev)

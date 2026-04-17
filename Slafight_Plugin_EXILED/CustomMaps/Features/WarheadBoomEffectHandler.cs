@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -9,7 +10,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
-namespace Slafight_Plugin_EXILED.CustomMaps;
+namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
 public static class WarheadBoomEffectHandler
 {
@@ -34,8 +35,13 @@ public static class WarheadBoomEffectHandler
     private static void OnDetonated()
     {
         IsBooming = false;
-        if (!Round.InProgress) return;
+        if (Round.IsLobby) return;
         Timing.RunCoroutine(KillCoroutine());
+        foreach (var player in Player.List)
+        {
+            if (player is null || !player.IsAlive) continue;
+            player.EnableEffect(EffectType.Concussed, 255, 5f);
+        }
     }
 
     private static void InvokeCoroutine(StartingEventArgs ev)
@@ -66,7 +72,7 @@ public static class WarheadBoomEffectHandler
 
         while (true)
         {
-            if (!Warhead.IsInProgress || !Round.InProgress) yield break;
+            if (!Warhead.IsInProgress || Round.IsLobby) yield break;
 
             float elapsed            = Time.realtimeSinceStartup - startRealTime;
             float estimatedRemaining = startTimer - elapsed;

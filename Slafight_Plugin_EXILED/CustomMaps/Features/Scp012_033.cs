@@ -5,7 +5,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.CustomMaps;
+namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
 /// <summary>
 /// SCP-012 (Theta Primed) 周辺にいるプレイヤーに「ラジオ使用不可」効果を付与するハンドラ（CustomMap 連動版）。

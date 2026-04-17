@@ -6,7 +6,9 @@ using Exiled.Events.EventArgs.Scp914;
 using MEC;
 using PlayerRoles;
 using Scp914;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
@@ -205,8 +207,14 @@ public static class Scp914Changes
                 case ItemType.SCP2176:
                     break;
                 case ItemType.SCP244a:
+                    CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
+                    ev.IsAllowed = false;
+                    ev.Pickup.Destroy();
                     break;
                 case ItemType.SCP244b:
+                    CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
+                    ev.IsAllowed = false;
+                    ev.Pickup.Destroy();
                     break;
                 case ItemType.SCP1853:
                     break;

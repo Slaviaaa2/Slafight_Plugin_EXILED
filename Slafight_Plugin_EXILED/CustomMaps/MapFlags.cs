@@ -1,4 +1,5 @@
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.CustomMaps.Features;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomMaps;

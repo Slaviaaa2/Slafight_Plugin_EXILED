@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using MEC;
 
-namespace Slafight_Plugin_EXILED.CustomMaps;
+namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
 /// <summary>
 /// SCP財団 Site-02 イースターエッグ放送システム

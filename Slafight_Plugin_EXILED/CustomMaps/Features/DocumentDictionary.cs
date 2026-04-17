@@ -1,6 +1,6 @@
 using System;
 
-namespace Slafight_Plugin_EXILED.CustomMaps;
+namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
 public static class DocumentDictionary
 {
