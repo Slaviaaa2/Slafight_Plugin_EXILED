@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
 using MEC;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Utils.NonAllocLINQ;
 
@@ -13,11 +16,13 @@ public static class Scp513
     public static void Register()
     {
         Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingPlayers;
+        Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
     }
 
     public static void Unregister()
     {
         Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingPlayers;
+        Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;
     }
 
     private static readonly List<Player> StalkingTargets = [];
@@ -30,10 +35,25 @@ public static class Scp513
         Scp513CoroutineHandle = Timing.RunCoroutine(Scp513Coroutine());
     }
 
+    private static void OnChangingRole(ChangingRoleEventArgs ev)
+    {
+        Timing.CallDelayed(1f, () =>
+        {
+            if (!ev.IsAllowed) return;
+            RemoveTarget(ev.Player);
+        });
+    }
+
     public static void AddTarget(Player? player)
     {
         if (player == null) return;
         StalkingTargets.AddIfNotContains(player);
+    }
+    
+    public static void RemoveTarget(Player? player)
+    {
+        if (player == null) return;
+        StalkingTargets.Remove(player);
     }
 
     private static IEnumerator<float> Scp513Coroutine()
@@ -48,8 +68,9 @@ public static class Scp513
             // 既存インスタンス破棄
             instances.ForEach(instance =>
             {
-                if (instance != null)
-                    instance.Destroy();
+                if (instance == null) return;
+                instance.NetworkIdentities.ToList().ForEach(netId => netId.RemoveShowState());
+                instance.Destroy();
             });
             instances.Clear();
             yield return Timing.WaitForSeconds(Random.Range(8f, 15f));
@@ -75,6 +96,8 @@ public static class Scp513
                     continue;
 
                 obj.transform.SetParent(player.Transform, true);
+                obj.NetworkIdentities.ToList().ForEach(netId => netId.InitShowState());
+                obj.NetworkIdentities.ToList().ForEach(netId => netId.SetShowState(player, true));
                 instances.Add(obj);
             }
 

@@ -207,14 +207,20 @@ public static class Scp914Changes
                 case ItemType.SCP2176:
                     break;
                 case ItemType.SCP244a:
-                    CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
-                    ev.IsAllowed = false;
-                    ev.Pickup.Destroy();
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine or Scp914KnobSetting.VeryFine)
+                    {
+                        CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.SCP244b:
-                    CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
-                    ev.IsAllowed = false;
-                    ev.Pickup.Destroy();
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine or Scp914KnobSetting.VeryFine)
+                    {
+                        CItem.Get<ThrowableScp244>()?.Spawn(ev.OutputPosition);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.SCP1853:
                     break;
