@@ -135,7 +135,10 @@ public class Toolbox : CItem
         {
             if (ev.Door.IsLocked) return;
             ev.Door.IsOpen = false;
-            ev.Door.Lock(30f, DoorLockType.Lockdown079);
+            Timing.CallDelayed(0.5f, () =>
+            {
+                ev.Door.Lock(30f, DoorLockType.Lockdown079);
+            });
             Timing.RunCoroutine(CooldownCoroutine(ev.Player));
         }
     }
