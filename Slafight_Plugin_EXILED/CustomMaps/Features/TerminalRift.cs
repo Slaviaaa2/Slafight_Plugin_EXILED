@@ -149,7 +149,7 @@ public static class TerminalRift
             return;
         }
         
-        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, RiftObject.transform, false, 30f, 0);
 
         _animCoroutineHandle = Timing.RunCoroutine(AnimSet());
         _timeoutHandle = Timing.CallDelayed(50f, () => ForceReset("timeout"));
@@ -229,7 +229,7 @@ public static class TerminalRift
         if (!Invoking) yield break;
 
         yield return Timing.WaitForSeconds(0.2f);
-        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, RiftObject.transform, false, 30f, 0);
 
         if (Round.IsLobby || Round.IsEnded)
         {
@@ -241,19 +241,19 @@ public static class TerminalRift
 
         if (!Invoking) yield break;
 
-        if (RiftObject?.gameObject == null)
+        if (RiftObject.gameObject == null)
         {
             ForceReset("rift destroyed before up anim");
             yield break;
         }
 
-        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+        CreateAndPlayAudio("Moving.ogg", "RiftElevator", RiftObjectPosition, true, RiftObject.transform, false, 30f, 0);
         yield return Timing.WaitUntilDone(AnimToPosition(RiftObject.Position, RiftObjectPosition, 15f));
 
         if (!Invoking) yield break;
 
         yield return Timing.WaitForSeconds(0.2f);
-        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, null, false, 30f, 0);
+        CreateAndPlayAudio("Beep.ogg", "RiftElevator", RiftObjectPosition, true, RiftObject.transform, false, 30f, 0);
         
         Invoking = false;
     }

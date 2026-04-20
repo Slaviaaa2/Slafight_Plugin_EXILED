@@ -137,7 +137,7 @@ public class DninoueMissile : CustomKeycard
                         player.EnableEffect(EffectType.Ghostly, 255, 5f);
                         player.EnableEffect(EffectType.DamageReduction, 255, 5f);
                         pushPlayer?.ShowHitMarker();
-                        CreateAndPlayAudio("healsound.ogg", "Nyaaaaa", player.Position, true, null, false, 5f, 0f);
+                        CreateAndPlayAudio("healsound.ogg", "Nyaaaaa", player.Position, true, schem.transform, false, 5f, 0f);
                     }
                     catch (Exception ex)
                     {

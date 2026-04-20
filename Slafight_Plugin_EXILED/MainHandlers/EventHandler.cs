@@ -43,7 +43,7 @@ public class EventHandler
         ServerHandler.RoundStarted += OnRoundStarted;
         ServerHandler.ReloadedPlugins += OnPluginLoad;
 
-        MapHandler.Decontaminating += DeconCancell;
+        MapHandler.Decontaminating += DeconCancel;
 
         PlayerHandler.ChangingRole += OnChangingRole;
         PlayerHandler.InteractingDoor += DoorGet;
@@ -51,7 +51,7 @@ public class EventHandler
         PlayerHandler.Hurting += OnHurting;
         PlayerHandler.Dying += OnDying;
         
-        WarheadHandler.DeadmanSwitchInitiating += DeadmanCancell;
+        WarheadHandler.DeadmanSwitchInitiating += DeadmanCancel;
     }
 
     ~EventHandler()
@@ -62,7 +62,7 @@ public class EventHandler
         ServerHandler.RoundStarted -= OnRoundStarted;
         ServerHandler.ReloadedPlugins -= OnPluginLoad;
 
-        MapHandler.Decontaminating -= DeconCancell;
+        MapHandler.Decontaminating -= DeconCancel;
 
         PlayerHandler.ChangingRole -= OnChangingRole;
         PlayerHandler.InteractingDoor -= DoorGet;
@@ -70,7 +70,7 @@ public class EventHandler
         PlayerHandler.Hurting -= OnHurting;
         PlayerHandler.Dying -= OnDying;
 
-        WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancell;
+        WarheadHandler.DeadmanSwitchInitiating -= DeadmanCancel;
     }
 
     public bool DeadmanDisable = false;
@@ -201,12 +201,6 @@ public class EventHandler
             player.ShowHint("");
             player.InitPlayerFlags();
         }
-        foreach (var door in Door.List)
-        {
-            if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.NuclearAttack) break;
-            if (door.Type is DoorType.GateA or DoorType.GateB)
-                door.Lock(120f, DoorLockType.AdminCommand);
-        }
 
         Timing.CallDelayed(1f, () =>
         {
@@ -252,6 +246,12 @@ public class EventHandler
                     if (door.Type != DoorType.Scp173Gate) continue;
                     door.Unlock();
                     door.IsOpen = true;
+                }
+                foreach (var door in Door.List)
+                {
+                    if (SpecialEventsHandler.Instance.NowEvent is SpecialEventType.NuclearAttack or SpecialEventType.SnowWarriersAttack or SpecialEventType.CandyWarriersAttack or SpecialEventType.FacilityTermination or SpecialEventType.SergeyMakarovReturns) break;
+                    if (door.Type is DoorType.GateA or DoorType.GateB)
+                        door.Lock(120f, DoorLockType.AdminCommand);
                 }
             });
         });
@@ -333,19 +333,19 @@ public class EventHandler
         audioPlayer.AddClip(fileName, destroyOnEnd: destroyOnEnd);
     }
 
-    private void DeadmanCancell(DeadmanSwitchInitiatingEventArgs? ev)
+    private void DeadmanCancel(DeadmanSwitchInitiatingEventArgs? ev)
     {
         if (ev is null) return;
         if (DeadmanDisable)
             ev.IsAllowed = false;
     }
 
-    private void DeconCancell(DecontaminatingEventArgs? ev)
+    private void DeconCancel(DecontaminatingEventArgs? ev)
     {
         if (ev is null) return;
         if (!DeconCancellFlag) return;
         ev.IsAllowed = false;
-        Log.Debug("Decon Cancell called.");
+        Log.Debug("Decon Cancel called.");
     }
 
     /// <summary>

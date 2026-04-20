@@ -135,7 +135,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         InTryNotToCryAnim[ev.Player] = true;
         ev.Player.EnableEffect(EffectType.Slowness, 95);
         ev.Player.EnableEffect(EffectType.DamageReduction, 90);
-        CreateAndPlayAudio("096Angered.ogg", "Scp096", ev.Player.Position, true, null, false, 80f, 0f);
+        CreateAndPlayAudio("096Angered.ogg", "Scp096", ev.Player.Position, true, ev.Player.Transform, false, 80f, 0f);
         Timing.CallDelayed(35f, () =>
         {
             if (!Check(ev.Player)) return;
