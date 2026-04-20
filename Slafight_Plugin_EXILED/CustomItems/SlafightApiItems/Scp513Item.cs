@@ -42,7 +42,7 @@ public class Scp513Item : CItem
 
     protected override void OnWaitingForPlayers()
     {
-        // Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up * 0.75f));
+        Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up * 0.75f)); // TODO: DISABLE IN NEW HCZ EX
         base.OnWaitingForPlayers();
     }
 
