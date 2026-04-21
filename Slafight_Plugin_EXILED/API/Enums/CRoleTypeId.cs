@@ -82,4 +82,5 @@ public enum CRoleTypeId
     Sculpture,
     SergeyMakarov,
     SergeyMakarovAwaken,
+    HideAdmin,
 }

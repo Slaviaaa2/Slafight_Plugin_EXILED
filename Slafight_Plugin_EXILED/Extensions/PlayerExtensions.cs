@@ -310,6 +310,9 @@ public static class PlayerExtensions
             case CRoleTypeId.SergeyMakarovAwaken:
                 new SergeyMakarovAwakenRole().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.HideAdmin:
+                new HideAdmin().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== GoC ====
             case CRoleTypeId.GoCSquadLeader:
                 new GoCSquadLeader().SpawnRole(player, roleSpawnFlags);

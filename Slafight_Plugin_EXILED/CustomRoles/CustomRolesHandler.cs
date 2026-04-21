@@ -231,11 +231,14 @@ public class CustomRolesHandler
         ev.Player!.UniqueRole = null;
         ev.Player.CustomInfo = null;
         ev.Player.Scale = new Vector3(1f, 1f, 1f);
+        ev.Player.IsGodModeEnabled = false;
+        ev.Player.IsNoclipPermitted = false;
+        ev.Player.IsBypassModeEnabled = false;
         ev.Player.ClearCustomInfo();
         ev.Player.DisableAllEffects();
 
         var player = ev.Player;
-        SpecificFlagsManager.Clear(player);
+        player.Clear();
         AbilityManager.ClearSlots(player);
         AbilityBase.RevokeAbility(player.Id);
 
