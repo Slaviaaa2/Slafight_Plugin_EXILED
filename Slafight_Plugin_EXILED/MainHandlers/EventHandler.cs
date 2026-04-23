@@ -249,9 +249,20 @@ public class EventHandler
                 }
                 foreach (var door in Door.List)
                 {
-                    if (SpecialEventsHandler.Instance.NowEvent is SpecialEventType.NuclearAttack or SpecialEventType.SnowWarriersAttack or SpecialEventType.CandyWarriersAttack or SpecialEventType.FacilityTermination or SpecialEventType.SergeyMakarovReturns) break;
+                    List<SpecialEventType> a = [
+                        SpecialEventType.NuclearAttack,
+                        SpecialEventType.SnowWarriersAttack,
+                        SpecialEventType.CandyWarriersAttack,
+                        SpecialEventType.FacilityTermination,
+                        SpecialEventType.SergeyMakarovReturns
+                    ];
+                    Log.Debug($"[EZ-GATE FIRST DOOR LOCK SEQUENCE]CurrentEvent: {Plugin.Singleton.SpecialEventsHandler.NowEvent}");
+                    if (a.Contains(Plugin.Singleton.SpecialEventsHandler.NowEvent)) break;
                     if (door.Type is DoorType.GateA or DoorType.GateB)
+                    {
+                        Log.Debug("[EZ-GATE FIRST LOCK SEQUENCE]Locked Down Gate-A & B!");
                         door.Lock(120f, DoorLockType.AdminCommand);
+                    }
                 }
             });
         });
