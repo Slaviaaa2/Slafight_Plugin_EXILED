@@ -26,7 +26,9 @@ public class ThrowableScp244 : CItem
     public override string Description => "投擲して使用することができるSCP-244";
     protected override string UniqueKey => "Scp244-Throwable";
     protected override ItemType BaseItem => ItemType.GrenadeFlash;
-    
+    protected override bool PickupLightEnabled => true;
+    protected override Color PickupLightColor => Color.yellow;
+
     private static readonly Dictionary<Projectile, Scp244Pickup>? TrackedPickups = new();
     private static readonly Dictionary<Projectile, CoroutineHandle> TrackedCoroutines = new();
 

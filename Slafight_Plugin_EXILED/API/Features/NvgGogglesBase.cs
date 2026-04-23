@@ -33,7 +33,7 @@ public abstract class NvgGogglesBase : CustomGoggles
     // 内部状態
     // --------------------------------------------------------
 
-    private readonly Dictionary<Pickup, Light> _activeLights = new();
+    private readonly Dictionary<ushort, Light> _activeLights = new();
 
     // --------------------------------------------------------
     // イベント購読
@@ -95,7 +95,7 @@ public abstract class NvgGogglesBase : CustomGoggles
 
             light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);
 
-            _activeLights[ev.Pickup] = light;
+            _activeLights[ev.Pickup.Serial] = light;
         }
         catch (Exception ex)
         {
@@ -107,9 +107,7 @@ public abstract class NvgGogglesBase : CustomGoggles
     {
         if (ev?.Pickup == null) return;
         if (!Check(ev.Pickup)) return;
-        if (ev.Pickup.Base?.gameObject == null) return;
-        if (!TryGet(ev.Pickup.Serial, out var ci) || ci == null) return;
-        if (!_activeLights.TryGetValue(ev.Pickup, out var light)) return;
+        if (!_activeLights.TryGetValue(ev.Pickup.Serial, out var light)) return;
 
         if (light?.Base != null)
         {
@@ -117,6 +115,6 @@ public abstract class NvgGogglesBase : CustomGoggles
             catch (Exception ex) { Log.Warn($"[{Name}] RemoveGlow Destroy 失敗: {ex.Message}"); }
         }
 
-        _activeLights.Remove(ev.Pickup);
+        _activeLights.Remove(ev.Pickup.Serial);
     }
 }

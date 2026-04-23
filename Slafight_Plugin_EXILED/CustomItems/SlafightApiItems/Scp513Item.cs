@@ -27,6 +27,8 @@ public class Scp513Item : CItem
     public override string Description => "???";
     protected override string UniqueKey => "Scp513Item";
     protected override ItemType BaseItem => ItemType.Coin;
+    protected override bool PickupLightEnabled => true;
+    protected override Color PickupLightColor => Color.gray;
 
     public override void RegisterEvents()
     {

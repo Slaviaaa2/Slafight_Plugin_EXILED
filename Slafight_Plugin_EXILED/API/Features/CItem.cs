@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using MEC;
+using Mirror;
 using UnityEngine;
 
 using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -38,6 +39,9 @@ public abstract class CItem
 
     // 追跡中のシリアル → インスタンス
     private static readonly Dictionary<ushort, CItem> SerialToItem = new();
+
+    // Pickup の Light オブジェクト管理: Serial → Light
+    private static readonly Dictionary<ushort, Exiled.API.Features.Toys.Light> PickupLights = new();
 
     private static bool _eventsSubscribed;
 
@@ -194,6 +198,23 @@ public abstract class CItem
 
     /// <summary>選択（手に持つ）したときに Hint を自動表示するか。</summary>
     protected virtual bool ShowSelectedHint => true;
+
+    // ==== Pickup ライト制御 ====
+
+    /// <summary>Pickup にライトを表示するか。</summary>
+    protected virtual bool PickupLightEnabled => false;
+
+    /// <summary>Pickup ライトの色。</summary>
+    protected virtual Color PickupLightColor => Color.white;
+
+    /// <summary>Pickup ライトの明度（輝度）。</summary>
+    protected virtual float PickupLightIntensity => 1f;
+
+    /// <summary>Pickup ライトの光の範囲。</summary>
+    protected virtual float PickupLightRange => 10f;
+
+    /// <summary>Pickup ライトの影の種類。</summary>
+    protected virtual LightShadows PickupLightShadowType => LightShadows.None;
 
     /// <summary>拾った瞬間に出す Hint メッセージを生成。</summary>
     protected virtual string BuildPickedUpMessage()
@@ -619,7 +640,28 @@ public abstract class CItem
     private static void OnAnyPickupAdded(MapEvents.PickupAddedEventArgs ev)
     {
         if (ev?.Pickup == null) return;
-        Dispatch(ev.Pickup.Serial, ci => ci.OnPickupAdded(ev), nameof(OnPickupAdded));
+
+        if (!SerialToItem.TryGetValue(ev.Pickup.Serial, out var ci) || ci == null) return;
+
+        try { ci.OnPickupAdded(ev); }
+        catch (Exception ex) { Log.Error($"CItem.OnPickupAdded error in {ci.GetType().Name}: {ex}"); }
+
+        // Pickup ライトの作成・設定
+        try
+        {
+            if (ci.PickupLightEnabled && ev.Pickup?.Base?.gameObject != null)
+            {
+                var light = Exiled.API.Features.Toys.Light.Create(ev.Pickup.Position);
+                light.Color = ci.PickupLightColor;
+                light.Intensity = ci.PickupLightIntensity;
+                light.Range = ci.PickupLightRange;
+                light.ShadowType = ci.PickupLightShadowType;
+                light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);
+
+                PickupLights[ev.Pickup.Serial] = light;
+            }
+        }
+        catch (Exception ex) { Log.Error($"CItem.OnPickupAdded(light) error in {ci.GetType().Name}: {ex}"); }
     }
 
     private static void OnAnyPickupDestroyed(MapEvents.PickupDestroyedEventArgs ev)
@@ -630,6 +672,17 @@ public abstract class CItem
 
         try { ci.OnPickupDestroyed(ev); }
         catch (Exception ex) { Log.Error($"CItem.OnPickupDestroyed error in {ci.GetType().Name}: {ex}"); }
+
+        // Pickup ライトの破棄
+        if (PickupLights.TryGetValue(ev.Pickup.Serial, out var light))
+        {
+            if (light?.Base?.gameObject != null)
+            {
+                try { NetworkServer.Destroy(light.Base.gameObject); }
+                catch (Exception ex) { Log.Error($"CItem.OnPickupDestroyed(light) error in {ci.GetType().Name}: {ex}"); }
+            }
+            PickupLights.Remove(ev.Pickup.Serial);
+        }
 
         // PickupDestroyed は「プレイヤーが拾って pickup が消えた」時にも発火するため、
         // ここで SerialToItem を即削除すると同じ CItem が拾われた瞬間に追跡が切れる。
@@ -651,6 +704,17 @@ public abstract class CItem
     private static void OnAnyWaitingForPlayers()
     {
         SerialToItem.Clear();
+
+        // 残存する Pickup ライトを破棄
+        foreach (var light in PickupLights.Values)
+        {
+            if (light?.Base?.gameObject != null)
+            {
+                try { NetworkServer.Destroy(light.Base.gameObject); }
+                catch (Exception ex) { Log.Error($"CItem.OnWaitingForPlayers(light) cleanup error: {ex}"); }
+            }
+        }
+        PickupLights.Clear();
 
         foreach (var ci in RegisteredInstances.ToList())
         {

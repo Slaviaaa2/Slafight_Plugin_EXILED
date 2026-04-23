@@ -21,6 +21,8 @@ public class Toolbox : CItem
     public override string Description => "様々な作業を行うことができる便利な工具箱。\nTキーで使う機能を切り替えられる。";
     protected override string UniqueKey => "Toolbox";
     protected override ItemType BaseItem => ItemType.Coin;
+    protected override bool PickupLightEnabled => true;
+    protected override Color PickupLightColor => Color.yellow;
 
     public enum UtilType
     {
