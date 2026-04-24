@@ -12,6 +12,7 @@ using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using InventorySystem.Items.Usables.Scp244;
 using MEC;
+using PlayerRoles;
 using Scp914;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
@@ -52,7 +53,13 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
-        Spawn(Locker.Random(ZoneType.HeavyContainment)!.Position + Vector3.up * 0.75f); // TODO: DISABLE IN NEW HCZ EX
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
+        Timing.CallDelayed(0.2f, () =>
+        {
+            Give(npc);
+            npc.Handcuff();
+            npc.LateDestroy(0.1f);
+        });
         base.OnWaitingForPlayers();
     }
 

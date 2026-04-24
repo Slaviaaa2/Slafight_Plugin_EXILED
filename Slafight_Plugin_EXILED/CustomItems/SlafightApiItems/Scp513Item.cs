@@ -11,6 +11,7 @@ using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Usables.Scp244;
 using MEC;
+using PlayerRoles;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.API.Features;
@@ -44,7 +45,13 @@ public class Scp513Item : CItem
 
     protected override void OnWaitingForPlayers()
     {
-        Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up * 0.75f)); // TODO: DISABLE IN NEW HCZ EX
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczHid).WorldPosition(Vector3.up));
+        Timing.CallDelayed(0.2f, () =>
+        {
+            Give(npc);
+            npc.Handcuff();
+            npc.LateDestroy(0.1f);
+        });
         base.OnWaitingForPlayers();
     }
 
