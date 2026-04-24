@@ -57,8 +57,11 @@ public class ThrowableScp244 : CItem
         Timing.CallDelayed(0.6f, () =>
         {
             Get<ThrowableScp244>()?.Give(npc);
-            npc.Handcuff();
-            npc.LateDestroy(1f);
+            Timing.CallDelayed(1f, () =>
+            {
+                npc.Handcuff();
+                npc.LateDestroy(1f);
+            });
         });
         base.OnWaitingForPlayers();
     }
