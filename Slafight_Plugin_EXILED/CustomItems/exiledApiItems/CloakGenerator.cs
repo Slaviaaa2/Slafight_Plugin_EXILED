@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using CustomPlayerEffects;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Mirror;
+using Scp914;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
@@ -41,6 +44,17 @@ public class CloakGenerator : CustomItem
         Exiled.Events.Handlers.Map.PickupAdded -= AddGlow;
         Exiled.Events.Handlers.Map.PickupDestroyed -= RemoveGlow;
         base.UnsubscribeEvents();
+    }
+
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        if (ev.KnobSetting is Scp914KnobSetting.Coarse or Scp914KnobSetting.Rough)
+        {
+            Pickup.CreateAndSpawn(ItemType.SCP268, ev.OutputPosition);
+            ev.IsAllowed = false;
+            ev.Item.DestroySelf();
+        }
+        base.OnUpgrading(ev);
     }
 
     private void OnWearing(UsingItemCompletedEventArgs ev)

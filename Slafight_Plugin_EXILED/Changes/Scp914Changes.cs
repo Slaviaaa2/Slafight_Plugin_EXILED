@@ -35,9 +35,91 @@ public static class Scp914Changes
     private static void Normal(UpgradingPickupEventArgs ev)
     {
         if (ev.Pickup == null) return;
+        if (Random.Next(0, 6) is 0)
+        {
+            switch (Random.Next(0, 10))
+            {
+                case 0:
+                    CItem.Get<Scp513Item>()?.Spawn(ev.OutputPosition);
+                    break;
+                case 1:
+                    CustomItemExtensions.TrySpawn<CapybaraMissile>(ev.OutputPosition, out _);
+                    break;
+            }
+            ev.IsAllowed = false;
+            ev.Pickup.Destroy();
+            return;
+        }
         if (ev.Pickup.TryGetCustomItem(out var customItem))
         {
             // CUSTOM ITEM UPGRADES
+            switch (customItem)
+            {
+                case KeycardFifthist:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        CustomItemExtensions.TrySpawn<Scp1425>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine)
+                    {
+                        CustomItemExtensions.TrySpawn<KeycardFifthistPriest>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+
+                    if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
+                    {
+                        if (Random.Next(0, 3) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<MagicMissile>(ev.OutputPosition, out _);
+                        }
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    break;
+                case KeycardFifthistPriest:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        CustomItemExtensions.TrySpawn<KeycardFifthist>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine)
+                    {
+                        CustomItemExtensions.TrySpawn<MagicMissile>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
+                    {
+                        CustomItemExtensions.TrySpawn<CaneOfTheStars>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    break;
+                case Scp1425:
+                    if (ev.KnobSetting is Scp914KnobSetting.OneToOne)
+                    {
+                        CustomItemExtensions.TrySpawn<GoCRecruitPaper>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    break;
+                case GoCRecruitPaper:
+                    if (ev.KnobSetting is Scp914KnobSetting.OneToOne)
+                    {
+                        CustomItemExtensions.TrySpawn<Scp1425>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
+                    break;
+            }
+        }
+        else if (CItem.TryGet(ev.Pickup, out var cItem))
+        {
+            // CITEM UPGRADES
         }
         else
         {
@@ -105,6 +187,13 @@ public static class Scp914Changes
                     }
                     break;
                 case ItemType.KeycardContainmentEngineer:
+                    if (ev.KnobSetting is Scp914KnobSetting.OneToOne)
+                    {
+                        CItem.Get<Toolbox>()?.Spawn(ev.OutputPosition);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                        break;
+                    }
                     if (Random.Next(0, 3) is 0)
                     {
                         CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
@@ -137,6 +226,15 @@ public static class Scp914Changes
                     }
                     break;
                 case ItemType.KeycardChaosInsurgency:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        if (Random.Next(0, 4) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<KeycardConscripts>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Destroy();
+                        }
+                    }
                     if (Random.Next(0, 2) is 0)
                     {
                         CustomItemExtensions.TrySpawn<MasterCard>(ev.OutputPosition, out _);
@@ -145,8 +243,23 @@ public static class Scp914Changes
                     }
                     break;
                 case ItemType.KeycardO5:
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine or Scp914KnobSetting.VeryFine)
+                    {
+                        if (Random.Next(0, 2) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<OmegaWarheadAccess>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Position = ev.OutputPosition;
+                        }
+                    }
                     break;
                 case ItemType.Radio:
+                    if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
+                    {
+                        CustomItemExtensions.TrySpawn<SNAV300>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.GunCOM15:
                     break;
@@ -155,6 +268,15 @@ public static class Scp914Changes
                 case ItemType.Flashlight:
                     break;
                 case ItemType.MicroHID:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        if (Random.Next(0, 2) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<HIDTurret>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Destroy();
+                        }
+                    }
                     break;
                 case ItemType.SCP207:
                     break;
@@ -173,6 +295,15 @@ public static class Scp914Changes
                 case ItemType.GrenadeHE:
                     break;
                 case ItemType.GrenadeFlash:
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine)
+                    {
+                        if (Random.Next(0, 3) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<FlashBangE>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Destroy();
+                        }
+                    }
                     break;
                 case ItemType.Ammo44cal:
                     break;
@@ -185,10 +316,25 @@ public static class Scp914Changes
                 case ItemType.SCP018:
                     break;
                 case ItemType.SCP268:
+                    if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
+                    {
+                        if (Random.Next(0, 4) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<CloakGenerator>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Destroy();
+                        }
+                    }
                     break;
                 case ItemType.Painkillers:
                     break;
                 case ItemType.Coin:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.ArmorLight:
                     break;
@@ -197,6 +343,15 @@ public static class Scp914Changes
                 case ItemType.ArmorHeavy:
                     break;
                 case ItemType.GunRevolver:
+                    if (ev.KnobSetting is Scp914KnobSetting.Fine)
+                    {
+                        if (Random.Next(0, 2) is 0)
+                        {
+                            CustomItemExtensions.TrySpawn<GunTacticalRevolver>(ev.OutputPosition, out _);
+                            ev.IsAllowed = false;
+                            ev.Pickup.Destroy();
+                        }
+                    }
                     break;
                 case ItemType.GunAK:
                     break;
@@ -241,6 +396,12 @@ public static class Scp914Changes
                 case ItemType.Lantern:
                     break;
                 case ItemType.SCP1344:
+                    if (ev.KnobSetting is Scp914KnobSetting.Coarse)
+                    {
+                        CustomItemExtensions.TrySpawn<NvgBlue>(ev.OutputPosition, out _);
+                        ev.IsAllowed = false;
+                        ev.Pickup.Destroy();
+                    }
                     break;
                 case ItemType.Snowball:
                     break;

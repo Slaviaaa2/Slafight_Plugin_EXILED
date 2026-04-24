@@ -2,10 +2,13 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Mirror;
+using Scp914;
 using UnityEngine;
 using YamlDotNet.Serialization;
 
@@ -60,11 +63,28 @@ public class KeycardConscripts : CustomKeycard
         base.UnsubscribeEvents();
     }
 
-    //private void PickMessage(PickingUpItemEventArgs ev)
-    //{
-    //    ev.Player.ShowHint("あなたはH.I.D. Turretを拾いました！\nこのH.I.D.は、小チャージのみ使用可能で、無限に撃つことが出来ます！\nただしダメージは低いので慢心しないように！");
-    //}
-    
+    protected override void OnUpgrading(UpgradingEventArgs ev)
+    {
+        if (ev.KnobSetting is Scp914KnobSetting.Fine)
+        {
+            Pickup.CreateAndSpawn(ItemType.KeycardChaosInsurgency, ev.OutputPosition);
+            ev.IsAllowed = false;
+            ev.Item.DestroySelf();
+        }
+
+        if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
+        {
+            if (Random.Range(0, 5) is 0)
+            {
+                Pickup.CreateAndSpawn(ItemType.KeycardO5, ev.OutputPosition);
+            }
+
+            ev.IsAllowed = false;
+            ev.Item.DestroySelf();
+        }
+        base.OnUpgrading(ev);
+    }
+
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))
