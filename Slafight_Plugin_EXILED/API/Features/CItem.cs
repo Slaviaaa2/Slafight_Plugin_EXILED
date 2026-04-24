@@ -211,10 +211,10 @@ public abstract class CItem
     protected virtual Color PickupLightColor => Color.white;
 
     /// <summary>Pickup ライトの明度（輝度）。</summary>
-    protected virtual float PickupLightIntensity => 1f;
+    protected virtual float PickupLightIntensity => 0.7f;
 
     /// <summary>Pickup ライトの光の範囲。</summary>
-    protected virtual float PickupLightRange => 10f;
+    protected virtual float PickupLightRange => 5f;
 
     /// <summary>Pickup ライトの影の種類。</summary>
     protected virtual LightShadows PickupLightShadowType => LightShadows.None;
