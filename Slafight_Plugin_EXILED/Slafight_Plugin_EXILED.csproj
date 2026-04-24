@@ -380,7 +380,6 @@
         <Compile Include="Extensions\RoomSpawner.cs" />
         <Compile Include="Extensions\RoundUtils.cs" />
         <Compile Include="Extensions\SchematicHelpers.cs" />
-        <Compile Include="Extensions\Scp096Extensions.cs" />
         <Compile Include="Extensions\StaticUtils.cs" />
         <Compile Include="LabApiBridgeHandlers\ObjectPrefabHandlers.cs" />
         <Compile Include="MainHandlers\BadgeHandler.cs" />
