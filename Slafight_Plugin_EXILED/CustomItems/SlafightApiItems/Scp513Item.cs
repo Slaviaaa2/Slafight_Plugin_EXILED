@@ -46,7 +46,7 @@ public class Scp513Item : CItem
     protected override void OnWaitingForPlayers()
     {
         var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.2f, () =>
+        Timing.CallDelayed(0.6f, () =>
         {
             Get<Scp513Item>()?.Give(npc);
             npc.Handcuff();

@@ -54,7 +54,7 @@ public class ThrowableScp244 : CItem
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
         var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.2f, () =>
+        Timing.CallDelayed(0.6f, () =>
         {
             Get<ThrowableScp244>()?.Give(npc);
             npc.Handcuff();
