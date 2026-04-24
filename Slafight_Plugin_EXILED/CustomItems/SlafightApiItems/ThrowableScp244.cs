@@ -6,6 +6,7 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using Exiled.API.Features.Lockers;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
@@ -37,7 +38,6 @@ public class ThrowableScp244 : CItem
 
     public override void RegisterEvents()
     {
-        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
         Exiled.Events.Handlers.Player.ThrownProjectile += OnThrown;
         Exiled.Events.Handlers.Map.ExplodingGrenade += OnExploding;
         base.RegisterEvents();
@@ -45,7 +45,6 @@ public class ThrowableScp244 : CItem
 
     public override void UnregisterEvents()
     {
-        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
         Exiled.Events.Handlers.Player.ThrownProjectile -= OnThrown;
         Exiled.Events.Handlers.Map.ExplodingGrenade -= OnExploding;
         base.UnregisterEvents();
@@ -57,6 +56,8 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
+        var pickup = Spawn(Door.Get(DoorType.HczArmory).Position + Vector3.up * 0.25f);
+        AddPickupLight(pickup);
         base.OnWaitingForPlayers();
     }
 
@@ -74,16 +75,6 @@ public class ThrowableScp244 : CItem
             ev.Pickup.Destroy();
         }
         base.OnUpgradingPickup(ev);
-    }
-    private static void OnRoundStarted()
-    {
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.6f, () =>
-        {
-            Get<ThrowableScp244>()?.Give(npc);
-            npc.DropItem(npc.Items.First(i => i.Type is ItemType.GrenadeFlash));
-            npc.Destroy();
-        });
     }
 
     private void OnThrown(ThrownProjectileEventArgs ev)

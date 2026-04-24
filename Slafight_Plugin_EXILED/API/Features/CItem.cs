@@ -364,6 +364,56 @@ public abstract class CItem
         }
     }
 
+    /// <summary>指定 Pickup に ライトを手動追加する。</summary>
+    public virtual Exiled.API.Features.Toys.Light? AddPickupLight(Pickup? pickup)
+    {
+        if (pickup == null || pickup.Base?.gameObject == null) return null;
+
+        try
+        {
+            if (PickupLights.ContainsKey(pickup.Serial))
+                return PickupLights[pickup.Serial];
+
+            var light = Exiled.API.Features.Toys.Light.Create(pickup.Position);
+            if (light == null) return null;
+
+            light.Color = PickupLightColor;
+            light.Intensity = PickupLightIntensity;
+            light.Range = PickupLightRange;
+            light.ShadowType = PickupLightShadowType;
+            light.Base.gameObject.transform.SetParent(pickup.Base.gameObject.transform);
+
+            PickupLights[pickup.Serial] = light;
+            return light;
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"CItem.AddPickupLight failed ({GetType().Name}): {ex}");
+            return null;
+        }
+    }
+
+    /// <summary>指定 Pickup のライトを手動削除する。</summary>
+    public virtual bool RemovePickupLight(Pickup? pickup)
+    {
+        if (pickup == null) return false;
+
+        if (!PickupLights.TryGetValue(pickup.Serial, out var light))
+            return false;
+
+        try
+        {
+            if (light?.Base?.gameObject != null)
+                NetworkServer.Destroy(light.Base.gameObject);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"CItem.RemovePickupLight failed ({GetType().Name}): {ex}");
+        }
+
+        return PickupLights.Remove(pickup.Serial);
+    }
+
     /// <summary>プレイヤーの所持品から一致する最初のインスタンスを消す。見つからなければ false。</summary>
     public bool RemoveFrom(Player? player, bool destroy = true)
     {

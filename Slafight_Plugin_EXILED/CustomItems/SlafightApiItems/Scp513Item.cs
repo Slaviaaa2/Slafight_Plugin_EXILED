@@ -35,14 +35,12 @@ public class Scp513Item : CItem
 
     public override void RegisterEvents()
     {
-        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
         Exiled.Events.Handlers.Player.FlippingCoin += OnFlipping;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
-        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
         Exiled.Events.Handlers.Player.FlippingCoin -= OnFlipping;
         base.UnregisterEvents();
     }
@@ -63,15 +61,18 @@ public class Scp513Item : CItem
         base.OnPickupDestroyed(ev);
     }
 
-    private static void OnRoundStarted()
+    protected override void OnWaitingForPlayers()
     {
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczHid).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.6f, () =>
+        var pickup = Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up));
+        if (pickup != null)
         {
-            Get<Scp513Item>()?.Give(npc);
-            npc.DropItem(npc.Items.First(i => i.Type is ItemType.Coin));
-            npc.Destroy();
-        });
+            var schem = ObjectSpawner.SpawnSchematic("SCP513ItemModel", pickup.Position, pickup.Rotation);
+            schem.transform.SetParent(pickup.Transform);
+            schem.transform.localPosition = Vector3.zero;
+            schem.transform.localRotation = Quaternion.identity;
+        }
+
+        base.OnWaitingForPlayers();
     }
 
     private void OnFlipping(FlippingCoinEventArgs ev)
