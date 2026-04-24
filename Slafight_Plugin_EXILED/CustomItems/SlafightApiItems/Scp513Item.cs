@@ -6,6 +6,7 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs.Map;
@@ -64,15 +65,14 @@ public class Scp513Item : CItem
 
     private static void OnRoundStarted()
     {
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Log.Debug(string.Join(", ",npc.Items.ToList()));
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Door.Get(DoorType.HczArmory).Position + Vector3.up * 0.25f);
         Timing.CallDelayed(0.6f, () =>
         {
             Get<Scp513Item>()?.Give(npc);
-            Timing.CallDelayed(1f, () =>
+            Timing.CallDelayed(3f, () =>
             {
                 npc.Handcuff();
-                npc.LateDestroy(1f);
+                Timing.CallDelayed(1f, npc.Destroy);
             });
         });
     }

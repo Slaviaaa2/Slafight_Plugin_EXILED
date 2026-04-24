@@ -80,11 +80,10 @@ public class ThrowableScp244 : CItem
         Timing.CallDelayed(0.6f, () =>
         {
             Get<ThrowableScp244>()?.Give(npc);
-            Log.Debug(string.Join(", ",npc.Items.ToList()));
-            Timing.CallDelayed(1f, () =>
+            Timing.CallDelayed(3f, () =>
             {
                 npc.Handcuff();
-                npc.LateDestroy(1f);
+                Timing.CallDelayed(1f, npc.Destroy);
             });
         });
     }
