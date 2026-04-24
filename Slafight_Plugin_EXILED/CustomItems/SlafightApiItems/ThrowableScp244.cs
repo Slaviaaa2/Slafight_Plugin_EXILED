@@ -35,6 +35,7 @@ public class ThrowableScp244 : CItem
 
     public override void RegisterEvents()
     {
+        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
         Exiled.Events.Handlers.Player.ThrownProjectile += OnThrown;
         Exiled.Events.Handlers.Map.ExplodingGrenade += OnExploding;
         base.RegisterEvents();
@@ -42,6 +43,7 @@ public class ThrowableScp244 : CItem
 
     public override void UnregisterEvents()
     {
+        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
         Exiled.Events.Handlers.Player.ThrownProjectile -= OnThrown;
         Exiled.Events.Handlers.Map.ExplodingGrenade -= OnExploding;
         base.UnregisterEvents();
@@ -53,16 +55,6 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.6f, () =>
-        {
-            Get<ThrowableScp244>()?.Give(npc);
-            Timing.CallDelayed(1f, () =>
-            {
-                npc.Handcuff();
-                npc.LateDestroy(1f);
-            });
-        });
         base.OnWaitingForPlayers();
     }
 
@@ -80,6 +72,19 @@ public class ThrowableScp244 : CItem
             ev.Pickup.Destroy();
         }
         base.OnUpgradingPickup(ev);
+    }
+    private static void OnRoundStarted()
+    {
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
+        Timing.CallDelayed(0.6f, () =>
+        {
+            Get<ThrowableScp244>()?.Give(npc);
+            Timing.CallDelayed(1f, () =>
+            {
+                npc.Handcuff();
+                npc.LateDestroy(1f);
+            });
+        });
     }
 
     private void OnThrown(ThrownProjectileEventArgs ev)

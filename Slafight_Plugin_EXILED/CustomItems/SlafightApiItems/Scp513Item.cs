@@ -33,29 +33,16 @@ public class Scp513Item : CItem
 
     public override void RegisterEvents()
     {
+        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
         Exiled.Events.Handlers.Player.FlippingCoin += OnFlipping;
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
+        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
         Exiled.Events.Handlers.Player.FlippingCoin -= OnFlipping;
         base.UnregisterEvents();
-    }
-
-    protected override void OnWaitingForPlayers()
-    {
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
-        Timing.CallDelayed(0.6f, () =>
-        {
-            Get<Scp513Item>()?.Give(npc);
-            Timing.CallDelayed(1f, () =>
-            {
-                npc.Handcuff();
-                npc.LateDestroy(1f);
-            });
-        });
-        base.OnWaitingForPlayers();
     }
 
     protected override void OnPickupAdded(PickupAddedEventArgs ev)
@@ -72,6 +59,20 @@ public class Scp513Item : CItem
         var schem = ev.Pickup.GameObject.GetComponentInChildren<SchematicObject>();
         schem.Destroy();
         base.OnPickupDestroyed(ev);
+    }
+
+    private static void OnRoundStarted()
+    {
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
+        Timing.CallDelayed(0.6f, () =>
+        {
+            Get<Scp513Item>()?.Give(npc);
+            Timing.CallDelayed(1f, () =>
+            {
+                npc.Handcuff();
+                npc.LateDestroy(1f);
+            });
+        });
     }
 
     private void OnFlipping(FlippingCoinEventArgs ev)
