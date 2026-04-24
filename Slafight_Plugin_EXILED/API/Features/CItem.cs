@@ -560,8 +560,9 @@ public abstract class CItem
 
     /// <summary>
     /// SCP-914 が床に置かれたこの CItem の Pickup をアップグレードするとき。
-    /// デフォルト動作: 既定のアップグレードを無効化し、同じ CItem のまま
-    /// 出力位置にテレポートする（シリアル保持したままなので追跡も継続）。
+    /// 変換ルールは <see cref="Scp914Changes"/> で一元管理しており、
+    /// このフックは「Registry にルールが無い場合の最終防衛」として
+    /// 出力位置にテレポート (Keep) するデフォルト挙動だけを持つ。
     /// </summary>
     protected virtual void OnUpgradingPickup(Scp914Events.UpgradingPickupEventArgs ev)
     {
@@ -572,7 +573,8 @@ public abstract class CItem
 
     /// <summary>
     /// SCP-914 がインベントリ内のこの CItem をアップグレードするとき。
-    /// デフォルト動作: 既定のアップグレードを無効化する（CItem を保持する）。
+    /// 変換ルールは <see cref="Scp914Changes"/> で一元管理しており、
+    /// このフックは Registry ヒット無しの場合のデフォルト (CItem 保持) を担当する。
     /// </summary>
     protected virtual void OnUpgradingInventoryItem(Scp914Events.UpgradingInventoryItemEventArgs ev)
     {

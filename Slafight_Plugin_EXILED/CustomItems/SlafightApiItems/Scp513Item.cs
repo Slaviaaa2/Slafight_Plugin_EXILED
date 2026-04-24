@@ -127,7 +127,8 @@ public class Scp513Item : CItem
             room = Room.Random(ZoneType.HeavyContainment);
             i++;
         }
-        ev.Item?.CreatePickup(room.Cameras.GetRandomValue().Position);
+
+        Spawn(room.Cameras.GetRandomValue().Position);
         ev.Item?.Destroy();
     }
 }

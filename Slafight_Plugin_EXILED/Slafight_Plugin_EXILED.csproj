@@ -180,6 +180,11 @@
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CItem.cs" />
+        <Compile Include="API\Features\Scp914\Scp914Context.cs" />
+        <Compile Include="API\Features\Scp914\Scp914Rule.cs" />
+        <Compile Include="API\Features\Scp914\Scp914RuleSet.cs" />
+        <Compile Include="API\Features\Scp914\Scp914Dispatcher.cs" />
+        <Compile Include="API\Features\Scp914\Scp914Registry.cs" />
         <Compile Include="API\Features\CRole.cs" />
         <Compile Include="API\Features\CRoom.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />

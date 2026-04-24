@@ -65,21 +65,6 @@ public class ThrowableScp244 : CItem
         base.OnWaitingForPlayers();
     }
 
-    protected override void OnUpgradingPickup(UpgradingPickupEventArgs ev)
-    {
-        if (ev.KnobSetting is Scp914KnobSetting.Coarse)
-        {
-            Pickup.CreateAndSpawn(Random.Range(0, 2) is 0 ? ItemType.SCP244a : ItemType.SCP244b, ev.OutputPosition);
-            ev.IsAllowed = false;
-            ev.Pickup.Destroy();
-        }
-        else if (ev.KnobSetting is not Scp914KnobSetting.OneToOne)
-        {
-            ev.IsAllowed = false;
-            ev.Pickup.Destroy();
-        }
-        base.OnUpgradingPickup(ev);
-    }
 
     private void OnThrown(ThrownProjectileEventArgs ev)
     {
