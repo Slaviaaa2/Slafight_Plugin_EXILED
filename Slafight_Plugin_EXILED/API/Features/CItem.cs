@@ -43,6 +43,9 @@ public abstract class CItem
     // Pickup の Light オブジェクト管理: Serial → Light
     private static readonly Dictionary<ushort, Exiled.API.Features.Toys.Light> PickupLights = new();
 
+    // Pickup ライトの追従コルーチンハンドル
+    private static readonly Dictionary<ushort, CoroutineHandle> PickupLightCoroutines = new();
+
     private static bool _eventsSubscribed;
 
     static CItem()
@@ -307,6 +310,11 @@ public abstract class CItem
     private static CItem? _pendingGiveCItem;
     private static bool _pendingGiveDisplayMessage;
 
+    // Spawn() が Pickup.CreateAndSpawn を呼ぶと、その中で PickupAdded が同期発火する。
+    // その時点では SerialToItem への登録がまだなので、OnAnyPickupAdded 側で CItem を
+    // 解決できるように一時マーカーを立てておく。
+    private static CItem? _pendingSpawnCItem;
+
     /// <summary>
     /// プレイヤーにこの CItem を付与する。
     /// Exiled CustomItem と同じく、既定で PickedUp 相当の Hint を表示する。
@@ -350,10 +358,19 @@ public abstract class CItem
     {
         try
         {
+            // Pickup.CreateAndSpawn は内部で PickupAdded を同期発火するため、
+            // そのタイミングで OnAnyPickupAdded 側で CItem を解決できるよう
+            // 事前にマーカーを立てておく。
+            _pendingSpawnCItem = this;
+
             var pickup = Pickup.CreateAndSpawn(BaseItem, position, Quaternion.identity);
             if (pickup == null) return null;
 
-            SerialToItem[pickup.Serial] = this;
+            // OnAnyPickupAdded が先に SerialToItem を登録しているはずだが、
+            // 万一発火していなかった場合の保険としてここでも登録する。
+            if (!SerialToItem.ContainsKey(pickup.Serial))
+                SerialToItem[pickup.Serial] = this;
+
             OnSpawned(pickup);
             return pickup;
         }
@@ -362,18 +379,27 @@ public abstract class CItem
             Log.Error($"CItem.Spawn failed ({GetType().Name}): {ex}");
             return null;
         }
+        finally
+        {
+            _pendingSpawnCItem = null;
+        }
     }
 
-    /// <summary>指定 Pickup に ライトを手動追加する。</summary>
+    /// <summary>
+    /// 指定 Pickup にライトを追加する。既にライトがあれば既存のものを返す。
+    /// Pickup.CreateAndSpawn 経由で作られた Pickup は SetParent しても
+    /// クライアントに親子関係が同期されないため、毎フレーム位置追従する
+    /// コルーチンで Pickup に Light を追従させる。
+    /// </summary>
     public virtual Exiled.API.Features.Toys.Light? AddPickupLight(Pickup? pickup)
     {
-        if (pickup == null || pickup.Base?.gameObject == null) return null;
+        if (pickup == null) return null;
+
+        if (PickupLights.TryGetValue(pickup.Serial, out var existing))
+            return existing;
 
         try
         {
-            if (PickupLights.ContainsKey(pickup.Serial))
-                return PickupLights[pickup.Serial];
-
             var light = Exiled.API.Features.Toys.Light.Create(pickup.Position);
             if (light == null) return null;
 
@@ -381,9 +407,11 @@ public abstract class CItem
             light.Intensity = PickupLightIntensity;
             light.Range = PickupLightRange;
             light.ShadowType = PickupLightShadowType;
-            light.Base.gameObject.transform.SetParent(pickup.Base.gameObject.transform);
 
-            PickupLights[pickup.Serial] = light;
+            var serial = pickup.Serial;
+            PickupLights[serial] = light;
+            PickupLightCoroutines[serial] = Timing.RunCoroutine(TrackPickupLight(pickup, light));
+
             return light;
         }
         catch (Exception ex)
@@ -393,25 +421,48 @@ public abstract class CItem
         }
     }
 
-    /// <summary>指定 Pickup のライトを手動削除する。</summary>
+    /// <summary>Pickup の位置に毎フレーム Light を追従させる。</summary>
+    private static IEnumerator<float> TrackPickupLight(Pickup pickup, Exiled.API.Features.Toys.Light light)
+    {
+        while (pickup != null && light != null
+               && pickup.Base != null && light.Base != null
+               && pickup.Base.gameObject != null && light.Base.gameObject != null)
+        {
+            light.Position = pickup.Position;
+            yield return Timing.WaitForOneFrame;
+        }
+    }
+
+    /// <summary>指定 Pickup のライトを削除する。</summary>
     public virtual bool RemovePickupLight(Pickup? pickup)
     {
         if (pickup == null) return false;
+        return DestroyPickupLightInternal(pickup.Serial);
+    }
 
-        if (!PickupLights.TryGetValue(pickup.Serial, out var light))
+    /// <summary>内部用: シリアル指定でライトとコルーチンを破棄する。</summary>
+    private static bool DestroyPickupLightInternal(ushort serial)
+    {
+        if (PickupLightCoroutines.TryGetValue(serial, out var handle))
+        {
+            Timing.KillCoroutines(handle);
+            PickupLightCoroutines.Remove(serial);
+        }
+
+        if (!PickupLights.TryGetValue(serial, out var light))
             return false;
 
         try
         {
-            if (light?.Base?.gameObject != null)
+            if (light != null && light.Base != null && light.Base.gameObject != null)
                 NetworkServer.Destroy(light.Base.gameObject);
         }
         catch (Exception ex)
         {
-            Log.Error($"CItem.RemovePickupLight failed ({GetType().Name}): {ex}");
+            Log.Error($"CItem.DestroyPickupLightInternal failed: {ex}");
         }
 
-        return PickupLights.Remove(pickup.Serial);
+        return PickupLights.Remove(serial);
     }
 
     /// <summary>プレイヤーの所持品から一致する最初のインスタンスを消す。見つからなければ false。</summary>
@@ -691,27 +742,30 @@ public abstract class CItem
     {
         if (ev?.Pickup == null) return;
 
-        if (!SerialToItem.TryGetValue(ev.Pickup.Serial, out var ci) || ci == null) return;
+        CItem? ci;
+
+        // 1. Spawn() 由来: _pendingSpawnCItem マーカーで CItem を解決し SerialToItem に登録
+        if (_pendingSpawnCItem != null)
+        {
+            ci = _pendingSpawnCItem;
+            SerialToItem[ev.Pickup.Serial] = ci;
+        }
+        // 2. 既に追跡中の Pickup (プレイヤーのドロップ等)
+        else if (SerialToItem.TryGetValue(ev.Pickup.Serial, out var existing) && existing != null)
+        {
+            ci = existing;
+        }
+        else
+        {
+            return;
+        }
 
         try { ci.OnPickupAdded(ev); }
         catch (Exception ex) { Log.Error($"CItem.OnPickupAdded error in {ci.GetType().Name}: {ex}"); }
 
-        // Pickup ライトの作成・設定
-        try
-        {
-            if (ci.PickupLightEnabled && ev.Pickup?.Base?.gameObject != null)
-            {
-                var light = Exiled.API.Features.Toys.Light.Create(ev.Pickup.Position);
-                light.Color = ci.PickupLightColor;
-                light.Intensity = ci.PickupLightIntensity;
-                light.Range = ci.PickupLightRange;
-                light.ShadowType = ci.PickupLightShadowType;
-                light.Base.gameObject.transform.SetParent(ev.Pickup.Base.gameObject.transform);
-
-                PickupLights[ev.Pickup.Serial] = light;
-            }
-        }
-        catch (Exception ex) { Log.Error($"CItem.OnPickupAdded(light) error in {ci.GetType().Name}: {ex}"); }
+        // PickupLightEnabled が true の CItem は自動でライトを追加。
+        if (ci.PickupLightEnabled)
+            ci.AddPickupLight(ev.Pickup);
     }
 
     private static void OnAnyPickupDestroyed(MapEvents.PickupDestroyedEventArgs ev)
@@ -723,16 +777,8 @@ public abstract class CItem
         try { ci.OnPickupDestroyed(ev); }
         catch (Exception ex) { Log.Error($"CItem.OnPickupDestroyed error in {ci.GetType().Name}: {ex}"); }
 
-        // Pickup ライトの破棄
-        if (PickupLights.TryGetValue(ev.Pickup.Serial, out var light))
-        {
-            if (light?.Base?.gameObject != null)
-            {
-                try { NetworkServer.Destroy(light.Base.gameObject); }
-                catch (Exception ex) { Log.Error($"CItem.OnPickupDestroyed(light) error in {ci.GetType().Name}: {ex}"); }
-            }
-            PickupLights.Remove(ev.Pickup.Serial);
-        }
+        // Pickup ライトとコルーチンの破棄
+        DestroyPickupLightInternal(ev.Pickup.Serial);
 
         // PickupDestroyed は「プレイヤーが拾って pickup が消えた」時にも発火するため、
         // ここで SerialToItem を即削除すると同じ CItem が拾われた瞬間に追跡が切れる。
@@ -755,16 +801,11 @@ public abstract class CItem
     {
         SerialToItem.Clear();
 
-        // 残存する Pickup ライトを破棄
-        foreach (var light in PickupLights.Values)
-        {
-            if (light?.Base?.gameObject != null)
-            {
-                try { NetworkServer.Destroy(light.Base.gameObject); }
-                catch (Exception ex) { Log.Error($"CItem.OnWaitingForPlayers(light) cleanup error: {ex}"); }
-            }
-        }
+        // 残存する Pickup ライトとコルーチンを一括破棄
+        foreach (var serial in PickupLights.Keys.ToList())
+            DestroyPickupLightInternal(serial);
         PickupLights.Clear();
+        PickupLightCoroutines.Clear();
 
         foreach (var ci in RegisteredInstances.ToList())
         {

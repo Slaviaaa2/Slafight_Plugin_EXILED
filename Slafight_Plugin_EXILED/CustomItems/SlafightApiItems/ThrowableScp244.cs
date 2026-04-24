@@ -56,8 +56,12 @@ public class ThrowableScp244 : CItem
         foreach (var handle in TrackedCoroutines.Values)
             Timing.KillCoroutines(handle);
         TrackedCoroutines.Clear();
-        var pickup = Spawn(Door.Get(DoorType.HczArmory).Position + Vector3.up * 0.25f);
-        AddPickupLight(pickup);
+
+        var armoryDoor = Door.Get(DoorType.HczArmory);
+        if (armoryDoor == null) return;
+
+        Spawn(armoryDoor.Position + Vector3.up * 0.25f);
+
         base.OnWaitingForPlayers();
     }
 

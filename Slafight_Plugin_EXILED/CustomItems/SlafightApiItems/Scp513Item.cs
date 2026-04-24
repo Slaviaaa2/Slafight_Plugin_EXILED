@@ -33,6 +33,11 @@ public class Scp513Item : CItem
     protected override bool PickupLightEnabled => true;
     protected override Color PickupLightColor => Color.gray;
 
+    // Pickup.CreateAndSpawn 直後は SetParent の親子関係がクライアントに同期されないため、
+    // Light と同じく毎フレーム位置追従で Schematic を Pickup にくっつける。
+    private static readonly Dictionary<ushort, SchematicObject> ActiveSchematics = new();
+    private static readonly Dictionary<ushort, CoroutineHandle> SchematicCoroutines = new();
+
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.FlippingCoin += OnFlipping;
@@ -47,30 +52,60 @@ public class Scp513Item : CItem
 
     protected override void OnPickupAdded(PickupAddedEventArgs ev)
     {
-        var schem = ObjectSpawner.SpawnSchematic("SCP513ItemModel", ev.Pickup.Position, ev.Pickup.Rotation);
-        schem.transform.SetParent(ev.Pickup.Transform);
-        schem.transform.localPosition = Vector3.zero;
-        schem.transform.localRotation = Quaternion.identity;
+        try
+        {
+            var schem = ObjectSpawner.SpawnSchematic("SCP513ItemModel", ev.Pickup.Position, ev.Pickup.Rotation);
+            if (schem != null)
+            {
+                var serial = ev.Pickup.Serial;
+                ActiveSchematics[serial] = schem;
+                SchematicCoroutines[serial] = Timing.RunCoroutine(TrackSchematic(ev.Pickup, schem));
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[SCP513] Schematic spawn failed: {ex.Message}");
+        }
+
         base.OnPickupAdded(ev);
+    }
+
+    private static IEnumerator<float> TrackSchematic(Pickup pickup, SchematicObject schem)
+    {
+        while (pickup != null && schem != null
+               && pickup.Base != null && schem.gameObject != null)
+        {
+            schem.transform.position = pickup.Position;
+            schem.transform.rotation = pickup.Rotation;
+            yield return Timing.WaitForOneFrame;
+        }
     }
 
     protected override void OnPickupDestroyed(PickupDestroyedEventArgs ev)
     {
-        var schem = ev.Pickup.GameObject.GetComponentInChildren<SchematicObject>();
-        schem.Destroy();
+        if (ev.Pickup != null)
+        {
+            var serial = ev.Pickup.Serial;
+            if (SchematicCoroutines.TryGetValue(serial, out var handle))
+            {
+                Timing.KillCoroutines(handle);
+                SchematicCoroutines.Remove(serial);
+            }
+            if (ActiveSchematics.TryGetValue(serial, out var schem))
+            {
+                try { schem?.Destroy(); } catch { /* ignore */ }
+                ActiveSchematics.Remove(serial);
+            }
+        }
         base.OnPickupDestroyed(ev);
     }
 
     protected override void OnWaitingForPlayers()
     {
-        var pickup = Spawn(Room.Get(RoomType.HczHid).WorldPosition(Vector3.up));
-        if (pickup != null)
-        {
-            var schem = ObjectSpawner.SpawnSchematic("SCP513ItemModel", pickup.Position, pickup.Rotation);
-            schem.transform.SetParent(pickup.Transform);
-            schem.transform.localPosition = Vector3.zero;
-            schem.transform.localRotation = Quaternion.identity;
-        }
+        var room = Room.Get(RoomType.HczHid);
+        if (room == null) return;
+
+        Spawn(room.WorldPosition(Vector3.up));
 
         base.OnWaitingForPlayers();
     }
