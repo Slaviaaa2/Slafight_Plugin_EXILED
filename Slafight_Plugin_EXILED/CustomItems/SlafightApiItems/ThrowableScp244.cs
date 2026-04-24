@@ -81,7 +81,7 @@ public class ThrowableScp244 : CItem
         Timing.CallDelayed(0.6f, () =>
         {
             Get<ThrowableScp244>()?.Give(npc);
-            npc.DropItems();
+            npc.DropItem(npc.Items.First(i => i.Type is ItemType.GrenadeFlash));
             npc.Destroy();
         });
     }

@@ -65,11 +65,11 @@ public class Scp513Item : CItem
 
     private static void OnRoundStarted()
     {
-        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Door.Get(DoorType.HczArmory).Position + Vector3.up * 0.25f);
+        var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczHid).WorldPosition(Vector3.up));
         Timing.CallDelayed(0.6f, () =>
         {
             Get<Scp513Item>()?.Give(npc);
-            npc.DropItems();
+            npc.DropItem(npc.Items.First(i => i.Type is ItemType.Coin));
             npc.Destroy();
         });
     }
