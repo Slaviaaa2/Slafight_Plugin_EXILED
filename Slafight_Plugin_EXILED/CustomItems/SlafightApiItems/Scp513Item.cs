@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -64,6 +65,7 @@ public class Scp513Item : CItem
     private static void OnRoundStarted()
     {
         var npc = Npc.Spawn("tmp", RoleTypeId.Tutorial, true, Room.Get(RoomType.HczArmory).WorldPosition(Vector3.up));
+        Log.Debug(string.Join(", ",npc.Items.ToList()));
         Timing.CallDelayed(0.6f, () =>
         {
             Get<Scp513Item>()?.Give(npc);
