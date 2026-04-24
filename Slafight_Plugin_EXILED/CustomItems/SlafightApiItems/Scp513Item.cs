@@ -69,11 +69,8 @@ public class Scp513Item : CItem
         Timing.CallDelayed(0.6f, () =>
         {
             Get<Scp513Item>()?.Give(npc);
-            Timing.CallDelayed(3f, () =>
-            {
-                npc.Handcuff();
-                Timing.CallDelayed(1f, npc.Destroy);
-            });
+            npc.DropItems();
+            npc.Destroy();
         });
     }
 

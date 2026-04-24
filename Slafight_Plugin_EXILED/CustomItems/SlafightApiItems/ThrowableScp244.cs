@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Lockers;
 using Exiled.API.Features.Pickups;
@@ -80,11 +81,8 @@ public class ThrowableScp244 : CItem
         Timing.CallDelayed(0.6f, () =>
         {
             Get<ThrowableScp244>()?.Give(npc);
-            Timing.CallDelayed(3f, () =>
-            {
-                npc.Handcuff();
-                Timing.CallDelayed(1f, npc.Destroy);
-            });
+            npc.DropItems();
+            npc.Destroy();
         });
     }
 
