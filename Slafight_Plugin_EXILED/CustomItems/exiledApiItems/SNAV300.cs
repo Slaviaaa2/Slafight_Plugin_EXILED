@@ -51,26 +51,6 @@ public class SNAV300 : CustomItem
         base.UnsubscribeEvents();
     }
 
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        if (ev.KnobSetting == Scp914KnobSetting.OneToOne)
-        {
-            CustomItemExtensions.TrySpawn<SNAV300>(ev.OutputPosition, out _);
-        }
-        else if (ev.KnobSetting == Scp914KnobSetting.Fine)
-        {
-            CustomItemExtensions.TrySpawn<SNAV310>(ev.OutputPosition, out _);
-        }
-        else if (ev.KnobSetting == Scp914KnobSetting.VeryFine)
-        {
-            CustomItemExtensions.TrySpawn<SNAVUltimate>(ev.OutputPosition, out _);
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-
     private RadioRange mode;
     private List<RoomType> uniques =
     [

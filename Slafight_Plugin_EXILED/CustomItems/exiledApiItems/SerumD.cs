@@ -49,28 +49,6 @@ public class SerumD : CustomItem
         base.UnsubscribeEvents();
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Rough:
-                break;
-            case Scp914KnobSetting.Coarse:
-                Pickup.CreateAndSpawn(ItemType.Adrenaline, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.OneToOne:
-                return;
-            case Scp914KnobSetting.Fine:
-            case Scp914KnobSetting.VeryFine:    
-                CustomItemExtensions.TrySpawn<SerumC>(ev.OutputPosition, out _);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-    
     private void OnUsed(UsedItemEventArgs ev)
     {
         if (Check(ev.Item))

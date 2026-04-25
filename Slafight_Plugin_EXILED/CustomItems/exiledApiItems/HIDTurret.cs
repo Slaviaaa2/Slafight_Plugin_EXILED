@@ -47,26 +47,6 @@ public class HIDTurret : CustomItem
         base.UnsubscribeEvents();
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.OneToOne:
-                CustomItemExtensions.TrySpawn<HIDTurret>(ev.OutputPosition, out _);
-                break;
-            case Scp914KnobSetting.Fine:
-                Pickup.CreateAndSpawn(ItemType.MicroHID, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.VeryFine:    
-                CustomItemExtensions.TrySpawn<GunGoCTurret>(ev.OutputPosition, out _);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-
     private void DisRight(ChangingMicroHIDStateEventArgs ev)
     {
         if (!Check(ev.Item)) { return; }

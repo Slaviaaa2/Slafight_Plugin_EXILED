@@ -41,23 +41,6 @@ public class Quarter : CustomItem
         base.UnsubscribeEvents();
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Fine:
-                Pickup.CreateAndSpawn(ItemType.Coin, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.VeryFine:
-                Pickup.CreateAndSpawn(ItemType.KeycardScientist, ev.OutputPosition);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

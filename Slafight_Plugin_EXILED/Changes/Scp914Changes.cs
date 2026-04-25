@@ -209,6 +209,142 @@ public static class Scp914Changes
         {
             OneToOne = Scp914Rule.ToCustomItem<Scp1425>(),
         });
+
+        // ---- 以下 R1 で集約 (旧: 各クラスの OnUpgrading)  ----
+
+        Scp914Registry.RegisterCustomItem<NvgNormal>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.ToCustomItem<NvgNormal>(),
+            Fine     = Scp914Rule.ToCustomItem<NvgRed>(),
+            VeryFine = Scp914Rule.ToCustomItem<NvgBlue>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<HIDTurret>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.ToCustomItem<HIDTurret>(),
+            Fine     = Scp914Rule.ToVanilla(ItemType.MicroHID),
+            VeryFine = Scp914Rule.ToCustomItem<GunGoCTurret>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<SerumD>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToVanilla(ItemType.Adrenaline),
+            OneToOne = Scp914Rule.Passthrough,
+            Fine     = Scp914Rule.ToCustomItem<SerumC>(),
+            VeryFine = Scp914Rule.ToCustomItem<SerumC>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<SerumC>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToCustomItem<SerumD>(),
+            OneToOne = Scp914Rule.ToCustomItem<SerumC>(),
+            Fine     = Scp914Rule.ToCustomItem<SerumC>(),
+            VeryFine = Scp914Rule.ToCustomItem<SerumC>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<ClassXMemoryForcePil>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToVanilla(ItemType.SCP500),
+            OneToOne = Scp914Rule.Passthrough,
+            Fine     = Scp914Rule.ToCustomItem<ClassZMemoryForcePil>(),
+            VeryFine = Scp914Rule.ToCustomItem<ClassZMemoryForcePil>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<SNAV300>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<SNAV310>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<SNAVUltimate>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+        });
+
+        Scp914Registry.RegisterCustomItem<MasterCard>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToCustomItem<Quarter>().Times(8),
+            OneToOne = Scp914Rule.ToCustomItem<PlayingCard>(),
+            Fine     = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
+            VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardResearchCoordinator),
+        });
+
+        Scp914Registry.RegisterCustomItem<PlayingCard>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToCustomItem<Quarter>().Times(8),
+            OneToOne = Scp914Rule.ToCustomItem<MasterCard>(),
+            Fine     = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
+            VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardResearchCoordinator),
+        });
+
+        Scp914Registry.RegisterCustomItem<Quarter>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.Destroy,
+            Fine     = Scp914Rule.ToVanilla(ItemType.Coin),
+            VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
+        });
+
+        Scp914Registry.RegisterCustomItem<KeycardConscripts>(new()
+        {
+            Fine     = Scp914Rule.ToVanilla(ItemType.KeycardChaosInsurgency),
+            VeryFine = Scp914Rule.Custom(ctx =>
+            {
+                if (UnityEngine.Random.Range(0, 5) == 0)
+                {
+                    if (ctx.IsInventory)
+                        ctx.Owner!.AddItem(ItemType.KeycardO5);
+                    else
+                        Exiled.API.Features.Pickups.Pickup.CreateAndSpawn(ItemType.KeycardO5, ctx.OutputPosition);
+                }
+
+                if (ctx.IsInventory)
+                    ctx.Owner!.RemoveItem(ctx.Item!, true);
+                else
+                    ctx.Pickup?.Destroy();
+            }),
+        });
+
+        Scp914Registry.RegisterCustomItem<KeycardSecurityChief>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToVanilla(ItemType.KeycardGuard),
+            OneToOne = Scp914Rule.ToCustomItem<KeycardSecurityChief>(),
+            Fine     = Scp914Rule.ToVanilla(ItemType.KeycardMTFOperative),
+            VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardMTFCaptain),
+        });
+
+        Scp914Registry.RegisterCustomItem<CloakGenerator>(new()
+        {
+            Rough  = Scp914Rule.ToVanilla(ItemType.SCP268),
+            Coarse = Scp914Rule.ToVanilla(ItemType.SCP268),
+        });
     }
 
     /// <summary>CItem → Vanilla/Custom/CItem の変換ルール。</summary>

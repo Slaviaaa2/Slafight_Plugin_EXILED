@@ -56,38 +56,6 @@ public class MasterCard : CustomKeycard
         base.UnsubscribeEvents();
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Rough:
-                break;
-            case Scp914KnobSetting.Coarse:
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                CustomItemExtensions.TrySpawn<Quarter>(ev.OutputPosition, out _);
-                break;
-            case Scp914KnobSetting.OneToOne:
-                CustomItemExtensions.TrySpawn<PlayingCard>(ev.OutputPosition, out _);
-                break;
-            case Scp914KnobSetting.Fine:
-                Pickup.CreateAndSpawn(ItemType.KeycardScientist, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.VeryFine:
-                Pickup.CreateAndSpawn(ItemType.KeycardResearchCoordinator, ev.OutputPosition);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

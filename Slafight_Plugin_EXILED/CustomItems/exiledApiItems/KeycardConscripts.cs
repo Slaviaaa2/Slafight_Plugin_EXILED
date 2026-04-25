@@ -63,28 +63,6 @@ public class KeycardConscripts : CustomKeycard
         base.UnsubscribeEvents();
     }
 
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        if (ev.KnobSetting is Scp914KnobSetting.Fine)
-        {
-            Pickup.CreateAndSpawn(ItemType.KeycardChaosInsurgency, ev.OutputPosition);
-            ev.IsAllowed = false;
-            ev.Item.DestroySelf();
-        }
-
-        if (ev.KnobSetting is Scp914KnobSetting.VeryFine)
-        {
-            if (Random.Range(0, 5) is 0)
-            {
-                Pickup.CreateAndSpawn(ItemType.KeycardO5, ev.OutputPosition);
-            }
-
-            ev.IsAllowed = false;
-            ev.Item.DestroySelf();
-        }
-        base.OnUpgrading(ev);
-    }
-
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

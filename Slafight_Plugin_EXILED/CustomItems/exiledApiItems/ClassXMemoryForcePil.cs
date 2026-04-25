@@ -71,26 +71,6 @@ public class ClassXMemoryForcePil : CustomItem
         ev.Player.WaitAndRemove(SpecificFlagType.AntiMemeEffectDisabled, 60f);
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Coarse:
-                Pickup.CreateAndSpawn(ItemType.SCP500, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.OneToOne:
-                return;
-            case Scp914KnobSetting.Fine:
-            case Scp914KnobSetting.VeryFine:
-                CustomItemExtensions.TrySpawn<ClassZMemoryForcePil>(ev.OutputPosition, out _);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

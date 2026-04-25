@@ -63,31 +63,6 @@ public class KeycardSecurityChief : CustomKeycard
         base.UnsubscribeEvents();
     }
 
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Rough:
-                break;
-            case Scp914KnobSetting.Coarse:
-                Pickup.CreateAndSpawn(ItemType.KeycardGuard, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.OneToOne:
-                CustomItemExtensions.TrySpawn<KeycardSecurityChief>(ev.OutputPosition, out _);
-                break;
-            case Scp914KnobSetting.Fine:
-                Pickup.CreateAndSpawn(ItemType.KeycardMTFOperative, ev.OutputPosition);
-                break;
-            case Scp914KnobSetting.VeryFine:    
-                Pickup.CreateAndSpawn(ItemType.KeycardMTFCaptain, ev.OutputPosition);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))

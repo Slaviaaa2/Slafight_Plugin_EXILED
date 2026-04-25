@@ -46,17 +46,6 @@ public class CloakGenerator : CustomItem
         base.UnsubscribeEvents();
     }
 
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        if (ev.KnobSetting is Scp914KnobSetting.Coarse or Scp914KnobSetting.Rough)
-        {
-            Pickup.CreateAndSpawn(ItemType.SCP268, ev.OutputPosition);
-            ev.IsAllowed = false;
-            ev.Item.DestroySelf();
-        }
-        base.OnUpgrading(ev);
-    }
-
     private void OnWearing(UsingItemCompletedEventArgs ev)
     {
         if (!Check(ev.Item) || ev.Player == null) return;

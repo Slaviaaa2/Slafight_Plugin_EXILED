@@ -57,27 +57,6 @@ public class SerumC : CustomItem
         }
     }
     
-    protected override void OnUpgrading(UpgradingEventArgs ev)
-    {
-        switch (ev.KnobSetting)
-        {
-            case Scp914KnobSetting.Rough:
-                break;
-            case Scp914KnobSetting.Coarse:
-                CustomItemExtensions.TrySpawn<SerumD>(ev.OutputPosition, out _);
-                break;
-            case Scp914KnobSetting.OneToOne:
-            case Scp914KnobSetting.Fine:
-            case Scp914KnobSetting.VeryFine:    
-                CustomItemExtensions.TrySpawn<SerumC>(ev.OutputPosition, out _);
-                break;
-        }
-
-        ev.IsAllowed = false;
-        ev.Item.DestroySelf();
-        base.OnUpgrading(ev);
-    }
-    
     private void RemoveGlow(PickupDestroyedEventArgs ev)
     {
         if (Check(ev.Pickup))
