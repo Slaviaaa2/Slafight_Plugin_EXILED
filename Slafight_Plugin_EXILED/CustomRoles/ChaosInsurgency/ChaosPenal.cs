@@ -4,7 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
@@ -31,7 +31,7 @@ public class ChaosPenal : CRole
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.SCP207);
         player.AddItem(ItemType.AntiSCP207);
-        player.TryAddCustomItem<KeycardConscripts>(); // Conscripts Card
+        CItem.Get<KeycardConscripts>()?.Give(player); // Conscripts Card
         player.TryAddCandy(CandyKindID.Pink);
             
         player.SetCustomInfo("Chaos Insurgency Penal");

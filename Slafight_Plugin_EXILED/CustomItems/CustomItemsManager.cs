@@ -26,7 +26,6 @@ public static class CustomItemsManager
         new GunProject90().Register();
         new GunSuperLogicer().Register();
         new HIDTurret().Register();
-        new KeycardConscripts().Register();
         new KeycardFifthist().Register();
         new KeycardFifthistPriest().Register();
         new KeycardOld_Cadet().Register();

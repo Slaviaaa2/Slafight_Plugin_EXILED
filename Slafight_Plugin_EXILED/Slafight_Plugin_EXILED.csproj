@@ -180,6 +180,7 @@
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CItem.cs" />
+        <Compile Include="API\Features\CItemKeycard.cs" />
         <Compile Include="API\Features\Scp914\Scp914Context.cs" />
         <Compile Include="API\Features\Scp914\Scp914Rule.cs" />
         <Compile Include="API\Features\Scp914\Scp914RuleSet.cs" />
@@ -267,7 +268,7 @@
         <Compile Include="CustomItems\exiledApiItems\GunSuperLogicer.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunTacticalRevolver.cs" />
         <Compile Include="CustomItems\exiledApiItems\HIDTurret.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardConscripts.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\KeycardConscripts.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardFifthist.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardFifthistPriest.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardOld_Cadet.cs" />

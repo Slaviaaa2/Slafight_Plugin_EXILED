@@ -339,6 +339,12 @@ public abstract class CItem
             if (!SerialToItem.ContainsKey(item.Serial))
                 SerialToItem[item.Serial] = this;
 
+            // 派生用カスタマイズ (Keycard の Label/Tint 等)。
+            // 注: OnAcquired は AddItem で先に発火しているため、CustomizeItem
+            // 適用後の状態を OnAcquired 内で読みたい場合は OnAcquired ではなく
+            // OnSelectedHintFinished など別タイミングを使うこと。
+            CustomizeItem(item);
+
             return item;
         }
         catch (Exception ex)
@@ -358,12 +364,12 @@ public abstract class CItem
     {
         try
         {
-            // Pickup.CreateAndSpawn は内部で PickupAdded を同期発火するため、
-            // そのタイミングで OnAnyPickupAdded 側で CItem を解決できるよう
-            // 事前にマーカーを立てておく。
+            // Pickup.CreateAndSpawn (および派生 override) は内部で PickupAdded を
+            // 同期発火するため、そのタイミングで OnAnyPickupAdded 側で CItem を
+            // 解決できるよう事前にマーカーを立てておく。
             _pendingSpawnCItem = this;
 
-            var pickup = Pickup.CreateAndSpawn(BaseItem, position, Quaternion.identity);
+            var pickup = CreatePickupForSpawn(position);
             if (pickup == null) return null;
 
             // OnAnyPickupAdded が先に SerialToItem を登録しているはずだが、
@@ -384,6 +390,24 @@ public abstract class CItem
             _pendingSpawnCItem = null;
         }
     }
+
+    /// <summary>
+    /// 派生クラスが Pickup の生成方法を差し替えたい場合のフック。
+    /// デフォルトは <see cref="Pickup.CreateAndSpawn(ItemType, Vector3, Quaternion)"/>。
+    /// CItemKeycard など <see cref="Item.Create(ItemType, Player)"/> + 個別カスタマイズ +
+    /// <see cref="Item.CreatePickup(Vector3, Quaternion?, bool)"/> 経由で生成したい
+    /// 派生はこのメソッドを override する。
+    /// </summary>
+    protected virtual Pickup? CreatePickupForSpawn(Vector3 position)
+        => Pickup.CreateAndSpawn(BaseItem, position, Quaternion.identity);
+
+    /// <summary>
+    /// プレイヤーへ <see cref="Give"/> でアイテムが渡った直後 / <see cref="Spawn"/>
+    /// で生成される Pickup の元となる Item に対して呼ばれる派生フック。
+    /// Keycard の Label / Tint など Item ベースで設定する必要のあるカスタマイズを
+    /// ここで適用する。
+    /// </summary>
+    protected virtual void CustomizeItem(Item item) { }
 
     /// <summary>
     /// 指定 Pickup にライトを追加する。既にライトがあれば既存のものを返す。

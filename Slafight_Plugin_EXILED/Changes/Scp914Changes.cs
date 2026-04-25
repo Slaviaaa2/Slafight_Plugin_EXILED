@@ -131,7 +131,7 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.KeycardChaosInsurgency, new()
         {
-            Coarse   = Scp914Rule.ToCustomItem<KeycardConscripts>().WithChance(1f / 4f),
+            Coarse   = Scp914Rule.ToCItem<KeycardConscripts>().WithChance(1f / 4f),
             Rough    = Scp914Rule.ToCustomItem<MasterCard>().WithChance(1f / 2f),
             OneToOne = Scp914Rule.ToCustomItem<MasterCard>().WithChance(1f / 2f),
             Fine     = Scp914Rule.ToCustomItem<MasterCard>().WithChance(1f / 2f),
@@ -311,7 +311,7 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
         });
 
-        Scp914Registry.RegisterCustomItem<KeycardConscripts>(new()
+        Scp914Registry.RegisterCItem<KeycardConscripts>(new()
         {
             Fine     = Scp914Rule.ToVanilla(ItemType.KeycardChaosInsurgency),
             VeryFine = Scp914Rule.Custom(ctx =>
