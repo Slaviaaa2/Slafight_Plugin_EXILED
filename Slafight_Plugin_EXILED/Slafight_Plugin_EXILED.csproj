@@ -240,8 +240,6 @@
         <Compile Include="CustomItems\exiledApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileCafeteriaNeeds.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileScientist_Samuels.cs" />
         <Compile Include="CustomItems\exiledApiItems\NvgBlue.cs" />
         <Compile Include="CustomItems\exiledApiItems\NvgRed.cs" />
         <Compile Include="CustomItems\exiledApiItems\Veritas.cs" />
@@ -255,13 +253,6 @@
         <Compile Include="CustomItems\exiledApiItems\ClassZMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\DummyRoad.cs" />
         <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
-        <Compile Include="CustomItems\exiledApiItems\File012_5_033.cs" />
-        <Compile Include="CustomItems\exiledApiItems\File096_777_A.cs" />
-        <Compile Include="CustomItems\exiledApiItems\File3005_Contain.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileBackrooms.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileDeltaWarhead.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileOmegaWarhead.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FileSergey.cs" />
         <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
         <Compile Include="CustomItems\exiledApiItems\GoCRecruitPaper.cs" />
         <Compile Include="CustomItems\exiledApiItems\GunCOM77.cs" />

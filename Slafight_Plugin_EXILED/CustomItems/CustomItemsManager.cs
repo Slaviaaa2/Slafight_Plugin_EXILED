@@ -14,12 +14,6 @@ public static class CustomItemsManager
         new CaneOfTheStars().Register();
         new DummyRoad().Register();
         new FakeGrenade().Register();
-        new File012_5_033().Register();
-        new File096_777_A().Register();
-        new File3005_Contain().Register();
-        new FileBackrooms().Register();
-        new FileDeltaWarhead().Register();
-        new FileOmegaWarhead().Register();
         new FlashBangE().Register();
         new GoCRecruitPaper().Register();
         new GunCOM77().Register();
@@ -62,13 +56,10 @@ public static class CustomItemsManager
         new SNAVUltimate().Register();
         new ClassXMemoryForcePil().Register();
         new ClassZMemoryForcePil().Register();
-        new FileSergey().Register();
         new GunGoCRailgunFull().Register();
         new GunTacticalRevolver().Register();
         new NvgNormal().Register();
         new CUA_SpyKit().Register();
-        new FileScientist_Samuels().Register();
-        new FileCafeteriaNeeds().Register();
         new Veritas().Register();
         new CloakGenerator().Register();
         new NvgRed().Register();
