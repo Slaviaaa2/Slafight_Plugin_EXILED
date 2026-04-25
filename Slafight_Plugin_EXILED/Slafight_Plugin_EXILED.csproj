@@ -282,14 +282,14 @@
         <Compile Include="CustomItems\exiledApiItems\KeycardOld_ResearchSupervisor.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardOld_Scientist.cs" />
         <Compile Include="CustomItems\exiledApiItems\KeycardOld_ZoneManager.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardSecurityChief.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
-        <Compile Include="CustomItems\exiledApiItems\MasterCard.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\MasterCard.cs" />
         <Compile Include="CustomItems\exiledApiItems\ClassXMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\NvgNormal.cs" />
         <Compile Include="CustomItems\exiledApiItems\OmegaWarheadAccess.cs" />
-        <Compile Include="CustomItems\exiledApiItems\PlayingCard.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\PlayingCard.cs" />
         <Compile Include="CustomItems\exiledApiItems\Quarter.cs" />
         <Compile Include="CustomItems\exiledApiItems\Scp1425.cs" />
         <Compile Include="CustomItems\exiledApiItems\Scp148.cs" />

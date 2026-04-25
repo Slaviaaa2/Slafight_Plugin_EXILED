@@ -39,12 +39,9 @@ public static class CustomItemsManager
         new KeycardOld_ResearchSupervisor().Register();
         new KeycardOld_Scientist().Register();
         new KeycardOld_ZoneManager().Register();
-        new KeycardSecurityChief().Register();
         new MagicMissile().Register();
-        new MasterCard().Register();
         new NeutralizeGrenade().Register();
         new OmegaWarheadAccess().Register();
-        new PlayingCard().Register();
         new Quarter().Register();
         new Scp148().Register();
         new Scp1425().Register();
