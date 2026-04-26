@@ -5,6 +5,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -25,7 +26,7 @@ public class HdMarshal : CRole
         player.ClearInventory();
         Log.Debug("Giving Items to HdMarshal");
         player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem<SerumC>();
+        CItem.Get<SerumC>()?.Give(player);
         player.TryAddCustomItem<AdvancedMedkit>();
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);

@@ -12,7 +12,9 @@ using ProjectMER.Features.Extensions;
 using ProjectMER.Features.Objects;
 using ProjectMER.Features.Serializable;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
@@ -159,7 +161,7 @@ public class LabApiHandler : CustomEventsHandler
                         CustomItemExtensions.TrySpawn<SNAV300>(pos, out _);
                         break;
                     case "CISR_MFP":
-                        CustomItemExtensions.TrySpawn<ClassXMemoryForcePil>(pos, out _);
+                        CItem.Get<ClassXMemoryForcePil>()?.Spawn(pos);
                         break;
                     case "Scp682SpawnPoint":
                         CustomItemExtensions.TrySpawn<OmegaWarheadAccess>(pos, out _);

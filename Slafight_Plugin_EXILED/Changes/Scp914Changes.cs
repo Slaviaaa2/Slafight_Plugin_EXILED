@@ -77,12 +77,12 @@ public static class Scp914Changes
     {
         Scp914Registry.RegisterVanilla(ItemType.Adrenaline, new()
         {
-            All = Scp914Rule.ToCustomItem<SerumD>(),
+            All = Scp914Rule.ToCItem<SerumD>(),
         });
 
         Scp914Registry.RegisterVanilla(ItemType.SCP500, new()
         {
-            All = Scp914Rule.ToCustomItem<ClassXMemoryForcePil>(),
+            All = Scp914Rule.ToCItem<ClassXMemoryForcePil>(),
         });
 
         Scp914Registry.RegisterVanilla(ItemType.KeycardJanitor, new()
@@ -157,11 +157,11 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.SCP268, new()
         {
-            VeryFine = Scp914Rule.ToCustomItem<CloakGenerator>().WithChance(1f / 4f),
+            VeryFine = Scp914Rule.ToCItem<CloakGenerator>().WithChance(1f / 4f),
         });
         Scp914Registry.RegisterVanilla(ItemType.Coin, new()
         {
-            Coarse = Scp914Rule.ToCustomItem<Quarter>(),
+            Coarse = Scp914Rule.ToCItem<Quarter>(),
         });
         Scp914Registry.RegisterVanilla(ItemType.GunRevolver, new()
         {
@@ -230,25 +230,25 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToCustomItem<GunGoCTurret>(),
         });
 
-        Scp914Registry.RegisterCustomItem<SerumD>(new()
+        Scp914Registry.RegisterCItem<SerumD>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToVanilla(ItemType.Adrenaline),
             OneToOne = Scp914Rule.Passthrough,
-            Fine     = Scp914Rule.ToCustomItem<SerumC>(),
-            VeryFine = Scp914Rule.ToCustomItem<SerumC>(),
+            Fine     = Scp914Rule.ToCItem<SerumC>(),
+            VeryFine = Scp914Rule.ToCItem<SerumC>(),
         });
 
-        Scp914Registry.RegisterCustomItem<SerumC>(new()
+        Scp914Registry.RegisterCItem<SerumC>(new()
         {
             Rough    = Scp914Rule.Destroy,
-            Coarse   = Scp914Rule.ToCustomItem<SerumD>(),
-            OneToOne = Scp914Rule.ToCustomItem<SerumC>(),
-            Fine     = Scp914Rule.ToCustomItem<SerumC>(),
-            VeryFine = Scp914Rule.ToCustomItem<SerumC>(),
+            Coarse   = Scp914Rule.ToCItem<SerumD>(),
+            OneToOne = Scp914Rule.ToCItem<SerumC>(),
+            Fine     = Scp914Rule.ToCItem<SerumC>(),
+            VeryFine = Scp914Rule.ToCItem<SerumC>(),
         });
 
-        Scp914Registry.RegisterCustomItem<ClassXMemoryForcePil>(new()
+        Scp914Registry.RegisterCItem<ClassXMemoryForcePil>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToVanilla(ItemType.SCP500),
@@ -287,7 +287,7 @@ public static class Scp914Changes
         Scp914Registry.RegisterCItem<MasterCard>(new()
         {
             Rough    = Scp914Rule.Destroy,
-            Coarse   = Scp914Rule.ToCustomItem<Quarter>().Times(8),
+            Coarse   = Scp914Rule.ToCItem<Quarter>().Times(8),
             OneToOne = Scp914Rule.ToCItem<PlayingCard>(),
             Fine     = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
             VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardResearchCoordinator),
@@ -296,13 +296,13 @@ public static class Scp914Changes
         Scp914Registry.RegisterCItem<PlayingCard>(new()
         {
             Rough    = Scp914Rule.Destroy,
-            Coarse   = Scp914Rule.ToCustomItem<Quarter>().Times(8),
+            Coarse   = Scp914Rule.ToCItem<Quarter>().Times(8),
             OneToOne = Scp914Rule.ToCItem<MasterCard>(),
             Fine     = Scp914Rule.ToVanilla(ItemType.KeycardScientist),
             VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardResearchCoordinator),
         });
 
-        Scp914Registry.RegisterCustomItem<Quarter>(new()
+        Scp914Registry.RegisterCItem<Quarter>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
@@ -340,7 +340,7 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToVanilla(ItemType.KeycardMTFCaptain),
         });
 
-        Scp914Registry.RegisterCustomItem<CloakGenerator>(new()
+        Scp914Registry.RegisterCItem<CloakGenerator>(new()
         {
             Rough  = Scp914Rule.ToVanilla(ItemType.SCP268),
             Coarse = Scp914Rule.ToVanilla(ItemType.SCP268),

@@ -12,6 +12,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Scp1344 = CustomPlayerEffects.Scp1344;
@@ -38,7 +39,7 @@ public class GoCHoundDog : CRole
         player.TryAddCustomItem<ArmorVip>();
         player.TryAddCustomItem<GunSuperLogicer>();
         player.TryAddCustomItem<GunGoCRailgunFull>();
-        player.TryAddCustomItem<CloakGenerator>();
+        CItem.Get<CloakGenerator>()?.Give(player);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
         player.IsBypassModeEnabled = true;

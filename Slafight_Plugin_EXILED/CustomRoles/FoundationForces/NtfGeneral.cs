@@ -5,6 +5,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -25,7 +26,7 @@ public class NtfGeneral : CRole
         player.ClearInventory();
         Log.Debug("Giving Items to NtfGeneral");
         player.AddItem(ItemType.KeycardMTFCaptain);
-        player.TryAddCustomItem<SerumD>();
+        CItem.Get<SerumD>()?.Give(player);
         player.TryAddCustomItem<AdvancedMedkit>();
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);

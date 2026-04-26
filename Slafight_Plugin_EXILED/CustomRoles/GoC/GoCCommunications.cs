@@ -7,6 +7,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -30,7 +31,7 @@ public class GoCCommunications : CRole
         player.AddItem(ItemType.KeycardMTFOperative);
         player.TryAddCustomItem<SNAVUltimate>();
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem<SerumC>();
+        CItem.Get<SerumC>()?.Give(player);
         player.AddItem(ItemType.Radio);
         player.TryAddCustomItem<ArmorInfantry>();
             
