@@ -367,6 +367,7 @@
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
         <Compile Include="Extensions\RoomSpawner.cs" />
+        <Compile Include="Extensions\RoomUtils.cs" />
         <Compile Include="Extensions\RoundUtils.cs" />
         <Compile Include="Extensions\SchematicHelpers.cs" />
         <Compile Include="Extensions\StaticUtils.cs" />

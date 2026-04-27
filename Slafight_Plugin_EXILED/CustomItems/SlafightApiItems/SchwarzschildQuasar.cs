@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
@@ -8,6 +9,7 @@ using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Jailbird;
 using PlayerStatsSystem;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
@@ -20,7 +22,7 @@ public class SchwarzschildQuasar : CItem
     protected override ItemType BaseItem => ItemType.Jailbird;
     protected override bool  PickupLightEnabled => true;
     protected override Color PickupLightColor => Color.blue;
-    private Dictionary<ushort, SchwarzchildQuaserStatusBase> Bases = [];
+    private Dictionary<ushort, SchwarzschildQuasarStatusBase> Bases = [];
 
     public override void RegisterEvents()
     {
@@ -44,8 +46,26 @@ public class SchwarzschildQuasar : CItem
 
     protected override void OnAcquired(ItemAddedEventArgs ev, bool displayMessage)
     {
-        Bases.TryAdd(ev.Item.Serial, new SchwarzchildQuaserStatusBase(){Serial = ev.Item.Serial});
+        Bases.TryAdd(ev.Item.Serial, new SchwarzschildQuasarStatusBase(){Serial = ev.Item.Serial});
         base.OnAcquired(ev, displayMessage);
+    }
+
+    protected override void OnSelectedHintFinished(Player player)
+    {
+        player.EnableEffect<Burned>(15);
+        base.OnSelectedHintFinished(player);
+    }
+
+    protected override void OnChangingItem(ChangingItemEventArgs ev)
+    {
+        ev.Player?.DisableEffect<Burned>();
+        base.OnChangingItem(ev);
+    }
+
+    protected override void OnDropping(DroppingItemEventArgs ev)
+    {
+        ev.Player?.DisableEffect<Burned>();
+        base.OnDropping(ev);
     }
 
     protected override void OnHurtingOthers(HurtingEventArgs ev)
@@ -161,7 +181,7 @@ public enum SchwarzschildQuasarPhaseType
     HighPowered,
     Ender
 }
-public class SchwarzchildQuaserStatusBase
+public class SchwarzschildQuasarStatusBase
 {
     public Jailbird Jailbird => Item.Get(Serial).As<Jailbird>();
     public ushort Serial { get; init; }

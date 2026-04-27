@@ -2,11 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
+using InventorySystem.Items.Usables.Scp1344;
 using MEC;
 using Mirror;
+using PlayerRoles.FirstPersonControl.Thirdperson.Subcontrollers.Wearables;
+using ProjectMER.Features;
+using ProjectMER.Features.Objects;
 using UnityEngine;
 
 using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -16,6 +21,8 @@ using MapEvents = Exiled.Events.EventArgs.Map;
 using ServerHandlers = Exiled.Events.Handlers.Server;
 using Scp914Handlers = Exiled.Events.Handlers.Scp914;
 using Scp914Events = Exiled.Events.EventArgs.Scp914;
+using Scp1344Handlers = Exiled.Events.Handlers.Scp1344;
+using Scp1344Events = Exiled.Events.EventArgs.Scp1344;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
@@ -45,6 +52,10 @@ public abstract class CItem
 
     // Pickup ライトの追従コルーチンハンドル
     private static readonly Dictionary<ushort, CoroutineHandle> PickupLightCoroutines = new();
+
+    // Pickup に追従中の Schematic: Serial → SchematicObject / コルーチン
+    private static readonly Dictionary<ushort, SchematicObject> PickupSchematics = new();
+    private static readonly Dictionary<ushort, CoroutineHandle> PickupSchematicCoroutines = new();
 
     private static bool _eventsSubscribed;
 
@@ -91,6 +102,12 @@ public abstract class CItem
             // 同じ挙動を自前実装して回避する。
             Scp914Handlers.UpgradingPickup += OnAnyUpgradingPickup;
             Scp914Handlers.UpgradingInventoryItem += OnAnyUpgradingInventoryItem;
+
+            // Goggles (Scp1344) 装着・取り外しのライフサイクル。
+            // IsGoggles=true な CItem 派生だけが OnGogglesWorn / OnGogglesRemoved を受ける。
+            Scp1344Handlers.ChangedStatus += OnAnyScp1344ChangedStatus;
+            Scp1344Handlers.ChangingStatus += OnAnyScp1344ChangingStatus;
+            Scp1344Handlers.Deactivating += OnAnyScp1344Deactivating;
 
             ServerHandlers.WaitingForPlayers += OnAnyWaitingForPlayers;
 
@@ -150,6 +167,10 @@ public abstract class CItem
 
             Scp914Handlers.UpgradingPickup -= OnAnyUpgradingPickup;
             Scp914Handlers.UpgradingInventoryItem -= OnAnyUpgradingInventoryItem;
+
+            Scp1344Handlers.ChangedStatus -= OnAnyScp1344ChangedStatus;
+            Scp1344Handlers.ChangingStatus -= OnAnyScp1344ChangingStatus;
+            Scp1344Handlers.Deactivating -= OnAnyScp1344Deactivating;
 
             ServerHandlers.WaitingForPlayers -= OnAnyWaitingForPlayers;
 
@@ -218,6 +239,49 @@ public abstract class CItem
 
     /// <summary>Pickup ライトの影の種類。</summary>
     protected virtual LightShadows PickupLightShadowType => LightShadows.None;
+
+    // ==== Schematic 追従 (Pickup に SchematicObject を貼り付ける) ====
+
+    /// <summary>
+    /// Pickup に追従させる ProjectMER schematic 名。null/空なら attach しない。
+    /// 設定すると Pickup 生成時に自動 spawn → 毎フレーム位置追従、Pickup 破棄時に
+    /// schematic も破棄する。
+    /// </summary>
+    protected virtual string? PickupSchematicName => null;
+
+    // ==== Goggles (Scp1344) ライフサイクル ====
+
+    /// <summary>true なら本派生を Scp1344 (ゴーグル) として扱い、装着/取り外しイベントを受ける。</summary>
+    protected virtual bool IsGoggles => false;
+
+    /// <summary>装着完了までの秒数。デフォルト 5s で通常 SCP-1344 と同等。</summary>
+    protected virtual float WearingTime => 5f;
+
+    /// <summary>取り外し完了までの秒数。デフォルト 5.1s で通常 SCP-1344 と同等。</summary>
+    protected virtual float RemovingTime => 5.1f;
+
+    /// <summary>装着時に SCP-1344 視覚効果 (青視野) を打ち消すか。</summary>
+    protected virtual bool Remove1344Effect => true;
+
+    /// <summary>取り外し時に Blinded を消すか (false なら通常 SCP-1344 同様の盲目発生)。</summary>
+    protected virtual bool CanBeRemoveSafely => true;
+
+    /// <summary>派生クラスがゴーグル装着完了タイミングをフックしたい場合用。</summary>
+    protected virtual void OnGogglesWorn(Player player, Scp1344 goggles) { }
+
+    /// <summary>派生クラスがゴーグル取り外しタイミングをフックしたい場合用。</summary>
+    protected virtual void OnGogglesRemoved(Player player, Scp1344 goggles) { }
+
+    // ==== Armor カスタマイズ ====
+
+    /// <summary>ベスト (体) アーマーの効力 0-100。負値なら override 無し。</summary>
+    protected virtual int VestEfficacy => -1;
+
+    /// <summary>ヘルメット (頭) アーマーの効力 0-100。負値なら override 無し。</summary>
+    protected virtual int HelmetEfficacy => -1;
+
+    /// <summary>スタミナ消費倍率 (1f 標準、1f より大きいほど消費が速い)。負値なら override 無し。</summary>
+    protected virtual float StaminaUseMultiplier => -1f;
 
     /// <summary>拾った瞬間に出す Hint メッセージを生成。</summary>
     protected virtual string BuildPickedUpMessage()
@@ -321,7 +385,7 @@ public abstract class CItem
     /// </summary>
     /// <param name="player">付与先プレイヤー。</param>
     /// <param name="displayMessage">true なら ShowPickedUpHint に従い Hint を表示する。</param>
-    public virtual Item? Give(Player? player, bool displayMessage = true)
+    public virtual Item? Give(Player? player, bool displayMessage = false)
     {
         if (player == null) return null;
 
@@ -792,6 +856,10 @@ public abstract class CItem
         // PickupLightEnabled が true の CItem は自動でライトを追加。
         if (ci.PickupLightEnabled)
             ci.AddPickupLight(ev.Pickup);
+
+        // PickupSchematicName が設定されている CItem は schematic を貼り付けて追従。
+        if (!string.IsNullOrEmpty(ci.PickupSchematicName))
+            AttachPickupSchematic(ev.Pickup, ci.PickupSchematicName!);
     }
 
     private static void OnAnyPickupDestroyed(MapEvents.PickupDestroyedEventArgs ev)
@@ -805,6 +873,9 @@ public abstract class CItem
 
         // Pickup ライトとコルーチンの破棄
         DestroyPickupLightInternal(ev.Pickup.Serial);
+
+        // 追従中の schematic も破棄。
+        DestroyPickupSchematicInternal(ev.Pickup.Serial);
 
         // PickupDestroyed は「プレイヤーが拾って pickup が消えた」時にも発火するため、
         // ここで SerialToItem を即削除すると同じ CItem が拾われた瞬間に追跡が切れる。
@@ -833,10 +904,146 @@ public abstract class CItem
         PickupLights.Clear();
         PickupLightCoroutines.Clear();
 
+        // 残存する Pickup schematic も同様に一括破棄
+        foreach (var serial in PickupSchematics.Keys.ToList())
+            DestroyPickupSchematicInternal(serial);
+        PickupSchematics.Clear();
+        PickupSchematicCoroutines.Clear();
+
         foreach (var ci in RegisteredInstances.ToList())
         {
             try { ci.OnWaitingForPlayers(); }
             catch (Exception ex) { Log.Error($"CItem.OnWaitingForPlayers error in {ci.GetType().Name}: {ex}"); }
         }
+    }
+
+    // ==== Pickup schematic 追従 ====
+
+    private static void AttachPickupSchematic(Pickup pickup, string schematicName)
+    {
+        if (PickupSchematics.ContainsKey(pickup.Serial)) return;
+
+        try
+        {
+            var schem = ObjectSpawner.SpawnSchematic(schematicName, pickup.Position, pickup.Rotation);
+            if (schem == null) return;
+
+            PickupSchematics[pickup.Serial] = schem;
+            PickupSchematicCoroutines[pickup.Serial] = Timing.RunCoroutine(TrackPickupSchematic(pickup, schem));
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"CItem.AttachPickupSchematic({schematicName}) failed: {ex}");
+        }
+    }
+
+    private static IEnumerator<float> TrackPickupSchematic(Pickup pickup, SchematicObject schem)
+    {
+        while (pickup != null && schem != null
+               && pickup.Base != null && schem.gameObject != null)
+        {
+            schem.transform.position = pickup.Position;
+            schem.transform.rotation = pickup.Rotation;
+            yield return Timing.WaitForOneFrame;
+        }
+    }
+
+    private static void DestroyPickupSchematicInternal(ushort serial)
+    {
+        if (PickupSchematicCoroutines.TryGetValue(serial, out var handle))
+        {
+            Timing.KillCoroutines(handle);
+            PickupSchematicCoroutines.Remove(serial);
+        }
+
+        if (PickupSchematics.TryGetValue(serial, out var schem))
+        {
+            try { schem?.Destroy(); }
+            catch (Exception ex) { Log.Warn($"CItem.DestroyPickupSchematicInternal failed: {ex}"); }
+            PickupSchematics.Remove(serial);
+        }
+    }
+
+    // ==== Goggles (Scp1344) ライフサイクル ディスパッチ ====
+
+    private static void OnAnyScp1344ChangedStatus(Scp1344Events.ChangedStatusEventArgs ev)
+    {
+        if (ev?.Item == null) return;
+        if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
+        if (!ci.IsGoggles) return;
+
+        try
+        {
+            switch (ev.Scp1344Status)
+            {
+                case Scp1344Status.Activating:
+                    // 装着開始: WearingTime に応じて _useTime を縮める
+                    ev.Scp1344.Base._useTime = 5f - ci.WearingTime;
+                    break;
+
+                case Scp1344Status.Active:
+                    // 装着完了
+                    if (ci.Remove1344Effect)
+                    {
+                        ev.Player.DisableEffect(EffectType.Scp1344);
+                        WearableSync.EnableWearables(ev.Player.ReferenceHub, WearableElements.Scp1344Goggles);
+                    }
+                    ci.OnGogglesWorn(ev.Player, ev.Scp1344);
+                    break;
+
+                case Scp1344Status.Deactivating:
+                    // 取り外し開始: RemovingTime に応じて _useTime を縮める
+                    ev.Scp1344.Base._useTime = 5.1f - ci.RemovingTime;
+                    break;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error($"CItem.OnAnyScp1344ChangedStatus error in {ci.GetType().Name}: {e}");
+        }
+    }
+
+    private static void OnAnyScp1344ChangingStatus(Scp1344Events.ChangingStatusEventArgs ev)
+    {
+        if (ev == null || !ev.IsAllowed || ev.Item == null) return;
+        if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
+        if (!ci.IsGoggles) return;
+
+        // Deactivating → Idle (取り外し完了) のとき OnGogglesRemoved を発火。
+        if (ev.Scp1344StatusOld == Scp1344Status.Deactivating
+            && ev.Scp1344StatusNew == Scp1344Status.Idle)
+        {
+            try
+            {
+                if (!ci.Remove1344Effect)
+                    ev.Player.DisableEffect(EffectType.Scp1344);
+
+                if (ci.CanBeRemoveSafely)
+                {
+                    ev.Player.DisableEffect(EffectType.Blinded);
+                    if (ev.Player.ReferenceHub != null)
+                        WearableSync.DisableWearables(ev.Player.ReferenceHub, WearableElements.Scp1344Goggles);
+                }
+
+                ci.OnGogglesRemoved(ev.Player, ev.Scp1344);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"CItem.OnAnyScp1344ChangingStatus(remove) error in {ci.GetType().Name}: {e}");
+            }
+        }
+    }
+
+    private static void OnAnyScp1344Deactivating(Scp1344Events.DeactivatingEventArgs ev)
+    {
+        if (ev == null || !ev.IsAllowed || ev.Item == null) return;
+        if (!SerialToItem.TryGetValue(ev.Item.Serial, out var ci) || ci == null) return;
+        if (!ci.IsGoggles) return;
+        if (!ci.CanBeRemoveSafely) return;
+
+        // 安全取り外し可: Deactivate イベントは「即座に Idle にする」形ではなく、
+        // ChangingStatus 経由で Deactivating → Idle 遷移を回す。
+        ev.NewStatus = Scp1344Status.Idle;
+        ev.IsAllowed = false;
     }
 }

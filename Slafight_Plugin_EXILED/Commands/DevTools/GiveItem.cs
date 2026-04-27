@@ -71,7 +71,7 @@ public class GiveItem : ICommand
         }
 
         // CItem を付与して、返り値があれば成功
-        var item = cItem.Give(target, displayMessage: true);
+        var item = cItem!.Give(target, displayMessage: true);
         if (item != null)
         {
             response = $"Gave {cItem.DisplayName} ({cItem.UniqueKeyName}) to {target.Nickname}.";
