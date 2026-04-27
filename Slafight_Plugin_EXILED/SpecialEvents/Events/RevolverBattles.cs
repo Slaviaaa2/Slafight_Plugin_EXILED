@@ -21,6 +21,11 @@ public class RevolverBattles : SpecialEvent
         EventHandler.CreateAndPlayAudio;
 
     // ===== 実行エントリポイント =====
+    public override bool IsReadyToExecute()
+    {
+        return false; // TEMPORARY TEST
+    }
+
     protected override void OnExecute(int eventPID)
     {
         if (CancelIfOutdated())
