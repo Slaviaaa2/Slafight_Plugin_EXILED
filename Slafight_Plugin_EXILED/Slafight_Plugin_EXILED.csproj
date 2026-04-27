@@ -285,9 +285,10 @@
         <Compile Include="CustomItems\SlafightApiItems\Scp148.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SerumC.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SerumD.cs" />
-        <Compile Include="CustomItems\exiledApiItems\SNAV300.cs" />
-        <Compile Include="CustomItems\exiledApiItems\SNAV310.cs" />
-        <Compile Include="CustomItems\exiledApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\SNAV300.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\SNAV310.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\SNAVUltimate.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\SnavCommon.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Scp513Item.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ThrowableScp244.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Toolbox.cs" />

@@ -145,7 +145,7 @@ public static class Scp914Changes
 
         Scp914Registry.RegisterVanilla(ItemType.Radio, new()
         {
-            VeryFine = Scp914Rule.ToCustomItem<SNAV300>(),
+            VeryFine = Scp914Rule.ToCItem<SNAV300>(),
         });
         Scp914Registry.RegisterVanilla(ItemType.MicroHID, new()
         {
@@ -257,31 +257,31 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToCustomItem<ClassZMemoryForcePil>(),
         });
 
-        Scp914Registry.RegisterCustomItem<SNAV300>(new()
+        Scp914Registry.RegisterCItem<SNAV300>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
-            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
-            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
-            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+            OneToOne = Scp914Rule.ToCItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCItem<SNAVUltimate>(),
         });
 
-        Scp914Registry.RegisterCustomItem<SNAV310>(new()
+        Scp914Registry.RegisterCItem<SNAV310>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
-            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
-            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
-            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+            OneToOne = Scp914Rule.ToCItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCItem<SNAVUltimate>(),
         });
 
-        Scp914Registry.RegisterCustomItem<SNAVUltimate>(new()
+        Scp914Registry.RegisterCItem<SNAVUltimate>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
-            OneToOne = Scp914Rule.ToCustomItem<SNAV300>(),
-            Fine     = Scp914Rule.ToCustomItem<SNAV310>(),
-            VeryFine = Scp914Rule.ToCustomItem<SNAVUltimate>(),
+            OneToOne = Scp914Rule.ToCItem<SNAV300>(),
+            Fine     = Scp914Rule.ToCItem<SNAV310>(),
+            VeryFine = Scp914Rule.ToCItem<SNAVUltimate>(),
         });
 
         Scp914Registry.RegisterCItem<MasterCard>(new()

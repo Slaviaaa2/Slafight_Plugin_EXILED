@@ -150,7 +150,7 @@ public class LabApiHandler : CustomEventsHandler
                             scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                         break;
                     case "CISR_SNAV300":
-                        CustomItemExtensions.TrySpawn<SNAV300>(pos, out _);
+                        CItem.Get<SNAV300>()?.Spawn(pos);
                         break;
                     case "CISR_MFP":
                         CItem.Get<ClassXMemoryForcePil>()?.Spawn(pos);

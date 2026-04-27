@@ -29,7 +29,7 @@ public class GoCCommunications : CRole
         player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.ParticleDisruptor);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem<SNAVUltimate>();
+        CItem.Get<SNAVUltimate>()?.Give(player);
         player.AddItem(ItemType.Medkit);
         CItem.Get<SerumC>()?.Give(player);
         player.AddItem(ItemType.Radio);

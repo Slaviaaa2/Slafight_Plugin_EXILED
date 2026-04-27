@@ -18,9 +18,6 @@ public static class CustomItemsManager
         new MagicMissile().Register();
         new NeutralizeGrenade().Register();
         new Scp1425().Register();
-        new SNAV300().Register();
-        new SNAV310().Register();
-        new SNAVUltimate().Register();
         new ClassZMemoryForcePil().Register();
         new NvgNormal().Register();
         new CUA_SpyKit().Register();
