@@ -100,16 +100,6 @@ public class Scp513Item : CItem
         base.OnPickupDestroyed(ev);
     }
 
-    protected override void OnWaitingForPlayers()
-    {
-        var room = Room.Get(RoomType.HczHid);
-        if (room == null) return;
-
-        Spawn(room.WorldPosition(Vector3.up));
-
-        base.OnWaitingForPlayers();
-    }
-
     private void OnFlipping(FlippingCoinEventArgs ev)
     {
         if (!CheckHeld(ev.Player)) return;
