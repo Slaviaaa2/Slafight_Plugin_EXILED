@@ -34,7 +34,7 @@ public class RPNameSetter
             return;
 
         // Sergey等でRPName無効化中なら安全にスキップ
-        var flags = SpecificFlagsManager.Get(player);
+        var flags = player.Get();
         if (flags == null)
         {
             // ラウンド開始直後やDestroy直後に来た場合用の保険

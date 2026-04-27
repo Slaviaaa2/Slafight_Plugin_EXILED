@@ -18,10 +18,10 @@ public static class CustomTeamUtils
         return new CustomTeamInfo
         {
             Team = team,
-            IsGoI = IsGoI(team),
-            TeamName = GetTeamName(team),
-            CassieString = GetTeamCassie(team),
-            TeamColor = GetTeamColor(team)
+            IsGoI = team.IsGoI(),
+            TeamName = team.GetTeamName(),
+            CassieString = team.GetTeamCassie(),
+            TeamColor = team.GetTeamColor()
         };
     }
 

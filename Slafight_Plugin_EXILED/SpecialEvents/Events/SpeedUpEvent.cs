@@ -38,7 +38,7 @@ public class SpeedUpEvent : SpecialEvent
             if (player == null) continue;
             player.EnableEffect(EffectType.MovementBoost, 255);
             player.EnableEffect(EffectType.Scp207, 255);
-            SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.Scp207Resistance);
+            player.TryAddFlag(SpecificFlagType.Scp207Resistance);
             player.IsUsingStamina = false;
         }
         
@@ -58,7 +58,7 @@ public class SpeedUpEvent : SpecialEvent
                 if (player == null) continue;
                 player.EnableEffect(EffectType.MovementBoost, 255);
                 player.EnableEffect(EffectType.Scp207, 255);
-                SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.Scp207Resistance);
+                player.TryAddFlag(SpecificFlagType.Scp207Resistance);
                 player.IsUsingStamina = false;
             }
             yield return Timing.WaitForSeconds(5f);

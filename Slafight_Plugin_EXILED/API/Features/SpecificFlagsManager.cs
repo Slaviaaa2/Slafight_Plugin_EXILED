@@ -134,7 +134,7 @@ public static class SpecificFlagsManager
 
         if (player?.IsAlive != true || !Round.InProgress) yield break;
 
-        TryRemoveFlag(player, flag);
+        player.TryRemoveFlag(flag);
 
         if (Coroutines.TryGetValue(player.Id, out var list))
             list.RemoveAll(h => !h.IsValid);

@@ -42,9 +42,9 @@ public static class SergeySharedContents
             if (!player.IsEffectActive<Ghostly>())
                 player.EnableEffect(EffectType.Ghostly);
 
-            var flags = SpecificFlagsManager.Get(player);
+            var flags = player.Get();
             if (flags != null && !flags.Contains(SpecificFlagType.RPNameDisabled))
-                SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.RPNameDisabled);
+                player.TryAddFlag(SpecificFlagType.RPNameDisabled);
 
             yield return Timing.WaitForSeconds(1f);
         }

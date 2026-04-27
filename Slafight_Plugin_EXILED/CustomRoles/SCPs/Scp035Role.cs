@@ -111,7 +111,7 @@ public class Scp035Role : CRole
     protected override void OnDying(DyingEventArgs ev)
     {
         Cleanup(ev.Player);
-        CassieHelper.AnnounceTermination(ev, "SCP 0 3 5", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 0 3 5", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 

@@ -57,7 +57,7 @@ public static class SpyKitRecords
         var data = morphData;
         if (!string.IsNullOrEmpty(data.MorphCustomName))
         {
-            SpecificFlagsManager.TryAddFlag(player, SpecificFlagType.RPNameDisabled);
+            player.TryAddFlag(SpecificFlagType.RPNameDisabled);
             player.CustomName = data.MorphCustomName!;
         }
         if (!string.IsNullOrEmpty(data.MorphCustomInfo))
@@ -74,7 +74,7 @@ public static class SpyKitRecords
             var data = playerSpyData.NowMorphData;
             if (!string.IsNullOrEmpty(data.MorphCustomName))
             {
-                SpecificFlagsManager.TryRemoveFlag(player, SpecificFlagType.RPNameDisabled);
+                player.TryRemoveFlag(SpecificFlagType.RPNameDisabled);
                 player.CustomName = RPNameSetter.PlayerInputNames.ContainsKey(player) 
                     ? RPNameSetter.PlayerInputNames[player] 
                     : playerSpyData.PlayerBaseRole.ToString();

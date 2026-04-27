@@ -112,7 +112,7 @@ public class Scp682Role : CRole
     protected override void OnDying(DyingEventArgs ev)
     {
         SpeedLevels.Remove(ev.Player);
-        CassieHelper.AnnounceTermination(ev, "SCP 6 8 2", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 6 8 2", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 }

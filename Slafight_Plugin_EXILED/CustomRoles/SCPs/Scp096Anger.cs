@@ -56,7 +56,7 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
             ShyGuyPositions.Remove(ev.Player);
             InTryNotToCryAnim.Remove(ev.Player);  // ★安全クリーンアップ
         }
-        CassieHelper.AnnounceTermination(ev, "SCP 0 9 6", $"<color={CustomTeamUtils.GetTeamColor(Team)}>{RoleName}</color>", true);
+        CassieHelper.AnnounceTermination(ev, "SCP 0 9 6", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         base.OnDying(ev);
     }
 

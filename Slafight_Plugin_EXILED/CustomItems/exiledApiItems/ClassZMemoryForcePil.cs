@@ -52,7 +52,7 @@ public class ClassZMemoryForcePil : CustomItem
     private void OnUsing(UsingItemEventArgs ev)
     {
         if (!Check(ev.Item) || ev.Player == null) return;
-        if (SpecificFlagsManager.HasFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled))
+        if (ev.Player.HasFlag(SpecificFlagType.AntiMemeEffectDisabled))
         {
             ev.IsAllowed = false;
             ev.Player.ShowHint("既に耐性を得ている為、使用できません。");
@@ -64,7 +64,7 @@ public class ClassZMemoryForcePil : CustomItem
         if (!Check(ev.Item) || ev.Player == null) return;
         ev.Player.EnableEffect(EffectType.Invigorated, 60);
         ev.Player.EnableEffect(EffectType.Scp207, 4);
-        SpecificFlagsManager.TryAddFlag(ev.Player, SpecificFlagType.AntiMemeEffectDisabled);
+        ev.Player.TryAddFlag(SpecificFlagType.AntiMemeEffectDisabled);
     }
     
     private void RemoveGlow(PickupDestroyedEventArgs ev)
