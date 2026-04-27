@@ -10,7 +10,9 @@ namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 public class GunGoCRailgunFull : CItemWeapon
 {
     public override string DisplayName => "GoCレールガン(正式)";
-    public override string Description => "にゃー";
+    public override string Description =>
+        "GoCのホワイトスーツに搭載されるとても強力な主砲。\n" +
+        "<color=red>最大15000ダメの即死級武器</color>";
 
     protected override string UniqueKey => "GunGoCRailgunFull";
     protected override ItemType BaseItem => ItemType.ParticleDisruptor;

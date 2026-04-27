@@ -8,7 +8,7 @@ namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 public class CloakGenerator : CItem
 {
     public override string DisplayName => "外套ジェネレータ";
-    public override string Description => "ほわいとすーつのやつ";
+    public override string Description => "ホワイトスーツが持つ特殊な透明化装置。\n使用することで透明・非透明を切り替えられる";
 
     protected override string UniqueKey => "CloakGenerator";
     protected override ItemType BaseItem => ItemType.SCP268;

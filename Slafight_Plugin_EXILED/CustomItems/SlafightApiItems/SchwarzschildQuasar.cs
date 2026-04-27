@@ -17,7 +17,7 @@ namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 public class SchwarzschildQuasar : CItem
 {
     public override string DisplayName => "シュバルツシルト・クエィサァー";
-    public override string Description => "W.I.P";
+    public override string Description => "???";
     protected override string UniqueKey => "SchwarzschildQuasar";
     protected override ItemType BaseItem => ItemType.Jailbird;
     protected override bool  PickupLightEnabled => true;
