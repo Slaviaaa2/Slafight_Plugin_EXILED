@@ -346,6 +346,29 @@ public static class Scp914Changes
             Rough  = Scp914Rule.ToVanilla(ItemType.SCP268),
             Coarse = Scp914Rule.ToVanilla(ItemType.SCP268),
         });
+        
+        Scp914Registry.RegisterCustomItem<CaneOfTheStars>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToCItem<KeycardFifthistPriest>(),
+            OneToOne = Scp914Rule.ToVanilla(ItemType.SCP1509),
+            Fine     = Scp914Rule.Keep,
+            VeryFine = Scp914Rule.Custom(ctx =>
+            {
+                if (UnityEngine.Random.Range(0, 77) == 0)
+                {
+                    if (ctx.IsInventory)
+                        CItem.Get<SchwarzschildQuasar>()?.Give(ctx.Owner, true);
+                    else
+                        CItem.Get<SchwarzschildQuasar>()?.Spawn(ctx.OutputPosition);
+                }
+
+                if (ctx.IsInventory)
+                    ctx.Owner!.RemoveItem(ctx.Item!, true);
+                else
+                    ctx.Pickup?.Destroy();
+            })
+        });
     }
 
     /// <summary>CItem → Vanilla/Custom/CItem の変換ルール。</summary>

@@ -219,7 +219,7 @@ public static class Scp914Dispatcher
         var instance = ResolveCItem(cItemType);
         if (instance == null) return;
 
-        if (!player.IsInventoryFull && instance.Give(player, false) != null) return;
+        if (!player.IsInventoryFull && instance.Give(player, true) != null) return;
         instance.Spawn(dropPosition);
     }
 }
