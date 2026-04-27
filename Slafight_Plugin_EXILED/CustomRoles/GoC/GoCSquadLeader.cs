@@ -27,7 +27,7 @@ public class GoCSquadLeader : CRole
         player.Health = player.MaxHealth;
         player.ClearInventory();
         player.AddItem(ItemType.GunFRMG0);
-        player.TryAddCustomItem<GunGoCRailgun>();
+        CItem.Get<GunGoCRailgun>()?.Give(player);
         player.AddItem(ItemType.KeycardMTFCaptain);
         CItem.Get<SerumC>()?.Give(player);
         player.AddItem(ItemType.Medkit);

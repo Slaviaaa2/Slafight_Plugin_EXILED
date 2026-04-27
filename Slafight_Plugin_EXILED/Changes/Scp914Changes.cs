@@ -149,7 +149,7 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.MicroHID, new()
         {
-            Coarse = Scp914Rule.ToCustomItem<HIDTurret>().WithChance(1f / 2f),
+            Coarse = Scp914Rule.ToCItem<HIDTurret>().WithChance(1f / 2f),
         });
         Scp914Registry.RegisterVanilla(ItemType.GrenadeFlash, new()
         {
@@ -165,7 +165,7 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.GunRevolver, new()
         {
-            Fine = Scp914Rule.ToCustomItem<GunTacticalRevolver>().WithChance(1f / 2f),
+            Fine = Scp914Rule.ToCItem<GunTacticalRevolver>().WithChance(1f / 2f),
         });
         Scp914Registry.RegisterVanilla(ItemType.SCP244a, new()
         {
@@ -221,13 +221,13 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToCustomItem<NvgBlue>(),
         });
 
-        Scp914Registry.RegisterCustomItem<HIDTurret>(new()
+        Scp914Registry.RegisterCItem<HIDTurret>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
-            OneToOne = Scp914Rule.ToCustomItem<HIDTurret>(),
+            OneToOne = Scp914Rule.ToCItem<HIDTurret>(),
             Fine     = Scp914Rule.ToVanilla(ItemType.MicroHID),
-            VeryFine = Scp914Rule.ToCustomItem<GunGoCTurret>(),
+            VeryFine = Scp914Rule.ToCItem<GunGoCTurret>(),
         });
 
         Scp914Registry.RegisterCItem<SerumD>(new()

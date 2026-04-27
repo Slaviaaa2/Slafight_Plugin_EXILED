@@ -122,7 +122,7 @@ public class LabApiHandler : CustomEventsHandler
 
         Timing.CallDelayed(1.05f, () =>
         {
-            CustomItemExtensions.TrySpawn<HIDTurret>(new Vector3(134.94f,300.65f,-65f),out _);
+            CItem.Get<HIDTurret>()?.Spawn(new Vector3(134.94f, 300.65f, -65f));
             CustomItemExtensions.TrySpawn<NvgNormal>(Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up*1.5f), out _);
         });
         Timing.CallDelayed(2.0f, PickupSetupTriggerPoints);
@@ -143,7 +143,7 @@ public class LabApiHandler : CustomEventsHandler
                 switch (trig.Tag)
                 {
                     case "CISR_GoCRailgun":
-                        CustomItemExtensions.TrySpawn<GunGoCRailgun>(pos, out _);
+                        CItem.Get<GunGoCRailgun>()?.Spawn(pos);
                         break;
                     case "CISR_Scp1425":
                         if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))

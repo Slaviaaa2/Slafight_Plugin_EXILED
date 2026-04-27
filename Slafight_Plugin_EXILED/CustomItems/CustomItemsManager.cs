@@ -15,9 +15,6 @@ public static class CustomItemsManager
         new FakeGrenade().Register();
         new FlashBangE().Register();
         new GoCRecruitPaper().Register();
-        new GunGoCRailgun().Register();
-        new GunGoCTurret().Register();
-        new HIDTurret().Register();
         new MagicMissile().Register();
         new NeutralizeGrenade().Register();
         new Scp1425().Register();
@@ -25,8 +22,6 @@ public static class CustomItemsManager
         new SNAV310().Register();
         new SNAVUltimate().Register();
         new ClassZMemoryForcePil().Register();
-        new GunGoCRailgunFull().Register();
-        new GunTacticalRevolver().Register();
         new NvgNormal().Register();
         new CUA_SpyKit().Register();
         new Veritas().Register();

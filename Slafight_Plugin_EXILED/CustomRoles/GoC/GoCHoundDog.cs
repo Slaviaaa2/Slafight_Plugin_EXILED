@@ -38,7 +38,7 @@ public class GoCHoundDog : CRole
         player.ClearInventory();
         player.TryAddCustomItem<ArmorVip>();
         CItem.Get<GunSuperLogicer>()?.Give(player);
-        player.TryAddCustomItem<GunGoCRailgunFull>();
+        CItem.Get<GunGoCRailgunFull>()?.Give(player);
         CItem.Get<CloakGenerator>()?.Give(player);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
