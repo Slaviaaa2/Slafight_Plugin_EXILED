@@ -6,7 +6,8 @@ using MEC;
 using Mirror;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.Changes;
@@ -27,7 +28,7 @@ public class Scp1509Handler
     {
         if (!ev.IsAllowed) return;
         if (ev.Player == null) return;
-        if (ev.Player.CurrentItem.IsCustomItem<Scp148>()) return;
+        if (CItem.Get<Scp148>()?.CheckHeld(ev.Player) == true) return;
 
         var caster = ev.Player;
         var target = ev.Target;

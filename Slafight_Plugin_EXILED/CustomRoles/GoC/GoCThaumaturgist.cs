@@ -7,6 +7,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -27,7 +28,7 @@ public class GoCThaumaturgist : CRole
         player.ClearInventory();
         player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem<Scp148>();
+        CItem.Get<Scp148>()?.Give(player);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.SCP500);

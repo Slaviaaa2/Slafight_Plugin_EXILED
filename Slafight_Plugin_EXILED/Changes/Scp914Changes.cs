@@ -139,8 +139,8 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.KeycardO5, new()
         {
-            Fine     = Scp914Rule.ToCustomItem<OmegaWarheadAccess>().WithChance(1f / 2f),
-            VeryFine = Scp914Rule.ToCustomItem<OmegaWarheadAccess>().WithChance(1f / 2f),
+            Fine     = Scp914Rule.ToCItem<OmegaWarheadAccess>().WithChance(1f / 2f),
+            VeryFine = Scp914Rule.ToCItem<OmegaWarheadAccess>().WithChance(1f / 2f),
         });
 
         Scp914Registry.RegisterVanilla(ItemType.Radio, new()
@@ -186,16 +186,16 @@ public static class Scp914Changes
     /// <summary>Exiled CustomItem → Custom/CItem の変換ルール。</summary>
     private static void RegisterCustomItemRules()
     {
-        Scp914Registry.RegisterCustomItem<KeycardFifthist>(new()
+        Scp914Registry.RegisterCItem<KeycardFifthist>(new()
         {
             Coarse   = Scp914Rule.ToCustomItem<Scp1425>(),
-            Fine     = Scp914Rule.ToCustomItem<KeycardFifthistPriest>(),
+            Fine     = Scp914Rule.ToCItem<KeycardFifthistPriest>(),
             VeryFine = Scp914Rule.ToCustomItem<MagicMissile>().WithChance(1f / 3f),
         });
 
-        Scp914Registry.RegisterCustomItem<KeycardFifthistPriest>(new()
+        Scp914Registry.RegisterCItem<KeycardFifthistPriest>(new()
         {
-            Coarse   = Scp914Rule.ToCustomItem<KeycardFifthist>(),
+            Coarse   = Scp914Rule.ToCItem<KeycardFifthist>(),
             Fine     = Scp914Rule.ToCustomItem<MagicMissile>(),
             VeryFine = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
         });

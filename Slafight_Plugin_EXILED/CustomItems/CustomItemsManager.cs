@@ -7,7 +7,6 @@ public static class CustomItemsManager
 {
     public static void RegisterAllItems()
     {
-        new AdvancedMedkit().Register();
         new AntiMemeGoggle().Register();
         new ArmorInfantry().Register();
         new ArmorVip().Register();
@@ -16,18 +15,9 @@ public static class CustomItemsManager
         new FakeGrenade().Register();
         new FlashBangE().Register();
         new GoCRecruitPaper().Register();
-        new GunCOM77().Register();
-        new GunFRMGX().Register();
-        new GunFSP18().Register();
         new GunGoCRailgun().Register();
         new GunGoCTurret().Register();
-        new GunN7CR().Register();
-        new GunN7Weltkrieg().Register();
-        new GunProject90().Register();
-        new GunSuperLogicer().Register();
         new HIDTurret().Register();
-        new KeycardFifthist().Register();
-        new KeycardFifthistPriest().Register();
         new KeycardOld_Cadet().Register();
         new KeycardOld_Commander().Register();
         new KeycardOld_ContainmentEngineer().Register();
@@ -41,8 +31,6 @@ public static class CustomItemsManager
         new KeycardOld_ZoneManager().Register();
         new MagicMissile().Register();
         new NeutralizeGrenade().Register();
-        new OmegaWarheadAccess().Register();
-        new Scp148().Register();
         new Scp1425().Register();
         new SNAV300().Register();
         new SNAV310().Register();

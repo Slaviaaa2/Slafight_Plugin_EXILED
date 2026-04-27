@@ -37,7 +37,7 @@ public class GoCHoundDog : CRole
         player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 3.5f;
         player.ClearInventory();
         player.TryAddCustomItem<ArmorVip>();
-        player.TryAddCustomItem<GunSuperLogicer>();
+        CItem.Get<GunSuperLogicer>()?.Give(player);
         player.TryAddCustomItem<GunGoCRailgunFull>();
         CItem.Get<CloakGenerator>()?.Give(player);
         player.AddItem(ItemType.Adrenaline);

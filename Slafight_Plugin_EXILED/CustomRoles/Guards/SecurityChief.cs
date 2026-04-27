@@ -32,7 +32,7 @@ public class SecurityChief : CRole
         player.AddItem(ItemType.ArmorCombat);
         player.AddItem(ItemType.Radio);
         CItem.Get<KeycardSecurityChief>()?.Give(player);
-        player.TryAddCustomItem<GunFSP18>();
+        CItem.Get<GunFSP18>()?.Give(player);
         player.AddAmmo(AmmoType.Nato9,180);
             
         player.SetCustomInfo("Security Chief");

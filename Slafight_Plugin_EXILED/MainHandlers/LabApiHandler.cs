@@ -164,7 +164,7 @@ public class LabApiHandler : CustomEventsHandler
                         CItem.Get<ClassXMemoryForcePil>()?.Spawn(pos);
                         break;
                     case "Scp682SpawnPoint":
-                        CustomItemExtensions.TrySpawn<OmegaWarheadAccess>(pos, out _);
+                        CItem.Get<OmegaWarheadAccess>()?.Spawn(pos);
                         break;
                 }
             }

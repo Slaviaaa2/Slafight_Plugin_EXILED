@@ -7,6 +7,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -27,9 +28,9 @@ public class GoCMedic : CRole
         player.ClearInventory();
         player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem<AdvancedMedkit>();
-        player.TryAddCustomItem<AdvancedMedkit>();
-        player.TryAddCustomItem<AdvancedMedkit>();
+        CItem.Get<AdvancedMedkit>()?.Give(player);
+        CItem.Get<AdvancedMedkit>()?.Give(player);
+        CItem.Get<AdvancedMedkit>()?.Give(player);
         player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.Radio);
         player.TryAddCustomItem<ArmorInfantry>();

@@ -9,6 +9,7 @@ using ProjectMER.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
@@ -52,7 +53,7 @@ public class FifthistPriest : CRole
         Log.Debug("Giving Items to F_Priest");
         player.AddItem(ItemType.GunSCP127);
         player.AddItem(ItemType.ArmorHeavy);
-        player.TryAddCustomItem<KeycardFifthistPriest>();
+        CItem.Get<KeycardFifthistPriest>()?.Give(player);
         player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.GrenadeHE);

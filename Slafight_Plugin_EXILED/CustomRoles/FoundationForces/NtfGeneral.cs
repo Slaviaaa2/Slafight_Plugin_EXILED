@@ -27,12 +27,12 @@ public class NtfGeneral : CRole
         Log.Debug("Giving Items to NtfGeneral");
         player.AddItem(ItemType.KeycardMTFCaptain);
         CItem.Get<SerumD>()?.Give(player);
-        player.TryAddCustomItem<AdvancedMedkit>();
+        CItem.Get<AdvancedMedkit>()?.Give(player);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
         player.TryAddCustomItem<ArmorVip>();
-        player.TryAddCustomItem<GunFRMGX>();
+        CItem.Get<GunFRMGX>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,320);
 

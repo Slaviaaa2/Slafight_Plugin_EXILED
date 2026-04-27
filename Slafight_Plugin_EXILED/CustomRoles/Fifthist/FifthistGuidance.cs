@@ -4,6 +4,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ public class FifthistGuidance : CRole
         player.ClearInventory();
         player.TryAddCustomItem<CaneOfTheStars>();
         player.AddItem(ItemType.ArmorHeavy);
-        player.TryAddCustomItem<KeycardFifthist>();
+        CItem.Get<KeycardFifthist>()?.Give(player);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.SCP500);

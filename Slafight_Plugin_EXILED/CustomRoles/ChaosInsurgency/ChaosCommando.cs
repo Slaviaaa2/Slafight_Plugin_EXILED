@@ -7,6 +7,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -31,9 +32,9 @@ public class ChaosCommando : CRole
         player.AddItem(ItemType.KeycardChaosInsurgency);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem<AdvancedMedkit>();
+        CItem.Get<AdvancedMedkit>()?.Give(player);
         player.TryAddCustomItem<ArmorInfantry>();
-        player.TryAddCustomItem<GunSuperLogicer>();
+        CItem.Get<GunSuperLogicer>()?.Give(player);
         
         player.AddAmmo(AmmoType.Nato762, 300);
             
