@@ -1,0 +1,170 @@
+using System.Collections.Generic;
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Pickups;
+using Exiled.Events.EventArgs.Item;
+using Exiled.Events.EventArgs.Player;
+using InventorySystem.Items.Jailbird;
+using PlayerStatsSystem;
+using Slafight_Plugin_EXILED.API.Features;
+using UnityEngine;
+
+namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
+
+public class SchwarzschildQuasar : CItem
+{
+    public override string DisplayName => "シュバルツシルト・クエィサァー";
+    public override string Description => "W.I.P";
+    protected override string UniqueKey => "SchwarzschildQuasar";
+    protected override ItemType BaseItem => ItemType.Jailbird;
+    protected override bool  PickupLightEnabled => true;
+    protected override Color PickupLightColor => Color.blue;
+    private Dictionary<uint, SchwarzchildQuaserStatusBase> Bases = [];
+
+    public override void RegisterEvents()
+    {
+        Exiled.Events.Handlers.Item.JailbirdChangingWearState += OnJailbirdChangingPhase;
+        Exiled.Events.Handlers.Item.JailbirdChargeComplete += OnJailbirdCharged;
+        base.RegisterEvents();
+    }
+
+    public override void UnregisterEvents()
+    {
+        Exiled.Events.Handlers.Item.JailbirdChangingWearState -= OnJailbirdChangingPhase;
+        Exiled.Events.Handlers.Item.JailbirdChargeComplete -= OnJailbirdCharged;
+        base.UnregisterEvents();
+    }
+
+    protected override void OnWaitingForPlayers()
+    {
+        Bases.Clear();
+        base.OnWaitingForPlayers();
+    }
+
+    protected override void OnSpawned(Pickup pickup)
+    {
+        Bases.Add(pickup.Serial, new SchwarzchildQuaserStatusBase());
+        base.OnSpawned(pickup);
+    }
+
+    protected override void OnHurtingOthers(HurtingEventArgs ev)
+    {
+        if (!Bases.TryGetValue(ev.Attacker.CurrentItem.Serial, out var @base)) return;
+        var result = @base.Phase switch
+        {
+            SchwarzschildQuasarPhaseType.WakeUp => 10f,
+            SchwarzschildQuasarPhaseType.Normal => 20f,
+            SchwarzschildQuasarPhaseType.HighPowered => 30f,
+            SchwarzschildQuasarPhaseType.Ender => 777f,
+            _ => 0f
+        };
+
+        if (@base.IsCharged)
+            result *= 2f;
+        
+        ev.Amount = result;
+        if (@base.IsCharged)
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
+            }
+
+            if (@base.Phase is SchwarzschildQuasarPhaseType.HighPowered)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    ev.Player?.ExplodeEffect(ProjectileType.Flashbang);
+                }
+            }
+            else if (@base.Phase is SchwarzschildQuasarPhaseType.Ender)
+            {
+                for (int i = 0; i < 7; i++)
+                {
+                    ev.Player?.ExplodeEffect(ProjectileType.Flashbang);
+                    ev.Player?.SendWarheadExplosionEffect();
+                }
+            }
+        }
+        else
+        {
+            ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
+        }
+
+        @base.UsedCount++;
+        @base.IsCharged = false;
+        base.OnHurtingOthers(ev);
+    }
+
+    private void OnJailbirdChangingPhase(JailbirdChangingWearStateEventArgs ev)
+    {
+        if (!Check(ev.Item) || !Bases.TryGetValue(ev.Item.Serial, out var @base)) return;
+    
+        // 30回使用後に壊れる: LowWear/MediumWear/HighWearすべて使用、29回AlmostBroken
+        ev.NewWearState = @base.UsedCount switch
+        {
+            // 0-19回: Healthy (初期~中盤)
+            <= 19 => JailbirdWearState.Healthy,
+        
+            // 20-24回: LowWear (低摩耗開始)
+            <= 24 => JailbirdWearState.LowWear,
+        
+            // 25-27回: MediumWear (中摩耗)
+            <= 27 => JailbirdWearState.MediumWear,
+        
+            // 28回: HighWear (高摩耗)
+            28 => JailbirdWearState.HighWear,
+        
+            // 29回: AlmostBroken (最終警告)
+            29 => JailbirdWearState.AlmostBroken,
+        
+            // 30回以上: Broken (破壊)
+            _ => JailbirdWearState.Broken
+        };
+    }
+
+    private void OnJailbirdCharged(JailbirdChargeCompleteEventArgs ev)
+    {
+        if (!Check(ev.Item)) return;
+        if (Bases.TryGetValue(ev.Item.Serial, out var @base))
+        {
+            @base.IsCharged = true;
+        }
+    }
+}
+
+public enum SchwarzschildQuasarPhaseType
+{
+    WakeUp,
+    Normal,
+    HighPowered,
+    Ender
+}
+public class SchwarzchildQuaserStatusBase
+{
+    public uint Serial { get; set; }
+    public int UsedCount { get; set; }
+    public SchwarzschildQuasarPhaseType Phase
+    {
+        get
+        {
+            if (UsedCount <= 5)
+            {
+                return SchwarzschildQuasarPhaseType.WakeUp;
+            }
+            else if (UsedCount <= 10)
+            {
+                return SchwarzschildQuasarPhaseType.Normal;
+            }
+            else if (UsedCount <= 15)
+            {
+                return SchwarzschildQuasarPhaseType.HighPowered;
+            }
+            else
+            {
+                return SchwarzschildQuasarPhaseType.Ender;
+            }
+        }
+    }
+    public bool IsCharged { get; set; }
+}

@@ -100,7 +100,7 @@ public class Scp3005Role : CRole
 
     private void OnConsumed(ConsumedCorpseEventArgs ev)
     {
-        if (!Check(ev.Player)) return;
+        if (!Check(ev.Player) || ev.Ragdoll.Owner.IsAlive) return;
         ev.ConsumeHeal = 0f;
         var target = ev.Ragdoll.Owner;
         target?.SetRole(CRoleTypeId.FifthistMarionette);

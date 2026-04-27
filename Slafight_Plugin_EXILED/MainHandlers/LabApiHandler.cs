@@ -158,6 +158,13 @@ public class LabApiHandler : CustomEventsHandler
                     case "Scp682SpawnPoint":
                         CItem.Get<OmegaWarheadAccess>()?.Spawn(pos);
                         break;
+                    case "CISR_SCP513":
+                        CItem.Get<Scp513Item>()?.Spawn(pos);
+                        break;
+                    case "CISR_SQ":
+                        var sq = CItem.Get<SchwarzschildQuasar>()?.Spawn(pos);
+                        sq?.Transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+                        break;
                 }
             }
             catch (Exception e)

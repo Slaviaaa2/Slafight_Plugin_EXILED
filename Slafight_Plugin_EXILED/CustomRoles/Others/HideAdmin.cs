@@ -27,7 +27,6 @@ public class HideAdmin : CRole
 
         Timing.CallDelayed(0.05f, () =>
         {
-            player.TryAddFlag(SpecificFlagType.SpecialWeaponsDisabled);
             player.SetCustomInfo("<color=black>THE ADMINISTRATOR</color>");
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
