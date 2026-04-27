@@ -272,17 +272,6 @@
         <Compile Include="CustomItems\SlafightApiItems\KeycardConscripts.cs" />
         <Compile Include="CustomItems\SlafightApiItems\KeycardFifthist.cs" />
         <Compile Include="CustomItems\SlafightApiItems\KeycardFifthistPriest.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Cadet.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Commander.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ContainmentEngineer.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_FacilityManager.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Guard.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Janitor.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Lieutenant.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_O5.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ResearchSupervisor.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_Scientist.cs" />
-        <Compile Include="CustomItems\exiledApiItems\KeycardOld_ZoneManager.cs" />
         <Compile Include="CustomItems\SlafightApiItems\KeycardSecurityChief.cs" />
         <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
         <Compile Include="CustomItems\SlafightApiItems\MasterCard.cs" />

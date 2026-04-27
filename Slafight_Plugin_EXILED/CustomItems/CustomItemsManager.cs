@@ -18,17 +18,6 @@ public static class CustomItemsManager
         new GunGoCRailgun().Register();
         new GunGoCTurret().Register();
         new HIDTurret().Register();
-        new KeycardOld_Cadet().Register();
-        new KeycardOld_Commander().Register();
-        new KeycardOld_ContainmentEngineer().Register();
-        new KeycardOld_FacilityManager().Register();
-        new KeycardOld_Guard().Register();
-        new KeycardOld_Janitor().Register();
-        new KeycardOld_Lieutenant().Register();
-        new KeycardOld_O5().Register();
-        new KeycardOld_ResearchSupervisor().Register();
-        new KeycardOld_Scientist().Register();
-        new KeycardOld_ZoneManager().Register();
         new MagicMissile().Register();
         new NeutralizeGrenade().Register();
         new Scp1425().Register();

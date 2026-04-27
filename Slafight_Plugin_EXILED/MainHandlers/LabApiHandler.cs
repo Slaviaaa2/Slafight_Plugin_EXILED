@@ -145,14 +145,6 @@ public class LabApiHandler : CustomEventsHandler
                     case "CISR_GoCRailgun":
                         CustomItemExtensions.TrySpawn<GunGoCRailgun>(pos, out _);
                         break;
-                    case "CISR_OldPrivateCard":
-                        if (CustomItemExtensions.TrySpawn<KeycardOld_Cadet>(pos, out var privateCard))
-                            privateCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-                        break;
-                    case "CISR_OldCECard":
-                        if (CustomItemExtensions.TrySpawn<KeycardOld_ContainmentEngineer>(pos, out var ceCard))
-                            ceCard?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
-                        break;
                     case "CISR_Scp1425":
                         if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))
                             scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
