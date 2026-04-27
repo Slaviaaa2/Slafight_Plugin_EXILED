@@ -42,10 +42,10 @@ public class SchwarzschildQuasar : CItem
         base.OnWaitingForPlayers();
     }
 
-    protected override void OnSpawned(Pickup pickup)
+    protected override void OnAcquired(ItemAddedEventArgs ev, bool displayMessage)
     {
-        Bases.Add(pickup.Serial, new SchwarzchildQuaserStatusBase(){Serial = pickup.Serial});
-        base.OnSpawned(pickup);
+        Bases.TryAdd(ev.Item.Serial, new SchwarzchildQuaserStatusBase(){Serial = ev.Item.Serial});
+        base.OnAcquired(ev, displayMessage);
     }
 
     protected override void OnHurtingOthers(HurtingEventArgs ev)
