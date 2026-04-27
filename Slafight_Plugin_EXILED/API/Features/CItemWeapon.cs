@@ -49,6 +49,7 @@ public abstract class CItemWeapon : CItem
     protected override void CustomizeItem(Item item)
     {
         ApplyFirearmCustomization(item);
+        base.CustomizeItem(item);
     }
 
     /// <summary>

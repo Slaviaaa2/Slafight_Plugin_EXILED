@@ -469,9 +469,22 @@ public abstract class CItem
     /// プレイヤーへ <see cref="Give"/> でアイテムが渡った直後 / <see cref="Spawn"/>
     /// で生成される Pickup の元となる Item に対して呼ばれる派生フック。
     /// Keycard の Label / Tint など Item ベースで設定する必要のあるカスタマイズを
-    /// ここで適用する。
+    /// ここで適用する。デフォルト実装は Armor 系の VestEfficacy / HelmetEfficacy /
+    /// StaminaUseMultiplier を該当アイテムに焼き付けるので、override する派生は
+    /// 必ず <c>base.CustomizeItem(item)</c> を呼ぶこと。
     /// </summary>
-    protected virtual void CustomizeItem(Item item) { }
+    protected virtual void CustomizeItem(Item item)
+    {
+        if (item is Armor armor)
+        {
+            if (VestEfficacy >= 0)
+                armor.VestEfficacy = VestEfficacy;
+            if (HelmetEfficacy >= 0)
+                armor.HelmetEfficacy = HelmetEfficacy;
+            if (StaminaUseMultiplier >= 0f)
+                armor.StaminaUseMultiplier = StaminaUseMultiplier;
+        }
+    }
 
     /// <summary>
     /// 指定 Pickup にライトを追加する。既にライトがあれば既存のものを返す。

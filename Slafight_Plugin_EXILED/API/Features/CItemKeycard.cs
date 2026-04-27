@@ -84,6 +84,7 @@ public abstract class CItemKeycard : CItem
     protected override void CustomizeItem(Item item)
     {
         ApplyKeycardCustomization(item);
+        base.CustomizeItem(item);
     }
 
     // ==== カスタマイズ適用本体 ====
