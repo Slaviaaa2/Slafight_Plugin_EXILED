@@ -179,7 +179,7 @@ public class CustomMapMainHandler : CustomEventsHandler
             HintMessage = "コードが正しくないようだ・・・"
         };
 
-        specialDoors[MapFlags.SQ_DoorPoint] = new DoorConfig()
+        specialDoors[MapFlags.SqDoorPoint] = new DoorConfig()
         {
             RequiredItemId = 0,
             RequiredCode = "0727",
@@ -326,7 +326,7 @@ public class CustomMapMainHandler : CustomEventsHandler
                     MapFlags.AntiAntiMemeDocPoint = pos;
                     break;
                 case "SQ_Door":
-                    MapFlags.SQ_DoorPoint = pos;
+                    MapFlags.SqDoorPoint = pos;
                     break;
             }
         }

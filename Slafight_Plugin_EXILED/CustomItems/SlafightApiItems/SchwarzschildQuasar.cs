@@ -26,6 +26,7 @@ public class SchwarzschildQuasar : CItem
 
     public override void RegisterEvents()
     {
+        Exiled.Events.Handlers.Player.ChangingItem += OnChangingOther;
         Exiled.Events.Handlers.Item.JailbirdChangingWearState += OnJailbirdChangingPhase;
         Exiled.Events.Handlers.Item.JailbirdChargeComplete += OnJailbirdCharged;
         base.RegisterEvents();
@@ -33,6 +34,7 @@ public class SchwarzschildQuasar : CItem
 
     public override void UnregisterEvents()
     {
+        Exiled.Events.Handlers.Player.ChangingItem -= OnChangingOther;
         Exiled.Events.Handlers.Item.JailbirdChangingWearState -= OnJailbirdChangingPhase;
         Exiled.Events.Handlers.Item.JailbirdChargeComplete -= OnJailbirdCharged;
         base.UnregisterEvents();
@@ -50,15 +52,9 @@ public class SchwarzschildQuasar : CItem
         base.OnAcquired(ev, displayMessage);
     }
 
-    protected override void OnSelectedHintFinished(Player player)
-    {
-        player.EnableEffect<Burned>(15);
-        base.OnSelectedHintFinished(player);
-    }
-
     protected override void OnChangingItem(ChangingItemEventArgs ev)
     {
-        ev.Player?.DisableEffect<Burned>();
+        ev.Player?.EnableEffect<Burned>(15);
         base.OnChangingItem(ev);
     }
 
@@ -66,6 +62,12 @@ public class SchwarzschildQuasar : CItem
     {
         ev.Player?.DisableEffect<Burned>();
         base.OnDropping(ev);
+    }
+
+    private void OnChangingOther(ChangingItemEventArgs ev)
+    {
+        if (!CheckHeld(ev.Player)) return;
+        ev.Player?.DisableEffect<Burned>();
     }
 
     protected override void OnHurtingOthers(HurtingEventArgs ev)

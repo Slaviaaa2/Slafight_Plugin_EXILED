@@ -14,7 +14,7 @@ public static class MapFlags
     public static Vector3 Scp682SpawnPoint = Vector3.zero;
     public static Vector3 FacilityManagerSpawnPoint = Vector3.zero;
     public static Vector3 AntiAntiMemeDocPoint = Vector3.zero;
-    public static Vector3 SQ_DoorPoint = Vector3.zero;
+    public static Vector3 SqDoorPoint = Vector3.zero;
 
     /// <summary>
     /// Get Season. Please look to 
