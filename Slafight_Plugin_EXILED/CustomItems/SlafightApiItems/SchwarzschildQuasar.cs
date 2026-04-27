@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Item;
 using Exiled.Events.EventArgs.Player;
@@ -19,7 +20,7 @@ public class SchwarzschildQuasar : CItem
     protected override ItemType BaseItem => ItemType.Jailbird;
     protected override bool  PickupLightEnabled => true;
     protected override Color PickupLightColor => Color.blue;
-    private Dictionary<uint, SchwarzchildQuaserStatusBase> Bases = [];
+    private Dictionary<ushort, SchwarzchildQuaserStatusBase> Bases = [];
 
     public override void RegisterEvents()
     {
@@ -93,6 +94,26 @@ public class SchwarzschildQuasar : CItem
 
         @base.UsedCount++;
         @base.IsCharged = false;
+        @base.Jailbird.WearState = @base.UsedCount switch
+        {
+            // 0-19回: Healthy (初期~中盤)
+            <= 19 => JailbirdWearState.Healthy,
+        
+            // 20-24回: LowWear (低摩耗開始)
+            <= 24 => JailbirdWearState.LowWear,
+        
+            // 25-27回: MediumWear (中摩耗)
+            <= 27 => JailbirdWearState.MediumWear,
+        
+            // 28回: HighWear (高摩耗)
+            28 => JailbirdWearState.HighWear,
+        
+            // 29回: AlmostBroken (最終警告)
+            29 => JailbirdWearState.AlmostBroken,
+        
+            // 30回以上: Broken (破壊)
+            _ => JailbirdWearState.Broken
+        };
         base.OnHurtingOthers(ev);
     }
 
@@ -142,27 +163,34 @@ public enum SchwarzschildQuasarPhaseType
 }
 public class SchwarzchildQuaserStatusBase
 {
-    public uint Serial { get; set; }
+    public Jailbird Jailbird => Item.Get(Serial).As<Jailbird>();
+    public ushort Serial { get; init; }
     public int UsedCount { get; set; }
     public SchwarzschildQuasarPhaseType Phase
     {
         get
         {
-            if (UsedCount <= 5)
+            switch (UsedCount)
             {
-                return SchwarzschildQuasarPhaseType.WakeUp;
-            }
-            else if (UsedCount <= 10)
-            {
-                return SchwarzschildQuasarPhaseType.Normal;
-            }
-            else if (UsedCount <= 15)
-            {
-                return SchwarzschildQuasarPhaseType.HighPowered;
-            }
-            else
-            {
-                return SchwarzschildQuasarPhaseType.Ender;
+                // Ender: 29回のみ (最後の攻撃だけEnder)
+                case 29:
+                    return SchwarzschildQuasarPhaseType.Ender;
+                // HighPowered: 16-28回 (Ender前)
+                case <= 28:
+                    return SchwarzschildQuasarPhaseType.HighPowered;
+                // Normal: 6-15回
+                default:
+                {
+                    if (UsedCount <= 15)
+                    {
+                        return SchwarzschildQuasarPhaseType.Normal;
+                    }
+                    // WakeUp: 0-5回 (初期)
+                    else
+                    {
+                        return SchwarzschildQuasarPhaseType.WakeUp;
+                    }
+                }
             }
         }
     }
