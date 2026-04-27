@@ -41,10 +41,10 @@ public static class OmegaWarhead
 
     public static bool CanBeStart() => !IsWarheadStarted && SpecialEventsHandler.IsWarheadable();
 
-    public static void StartProtocol(float triggerTime = 0f, Player startedBy = null)
+    public static bool StartProtocol(float triggerTime = 0f, Player startedBy = null)
     {
         Log.Debug("[OMEGA WARHEAD]Called Start Protocol.");
-        if (IsWarheadStarted) return;
+        if (!CanBeStart()) return false;
         if (Warhead.IsInProgress) Warhead.Stop();
         Plugin.Singleton.EventHandler.DeadmanDisable = true;
         Warhead.IsLocked = true;
@@ -53,6 +53,7 @@ public static class OmegaWarhead
             Timing.KillCoroutines(_warheadCoroutine);
 
         _warheadCoroutine = Timing.RunCoroutine(WarheadSequence(triggerTime, startedBy));
+        return true;
     }
 
     private static IEnumerator<float> WarheadSequence(float triggerTime, Player startedBy)

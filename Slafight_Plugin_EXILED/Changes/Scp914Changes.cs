@@ -7,6 +7,7 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Features.Scp914;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
+using Slafight_Plugin_EXILED.CustomMaps.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
@@ -358,6 +359,22 @@ public static class Scp914Changes
             OneToOne = Scp914Rule.Keep,
             Fine     = Scp914Rule.Destroy,
             VeryFine = Scp914Rule.Destroy,
+        });
+        
+        Scp914Registry.RegisterCItem<SchwarzschildQuasar>(new ()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToVanilla(ItemType.Jailbird),
+            OneToOne = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
+            Fine     = Scp914Rule.Keep,
+            VeryFine = Scp914Rule.Custom(ctx =>
+            {
+                OmegaWarhead.StartProtocol();
+                if (ctx.IsInventory)
+                    ctx.Owner!.RemoveItem(ctx.Item!, true);
+                else
+                    ctx.Pickup?.Destroy();
+            })
         });
     }
 
