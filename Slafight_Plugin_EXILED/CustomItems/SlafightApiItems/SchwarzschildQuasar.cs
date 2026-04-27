@@ -43,7 +43,7 @@ public class SchwarzschildQuasar : CItem
 
     protected override void OnSpawned(Pickup pickup)
     {
-        Bases.Add(pickup.Serial, new SchwarzchildQuaserStatusBase());
+        Bases.Add(pickup.Serial, new SchwarzchildQuaserStatusBase(){Serial = pickup.Serial});
         base.OnSpawned(pickup);
     }
 
