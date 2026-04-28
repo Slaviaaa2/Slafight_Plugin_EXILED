@@ -180,6 +180,7 @@
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CItem.cs" />
+        <Compile Include="API\Features\CItemArmor.cs" />
         <Compile Include="API\Features\CItemKeycard.cs" />
         <Compile Include="API\Features\CItemWeapon.cs" />
         <Compile Include="API\Features\Scp914\Scp914Context.cs" />
@@ -239,6 +240,8 @@
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
         <Compile Include="CustomItems\exiledApiItems\CapybaraMissile.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\ArmorInfantry.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\ArmorVip.cs" />
         <Compile Include="CustomItems\SlafightApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
@@ -249,8 +252,6 @@
         <Compile Include="CustomItems\CustomItemsManager.cs" />
         <Compile Include="CustomItems\SlafightApiItems\AdvancedMedkit.cs" />
         <Compile Include="CustomItems\SlafightApiItems\AntiMemeGoggle.cs" />
-        <Compile Include="CustomItems\exiledApiItems\ArmorInfantry.cs" />
-        <Compile Include="CustomItems\exiledApiItems\ArmorVIP.cs" />
         <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
         <Compile Include="CustomItems\exiledApiItems\ClassZMemoryForcePil.cs" />
         <Compile Include="CustomItems\SlafightApiItems\DummyRoad.cs" />
@@ -364,6 +365,7 @@
         <Compile Include="Extensions\NetworkVisibilityExtensions.cs" />
         <Compile Include="Extensions\OnlyChecker.cs" />
         <Compile Include="Extensions\PlayerAbilityExtensions.cs" />
+        <Compile Include="Extensions\PlayerCItemBaseExtensions.cs" />
         <Compile Include="Extensions\PlayerExtensions.cs" />
         <Compile Include="Extensions\PlayerRoleHelpers.cs" />
         <Compile Include="Extensions\RoomSpawner.cs" />

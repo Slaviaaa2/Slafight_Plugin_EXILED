@@ -36,7 +36,7 @@ public class GoCHoundDog : CRole
         player.CustomHumeShieldStat.CurValue = player.CustomHumeShieldStat.MaxValue;
         player.CustomHumeShieldStat.ShieldRegenerationMultiplier = 3.5f;
         player.ClearInventory();
-        player.TryAddCustomItem<ArmorVip>();
+        CItem.Get<ArmorVip>()?.Give(player);
         CItem.Get<GunSuperLogicer>()?.Give(player);
         CItem.Get<GunGoCRailgunFull>()?.Give(player);
         CItem.Get<CloakGenerator>()?.Give(player);

@@ -33,7 +33,7 @@ public class ChaosCommando : CRole
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
         CItem.Get<AdvancedMedkit>()?.Give(player);
-        player.TryAddCustomItem<ArmorInfantry>();
+        CItem.Get<ArmorInfantry>()?.Give(player);
         CItem.Get<GunSuperLogicer>()?.Give(player);
         
         player.AddAmmo(AmmoType.Nato762, 300);

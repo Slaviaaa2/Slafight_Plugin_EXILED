@@ -33,7 +33,7 @@ public class GoCThaumaturgist : CRole
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem<ArmorInfantry>();
+        CItem.Get<ArmorInfantry>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,140);
 

@@ -33,7 +33,7 @@ public class GoCCommunications : CRole
         player.AddItem(ItemType.Medkit);
         CItem.Get<SerumC>()?.Give(player);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem<ArmorInfantry>();
+        CItem.Get<ArmorInfantry>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,140);
 

@@ -7,8 +7,6 @@ public static class CustomItemsManager
 {
     public static void RegisterAllItems()
     {
-        new ArmorInfantry().Register();
-        new ArmorVip().Register();
         new CaneOfTheStars().Register();
         new FakeGrenade().Register();
         new FlashBangE().Register();

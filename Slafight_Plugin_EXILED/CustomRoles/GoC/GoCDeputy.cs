@@ -7,6 +7,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -33,7 +34,7 @@ public class GoCDeputy : CRole
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
         
-        player.TryAddCustomItem<ArmorInfantry>();
+        CItem.Get<ArmorInfantry>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,140);
 

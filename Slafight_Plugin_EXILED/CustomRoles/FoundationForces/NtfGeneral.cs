@@ -31,7 +31,7 @@ public class NtfGeneral : CRole
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem<ArmorVip>();
+        CItem.Get<ArmorVip>()?.Give(player);
         CItem.Get<GunFRMGX>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,320);

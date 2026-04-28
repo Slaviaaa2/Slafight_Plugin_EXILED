@@ -31,7 +31,7 @@ public class HdCommander : CRole
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem<ArmorVip>();
+        CItem.Get<ArmorVip>()?.Give(player);
         CItem.Get<GunN7CR>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,200);

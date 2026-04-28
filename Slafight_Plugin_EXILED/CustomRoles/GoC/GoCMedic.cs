@@ -33,7 +33,7 @@ public class GoCMedic : CRole
         CItem.Get<AdvancedMedkit>()?.Give(player);
         player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.Radio);
-        player.TryAddCustomItem<ArmorInfantry>();
+        CItem.Get<ArmorInfantry>()?.Give(player);
             
         player.AddAmmo(AmmoType.Nato556,140);
 
