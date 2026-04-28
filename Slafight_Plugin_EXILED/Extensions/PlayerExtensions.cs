@@ -2,6 +2,8 @@ using System.Linq;
 using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 using Slafight_Plugin_EXILED.CustomRoles.ClassD;
 using Slafight_Plugin_EXILED.CustomRoles.Fifthist;
@@ -97,7 +99,7 @@ public static class PlayerExtensions
                         player.RemoveItem(item);
                     }
                 }
-                player.TryAddCustomItem(1101);
+                CItem.Get<KeycardConscripts>()?.Give(player); // Conscripts Card
                 break;
 
             case RoleTypeId.ChaosRifleman:
