@@ -253,7 +253,7 @@
         <Compile Include="CustomItems\exiledApiItems\ArmorVIP.cs" />
         <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
         <Compile Include="CustomItems\exiledApiItems\ClassZMemoryForcePil.cs" />
-        <Compile Include="CustomItems\exiledApiItems\DummyRoad.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\DummyRoad.cs" />
         <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
         <Compile Include="CustomItems\exiledApiItems\GoCRecruitPaper.cs" />
@@ -273,7 +273,7 @@
         <Compile Include="CustomItems\SlafightApiItems\KeycardFifthist.cs" />
         <Compile Include="CustomItems\SlafightApiItems\KeycardFifthistPriest.cs" />
         <Compile Include="CustomItems\SlafightApiItems\KeycardSecurityChief.cs" />
-        <Compile Include="CustomItems\exiledApiItems\MagicMissile.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\MagicMissile.cs" />
         <Compile Include="CustomItems\SlafightApiItems\MasterCard.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ClassXMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />

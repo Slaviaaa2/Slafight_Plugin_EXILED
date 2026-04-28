@@ -10,11 +10,9 @@ public static class CustomItemsManager
         new ArmorInfantry().Register();
         new ArmorVip().Register();
         new CaneOfTheStars().Register();
-        new DummyRoad().Register();
         new FakeGrenade().Register();
         new FlashBangE().Register();
         new GoCRecruitPaper().Register();
-        new MagicMissile().Register();
         new NeutralizeGrenade().Register();
         new Scp1425().Register();
         new ClassZMemoryForcePil().Register();

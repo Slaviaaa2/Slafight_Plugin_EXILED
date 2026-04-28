@@ -191,13 +191,13 @@ public static class Scp914Changes
         {
             Coarse   = Scp914Rule.ToCustomItem<Scp1425>(),
             Fine     = Scp914Rule.ToCItem<KeycardFifthistPriest>(),
-            VeryFine = Scp914Rule.ToCustomItem<MagicMissile>().WithChance(1f / 3f),
+            VeryFine = Scp914Rule.ToCItem<MagicMissile>().WithChance(1f / 3f),
         });
 
         Scp914Registry.RegisterCItem<KeycardFifthistPriest>(new()
         {
             Coarse   = Scp914Rule.ToCItem<KeycardFifthist>(),
-            Fine     = Scp914Rule.ToCustomItem<MagicMissile>(),
+            Fine     = Scp914Rule.ToCItem<MagicMissile>(),
             VeryFine = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
         });
 
