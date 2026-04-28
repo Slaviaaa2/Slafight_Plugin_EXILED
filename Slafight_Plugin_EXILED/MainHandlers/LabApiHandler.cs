@@ -146,8 +146,9 @@ public class LabApiHandler : CustomEventsHandler
                         CItem.Get<GunGoCRailgun>()?.Spawn(pos);
                         break;
                     case "CISR_Scp1425":
-                        if (CustomItemExtensions.TrySpawn<Scp1425>(pos, out var scp1425))
-                            scp1425?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                        var scp1425Pickup = CItem.Get<Scp1425>()?.Spawn(pos);
+                        if (scp1425Pickup != null)
+                            scp1425Pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                         break;
                     case "CISR_SNAV300":
                         CItem.Get<SNAV300>()?.Spawn(pos);

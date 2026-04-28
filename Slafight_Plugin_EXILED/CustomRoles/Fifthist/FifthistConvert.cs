@@ -3,7 +3,6 @@ using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -42,7 +41,7 @@ public class FifthistConvert : CRole
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.ArmorCombat);
         CItem.Get<KeycardFifthist>()?.Give(player);
-        player.TryAddCustomItem<Scp1425>();
+        CItem.Get<Scp1425>()?.Give(player);
         player.AddAmmo(AmmoType.Nato9,170);
     }
 }

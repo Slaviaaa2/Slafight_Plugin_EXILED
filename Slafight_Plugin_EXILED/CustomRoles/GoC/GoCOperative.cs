@@ -6,7 +6,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
@@ -29,7 +29,7 @@ public class GoCOperative : CRole
         player.AddItem(ItemType.GunShotgun);
         player.AddItem(ItemType.KeycardMTFOperative);
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem<GoCRecruitPaper>();
+        CItem.Get<GoCRecruitPaper>()?.Give(player);
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorCombat);
             

@@ -10,9 +10,7 @@ public static class CustomItemsManager
         new CaneOfTheStars().Register();
         new FakeGrenade().Register();
         new FlashBangE().Register();
-        new GoCRecruitPaper().Register();
         new NeutralizeGrenade().Register();
-        new Scp1425().Register();
         new ClassZMemoryForcePil().Register();
         new CUA_SpyKit().Register();
         new CapybaraMissile().Register();

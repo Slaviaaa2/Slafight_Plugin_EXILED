@@ -189,7 +189,7 @@ public static class Scp914Changes
     {
         Scp914Registry.RegisterCItem<KeycardFifthist>(new()
         {
-            Coarse   = Scp914Rule.ToCustomItem<Scp1425>(),
+            Coarse   = Scp914Rule.ToCItem<Scp1425>(),
             Fine     = Scp914Rule.ToCItem<KeycardFifthistPriest>(),
             VeryFine = Scp914Rule.ToCItem<MagicMissile>().WithChance(1f / 3f),
         });
@@ -201,14 +201,14 @@ public static class Scp914Changes
             VeryFine = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
         });
 
-        Scp914Registry.RegisterCustomItem<Scp1425>(new()
+        Scp914Registry.RegisterCItem<Scp1425>(new()
         {
-            OneToOne = Scp914Rule.ToCustomItem<GoCRecruitPaper>(),
+            OneToOne = Scp914Rule.ToCItem<GoCRecruitPaper>(),
         });
 
-        Scp914Registry.RegisterCustomItem<GoCRecruitPaper>(new()
+        Scp914Registry.RegisterCItem<GoCRecruitPaper>(new()
         {
-            OneToOne = Scp914Rule.ToCustomItem<Scp1425>(),
+            OneToOne = Scp914Rule.ToCItem<Scp1425>(),
         });
 
         // ---- 以下 R1 で集約 (旧: 各クラスの OnUpgrading)  ----

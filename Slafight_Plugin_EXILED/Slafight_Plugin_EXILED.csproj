@@ -257,7 +257,7 @@
         <Compile Include="CustomItems\SlafightApiItems\DummyRoad.cs" />
         <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
-        <Compile Include="CustomItems\exiledApiItems\GoCRecruitPaper.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\GoCRecruitPaper.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GunCOM77.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GunFRMGX.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GunFSP18.cs" />
@@ -282,7 +282,7 @@
         <Compile Include="CustomItems\SlafightApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\SlafightApiItems\PlayingCard.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Quarter.cs" />
-        <Compile Include="CustomItems\exiledApiItems\Scp1425.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\Scp1425.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SchwarzschildQuasar.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Scp148.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SerumC.cs" />
