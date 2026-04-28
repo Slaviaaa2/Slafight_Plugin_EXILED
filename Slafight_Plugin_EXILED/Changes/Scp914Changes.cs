@@ -154,7 +154,7 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.GrenadeFlash, new()
         {
-            Fine = Scp914Rule.ToCustomItem<FlashBangE>().WithChance(1f / 3f),
+            Fine = Scp914Rule.ToCItem<FlashBangE>().WithChance(1f / 3f),
         });
         Scp914Registry.RegisterVanilla(ItemType.SCP268, new()
         {

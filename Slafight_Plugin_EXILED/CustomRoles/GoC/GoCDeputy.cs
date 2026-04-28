@@ -6,7 +6,6 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
@@ -29,7 +28,7 @@ public class GoCDeputy : CRole
         player.AddItem(ItemType.GunCom45);
         player.AddItem(ItemType.GunE11SR);
         player.AddItem(ItemType.KeycardMTFOperative);
-        player.TryAddCustomItem<FlashBangE>();
+        CItem.Get<FlashBangE>()?.Give(player);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.GrenadeHE);
         player.AddItem(ItemType.Radio);

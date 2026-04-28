@@ -4,7 +4,7 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
@@ -27,8 +27,8 @@ public class SneNeutralitist : CRole
         player.AddItem(ItemType.KeycardMTFOperative);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem<NeutralizeGrenade>();
-        player.TryAddCustomItem<NeutralizeGrenade>();
+        CItem.Get<NeutralizeGrenade>()?.Give(player);
+        CItem.Get<NeutralizeGrenade>()?.Give(player);
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorCombat);
             

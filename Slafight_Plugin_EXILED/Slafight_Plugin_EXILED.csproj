@@ -256,8 +256,8 @@
         <Compile Include="CustomItems\SlafightApiItems\CaneOfTheStars.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ClassZMemoryForcePil.cs" />
         <Compile Include="CustomItems\SlafightApiItems\DummyRoad.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
-        <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\FakeGrenade.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\FlashBangE.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GoCRecruitPaper.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GunCOM77.cs" />
         <Compile Include="CustomItems\SlafightApiItems\GunFRMGX.cs" />
@@ -278,7 +278,7 @@
         <Compile Include="CustomItems\SlafightApiItems\MagicMissile.cs" />
         <Compile Include="CustomItems\SlafightApiItems\MasterCard.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ClassXMemoryForcePil.cs" />
-        <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\NeutralizeGrenade.cs" />
         <Compile Include="CustomItems\SlafightApiItems\NvgNormal.cs" />
         <Compile Include="CustomItems\SlafightApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\SlafightApiItems\PlayingCard.cs" />
