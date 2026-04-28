@@ -230,6 +230,15 @@ public static class Scp914Changes
             Fine     = Scp914Rule.ToVanilla(ItemType.MicroHID),
             VeryFine = Scp914Rule.ToCItem<GunGoCTurret>(),
         });
+        
+        Scp914Registry.RegisterCItem<GunGoCRailgun>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.ToVanilla(ItemType.ParticleDisruptor),
+            OneToOne = Scp914Rule.Keep,
+            Fine     = Scp914Rule.Keep,
+            VeryFine = Scp914Rule.ToCItem<GunGoCRailgunFull>(),
+        });
 
         Scp914Registry.RegisterCItem<SerumD>(new()
         {

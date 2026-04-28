@@ -593,6 +593,11 @@ public class PlayerHUD
                         SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
                         SyncTextObjective = "人類第一に、財団に抵抗せよ。";
                         break;
+                    case CRoleTypeId.GoCHoundDog:
+                        SyncTextRole = "<color=#0000c8>Hound Dog: White Suit</color>";
+                        SyncTextTeam = "<color=#0000c8>Global Occult Coalition</color>";
+                        SyncTextObjective = "人類第一に、財団に抵抗せよ。";
+                        break;
 
                     default:
                         ApplyTeamFallback(sourcePlayer);
