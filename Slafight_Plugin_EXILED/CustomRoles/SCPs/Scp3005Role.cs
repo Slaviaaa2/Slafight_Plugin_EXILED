@@ -11,6 +11,7 @@ using Slafight_Plugin_EXILED.Abilities;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
+using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
@@ -88,7 +89,7 @@ public class Scp3005Role : CRole
         {
             var hasGoggles = ev.Attacker != null && ev.Attacker.Items
                 .OfType<Scp1344>()
-                .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                .Any(i => CItem.TryGet(i, out var ci) && ci is AntiMemeGoggle && i.IsWorn);
             if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
             ev.IsAllowed = false;
             ev.Attacker?.Hurt(ev.Player, 5f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
@@ -130,7 +131,7 @@ public class Scp3005Role : CRole
                     
                 var hasGoggles = target.Items
                     .OfType<Scp1344>()
-                    .Any(i => i.TryGetCustomItem(out var ci) && ci is AntiMemeGoggle && i.IsWorn);
+                    .Any(i => CItem.TryGet(i, out var ci) && ci is AntiMemeGoggle && i.IsWorn);
                 if (hasGoggles)  continue;
 
                 var distance = Vector3.Distance(player.Position, target.Position);

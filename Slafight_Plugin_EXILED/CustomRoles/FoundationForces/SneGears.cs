@@ -28,7 +28,7 @@ public class SneGears : CRole
         player.AddItem(ItemType.KeycardMTFOperative);
         CItem.Get<SerumC>()?.Give(player);
         player.AddItem(ItemType.Medkit);
-        player.TryAddCustomItem<AntiMemeGoggle>();
+        CItem.Get<AntiMemeGoggle>()?.Give(player);
         player.AddItem(ItemType.Radio);
         player.AddItem(ItemType.ArmorHeavy);
             

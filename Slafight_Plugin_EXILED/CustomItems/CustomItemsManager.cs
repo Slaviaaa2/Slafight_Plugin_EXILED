@@ -7,7 +7,6 @@ public static class CustomItemsManager
 {
     public static void RegisterAllItems()
     {
-        new AntiMemeGoggle().Register();
         new ArmorInfantry().Register();
         new ArmorVip().Register();
         new CaneOfTheStars().Register();
@@ -19,11 +18,7 @@ public static class CustomItemsManager
         new NeutralizeGrenade().Register();
         new Scp1425().Register();
         new ClassZMemoryForcePil().Register();
-        new NvgNormal().Register();
         new CUA_SpyKit().Register();
-        new Veritas().Register();
-        new NvgRed().Register();
-        new NvgBlue().Register();
         new CapybaraMissile().Register();
         new DninoueMissile().Register();
     }

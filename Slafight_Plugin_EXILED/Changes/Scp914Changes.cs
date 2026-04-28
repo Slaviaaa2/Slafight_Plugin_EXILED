@@ -180,7 +180,7 @@ public static class Scp914Changes
         });
         Scp914Registry.RegisterVanilla(ItemType.SCP1344, new()
         {
-            Coarse = Scp914Rule.ToCustomItem<NvgBlue>(),
+            Coarse = Scp914Rule.ToCItem<NvgBlue>(),
         });
     }
 
@@ -213,13 +213,13 @@ public static class Scp914Changes
 
         // ---- 以下 R1 で集約 (旧: 各クラスの OnUpgrading)  ----
 
-        Scp914Registry.RegisterCustomItem<NvgNormal>(new()
+        Scp914Registry.RegisterCItem<NvgNormal>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.Destroy,
-            OneToOne = Scp914Rule.ToCustomItem<NvgNormal>(),
-            Fine     = Scp914Rule.ToCustomItem<NvgRed>(),
-            VeryFine = Scp914Rule.ToCustomItem<NvgBlue>(),
+            OneToOne = Scp914Rule.ToCItem<NvgNormal>(),
+            Fine     = Scp914Rule.ToCItem<NvgRed>(),
+            VeryFine = Scp914Rule.ToCItem<NvgBlue>(),
         });
 
         Scp914Registry.RegisterCItem<HIDTurret>(new()

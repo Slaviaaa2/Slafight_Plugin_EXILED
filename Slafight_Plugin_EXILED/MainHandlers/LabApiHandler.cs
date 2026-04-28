@@ -123,7 +123,7 @@ public class LabApiHandler : CustomEventsHandler
         Timing.CallDelayed(1.05f, () =>
         {
             CItem.Get<HIDTurret>()?.Spawn(new Vector3(134.94f, 300.65f, -65f));
-            CustomItemExtensions.TrySpawn<NvgNormal>(Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up*1.5f), out _);
+            CItem.Get<NvgNormal>()?.Spawn(Room.Get(RoomType.Hcz939).WorldPosition(Vector3.up * 1.5f));
         });
         Timing.CallDelayed(2.0f, PickupSetupTriggerPoints);
     }

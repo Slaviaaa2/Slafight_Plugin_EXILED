@@ -27,7 +27,7 @@ public class SneOperator : CRole
         player.AddItem(ItemType.GunFRMG0);
         player.AddItem(ItemType.KeycardMTFCaptain);
         CItem.Get<SerumC>()?.Give(player);
-        player.TryAddCustomItem<AntiMemeGoggle>();
+        CItem.Get<AntiMemeGoggle>()?.Give(player);
         player.TryAddCustomItem<NeutralizeGrenade>();
         player.TryAddCustomItem<NeutralizeGrenade>();
         player.AddItem(ItemType.Radio);

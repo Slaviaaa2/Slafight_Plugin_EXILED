@@ -191,7 +191,7 @@
         <Compile Include="API\Features\CRoom.cs" />
         <Compile Include="API\Features\CustomBooleans.cs" />
         <Compile Include="API\Features\GlobalVentManager.cs" />
-        <Compile Include="API\Features\NvgGogglesBase.cs" />
+        <Compile Include="API\Features\CItemNvg.cs" />
         <Compile Include="API\Features\ObjectPrefab.cs" />
         <Compile Include="API\Features\PrefabSaveData.cs" />
         <Compile Include="API\Features\RoleLimitManager.cs" />
@@ -242,13 +242,13 @@
         <Compile Include="CustomItems\SlafightApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
-        <Compile Include="CustomItems\exiledApiItems\NvgBlue.cs" />
-        <Compile Include="CustomItems\exiledApiItems\NvgRed.cs" />
-        <Compile Include="CustomItems\exiledApiItems\Veritas.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\NvgBlue.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\NvgRed.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\Veritas.cs" />
         <Compile Include="CustomItems\NvgManager.cs" />
         <Compile Include="CustomItems\CustomItemsManager.cs" />
         <Compile Include="CustomItems\SlafightApiItems\AdvancedMedkit.cs" />
-        <Compile Include="CustomItems\exiledApiItems\AntiMemeGoggle.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\AntiMemeGoggle.cs" />
         <Compile Include="CustomItems\exiledApiItems\ArmorInfantry.cs" />
         <Compile Include="CustomItems\exiledApiItems\ArmorVIP.cs" />
         <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
@@ -277,7 +277,7 @@
         <Compile Include="CustomItems\SlafightApiItems\MasterCard.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ClassXMemoryForcePil.cs" />
         <Compile Include="CustomItems\exiledApiItems\NeutralizeGrenade.cs" />
-        <Compile Include="CustomItems\exiledApiItems\NvgNormal.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\NvgNormal.cs" />
         <Compile Include="CustomItems\SlafightApiItems\OmegaWarheadAccess.cs" />
         <Compile Include="CustomItems\SlafightApiItems\PlayingCard.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Quarter.cs" />
