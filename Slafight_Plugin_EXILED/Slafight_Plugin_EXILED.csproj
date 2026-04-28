@@ -253,8 +253,8 @@
         <Compile Include="CustomItems\CustomItemsManager.cs" />
         <Compile Include="CustomItems\SlafightApiItems\AdvancedMedkit.cs" />
         <Compile Include="CustomItems\SlafightApiItems\AntiMemeGoggle.cs" />
-        <Compile Include="CustomItems\exiledApiItems\CaneOfTheStars.cs" />
-        <Compile Include="CustomItems\exiledApiItems\ClassZMemoryForcePil.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\CaneOfTheStars.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\ClassZMemoryForcePil.cs" />
         <Compile Include="CustomItems\SlafightApiItems\DummyRoad.cs" />
         <Compile Include="CustomItems\exiledApiItems\FakeGrenade.cs" />
         <Compile Include="CustomItems\exiledApiItems\FlashBangE.cs" />

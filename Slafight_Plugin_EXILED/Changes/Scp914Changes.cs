@@ -198,7 +198,7 @@ public static class Scp914Changes
         {
             Coarse   = Scp914Rule.ToCItem<KeycardFifthist>(),
             Fine     = Scp914Rule.ToCItem<MagicMissile>(),
-            VeryFine = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
+            VeryFine = Scp914Rule.ToCItem<CaneOfTheStars>(),
         });
 
         Scp914Registry.RegisterCItem<Scp1425>(new()
@@ -263,8 +263,8 @@ public static class Scp914Changes
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToVanilla(ItemType.SCP500),
             OneToOne = Scp914Rule.Passthrough,
-            Fine     = Scp914Rule.ToCustomItem<ClassZMemoryForcePil>(),
-            VeryFine = Scp914Rule.ToCustomItem<ClassZMemoryForcePil>(),
+            Fine     = Scp914Rule.ToCItem<ClassZMemoryForcePil>(),
+            VeryFine = Scp914Rule.ToCItem<ClassZMemoryForcePil>(),
         });
 
         Scp914Registry.RegisterCItem<SNAV300>(new()
@@ -356,7 +356,7 @@ public static class Scp914Changes
             Coarse = Scp914Rule.ToVanilla(ItemType.SCP268),
         });
         
-        Scp914Registry.RegisterCustomItem<CaneOfTheStars>(new()
+        Scp914Registry.RegisterCItem<CaneOfTheStars>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToCItem<KeycardFifthistPriest>(),
@@ -397,7 +397,7 @@ public static class Scp914Changes
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToVanilla(ItemType.Jailbird),
-            OneToOne = Scp914Rule.ToCustomItem<CaneOfTheStars>(),
+            OneToOne = Scp914Rule.ToCItem<CaneOfTheStars>(),
             Fine     = Scp914Rule.Keep,
             VeryFine = Scp914Rule.Custom(ctx =>
             {
