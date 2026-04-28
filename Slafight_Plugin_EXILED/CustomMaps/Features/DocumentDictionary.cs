@@ -95,6 +95,15 @@ public static class DocumentDictionary
                        "Researcher | Dr. Redheart</size>";
             case DocumentType.AprilWtf:
                 return "REDACTED";
+            case DocumentType.Overbeyond:
+                return "<size=22>シュバルツシルト・クエィサァー</size>\n" +
+                       "<size=20>シュバルツシルト・クエィサァー、■■■■■■■■■■の一つでありプロトコル■■■■■の副産物だ。\n" +
+                       "内部の重力装置を使い量子トンネル効果を引き起こし疑似ブラックホールを生み出す、\n" +
+                       "その引力と破壊は他のセグメンタムに引けを取らない戦闘力を発揮するだろう。\n" +
+                       "…だが謎なのは安全性と技術だ。SQは常に熱を帯びているしなんらかの異常存在が使われているかもしれない。\n- Dr. </size>";
+            case DocumentType.AboutSQ:
+                return "<size=24>If you want to over the beyond, try this.</size>\n" +
+                       "<size=30><b>0 7 2 7</b></size>\n\n\n\n<size=8><color=black><b>BE CURIOUS</b></color></size>";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
@@ -103,5 +112,17 @@ public static class DocumentDictionary
 
 public enum DocumentType
 {
-    Scp033,Scp096,Scp3005,Backrooms,Cafeteria,DeltaWarhead,OmegaWarhead,ScientistSamuels,AboutSergey,AntiAntiMeme,AprilWtf
+    Scp033,
+    Scp096,
+    Scp3005,
+    Backrooms,
+    Cafeteria,
+    DeltaWarhead,
+    OmegaWarhead,
+    ScientistSamuels,
+    AboutSergey,
+    AntiAntiMeme,
+    AprilWtf,
+    Overbeyond,
+    AboutSQ,
 }

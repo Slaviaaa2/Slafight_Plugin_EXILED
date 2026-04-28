@@ -36,12 +36,12 @@ public class FifthistConvert : CRole
             
         player.ClearInventory();
         Log.Debug("Giving Items to FifthistConvert");
-        player.AddItem(ItemType.GunCrossvec);
+        player.AddItem(ItemType.GunA7);
         //player.AddItem(ItemType.KeycardFacilityManager);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.ArmorCombat);
         CItem.Get<KeycardFifthist>()?.Give(player);
         CItem.Get<Scp1425>()?.Give(player);
-        player.AddAmmo(AmmoType.Nato9,170);
+        player.AddAmmo(AmmoType.Nato762,170);
     }
 }

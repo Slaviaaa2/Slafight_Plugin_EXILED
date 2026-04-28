@@ -41,12 +41,13 @@ public class FifthistRescure : CRole
 
         player.ClearInventory();
         Log.Debug("Giving Items to Fifthist");
-        player.AddItem(ItemType.GunSCP127);
+        player.AddItem(ItemType.GunAK);
         player.AddItem(ItemType.ArmorHeavy);
         CItem.Get<KeycardFifthist>()?.Give(player);
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Adrenaline);
         player.AddItem(ItemType.SCP500);
         player.AddItem(ItemType.GrenadeHE);
+        player.AddAmmo(AmmoType.Nato762,180);
     }
 }

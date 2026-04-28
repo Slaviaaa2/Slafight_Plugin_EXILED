@@ -39,7 +39,7 @@ public abstract class ObjectPrefab : IObjectPrefab
 
     public virtual ObjectPrefab Create()
     {
-        Log.Debug("[ObjectPrefab]Create Invoked.");
+        Log.Debug($"[ObjectPrefab]{this.GetType().Name} Create Invoked.");
         ObjectInstanceID = Guid.NewGuid().ToString("N")[..5];
         InstanceManager.Register(this);
         if (AutoDestroyEnabled)
@@ -50,7 +50,7 @@ public abstract class ObjectPrefab : IObjectPrefab
 
     public virtual void Destroy()
     {
-        Log.Debug("[ObjectPrefab]Destroy Invoked.");
+        Log.Debug($"[ObjectPrefab]{this.GetType().Name} Destroy Invoked.");
 
         if (string.IsNullOrEmpty(ObjectInstanceID))
             return;

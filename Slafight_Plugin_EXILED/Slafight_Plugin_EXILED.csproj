@@ -216,6 +216,7 @@
         <Compile Include="API\Features\SpawnSystemBootstrap.cs" />
         <Compile Include="API\Features\UnitPackRegistry.cs" />
         <Compile Include="API\Features\WearFollower.cs" />
+        <Compile Include="API\Interface\IBootstrapHandler.cs" />
         <Compile Include="API\Interface\IControllableObject.cs" />
         <Compile Include="API\Interface\IObjectPrefab.cs" />
         <Compile Include="API\Interface\ISpawnableObject.cs" />
@@ -295,6 +296,7 @@
         <Compile Include="CustomItems\SlafightApiItems\ThrowableScp244.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Toolbox.cs" />
         <Compile Include="CustomMaps\Communications.cs" />
+        <Compile Include="CustomMaps\Entities\ObjectBootstraps.cs" />
         <Compile Include="CustomMaps\Entities\Scp513.cs" />
         <Compile Include="CustomMaps\Features\DailyCassieAnnounce.cs" />
         <Compile Include="CustomMaps\Features\DocumentDictionary.cs" />
@@ -374,6 +376,7 @@
         <Compile Include="Extensions\SchematicHelpers.cs" />
         <Compile Include="Extensions\StaticUtils.cs" />
         <Compile Include="LabApiBridgeHandlers\ObjectPrefabHandlers.cs" />
+        <Compile Include="MainHandlers\AutoHandlerBootstrapRegister.cs" />
         <Compile Include="MainHandlers\BadgeHandler.cs" />
         <Compile Include="MainHandlers\DebugModeHandler.cs" />
         <Compile Include="MainHandlers\EventHandler.cs" />

@@ -130,6 +130,7 @@ public class Plugin : Plugin<Config>
         SpawnSystem = new();
         SpawningHandler = new();
         
+        AutoHandlerBootstrapRegister.Register();
         DebugModeHandler.Register();
 
         var Settings = ServerSpecifics.Settings();
@@ -203,6 +204,7 @@ public class Plugin : Plugin<Config>
         Scp914Changes.Unregister();
         Scp513.Unregister();
         
+        AutoHandlerBootstrapRegister.Unregister();
         DebugModeHandler.Unregister();
             
         HarmonyInstance.UnpatchAll(this.Name);

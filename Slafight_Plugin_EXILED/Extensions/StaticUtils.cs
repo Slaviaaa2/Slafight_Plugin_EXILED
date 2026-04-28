@@ -150,6 +150,15 @@ public static class StaticUtils
         float randomZ = UnityEngine.Random.Range(center.z - halfSize, center.z + halfSize);
         return new Vector3(randomX, y, randomZ);
     }
+    
+    public static Vector3 GetRandomSquarePosition(this Vector3 pos, float halfSize, float fixedY = float.NaN)
+    {
+        Vector3 center = pos;
+        float y = float.IsNaN(fixedY) ? center.y : fixedY;
+        float randomX = UnityEngine.Random.Range(center.x - halfSize, center.x + halfSize);
+        float randomZ = UnityEngine.Random.Range(center.z - halfSize, center.z + halfSize);
+        return new Vector3(randomX, y, randomZ);
+    }
 
     // ───────────────────────────────
     // カスタムアイテム確認 (Player 拡張)
