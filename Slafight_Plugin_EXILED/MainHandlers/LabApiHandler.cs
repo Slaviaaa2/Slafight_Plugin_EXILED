@@ -201,7 +201,7 @@ public class LabApiHandler : CustomEventsHandler
                 return;
             }
 
-            labPlayer.Scale = new Vector3(0.001f, 1f, 0.001f);
+            labPlayer.Scale = new Vector3(0.01f, 1f, 0.01f);
             schem.transform.SetParent(labPlayer.GameObject?.transform);
 
             // ロール監視用に WearsHandler に登録
