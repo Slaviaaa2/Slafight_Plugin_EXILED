@@ -4,7 +4,6 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -45,7 +44,7 @@ public class ChaosUndercoverAgent : CRole
         if (!player.HasItem(ItemType.GunRevolver))
             player.AddItem(ItemType.GunRevolver);
         CItem.Get<KeycardConscripts>()?.Give(player); // Conscripts Card
-        player.GiveOrDrop<CUA_SpyKit>();
+        CItem.Get<CUA_SpyKit>()?.Give(player);
         
         player.AddAmmo(AmmoType.Ammo44Cal, 6);
             

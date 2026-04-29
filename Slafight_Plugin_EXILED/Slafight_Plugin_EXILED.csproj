@@ -240,12 +240,12 @@
         <Compile Include="Commands\DevTools\SpawnBuiltInPrefab.cs" />
         <Compile Include="Commands\DevTools\SpawnUniversal.cs" />
         <Compile Include="Commands\DevTools\SpawnWave.cs" />
-        <Compile Include="CustomItems\exiledApiItems\CapybaraMissile.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\CapybaraMissile.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ArmorInfantry.cs" />
         <Compile Include="CustomItems\SlafightApiItems\ArmorVip.cs" />
         <Compile Include="CustomItems\SlafightApiItems\CloakGenerator.cs" />
-        <Compile Include="CustomItems\exiledApiItems\CUA_SpyKit.cs" />
-        <Compile Include="CustomItems\exiledApiItems\DninoueMissile.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\CUA_SpyKit.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\DninoueMissile.cs" />
         <Compile Include="CustomItems\SlafightApiItems\NvgBlue.cs" />
         <Compile Include="CustomItems\SlafightApiItems\NvgRed.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Veritas.cs" />

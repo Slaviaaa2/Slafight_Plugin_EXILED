@@ -5,7 +5,6 @@ using PlayerRoles;
 using Scp914;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Features.Scp914;
-using Slafight_Plugin_EXILED.CustomItems.exiledApiItems;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.CustomMaps.Features;
 using Slafight_Plugin_EXILED.Extensions;
@@ -67,7 +66,7 @@ public static class Scp914Changes
             if (UnityEngine.Random.Range(0, 10) == 0)
                 CItem.Get<Scp513Item>()?.Spawn(position);
             else
-                Scp914Dispatcher.TrySpawnCustomItem(typeof(CapybaraMissile), position);
+                CItem.Get<CapybaraMissile>()?.Spawn(position);
 
             ctx.Pickup?.Destroy();
         }).WithChance(1f / 6f);
