@@ -80,12 +80,17 @@ public abstract class CItemHybrid : CItem
 
         if (newItem == null) return; // インベントリ満杯
 
-        // oldSerial を先に解除してから RemoveItem（ItemRemoved の dispatch をスキップ）
+        // CurrentItem を切り替える時点では oldSerial がまだ SerialToItem に残っている。
+        // これにより ChangingItem 発火時に旧 sub の OnChangingOther 系 cleanup が
+        // Check() / CheckHeld() を通過して正しく動く（Burned 解除など）。
+        player.CurrentItem = newItem;
+
+        // ChangingItem が解決した後に旧 serial を解除
         _serialModeIndex.Remove(oldSerial);
         SerialTracker.ForceUnregister(oldSerial);
 
+        // serial 解除後に RemoveItem → ItemRemoved の dispatch をスキップ
         player.RemoveItem(oldItem, destroy: true);
-        player.CurrentItem = newItem;
 
         player.ShowHint($"<size=24>モード切替: {nextSub.DisplayName}</size>", 2f);
     }
