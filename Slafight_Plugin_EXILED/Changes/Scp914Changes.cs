@@ -183,8 +183,11 @@ public static class Scp914Changes
         });
     }
 
-    /// <summary>Exiled CustomItem → Custom/CItem の変換ルール。</summary>
-    private static void RegisterCustomItemRules()
+    /// <summary>Exiled CustomItem 固有の変換ルール (将来の CustomItem 専用ルール用に確保)。</summary>
+    private static void RegisterCustomItemRules() { }
+
+    /// <summary>CItem → Vanilla/CItem の変換ルール。</summary>
+    private static void RegisterCItemRules()
     {
         Scp914Registry.RegisterCItem<KeycardFifthist>(new()
         {
@@ -210,8 +213,6 @@ public static class Scp914Changes
             OneToOne = Scp914Rule.ToCItem<Scp1425>(),
         });
 
-        // ---- 以下 R1 で集約 (旧: 各クラスの OnUpgrading)  ----
-
         Scp914Registry.RegisterCItem<NvgNormal>(new()
         {
             Rough    = Scp914Rule.Destroy,
@@ -229,7 +230,7 @@ public static class Scp914Changes
             Fine     = Scp914Rule.ToVanilla(ItemType.MicroHID),
             VeryFine = Scp914Rule.ToCItem<GunGoCTurret>(),
         });
-        
+
         Scp914Registry.RegisterCItem<GunGoCRailgun>(new()
         {
             Rough    = Scp914Rule.Destroy,
@@ -354,7 +355,7 @@ public static class Scp914Changes
             Rough  = Scp914Rule.ToVanilla(ItemType.SCP268),
             Coarse = Scp914Rule.ToVanilla(ItemType.SCP268),
         });
-        
+
         Scp914Registry.RegisterCItem<CaneOfTheStars>(new()
         {
             Rough    = Scp914Rule.Destroy,
@@ -377,11 +378,7 @@ public static class Scp914Changes
                     ctx.Pickup?.Destroy();
             })
         });
-    }
 
-    /// <summary>CItem → Vanilla/Custom/CItem の変換ルール。</summary>
-    private static void RegisterCItemRules()
-    {
         Scp914Registry.RegisterCItem<ThrowableScp244>(new()
         {
             Rough    = Scp914Rule.Destroy,
@@ -391,8 +388,8 @@ public static class Scp914Changes
             Fine     = Scp914Rule.Destroy,
             VeryFine = Scp914Rule.Destroy,
         });
-        
-        Scp914Registry.RegisterCItem<SchwarzschildQuasar>(new ()
+
+        Scp914Registry.RegisterCItem<SchwarzschildQuasar>(new()
         {
             Rough    = Scp914Rule.Destroy,
             Coarse   = Scp914Rule.ToVanilla(ItemType.Jailbird),
