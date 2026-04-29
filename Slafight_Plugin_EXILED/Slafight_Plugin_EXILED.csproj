@@ -288,7 +288,6 @@
         <Compile Include="CustomItems\SlafightApiItems\Quarter.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Scp1425.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SchwarzschildQuasar.cs" />
-        <Compile Include="CustomItems\SlafightApiItems\SchwarzschildRailbreaker.cs" />
         <Compile Include="CustomItems\SlafightApiItems\Scp148.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SerumC.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SerumD.cs" />
