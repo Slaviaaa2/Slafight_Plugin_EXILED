@@ -239,8 +239,16 @@ public abstract class CItemHybrid : CItem
         base.CustomizeItem(item);
     }
 
-    protected override void ShowPickedUpMessage(Player player) { }
-    protected override void ShowSelectedMessage(Player player) { }
+    // 拾ったとき: Hybrid 自身の hint を表示（mode switch 時は displayMessage=false なので呼ばれない）
+    protected override void ShowPickedUpMessage(Player player)
+        => base.ShowPickedUpMessage(player);
+
+    // 選択したとき: mode switch 起因の ChangingItem では抑制、それ以外は通常表示
+    protected override void ShowSelectedMessage(Player player)
+    {
+        if (_isSwitching) return;
+        base.ShowSelectedMessage(player);
+    }
 }
 public class CItemHybridMode(CItem targetItem, string modeName = "", string modeDescription = "")
 {
