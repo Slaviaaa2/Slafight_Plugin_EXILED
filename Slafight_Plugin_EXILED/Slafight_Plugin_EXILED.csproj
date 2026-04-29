@@ -180,6 +180,7 @@
         <Compile Include="API\Features\AbilityParseHelper.cs" />
         <Compile Include="API\Features\CassieHelper.cs" />
         <Compile Include="API\Features\CItem.cs" />
+        <Compile Include="API\Features\CItemHybrid.cs" />
         <Compile Include="API\Features\CItemArmor.cs" />
         <Compile Include="API\Features\CItemKeycard.cs" />
         <Compile Include="API\Features\CItemWeapon.cs" />

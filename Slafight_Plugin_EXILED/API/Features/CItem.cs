@@ -1059,4 +1059,63 @@ public abstract class CItem
         ev.NewStatus = Scp1344Status.Idle;
         ev.IsAllowed = false;
     }
+
+    // ==== SerialTracker (CItemHybrid から serial の dispatch先を差し替えるための公開ヘルパー) ====
+
+    public static class SerialTracker
+    {
+        /// <summary>指定 serial の dispatch先を強制的に差し替える。イベント購読は行わない。</summary>
+        public static void ForceRegister(ushort serial, CItem item)
+        {
+            if (item == null) return;
+            SerialToItem[serial] = item;
+        }
+
+        /// <summary>指定 serial の dispatch登録を解除する。</summary>
+        public static void ForceUnregister(ushort serial)
+            => SerialToItem.Remove(serial);
+
+        public static bool TryGet(ushort serial, out CItem? item)
+            => SerialToItem.TryGetValue(serial, out item!);
+    }
+
+    // ==== internal shims (CItemHybrid が sub インスタンスの protected メソッドを呼ぶために使う) ====
+
+    internal ItemType GetBaseItem() => BaseItem;
+
+    internal void CallOnAcquired(PlayerEvents.ItemAddedEventArgs ev, bool displayMessage)
+        => OnAcquired(ev, displayMessage);
+    internal void CallOnReleased(PlayerEvents.ItemRemovedEventArgs ev) => OnReleased(ev);
+    internal void CallOnSpawned(Pickup pickup) => OnSpawned(pickup);
+    internal void CallOnPickingUp(PlayerEvents.PickingUpItemEventArgs ev) => OnPickingUp(ev);
+    internal void CallOnDropping(PlayerEvents.DroppingItemEventArgs ev) => OnDropping(ev);
+    internal void CallOnUsing(PlayerEvents.UsingItemEventArgs ev) => OnUsing(ev);
+    internal void CallOnUsed(PlayerEvents.UsedItemEventArgs ev) => OnUsed(ev);
+    internal void CallOnShooting(PlayerEvents.ShootingEventArgs ev) => OnShooting(ev);
+    internal void CallOnShot(PlayerEvents.ShotEventArgs ev) => OnShot(ev);
+    internal void CallOnHurtingOthers(PlayerEvents.HurtingEventArgs ev) => OnHurtingOthers(ev);
+    internal void CallOnOwnerDying(PlayerEvents.DyingEventArgs ev) => OnOwnerDying(ev);
+    internal void CallOnChangingItem(PlayerEvents.ChangingItemEventArgs ev) => OnChangingItem(ev);
+    internal void CallOnThrowingRequest(PlayerEvents.ThrowingRequestEventArgs ev) => OnThrowingRequest(ev);
+    internal void CallOnPickupAdded(MapEvents.PickupAddedEventArgs ev) => OnPickupAdded(ev);
+    internal void CallOnPickupDestroyed(MapEvents.PickupDestroyedEventArgs ev) => OnPickupDestroyed(ev);
+    internal void CallOnWaitingForPlayers() => OnWaitingForPlayers();
+    internal void CallOnUpgradingPickup(Scp914Events.UpgradingPickupEventArgs ev) => OnUpgradingPickup(ev);
+    internal void CallOnUpgradingInventoryItem(Scp914Events.UpgradingInventoryItemEventArgs ev)
+        => OnUpgradingInventoryItem(ev);
+    internal void CallCustomizeItem(Item item) => CustomizeItem(item);
+
+    // ==== Give() pending state を CItemHybrid から制御するための内部 API ====
+
+    internal static void SetPendingGive(CItem ci, bool displayMessage)
+    {
+        _pendingGiveCItem = ci;
+        _pendingGiveDisplayMessage = displayMessage;
+    }
+
+    internal static void ClearPendingGive()
+    {
+        _pendingGiveCItem = null;
+        _pendingGiveDisplayMessage = false;
+    }
 }

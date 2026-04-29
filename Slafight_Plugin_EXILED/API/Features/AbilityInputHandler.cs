@@ -47,6 +47,19 @@ public class AbilityInputHandler
             return;
         }
 
+        // アイテムモード切替 (loadout不要、手持ちアイテムが CItemHybrid なら切り替える)
+        if (keybind.SettingId == 5)
+        {
+            var currentItem = player.CurrentItem;
+            if (currentItem != null
+                && CItem.TryGet(currentItem.Serial, out var ci)
+                && ci is CItemHybrid hybrid)
+            {
+                hybrid.SwitchMode(currentItem.Serial, player);
+            }
+            return;
+        }
+
         // ロードアウト取得（ないなら何もしない）
         if (!AbilityManager.Loadouts.TryGetValue(player.Id, out var loadout) || loadout == null)
         {
