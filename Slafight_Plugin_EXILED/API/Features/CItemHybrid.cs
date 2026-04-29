@@ -194,6 +194,20 @@ public abstract class CItemHybrid : CItem
         _serialModeIndex.Remove(ev.Pickup.Serial);
     }
 
+    public override void RegisterEvents()
+    {
+        foreach (var sub in SubModes)
+            sub?.RegisterEvents();
+        base.RegisterEvents();
+    }
+
+    public override void UnregisterEvents()
+    {
+        foreach (var sub in SubModes)
+            sub?.UnregisterEvents();
+        base.UnregisterEvents();
+    }
+
     protected override void OnWaitingForPlayers()
     {
         _serialModeIndex.Clear();
