@@ -61,7 +61,7 @@ public class RPNameSetter
             
             PlayerInputNames[player] = player.CustomName;
         }
-        else if (textSettings.SettingId == 5)
+        else if (textSettings.SettingId == 6)
         {
             Log.Debug("passcode updated");
             Passcodes[player] = textSettings.SyncInputText;

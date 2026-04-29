@@ -61,7 +61,7 @@ public static class DebugModeHandler
 
     public static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
     {
-        if (@base is not SSTwoButtonsSetting twoButton || twoButton.SettingId != 6)
+        if (@base is not SSTwoButtonsSetting twoButton || twoButton.SettingId != 7)
             return;
 
         var player = Player.Get(hub);
