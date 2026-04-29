@@ -71,7 +71,7 @@ public class Scp3005Role : CRole
     
     protected override void OnDying(DyingEventArgs ev)
     {
-        if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol && ev.Attacker is null)
+        if (LabApiHandler.Instance.ActivatedAntiMemeProtocol && ev.Attacker is null)
         {
             Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CTeam.Fifthists.GetTeamColor()}>アンチミームプロトコル</color>により正常に無効化されました。");
         }
@@ -139,7 +139,7 @@ public class Scp3005Role : CRole
                 player.ShowHitMarker();
             }
 
-            if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocolInPast)
+            if (LabApiHandler.Instance.ActivatedAntiMemeProtocolInPast)
             {
                 player.DisableEffect(EffectType.Slowness);
                 player.EnableEffect(EffectType.MovementBoost, 25);
@@ -150,7 +150,7 @@ public class Scp3005Role : CRole
                 player.EnableEffect(EffectType.Slowness, 25);
             }
 
-            if (Plugin.Singleton.LabApiHandler.ActivatedAntiMemeProtocol)
+            if (LabApiHandler.Instance.ActivatedAntiMemeProtocol)
                 player.Hurt(100f, "<color=#ff00fa>アンチミームプロトコロル</color>により終了された");
 
             yield return Timing.WaitForSeconds(1.5f);

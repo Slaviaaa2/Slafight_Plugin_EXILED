@@ -9,6 +9,7 @@ using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.MainHandlers;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 using Random = UnityEngine.Random;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.SpecialEvents;
 
@@ -26,9 +27,11 @@ public static class LinqExtensions
     }
 }
 
-public class SpecialEventsHandler
+public class SpecialEventsHandler : IBootstrapHandler
 {
     public static SpecialEventsHandler Instance { get; private set; }
+    public static void Register() { _ = new SpecialEventsHandler(); }
+    public static void Unregister() { Instance = null; }
 
     public SpecialEventsHandler()
     {
@@ -302,8 +305,8 @@ public class SpecialEventsHandler
     public void InitStats()
     {
         EventPID++;
-        Plugin.Singleton.EventHandler.DeadmanDisable = false;
-        Plugin.Singleton.EventHandler.DeconCancellFlag = false;
+        EventHandler.Instance.DeadmanDisable = false;
+        EventHandler.Instance.DeconCancellFlag = false;
         Warhead.IsLocked = false;
         EscapeHandler.ClearEscapeOverrides();
         SpawnSystem.Disable = false;

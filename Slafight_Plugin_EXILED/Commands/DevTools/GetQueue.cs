@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using CommandSystem;
 using Exiled.Permissions.Extensions;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
@@ -19,7 +20,7 @@ public class GetQueue : ICommand
             return false;
         }
 
-        var seh = Plugin.Singleton.SpecialEventsHandler;
+        var seh = SpecialEventsHandler.Instance;
         var queues = seh.EventQueue.ToList();
         var result = queues.Any() ? String.Join(",", queues) : "none";
 

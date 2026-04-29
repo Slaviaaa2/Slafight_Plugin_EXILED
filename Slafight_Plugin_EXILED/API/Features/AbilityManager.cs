@@ -5,6 +5,7 @@ using System.Text;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
@@ -78,16 +79,7 @@ public static class AbilityManager
 
         try
         {
-            if (Plugin.Singleton?.PlayerHUD != null)
-            {
-                // ★ ここを PHUD_Ability に変更
-                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Ability, text, player);
-            }
-            else
-            {
-                string shortText = text.Length > 100 ? text[..100] + "..." : text;
-                player.ShowHint(shortText, 2f);
-            }
+            PlayerHUD.Instance.HintSync(SyncType.PHUD_Ability, text, player);
         }
         catch (Exception ex)
         {

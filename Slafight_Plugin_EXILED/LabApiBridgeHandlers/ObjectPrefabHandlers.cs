@@ -4,14 +4,19 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Events.Handlers;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.LabApiBridgeHandlers;
 
 /// <summary>
 /// This Handler is wrapper for ObjectPrefabs event receiving.
 /// </summary>
-public class ObjectPrefabHandler : CustomEventsHandler
+public class ObjectPrefabHandler : CustomEventsHandler, IBootstrapHandler
 {
+    public static ObjectPrefabHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); CustomHandlersManager.RegisterEventsHandler(Instance); }
+    public static void Unregister() { CustomHandlersManager.UnregisterEventsHandler(Instance); Instance = null; }
+
     public ObjectPrefabHandler()
     {
         PlayerEvents.SearchingToy += OnSearchingToy;

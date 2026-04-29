@@ -11,6 +11,8 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
+using Slafight_Plugin_EXILED.API.Interface;
+using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED.CustomRoles;
 
@@ -32,8 +34,12 @@ public sealed class WinCondition(
     public bool Check(List<Player> players) => CheckFunc(players);
 }
 
-public class CustomRolesHandler
+public class CustomRolesHandler : IBootstrapHandler
 {
+    public static CustomRolesHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     private readonly List<WinCondition> _winConditions;
 
     public CustomRolesHandler()
@@ -247,7 +253,7 @@ public class CustomRolesHandler
             try
             {
                 if (player.IsConnected)
-                    Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Specific, string.Empty, player);
+                    PlayerHUD.Instance.HintSync(SyncType.PHUD_Specific, string.Empty, player);
 
                 RoleSpecificTextProvider.Clear(player);
             }

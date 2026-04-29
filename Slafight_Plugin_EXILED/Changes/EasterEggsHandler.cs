@@ -5,10 +5,16 @@ using Exiled.API.Features;
 using MEC;
 using UnityEngine;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.Changes;
 
-public class EasterEggsHandler
+public class EasterEggsHandler : IBootstrapHandler
 {
+    public static EasterEggsHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); Instance.loadClips(); }
+    public static void Unregister() { Instance = null; }
+
     public EasterEggsHandler()
     {
         Exiled.Events.Handlers.Server.RoundStarted += MelancholyNuke;

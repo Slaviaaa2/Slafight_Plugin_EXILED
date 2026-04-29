@@ -9,11 +9,20 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Random = UnityEngine.Random;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
-public class SpawnSystem
+public class SpawnSystem : IBootstrapHandler
 {
+    public static void Register()
+    {
+        UnitPackBootstrap.RegisterAllPacks();
+        SpawnContextBootstrap.RegisterAllContexts(Config);
+        _ = new SpawnSystem();
+    }
+    public static void Unregister() { Instance = null; }
+
     // =====================
     //  種別
     // =====================
@@ -185,7 +194,7 @@ public class SpawnSystem
     public static SpawnTypeId? PendingOverrideType { get; private set; }
     public static bool PendingMiniWave { get; private set; }
 
-    public static SpawnSystem Instance { get; set; }
+    public static SpawnSystem Instance { get; private set; }
 
     // =====================
     //  コンストラクタ

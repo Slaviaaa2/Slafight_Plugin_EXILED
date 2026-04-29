@@ -14,10 +14,16 @@ using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
-public class FirstRolesHandler
+public class FirstRolesHandler : IBootstrapHandler
 {
+    public static FirstRolesHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public FirstRolesHandler()
     {
         Exiled.Events.Handlers.Server.WaitingForPlayers += RoundLocker;

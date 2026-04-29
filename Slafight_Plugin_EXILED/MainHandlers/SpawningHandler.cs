@@ -7,10 +7,16 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
-public class SpawningHandler
+public class SpawningHandler : IBootstrapHandler
 {
+    public static SpawningHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public SpawningHandler()
     {
         SpawnSystem.Spawning += OnSpawning;

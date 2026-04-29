@@ -17,10 +17,16 @@ using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.Hints;
 
-public class PlayerHUD
+public class PlayerHUD : IBootstrapHandler
 {
+    public static PlayerHUD Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
@@ -321,7 +327,7 @@ public class PlayerHUD
                     SyncTextRole = $"<color=#00b7eb>{sourcePlayer.Role.Name}</color>";
                     SyncTextTeam = "<color=#00b7eb>The Foundation</color>";
                     SyncTextObjective = "財団に従い、人類を根絶させよ。";
-                    SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.LocalizedEventName;
+                    SyncTextEvent = SpecialEventsHandler.Instance.LocalizedEventName;
 
                     HintSync(SyncType.PHUD_Role, SyncTextRole, targetForHint);
                     HintSync(SyncType.PHUD_Objective, SyncTextObjective, targetForHint);
@@ -609,7 +615,7 @@ public class PlayerHUD
                 ApplyTeamFallback(sourcePlayer);
             }
 
-            SyncTextEvent = Plugin.Singleton.SpecialEventsHandler.LocalizedEventName;
+            SyncTextEvent = SpecialEventsHandler.Instance.LocalizedEventName;
 
             HintSync(SyncType.PHUD_Role, SyncTextRole ?? "", targetForHint);
             HintSync(SyncType.PHUD_Objective, SyncTextObjective ?? "", targetForHint);

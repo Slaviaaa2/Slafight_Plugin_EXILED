@@ -2,6 +2,7 @@ using System;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
@@ -20,7 +21,7 @@ public class SpawnMapEditRole : ICommand
 
         Player player = Player.Get(sender);
         player.UniqueRole = "MapEditor";
-        Plugin.Singleton.PlayerHUD.DestroyHints();
+        PlayerHUD.Instance.DestroyHints();
         response = "You're now Entered Map Editor Mode!";
         return true;
     }

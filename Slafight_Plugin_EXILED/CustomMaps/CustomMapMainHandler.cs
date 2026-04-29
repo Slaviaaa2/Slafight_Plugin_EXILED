@@ -27,11 +27,16 @@ using UnityEngine;
 using ServerHandler = Exiled.Events.Handlers.Server;
 using MapHandler = Exiled.Events.Handlers.Map;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.CustomMaps;
 
-public class CustomMapMainHandler : CustomEventsHandler
+public class CustomMapMainHandler : CustomEventsHandler, IBootstrapHandler
 {
+    public static CustomMapMainHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); CustomHandlersManager.RegisterEventsHandler(Instance); }
+    public static void Unregister() { CustomHandlersManager.UnregisterEventsHandler(Instance); Instance = null; }
+
     private const float PositionTolerance = 1.25f;
     private const float FemurJoinRadius = 1.005f;
 
@@ -399,7 +404,7 @@ public class CustomMapMainHandler : CustomEventsHandler
 
     private void InteractionButton(PlayerSearchedToyEventArgs ev)
     {
-        var specialEventsHandler = Plugin.Singleton.SpecialEventsHandler;
+        var specialEventsHandler = SpecialEventsHandler.Instance;
         var pos = ev.Interactable.Position;
 
         if (ChaosBar != null &&

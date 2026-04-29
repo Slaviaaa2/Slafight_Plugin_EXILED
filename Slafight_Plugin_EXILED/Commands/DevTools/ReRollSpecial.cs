@@ -1,6 +1,7 @@
 using System;
 using CommandSystem;
 using Exiled.Permissions.Extensions;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
@@ -17,9 +18,9 @@ public class ReRollSpecial : ICommand
             return false;
         }
 
-        Plugin.Singleton.SpecialEventsHandler.RunRandomEvent();
+        SpecialEventsHandler.Instance.RunRandomEvent();
 
-        response = ("Special Events now Rerolled!\nNew Event: "+Plugin.Singleton.SpecialEventsHandler.LocalizedEventName);
+        response = ("Special Events now Rerolled!\nNew Event: "+SpecialEventsHandler.Instance.LocalizedEventName);
         return true;
     }
 }

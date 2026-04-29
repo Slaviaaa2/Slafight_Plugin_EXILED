@@ -64,13 +64,13 @@ public class SnowWarriersAttackEvent : SpecialEvent
     // ===== 共通キャンセル判定 =====
     private bool CancelIfOutdated()
     {
-        return _eventPidGlobal != Plugin.Singleton.SpecialEventsHandler.EventPID;
+        return _eventPidGlobal != SpecialEventsHandler.Instance.EventPID;
     }
 
     // ===== メイン処理 =====
     private void DoSnowWarriorsSetup()
     {
-        var eventHandler = Plugin.Singleton.EventHandler;
+        var eventHandler = EventHandler.Instance;
 
         Warhead.IsLocked = true;
         eventHandler.DeadmanDisable = true;

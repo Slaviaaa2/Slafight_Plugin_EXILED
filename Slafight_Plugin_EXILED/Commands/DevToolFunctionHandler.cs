@@ -144,7 +144,7 @@ public class DevToolFunctionHandler
 
     public void PlayOmegaWarhead()
     {
-        OmegaWarhead.StartProtocol(Plugin.Singleton.SpecialEventsHandler.EventPID);
+        OmegaWarhead.StartProtocol(SpecialEventsHandler.Instance.EventPID);
     }
 
     public void DebugRoundStart([NotNull] Player startedPlayer)

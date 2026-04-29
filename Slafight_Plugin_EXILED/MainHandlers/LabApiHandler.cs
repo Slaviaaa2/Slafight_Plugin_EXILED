@@ -19,11 +19,16 @@ using UnityEngine;
 using Light = LabApi.Features.Wrappers.LightSourceToy;
 using Logger = LabApi.Features.Console.Logger;
 using Player = LabApi.Features.Wrappers.Player;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
-public class LabApiHandler : CustomEventsHandler
+public class LabApiHandler : CustomEventsHandler, IBootstrapHandler
 {
+    public static LabApiHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); CustomHandlersManager.RegisterEventsHandler(Instance); }
+    public static void Unregister() { CustomHandlersManager.UnregisterEventsHandler(Instance); Instance = null; }
+
     public LabApiHandler()
     {
         LabApi.Events.Handlers.ServerEvents.RoundStarted += PickupSetup;

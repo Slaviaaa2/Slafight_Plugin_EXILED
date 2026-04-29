@@ -5,6 +5,7 @@ using Exiled.Permissions.Extensions;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.Hints;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
@@ -44,7 +45,7 @@ public class SpawnUniversal : ICommand
         if (roleId.Equals("mp", StringComparison.OrdinalIgnoreCase))
         {
             executor.UniqueRole = "MapEditor";
-            Plugin.Singleton.PlayerHUD.DestroyHints();
+            PlayerHUD.Instance.DestroyHints();
             response = $"{executor.Nickname} is now {executor.UniqueRole}";
             return true;
         }

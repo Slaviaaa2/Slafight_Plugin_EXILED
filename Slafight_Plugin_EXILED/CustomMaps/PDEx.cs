@@ -12,10 +12,16 @@ using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.CustomMaps;
 
-public class PDEx
+public class PDEx : IBootstrapHandler
 {
+    public static PDEx Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public PDEx()
     {
         Exiled.Events.Handlers.Server.RoundStarted += Setup;

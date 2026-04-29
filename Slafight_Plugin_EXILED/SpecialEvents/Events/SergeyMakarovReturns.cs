@@ -24,7 +24,7 @@ public class SergeyMakarovReturns : SpecialEvent
     public override string TriggerRequirement => "April Fools";
 
     // ===== ショートカット =====
-    private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private EventHandler EventHandler => EventHandler.Instance;
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;

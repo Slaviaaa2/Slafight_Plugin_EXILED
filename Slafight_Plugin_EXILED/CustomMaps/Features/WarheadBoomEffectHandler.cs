@@ -50,7 +50,7 @@ public static class WarheadBoomEffectHandler
         foreach (var player in Player.List)
         {
             if (player == null) continue;
-            /*Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
+            /*PlayerHUD.Instance.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
                                                                      $"DetonationTimer: {Warhead.DetonationTimer}\n" +
                                                                      $"RealDetonationTimer: {Warhead.RealDetonationTimer}\n" +
                                                                      $"TimeToDetonate: {Warhead.Controller.CurScenario.TimeToDetonate}\n" +
@@ -81,7 +81,7 @@ public static class WarheadBoomEffectHandler
             {
                 if (player == null) continue;
                 /*
-                Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
+                PlayerHUD.Instance.HintSync(SyncType.PHUD_Debug, "<size=18>[WarheadStatus]\n" +
                                                                          $"DetonationTimer: {Warhead.DetonationTimer}\n" +
                                                                          $"RealDetonationTimer: {Warhead.RealDetonationTimer}\n" +
                                                                          $"TimeToDetonate: {Warhead.Controller.CurScenario.TimeToDetonate}\n" +

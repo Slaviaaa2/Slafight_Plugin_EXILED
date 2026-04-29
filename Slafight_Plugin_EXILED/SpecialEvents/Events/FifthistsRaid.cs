@@ -19,7 +19,7 @@ public class FifthistsRaidEvent : SpecialEvent
     public override string TriggerRequirement => "4人以上のプレイヤー";
 
     // ===== ショートカット =====
-    private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private EventHandler EventHandler => EventHandler.Instance;
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;
@@ -31,7 +31,7 @@ public class FifthistsRaidEvent : SpecialEvent
         if (CancelIfOutdated())
             return;
 
-        Plugin.Singleton.SpecialEventsHandler.IsFifthistsRaidActive = true;
+        SpecialEventsHandler.Instance.IsFifthistsRaidActive = true;
 
         // まず非 SCP から 1/4 を FifthistRescure に
         var convertedCount = 0;

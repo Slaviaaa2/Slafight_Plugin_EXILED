@@ -28,13 +28,18 @@ using Player = Exiled.API.Features.Player;
 using PlayerHandler = Exiled.Events.Handlers.Player;
 using Room = Exiled.API.Features.Room;
 using ServerHandler = Exiled.Events.Handlers.Server;
+using Slafight_Plugin_EXILED.API.Interface;
 using WarheadHandler = Exiled.Events.Handlers.Warhead;
 using MapHandler = Exiled.Events.Handlers.Map;
 
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
-public class EventHandler
+public class EventHandler : IBootstrapHandler
 {
+    public static EventHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public EventHandler()
     {
         PlayerHandler.Verified += OnVerified;
@@ -109,7 +114,7 @@ public class EventHandler
             if (!IsPlayerValid(ev.Player)) return;
             string tips = Tips.GetRandomTip();
             ev.Player.ShowHint(
-                "\n\n\n\n\n\n\n<size=32>次のイベント：" + Plugin.Singleton.SpecialEventsHandler.LocalizedEventName + "</size>" +
+                "\n\n\n\n\n\n\n<size=32>次のイベント：" + SpecialEventsHandler.Instance.LocalizedEventName + "</size>" +
                 $"\n\n<size=28>Tips: {tips}</size>",
                 5555f);
         });
@@ -153,7 +158,7 @@ public class EventHandler
                 if (!IsPlayerValid(player)) continue;
                 var tips = Tips.GetRandomTip();
                 player.ShowHint(
-                    "\n\n\n\n\n\n\n<size=32>次のイベント：" + Plugin.Singleton.SpecialEventsHandler.LocalizedEventName + "</size>" +
+                    "\n\n\n\n\n\n\n<size=32>次のイベント：" + SpecialEventsHandler.Instance.LocalizedEventName + "</size>" +
                     $"\n\n<size=28>Tips: {tips}</size>",
                     5555f);
             }
@@ -217,9 +222,9 @@ public class EventHandler
                 SpecialEventType.FacilityTermination,
                 SpecialEventType.SergeyMakarovReturns,
             ];
-            if (!notallowed.Contains(Plugin.Singleton.SpecialEventsHandler.NowEvent))
+            if (!notallowed.Contains(SpecialEventsHandler.Instance.NowEvent))
             {
-                if (Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.OmegaWarhead)
+                if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.OmegaWarhead)
                 {
                     Exiled.API.Features.Cassie.MessageTranslated(
                         "Emergency , emergency , A large containment breach is currently started within the site. All personnel must immediately begin evacuation .",
@@ -256,7 +261,7 @@ public class EventHandler
                         SpecialEventType.FacilityTermination,
                         SpecialEventType.SergeyMakarovReturns
                     ];
-                    if (a.Contains(Plugin.Singleton.SpecialEventsHandler.NowEvent)) break;
+                    if (a.Contains(SpecialEventsHandler.Instance.NowEvent)) break;
                     if (door.Type is DoorType.GateA or DoorType.GateB)
                     {
                         door.Lock(120f, DoorLockType.AdminCommand);
@@ -387,7 +392,7 @@ public class EventHandler
         {
             if (ev.Door.Type is DoorType.GateA or DoorType.GateB)
             {
-                if (ev.Door.IsLocked && Plugin.Singleton.SpecialEventsHandler.NowEvent == SpecialEventType.None)
+                if (ev.Door.IsLocked && SpecialEventsHandler.Instance.NowEvent == SpecialEventType.None)
                 {
                     ev.Player.ShowHint("収容違反への対応として暫くロックされているようだ・・・");
                 }

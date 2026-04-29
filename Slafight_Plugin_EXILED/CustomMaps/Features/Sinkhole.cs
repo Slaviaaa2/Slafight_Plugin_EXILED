@@ -9,10 +9,16 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.CustomMaps.Features;
 
-public class Sinkhole
+public class Sinkhole : IBootstrapHandler
 {
+    public static Sinkhole Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public Sinkhole()
     {
         Exiled.Events.Handlers.Server.RoundStarted += RoundStartHole;

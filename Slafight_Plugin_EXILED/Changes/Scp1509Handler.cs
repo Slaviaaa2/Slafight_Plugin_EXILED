@@ -10,10 +10,16 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.Changes;
 
-public class Scp1509Handler
+public class Scp1509Handler : IBootstrapHandler
 {
+    public static Scp1509Handler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public Scp1509Handler()
     {
         Exiled.Events.Handlers.Scp1509.Resurrecting += OnReincarnating;

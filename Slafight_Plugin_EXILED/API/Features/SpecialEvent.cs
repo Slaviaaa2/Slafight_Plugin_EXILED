@@ -90,7 +90,7 @@ public abstract class SpecialEvent
     {
         if (Round.IsLobby)
             return true;
-        return CurrentEventPid != Plugin.Singleton.SpecialEventsHandler.EventPID;
+        return CurrentEventPid != SpecialEventsHandler.Instance.EventPID;
     }
 
     /// <summary>

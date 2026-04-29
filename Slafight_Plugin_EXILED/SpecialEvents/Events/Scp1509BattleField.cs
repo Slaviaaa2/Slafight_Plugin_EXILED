@@ -27,7 +27,7 @@ public class Scp1509BattleFieldEvent : SpecialEvent
     // ===== 内部状態 =====
     private int _eventPid;
 
-    private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private EventHandler EventHandler => EventHandler.Instance;
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;
@@ -47,7 +47,7 @@ public class Scp1509BattleFieldEvent : SpecialEvent
     public override void UnregisterEvents() { }
 
     private bool CancelIfOutdated()
-        => _eventPid != Plugin.Singleton.SpecialEventsHandler.EventPID;
+        => _eventPid != SpecialEventsHandler.Instance.EventPID;
 
     // ===== メイン処理 =====
     private void RunBattleField()

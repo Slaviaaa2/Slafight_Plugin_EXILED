@@ -1,6 +1,7 @@
 using System;
 using Exiled.API.Features;
 using InventorySystem;
+using Scp914;
 using Scp914.Processors;
 using ServerHandlers = Exiled.Events.Handlers.Server;
 
@@ -8,7 +9,7 @@ namespace Slafight_Plugin_EXILED.Patches;
 
 /// <summary>
 /// ExMod-Team/EXILED#718 対策。
-/// BaseGame の <see cref="Scp914.Scp914Upgrader"/> は ProcessPickup / ProcessPlayer の冒頭で
+/// BaseGame の <see cref="Scp914Upgrader"/> は ProcessPickup / ProcessPlayer の冒頭で
 /// <see cref="Scp914ItemProcessor"/> を持たない ItemType を早期 return / continue で握り潰す。
 /// Exiled の Scp914.UpgradingPickup / UpgradingInventoryItem は transpiler で
 /// その先の Stloc に差し込まれているため、processor が無いと Exiled イベントすら発火しない。

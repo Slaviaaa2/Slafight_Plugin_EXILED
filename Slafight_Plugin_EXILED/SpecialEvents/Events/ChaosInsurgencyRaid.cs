@@ -30,7 +30,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
     // ===== 内部状態 =====
     private bool _teslaDisabled = false;
 
-    private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private EventHandler EventHandler => EventHandler.Instance;
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;

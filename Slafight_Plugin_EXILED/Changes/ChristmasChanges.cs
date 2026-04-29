@@ -11,10 +11,16 @@ using PlayerRoles;
 using UnityEngine;
 using EffectType = Exiled.API.Enums.EffectType;
 
+using Slafight_Plugin_EXILED.API.Interface;
+
 namespace Slafight_Plugin_EXILED.Changes;
 
-public class ChristmasChanges
+public class ChristmasChanges : IBootstrapHandler
 {
+    public static ChristmasChanges Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public ChristmasChanges()
     {
         //Exiled.Events.Handlers.Scp2536.GrantingGift += TreeChange;

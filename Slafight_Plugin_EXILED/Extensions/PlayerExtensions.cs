@@ -273,7 +273,7 @@ public static class PlayerExtensions
                 new FacilityManager().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Engineer:
-                Plugin.Singleton.EngineerRole.SpawnRole(player, roleSpawnFlags);
+                Engineer.Instance.SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ObjectObserver:
                 new ObjectObserver().SpawnRole(player, roleSpawnFlags);

@@ -34,7 +34,7 @@ public static class OmegaWarhead
     public static bool IsWarheadStarted;
     public static Player StartedPlayer;
 
-    private static SpecialEventsHandler SpecialEventsHandler => Plugin.Singleton.SpecialEventsHandler;
+    private static SpecialEventsHandler SpecialEventsHandler => SpecialEventsHandler.Instance;
     private static Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio = EventHandler.CreateAndPlayAudio;
 
     public static event EventHandler<OmegaWarheadStartingEventArgs> OmegaWarheadStarting;
@@ -46,7 +46,7 @@ public static class OmegaWarhead
         Log.Debug("[OMEGA WARHEAD]Called Start Protocol.");
         if (!CanBeStart()) return false;
         if (Warhead.IsInProgress) Warhead.Stop();
-        Plugin.Singleton.EventHandler.DeadmanDisable = true;
+        EventHandler.Instance.DeadmanDisable = true;
         Warhead.IsLocked = true;
 
         if (_warheadCoroutine.IsRunning)

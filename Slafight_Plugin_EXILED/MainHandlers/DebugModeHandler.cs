@@ -3,22 +3,10 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
-using UserSettings.ServerSpecific;
-
 namespace Slafight_Plugin_EXILED.MainHandlers;
 
 public static class DebugModeHandler
 {
-    public static void Register()
-    {
-        ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingValueReceived;
-    }
-
-    public static void Unregister()
-    {
-        ServerSpecificSettingsSync.ServerOnSettingValueReceived -= OnSettingValueReceived;
-    }
-
     // =====================
     //  デバッグモード管理
     // =====================
@@ -55,41 +43,10 @@ public static class DebugModeHandler
     public static bool TryGetDoor(Player player, out DoorInfo info)
         => _lastDoors.TryGetValue(player.Id, out info);
 
-    // =====================
-    //  設定受信
-    // =====================
-
-    public static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase @base)
+    public static void SetDebugMode(Player player, bool isOn)
     {
-        if (@base is not SSTwoButtonsSetting twoButton || twoButton.SettingId != 7)
-            return;
-
-        var player = Player.Get(hub);
-        if (player == null || !player.IsConnected)
-            return;
-
-        // SyncIsA: true = 左ボタン(ON), false = 右ボタン(OFF)
-        if (twoButton.SyncIsA)
-        {
-            DebugModePlayers.Add(player);
-            // ignored
-        }
-        else
-        {
-            DebugModePlayers.Remove(player);
-            // ignored
-        }
-
-        try
-        {
-            Plugin.Singleton.PlayerHUD.HintSync(SyncType.PHUD_Debug, "", player);
-        }
-        catch
-        {
-            // ignored
-        }
-
-        Log.Debug($"[DebugMode] {player.Nickname} => {(twoButton.SyncIsA ? "ON" : "OFF")}");
+        if (isOn) DebugModePlayers.Add(player);
+        else DebugModePlayers.Remove(player);
     }
 
     // =====================

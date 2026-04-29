@@ -15,12 +15,26 @@ using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Random = System.Random;
+using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 [CRoleAutoRegisterIgnore]
-public class Engineer : CRole
+public class Engineer : CRole, IBootstrapHandler
 {
+    public static Engineer Instance { get; private set; }
+    public static void Register()
+    {
+        Instance = new();
+        Instance.RegisterEvents();
+        CRole.OverrideRoleInstance(Instance.UniqueRoleName, Instance);
+    }
+    public static void Unregister()
+    {
+        Instance?.UnregisterEvents();
+        Instance = null;
+    }
+
     // TODO: need rework
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Engineer;
     protected override CTeam Team { get; set; } = CTeam.Scientists;

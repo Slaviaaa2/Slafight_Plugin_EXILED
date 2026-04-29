@@ -64,7 +64,7 @@ public class CandyWarriersAttackEvent : SpecialEvent
     // ===== メイン処理 =====
     private void DoCandyWarriorsSetup()
     {
-        var eventHandler = Plugin.Singleton.EventHandler;
+        var eventHandler = EventHandler.Instance;
 
         Warhead.IsLocked = true;
         eventHandler.DeadmanDisable = true;

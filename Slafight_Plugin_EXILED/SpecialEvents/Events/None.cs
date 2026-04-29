@@ -15,7 +15,7 @@ public class NoneEvent : SpecialEvent
     public override string TriggerRequirement => "無し";
 
     // ===== ショートカット =====
-    private EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private EventHandler EventHandler => EventHandler.Instance;
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;

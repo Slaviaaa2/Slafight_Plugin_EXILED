@@ -12,6 +12,8 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Player = Exiled.API.Features.Player;
+using Slafight_Plugin_EXILED.API.Interface;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.Changes;
 
@@ -28,8 +30,12 @@ public class PlayerCustomEscapedEventArgs : EventArgs
     public PlayerCustomEscapedEventArgs(Player player) => Player = player;
 }
 
-public class EscapeHandler
+public class EscapeHandler : IBootstrapHandler
 {
+    public static EscapeHandler Instance { get; private set; }
+    public static void Register() { Instance = new(); }
+    public static void Unregister() { Instance = null; }
+
     public static event EventHandler<PlayerCustomEscapingEventArgs> PlayerCustomEscaping;
     public static event EventHandler<PlayerCustomEscapedEventArgs> PlayerCustomEscaped;
 
@@ -161,7 +167,7 @@ public class EscapeHandler
 
     private EscapeTargetRole ApplyEventOverrides(EscapeTargetRole baseTarget, Player player)
     {
-        var nowEvent = Plugin.Singleton.SpecialEventsHandler.NowEvent;
+        var nowEvent = SpecialEventsHandler.Instance.NowEvent;
 
         switch (nowEvent)
         {

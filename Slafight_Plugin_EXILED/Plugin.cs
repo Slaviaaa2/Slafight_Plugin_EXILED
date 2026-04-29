@@ -5,10 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API.Features;
-using LabApi.Events.CustomHandlers;
 using Slafight_Plugin_EXILED.CustomItems;
-using Slafight_Plugin_EXILED.CustomRoles;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using System.Text.Json;
 using System.Threading;
 using HarmonyLib;
@@ -17,15 +14,11 @@ using Slafight_Plugin_EXILED.Changes;
 using Slafight_Plugin_EXILED.CustomMaps;
 using Slafight_Plugin_EXILED.CustomMaps.Entities;
 using Slafight_Plugin_EXILED.CustomMaps.Features;
-using Slafight_Plugin_EXILED.CustomRoles.Scientist;
 using Slafight_Plugin_EXILED.Extensions;
-using Slafight_Plugin_EXILED.Hints;
-using Slafight_Plugin_EXILED.LabApiBridgeHandlers;
 using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.Patches;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UserSettings.ServerSpecific;
-using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
 
 namespace Slafight_Plugin_EXILED;
 
@@ -48,58 +41,12 @@ public class Plugin : Plugin<Config>
     public override Version RequiredExiledVersion { get; } = new Version(9, 13, 3);
 
     public Harmony HarmonyInstance { get; private set; }
-    
-    public EventHandler EventHandler { get; set; }
-    public SpecialEventsHandler SpecialEventsHandler { get; set; }
-    public CustomMapMainHandler CustomMapMainHandler { get; set; }
-    public CustomRolesHandler CustomRolesHandler { get; set; }
-    public LabApiHandler LabApiHandler { get; set; }
-    public EasterEggsHandler EasterEggsHandler { get; set; }
-    public PlayerHUD PlayerHUD { get; set; }
-    public ActivateHandler ProximityChatActiveHandler { get; set; }
-    public RPNameSetter RolePlayNameSetter { get; set; }
-    public FirstRolesHandler FirstRolesHandler { get; set; }
-    public ChristmasChanges ChristmasChanges { get; set; }
-        
-    public SpawnSystem SpawnSystem { get; set; }
-    public SpawningHandler SpawningHandler { get; set; }
-    public EscapeHandler EscapeHandler { get; set; }
-    public AbilityInputHandler AbilityInputHandler { get; set; }
-    public Sinkhole Sinkhole { get; set; }
-    public PDEx PDEx { get; set; }
-    public Engineer EngineerRole { get; private set; }
-    public Scp1509Handler Scp1509Handler { get; set; }
-    public ObjectPrefabHandler ObjectPrefabHandler { get; set; }
     // Enable & Disable
     public override void OnEnabled()
     {
         Singleton = this;
-        EventHandler = new EventHandler();
-        SpecialEventsHandler = new SpecialEventsHandler();
-        CustomMapMainHandler = new CustomMapMainHandler();
-        CustomRolesHandler = new CustomRolesHandler();
-        LabApiHandler = new();
-        EasterEggsHandler = new();
-        PlayerHUD = new();
-        EscapeHandler = new();
         ProximityChat.Handler.RegisterEvents();
-        ProximityChatActiveHandler = new();
-        RolePlayNameSetter = new();
-        FirstRolesHandler = new();
-        ChristmasChanges = new();
-        AbilityInputHandler = new();
-        Sinkhole = new();
-        PDEx = new();
-        Scp1509Handler = new();
-        ObjectPrefabHandler = new();
-        CustomHandlersManager.RegisterEventsHandler(LabApiHandler);
-        CustomHandlersManager.RegisterEventsHandler(CustomMapMainHandler);
-        CustomHandlersManager.RegisterEventsHandler(ObjectPrefabHandler);
 
-        EngineerRole = new Engineer();
-        EngineerRole.RegisterEvents();
-        CRole.OverrideRoleInstance(EngineerRole.UniqueRoleName, EngineerRole);
-            
         NetworkVisibilityExtensions.Register();
         NvgManager.Register();
         SpecificFlagsHandler.Register();
@@ -125,21 +72,14 @@ public class Plugin : Plugin<Config>
         Scp914Changes.Register();
         Scp513.Register();
             
-        UnitPackBootstrap.RegisterAllPacks();
-        SpawnContextBootstrap.RegisterAllContexts(SpawnSystem.Config);
-        SpawnSystem = new();
-        SpawningHandler = new();
-        
         AutoHandlerBootstrapRegister.Register();
-        DebugModeHandler.Register();
+        ServerSpecificsHandler.Register();
 
         var Settings = ServerSpecifics.Settings();
         var a = Settings.ToList();
         ServerSpecificSettingsSync.DefinedSettings = a.ToArray();
         ServerSpecificSettingsSync.SendToAll();
         Log.Debug($"Settings List: \n{ServerSpecificSettingsSync.DefinedSettings}");
-            
-        Plugin.Singleton.EasterEggsHandler.loadClips();
             
         HarmonyInstance = new Harmony(this.Name);
         HarmonyInstance.PatchAll();
@@ -171,14 +111,7 @@ public class Plugin : Plugin<Config>
         }
             
         ProximityChat.Handler.UnregisterEvents();
-        CustomHandlersManager.UnregisterEventsHandler(LabApiHandler);
-        CustomHandlersManager.UnregisterEventsHandler(CustomMapMainHandler);
-        CustomHandlersManager.UnregisterEventsHandler(ObjectPrefabHandler);
-            
-        // DailyCassieAnnounce.Unregister(); -- 何か微妙だったので没
-            
-        EngineerRole.UnregisterEvents();
-            
+
         NetworkVisibilityExtensions.Unregister();
         NvgManager.Unregister();
         SpecificFlagsHandler.Unregister();
@@ -205,7 +138,7 @@ public class Plugin : Plugin<Config>
         Scp513.Unregister();
         
         AutoHandlerBootstrapRegister.Unregister();
-        DebugModeHandler.Unregister();
+        ServerSpecificsHandler.Unregister();
             
         HarmonyInstance.UnpatchAll(this.Name);
         HarmonyInstance = null;

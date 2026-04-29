@@ -10,6 +10,7 @@ using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomRoles;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.Hints;
 using Slafight_Plugin_EXILED.MainHandlers;
 using UnityEngine;
 using EventHandler = Slafight_Plugin_EXILED.MainHandlers.EventHandler;
@@ -26,7 +27,7 @@ public class FacilityTermination : SpecialEvent
     private CoroutineHandle _mainCoroutine;
     private CoroutineHandle _humanitistsCoroutine;
 
-    private static EventHandler EventHandler => Plugin.Singleton.EventHandler;
+    private static EventHandler EventHandler => EventHandler.Instance;
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
         EventHandler.CreateAndPlayAudio;
 
@@ -145,7 +146,7 @@ public class FacilityTermination : SpecialEvent
         yield return Timing.WaitForSeconds(2f);
         if (KillEvent()) yield break;
 
-        Plugin.Singleton.PlayerHUD.AllSyncHUD_();
+        PlayerHUD.Instance.AllSyncHUD_();
         foreach (var player in Player.List)
         {
             if (player == null) continue;

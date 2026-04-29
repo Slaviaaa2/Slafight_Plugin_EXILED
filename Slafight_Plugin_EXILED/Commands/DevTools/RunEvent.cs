@@ -2,6 +2,7 @@ using System;
 using CommandSystem;
 using Exiled.Permissions.Extensions;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.Commands.DevTools;
 
@@ -38,7 +39,7 @@ public class RunEvent : ICommand
             return false;
         }
 
-        var seh = Plugin.Singleton.SpecialEventsHandler;
+        var seh = SpecialEventsHandler.Instance;
         seh.RunEvent(eventType);
 
         response = $"Special event forced and started: {seh.LocalizedEventName} ({eventType})";

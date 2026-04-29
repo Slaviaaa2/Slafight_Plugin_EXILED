@@ -48,7 +48,7 @@ public class EndlessCryEvent : SpecialEvent
     // ==== 共通キャンセル判定 ====
     private bool CancelIfOutdated()
     {
-        if (_eventPid != Plugin.Singleton.SpecialEventsHandler.EventPID)
+        if (_eventPid != SpecialEventsHandler.Instance.EventPID)
             return true;
 
         return false;
