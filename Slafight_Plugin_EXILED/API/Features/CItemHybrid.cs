@@ -99,6 +99,16 @@ public abstract class CItemHybrid : CItem
         return SubModes[idx];
     }
 
+    /// <summary>
+    /// 指定 serial の現在アクティブな sub が <paramref name="sub"/> と同一インスタンスか。
+    /// CItem.Check() が Hybrid 管理下の serial でも sub 視点で true を返せるようにするために使う。
+    /// </summary>
+    internal bool IsCurrentSub(ushort serial, CItem sub)
+    {
+        var current = GetCurrentSub(serial);
+        return current != null && ReferenceEquals(current, sub);
+    }
+
     // ==== CItem virtual overrides ====
 
     protected override void OnAcquired(PlayerEvents.ItemAddedEventArgs ev, bool displayMessage)

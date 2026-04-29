@@ -587,13 +587,27 @@ public abstract class CItem
 
     // ==== Check / TryGet ====
 
-    /// <summary>このアイテムが CItem のこのインスタンス由来か。</summary>
+    /// <summary>このアイテムが CItem のこのインスタンス由来か。
+    /// Hybrid の sub インスタンスから呼んだ場合、その serial の現在アクティブな sub が
+    /// 自分であれば true を返す。</summary>
     public bool Check(Item? item)
-        => item != null && SerialToItem.TryGetValue(item.Serial, out var ci) && ReferenceEquals(ci, this);
+    {
+        if (item == null) return false;
+        if (!SerialToItem.TryGetValue(item.Serial, out var ci) || ci == null) return false;
+        if (ReferenceEquals(ci, this)) return true;
+        return ci is CItemHybrid hybrid && hybrid.IsCurrentSub(item.Serial, this);
+    }
 
-    /// <summary>このピックアップが CItem のこのインスタンス由来か。</summary>
+    /// <summary>このピックアップが CItem のこのインスタンス由来か。
+    /// Hybrid の sub インスタンスから呼んだ場合、その serial の現在アクティブな sub が
+    /// 自分であれば true を返す。</summary>
     public bool Check(Pickup? pickup)
-        => pickup != null && SerialToItem.TryGetValue(pickup.Serial, out var ci) && ReferenceEquals(ci, this);
+    {
+        if (pickup == null) return false;
+        if (!SerialToItem.TryGetValue(pickup.Serial, out var ci) || ci == null) return false;
+        if (ReferenceEquals(ci, this)) return true;
+        return ci is CItemHybrid hybrid && hybrid.IsCurrentSub(pickup.Serial, this);
+    }
 
     /// <summary>プレイヤーが手に持っている現在のアイテムがこの CItem のインスタンスか。</summary>
     public bool CheckHeld(Player? player)
