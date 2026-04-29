@@ -29,16 +29,16 @@ public abstract class CItemHybrid : CItem
     // OnOwnerDying の重複呼び出し防止
     private PlayerEvents.DyingEventArgs? _lastDyingEv;
 
-    private List<CItem>? _subModes;
-    protected List<CItem> SubModes => _subModes ??= BuildSubModes();
+    // SwitchMode 実行中は selected hint を抑制するフラグ
+    private bool _isSwitching;
+
+    private List<CItemHybridMode>? _subModes;
+    protected List<CItemHybridMode> SubModes => _subModes ??= BuildSubModes();
 
     /// <summary>モードとして使う CItem インスタンスのリストを構築する。インデックス 0 が初期モード。</summary>
-    protected abstract List<CItem> BuildSubModes();
+    protected abstract List<CItemHybridMode> BuildSubModes();
 
-    protected override ItemType BaseItem => SubModes[0].GetBaseItem();
-    protected override bool ShowPickedUpHint => false;
-    protected override bool ShowSelectedHint => false;
-
+    protected override ItemType BaseItem => SubModes[0].TargetItem.GetBaseItem();
     // ==== Give ====
 
     public override Item? Give(Player? player, bool displayMessage = false)
@@ -70,7 +70,7 @@ public abstract class CItemHybrid : CItem
         Item? newItem;
         try
         {
-            newItem = player.AddItem(nextSub.GetBaseItem());
+            newItem = player.AddItem(nextSub.TargetItem.GetBaseItem());
         }
         finally
         {
@@ -83,7 +83,10 @@ public abstract class CItemHybrid : CItem
         // CurrentItem を切り替える時点では oldSerial がまだ SerialToItem に残っている。
         // これにより ChangingItem 発火時に旧 sub の OnChangingOther 系 cleanup が
         // Check() / CheckHeld() を通過して正しく動く（Burned 解除など）。
-        player.CurrentItem = newItem;
+        // _isSwitching を立てることで切り替え起因の selected hint を抑制する。
+        _isSwitching = true;
+        try { player.CurrentItem = newItem; }
+        finally { _isSwitching = false; }
 
         // ChangingItem が解決した後に旧 serial を解除
         _serialModeIndex.Remove(oldSerial);
@@ -92,7 +95,8 @@ public abstract class CItemHybrid : CItem
         // serial 解除後に RemoveItem → ItemRemoved の dispatch をスキップ
         player.RemoveItem(oldItem, destroy: true);
 
-        player.ShowHint($"<size=24>モード切替: {nextSub.DisplayName}</size>", 2f);
+        player.ShowHint($"<size=24>モード切替: {nextSub.ModeName.OrDefault($"{nextSub.TargetItem.DisplayName}")}</size>\n" +
+                        $"<size=23>{nextSub.ModeDescription.OrDefault($"{nextSub.TargetItem.Description}")}</size>", 2f);
     }
 
     // ==== sub 解決 ====
@@ -101,7 +105,7 @@ public abstract class CItemHybrid : CItem
     {
         if (!_serialModeIndex.TryGetValue(serial, out var idx)) return null;
         if (idx < 0 || idx >= SubModes.Count) return null;
-        return SubModes[idx];
+        return SubModes[idx].TargetItem;
     }
 
     /// <summary>
@@ -180,7 +184,7 @@ public abstract class CItemHybrid : CItem
             if (!TryGet(item.Serial, out var ci) || !ReferenceEquals(ci, this)) continue;
             if (!_serialModeIndex.TryGetValue(item.Serial, out var idx)) continue;
             if (notified.Add(idx))
-                SubModes[idx]?.CallOnOwnerDying(ev);
+                SubModes[idx]?.TargetItem.CallOnOwnerDying(ev);
         }
     }
 
@@ -202,14 +206,14 @@ public abstract class CItemHybrid : CItem
     public override void RegisterEvents()
     {
         foreach (var sub in SubModes)
-            sub?.RegisterEvents();
+            sub?.TargetItem.RegisterEvents();
         base.RegisterEvents();
     }
 
     public override void UnregisterEvents()
     {
         foreach (var sub in SubModes)
-            sub?.UnregisterEvents();
+            sub?.TargetItem.UnregisterEvents();
         base.UnregisterEvents();
     }
 
@@ -218,7 +222,7 @@ public abstract class CItemHybrid : CItem
         _serialModeIndex.Clear();
         _lastDyingEv = null;
         foreach (var sub in SubModes)
-            sub?.CallOnWaitingForPlayers();
+            sub?.TargetItem.CallOnWaitingForPlayers();
     }
 
     protected override void OnUpgradingPickup(Scp914Events.UpgradingPickupEventArgs ev)
@@ -231,10 +235,16 @@ public abstract class CItemHybrid : CItem
     {
         var idx = _serialModeIndex.TryGetValue(item.Serial, out var i) ? i : _pendingModeIndex;
         if (idx >= 0 && idx < SubModes.Count)
-            SubModes[idx]?.CallCustomizeItem(item);
+            SubModes[idx]?.TargetItem.CallCustomizeItem(item);
         base.CustomizeItem(item);
     }
 
     protected override void ShowPickedUpMessage(Player player) { }
     protected override void ShowSelectedMessage(Player player) { }
+}
+public class CItemHybridMode(CItem targetItem, string modeName = "", string modeDescription = "")
+{
+    public CItem TargetItem { get; set; } = targetItem;
+    public string ModeName { get; set; } = modeName;
+    public string ModeDescription { get; set; } = modeDescription;
 }

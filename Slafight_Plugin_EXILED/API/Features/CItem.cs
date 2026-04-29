@@ -212,10 +212,10 @@ public abstract class CItem
     // ==== ヒント表示 (Exiled CustomItem の PickedUpHint / SelectedHint に書式を合わせる) ====
 
     private const string PickedUpHintFormat = "<size=24>あなたは{0}を拾いました！\n{1}</size>";
-    private const float PickedUpHintDuration = 4f;
+    private const float PickedUpHintDuration = 6f;
 
     private const string SelectedHintFormat = "<size=24>あなたは{0}を選択しました！\n{1}</size>";
-    private const float SelectedHintDuration = 3f;
+    private const float SelectedHintDuration = 5f;
 
     /// <summary>拾ったときに Hint を自動表示するか。</summary>
     protected virtual bool ShowPickedUpHint => true;

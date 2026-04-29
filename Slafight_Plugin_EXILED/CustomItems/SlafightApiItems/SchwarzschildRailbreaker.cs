@@ -10,6 +10,6 @@ public class SchwarzschildRailbreaker : CItemHybrid
     public override string Description => "クエィサァーとレールガンを切り替えられる複合武器";
     protected override string UniqueKey => "SchwarzschildRailbreaker";
 
-    protected override List<CItem> BuildSubModes()
-        => [new SchwarzschildQuasar(), new GunGoCRailgunFull()];
+    protected override List<CItemHybridMode> BuildSubModes()
+        => [new(new SchwarzschildQuasar(), "クエィサァー"), new(new GunGoCRailgunFull(), "超電磁砲")];
 }

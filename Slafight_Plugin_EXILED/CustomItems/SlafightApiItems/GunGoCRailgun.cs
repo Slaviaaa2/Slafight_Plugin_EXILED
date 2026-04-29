@@ -1,24 +1,35 @@
+using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Enums;
-using Exiled.API.Features.Pickups;
+using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
+using InventorySystem.Items.Autosync;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Modules;
+using LabApi.Features.Wrappers;
+using MEC;
+using Mirror;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 using Firearm = Exiled.API.Features.Items.Firearm;
+using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
+using Item = Exiled.API.Features.Items.Item;
 
 namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 
 public class GunGoCRailgun : CItemWeapon
 {
-    public override string DisplayName => "GoCレールガン(実験式)";
+    public override string DisplayName => "GOC戦略兵装 EMR-X1";
     public override string Description =>
-        "GoCのホワイトスーツに搭載される予定の主砲を財団との協定の一環として歩兵用に改造した物。\n" +
-        "<color=red>一発のみ撃てる。最大6000ダメの即死級武器</color>";
+        "<size=22>GoCのホワイトスーツに搭載予定だった主砲を、財団との協定に基づき歩兵運用向けへ再設計した電磁加速兵装。\n" +
+        "対異常存在への対処能力を維持しつつ、安全性と携行性を重視した出力制限モデルであり、\n" +
+        "制式採用機に比べ抑制された性能で運用される。\n" +
+        "高エネルギー電磁加速機構により、小型ながら高い貫通力を発揮する。\n" +
+        "<color=red>単発式：装填弾数1発のみ／最大6000ダメージの致死級出力</color></size>";
 
     protected override string UniqueKey => "GunGoCRailgun";
     protected override ItemType BaseItem => ItemType.ParticleDisruptor;
-
-    protected override byte    MagazineSize => 1;
     protected override Vector3 Scale        => new(1.15f, 1f, 1.15f);
 
     protected override bool  PickupLightEnabled => true;
@@ -49,20 +60,14 @@ public class GunGoCRailgun : CItemWeapon
         }
     }
 
-    /// <summary>床から拾った瞬間に MaxAmmo=1 / Ammo=1 を強制。</summary>
-    protected override void OnPickingUp(PickingUpItemEventArgs ev)
+    protected override void ApplyFirearmCustomization(Item item)
     {
-        if (ev.Pickup is FirearmPickup pickup)
+        if (item is Firearm pickup)
         {
-            pickup.MaxAmmo = 1;
-            pickup.Ammo    = 1;
+            pickup.MaxMagazineAmmo = 1;
+            pickup.MagazineAmmo    = 1;
+            pickup.AmmoDrain = 1;
         }
-    }
-
-    /// <summary>未使用 (1 発残り) で無いまま手放したら破棄。</summary>
-    protected override void OnDropping(DroppingItemEventArgs ev)
-    {
-        if (ev.Item is Firearm firearm && firearm.TotalAmmo != 1)
-            firearm.Destroy();
+        base.ApplyFirearmCustomization(item);
     }
 }

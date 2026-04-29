@@ -1,23 +1,30 @@
+using System.Collections.Generic;
 using Exiled.API.Enums;
-using Exiled.API.Features.Pickups;
+using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Modules;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
+using Firearm = Exiled.API.Features.Items.Firearm;
+using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
 
 namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 
 public class GunGoCRailgunFull : CItemWeapon
 {
-    public override string DisplayName => "GoCレールガン(正式)";
+    public override string DisplayName => "GOC戦略兵装 EMR-01";
     public override string Description =>
-        "GoCのホワイトスーツに搭載されるとても強力な主砲。\n" +
-        "<color=red>最大15000ダメの即死級武器</color>";
+        "<size=22>世界オカルト連合（GOC）により正式採用された戦略級電磁加速兵装「EMR-01」。\n" +
+        "対大規模異常存在の迅速な無力化を目的として設計されており、\n" +
+        "超高出力の電磁加速機構により、単発で圧倒的な貫通力と破壊力を発揮する。\n" +
+        "本兵装は複数弾を同時に消費しエネルギーを集約することで最大出力を実現しており、携行兵装としては規格外の性能を有する。\n" +
+        "運用には厳格な安全プロトコルと適合装備（ホワイトスーツ）が必須とされる。\n" +
+        "<color=red>単発式：発射ごとに弾薬を5発消費／最大出力時、15000ダメージを与える</color></size>";
 
     protected override string UniqueKey => "GunGoCRailgunFull";
     protected override ItemType BaseItem => ItemType.ParticleDisruptor;
-
-    protected override byte    MagazineSize => 70;
     protected override Vector3 Scale        => new(1.15f, 1f, 1.15f);
 
     protected override bool  PickupLightEnabled => true;
@@ -45,13 +52,14 @@ public class GunGoCRailgunFull : CItemWeapon
         }
     }
 
-    /// <summary>床から拾った瞬間に MaxAmmo=70 / Ammo=70 を強制。</summary>
-    protected override void OnPickingUp(PickingUpItemEventArgs ev)
+    protected override void ApplyFirearmCustomization(Item item)
     {
-        if (ev.Pickup is FirearmPickup pickup)
+        if (item is Firearm pickup)
         {
-            pickup.MaxAmmo = 70;
-            pickup.Ammo    = 70;
+            pickup.MaxMagazineAmmo = 20;
+            pickup.MagazineAmmo    = 20;
+            pickup.AmmoDrain = 5;
         }
+        base.ApplyFirearmCustomization(item);
     }
 }

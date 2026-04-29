@@ -1,63 +1,34 @@
+using System.Collections.Generic;
 using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Player;
+using InventorySystem.Items.MicroHID.Modules;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
-using Firearm = Exiled.API.Features.Items.Firearm;
 
 namespace Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 
 public class GunGoCTurret : CItemWeapon
 {
-    public override string DisplayName => "GoC Turret";
-    public override string Description => "テストアイテム。";
-
+    public override string DisplayName => "GOC高出力指向性電磁照射兵装《HID-Ω》";
+    public override string Description => "<size=22>財団製MicroHIDをベースに、世界オカルト連合（GOC）が独自に大幅改修を施した高出力モデル。\n" +
+                                          "出力制御系および冷却機構は戦闘効率を最優先に再設計されており、原型機に存在した安全制限の大半は意図的に解除されている。\n" +
+                                          "これにより照射出力と持続時間は飛躍的に向上したが、使用者および周辺環境への負荷も著しく増大している。\n" +
+                                          "対異常存在の強制無力化を主目的とした、極めて攻撃的な運用思想のもと開発された兵装である。\n" +
+                                          "<color=red>高出力連続照射型：使用中はエネルギーを急速消費／過熱時、強制停止および使用者へダメージ</color></size>";
     protected override string UniqueKey => "GunGoCTurret";
     protected override ItemType BaseItem => ItemType.MicroHID;
+    protected override Vector3 Scale => new(1.15f, 1f, 1.15f);
+    protected override bool PickupLightEnabled => true;
+    protected override Color PickupLightColor => CustomColor.Gold.ToUnityColor();
 
-    protected override byte    MagazineSize => 1;
-    protected override Vector3 Scale        => new(1.15f, 1f, 1.15f);
-
-    protected override bool  PickupLightEnabled => true;
-    protected override Color PickupLightColor   => CustomColor.Gold.ToUnityColor();
-
-    private bool _isProcessing;
-
-    /// <summary>命中: 即時 2000 ダメージの Explosion 再ヒット。再帰防止フラグ付き。</summary>
     protected override void OnHurtingOthers(HurtingEventArgs ev)
     {
-        if (_isProcessing) return;
-        if (ev.Attacker is null) return;
-
-        _isProcessing = true;
-        try
-        {
-            ev.Amount = 0f;
-            ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
-            ev.Player?.Hurt(ev.Attacker, 2000f, DamageType.Explosion);
-            ev.Attacker?.ShowHitMarker();
-        }
-        finally
-        {
-            _isProcessing = false;
-        }
-    }
-
-    /// <summary>FirearmPickup なら MaxAmmo=1/Ammo=1 を強制 (MicroHID は no-op)。</summary>
-    protected override void OnPickingUp(PickingUpItemEventArgs ev)
-    {
-        if (ev.Pickup is FirearmPickup pickup)
-        {
-            pickup.MaxAmmo = 1;
-            pickup.Ammo    = 1;
-        }
-    }
-
-    /// <summary>1 発未使用で無いまま手放したら破棄 (MicroHID は no-op)。</summary>
-    protected override void OnDropping(DroppingItemEventArgs ev)
-    {
-        if (ev.Item is Firearm firearm && firearm.TotalAmmo != 1)
-            firearm.Destroy();
+        ev.Amount = 100f;
+        ev.Player?.ExplodeEffect(ProjectileType.FragGrenade);
+        base.OnHurtingOthers(ev);
     }
 }
