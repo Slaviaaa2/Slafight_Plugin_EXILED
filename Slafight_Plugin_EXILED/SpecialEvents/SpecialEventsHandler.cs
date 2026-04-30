@@ -116,7 +116,6 @@ public class SpecialEventsHandler : IBootstrapHandler
             return;
         }
 
-        InitStats();
         EventQueue.Clear();
         EventQueue.Add(eventType);
         SpecialEventsController();
@@ -225,7 +224,25 @@ public class SpecialEventsHandler : IBootstrapHandler
             return;
         }
 
-        SelectedEvent = allowedEvents[Random.Range(0, allowedEvents.Count)];
+        var weights = Plugin.Singleton.Config.EventWeights;
+
+        // 重み付きプールを構築（重み0のイベントは除外）
+        var pool = new List<SpecialEventType>();
+        foreach (var ev in allowedEvents)
+        {
+            int w = weights.GetWeight(ev);
+            for (int i = 0; i < w; i++)
+                pool.Add(ev);
+        }
+
+        if (pool.Count == 0)
+        {
+            // 全イベントが重み0の場合は均等フォールバック
+            SelectedEvent = allowedEvents[Random.Range(0, allowedEvents.Count)];
+            return;
+        }
+
+        SelectedEvent = pool[Random.Range(0, pool.Count)];
     }
 
     /// <summary>
@@ -279,6 +296,15 @@ public class SpecialEventsHandler : IBootstrapHandler
         }
 
         var eventType = EventQueue[0];
+
+        if (eventType == SpecialEventType.None)
+        {
+            EventQueue.RemoveAt(0);
+            EventLocSet();
+            Log.Debug("SEH: None event dequeued, no action.");
+            return;
+        }
+
         var specialEvent = SpecialEvent.GetEvent(eventType);
         if (specialEvent == null)
         {

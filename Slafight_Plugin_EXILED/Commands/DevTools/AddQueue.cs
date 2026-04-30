@@ -39,8 +39,7 @@ public class AddQueue : ICommand
         }
 
         var seh = SpecialEventsHandler.Instance;
-        seh.EventQueue.Add(eventType);
-        seh.EventLocSet();
+        seh.AddEvent(eventType);
 
         response = $"New queued special event set to: {eventType}";
         return true;

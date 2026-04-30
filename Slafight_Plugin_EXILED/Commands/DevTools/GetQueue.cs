@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using CommandSystem;
 using Exiled.Permissions.Extensions;
 using Slafight_Plugin_EXILED.SpecialEvents;
@@ -21,8 +20,7 @@ public class GetQueue : ICommand
         }
 
         var seh = SpecialEventsHandler.Instance;
-        var queues = seh.EventQueue.ToList();
-        var result = queues.Any() ? String.Join(",", queues) : "none";
+        var result = seh.EventQueue.Count > 0 ? string.Join(", ", seh.EventQueue) : "none";
 
         response = $"Now queued Special Events: {result}";
         return true;

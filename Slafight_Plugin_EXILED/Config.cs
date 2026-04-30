@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED;
 
@@ -25,12 +26,9 @@ public class Config : IConfig
     }
         
     [Description("")]
-    public bool WarheadLockAllowed { get; set; } = true;
-    [Description("")]
-    public float WarheadLockTimeMultiplier { get; set; } = 0.75f;
-        
-    [Description("")]
     public bool EventAllowed { get; set; } = true;
+    [Description("各 SpecialEvent の抽選重み設定")]
+    public SpecialEventWeightContext EventWeights { get; set; } = new();
     [Description("")]
     public float OwBoomTime { get; set; } = 160f;
     [Description("")]

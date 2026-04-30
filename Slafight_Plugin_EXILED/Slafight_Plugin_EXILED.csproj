@@ -445,6 +445,7 @@
         <Compile Include="SpecialEvents\Events\SnowWarriersAttack.cs" />
         <Compile Include="SpecialEvents\Events\SpeedUpEvent.cs" />
         <Compile Include="SpecialEvents\SpecialEventsHandler.cs" />
+        <Compile Include="SpecialEvents\SpecialEventWeightContext.cs" />
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />

@@ -151,8 +151,7 @@ public class LabApiHandler : CustomEventsHandler, IBootstrapHandler
                         break;
                     case "CISR_Scp1425":
                         var scp1425Pickup = CItem.Get<Scp1425>()?.Spawn(pos);
-                        if (scp1425Pickup != null)
-                            scp1425Pickup.Rotation *= Quaternion.Euler(180f, 0f, 0f);
+                        scp1425Pickup?.Rotation *= Quaternion.Euler(180f, 0f, 0f);
                         break;
                     case "CISR_SNAV300":
                         CItem.Get<SNAV300>()?.Spawn(pos);
@@ -169,6 +168,13 @@ public class LabApiHandler : CustomEventsHandler, IBootstrapHandler
                     case "CISR_SQ":
                         var sq = CItem.Get<SchwarzschildQuasar>()?.Spawn(pos);
                         sq?.Transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+                        break;
+                    case "CISR_AntiMemeGrenade":
+                        CItem.Get<NeutralizeGrenade>()?.Spawn(pos);
+                        CItem.Get<NeutralizeGrenade>()?.Spawn(pos);
+                        CItem.Get<NeutralizeGrenade>()?.Spawn(pos);
+                        CItem.Get<NeutralizeGrenade>()?.Spawn(pos);
+                        CItem.Get<NeutralizeGrenade>()?.Spawn(pos);
                         break;
                 }
             }
