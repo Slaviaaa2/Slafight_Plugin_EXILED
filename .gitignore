@@ -13,6 +13,8 @@
 **/*.suo
 **/*.csproj.user
 
+**/discord.xml
+
 # .NET 系
 **/*.cache
 **/node_modules/
