@@ -422,6 +422,7 @@
         <Compile Include="CustomRoles\SCPs\Scp966Role.cs" />
         <Compile Include="Extensions\CassieExtensions.cs" />
         <Compile Include="Hints\PlayerHUD.cs" />
+        <Compile Include="Hints\RoleHintsDictionary.cs" />
         <Compile Include="Patches\CandyPatch.cs" />
         <Compile Include="Patches\Scp914ProcessorFix.cs" />
         <Compile Include="Plugin.cs" />
