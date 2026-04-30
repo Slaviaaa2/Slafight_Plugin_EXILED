@@ -11,7 +11,7 @@ public class Config : IConfig
     public bool IsEnabled { get; set; } = true;
     [Description("Show Debug Logs?")]
     public bool Debug { get; set; } = true;
-    [Description("Server Specific Season. 0=Normal,1=Halloween,2=Christmas,3=April,4=SergeyReturns")]
+    [Description("Server Specific Season. 0=Normal,1=Halloween,2=Christmas,3=April,4=SergeyReturns,5=FifthFestival")]
     public int Season { get; set; } = 0;
         
     [Description("")]

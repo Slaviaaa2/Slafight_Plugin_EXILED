@@ -7,4 +7,5 @@ public enum SeasonTypeId
     Sergey,
     Halloween,
     Christmas,
+    FifthFestival,
 }
