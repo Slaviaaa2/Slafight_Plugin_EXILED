@@ -25,9 +25,18 @@ public static class Tips
         "AIに鯖乗っ取られるんじゃないかってぐらい貢献させてて怖くなってくる今日この頃"
     ];
 
+    public static readonly List<string> TipsList2 = 
+    [
+        "5月5日は第五祭！是非遊びに来てね！",
+        "SEE NO EVILは職員たちの希望です！",
+        "改宗者のへんてこな武器は一体何なのでしょうか？",
+        "何やら怪しい管理官のうわさが最近聞こえます・・・",
+        "上層通信室の文字は実は毎ラウンド変わっています！"
+    ];
+
     public static string Get(int id)
     {
-        return TipsList[id];
+        return TipsList2[id]; //TipsList[id];
     }
     public static string GetRandomTip()
     {

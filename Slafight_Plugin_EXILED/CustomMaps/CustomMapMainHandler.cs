@@ -149,6 +149,7 @@ public class CustomMapMainHandler : CustomEventsHandler, IBootstrapHandler
 
     private static void TeleportClassD()
     {
+        return;
         Timing.CallDelayed(1f, () =>
         {
             foreach (var player in Player.List.ToList())
