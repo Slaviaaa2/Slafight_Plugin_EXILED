@@ -4,8 +4,7 @@ public enum SeasonTypeId
 {
     None,
     April,
-    Sergey,
+    FifthFestival,
     Halloween,
     Christmas,
-    FifthFestival,
 }

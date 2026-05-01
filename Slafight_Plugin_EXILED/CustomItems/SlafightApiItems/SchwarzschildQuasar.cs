@@ -26,6 +26,7 @@ public class SchwarzschildQuasar : CItem
 
     public override void RegisterEvents()
     {
+        Exiled.Events.Handlers.Player.Dying += OnDyingOthers;
         Exiled.Events.Handlers.Player.ChangingItem += OnChangingOther;
         Exiled.Events.Handlers.Item.JailbirdChangingWearState += OnJailbirdChangingPhase;
         Exiled.Events.Handlers.Item.JailbirdChargeComplete += OnJailbirdCharged;
@@ -34,6 +35,7 @@ public class SchwarzschildQuasar : CItem
 
     public override void UnregisterEvents()
     {
+        Exiled.Events.Handlers.Player.Dying -= OnDyingOthers;
         Exiled.Events.Handlers.Player.ChangingItem -= OnChangingOther;
         Exiled.Events.Handlers.Item.JailbirdChangingWearState -= OnJailbirdChangingPhase;
         Exiled.Events.Handlers.Item.JailbirdChargeComplete -= OnJailbirdCharged;
@@ -173,6 +175,13 @@ public class SchwarzschildQuasar : CItem
         {
             @base.IsCharged = true;
         }
+    }
+
+    private void OnDyingOthers(DyingEventArgs ev)
+    {
+        if (!CheckHeld(ev.Attacker) || ev.DamageHandler.Type is not DamageType.ParticleDisruptor) return;
+        ev.IsAllowed = false;
+        ev.Player.Vaporize();
     }
 }
 

@@ -16,6 +16,7 @@ public static class AbilityLocalization
         ["Scp035TentacleAbility"] = "触手",
         ["Scp966SpeedAbility"] = "這いよる混沌",
         ["DropBiggerShitAbility"] = "爺街道",
+        ["MemeWaveAbility"] = "ミーム波動",
     };
     private static readonly Dictionary<string, string> JaNamesSergey = new()
     {
@@ -28,6 +29,7 @@ public static class AbilityLocalization
         ["Scp035TentacleAbility"] = "冥界からの呼び声",
         ["Scp966SpeedAbility"] = "背後からの一突き",
         ["DropBiggerShitAbility"] = "怨念大肛爆発",
+        ["MemeWaveAbility"] = "ミーム波動",
     };
 
     public static string GetDisplayName(string key, Exiled.API.Features.Player player)

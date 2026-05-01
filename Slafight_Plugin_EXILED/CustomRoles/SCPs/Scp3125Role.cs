@@ -17,18 +17,17 @@ using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 
-public class Scp3005Role : CRole
+public class Scp3125Role : CRole
 {
-    protected override string RoleName { get; set; } = "SCP-3005";
-    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3005;
-    protected override CTeam Team { get; set; } = CTeam.SCPs;
-    protected override string UniqueRoleKey { get; set; } = "SCP-3005";
+    protected override string RoleName { get; set; } = "SCP-3125";
+    protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3125;
+    protected override CTeam Team { get; set; } = CTeam.Fifthists;
+    protected override string UniqueRoleKey { get; set; } = "SCP-3125";
 
     public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Hurting += OnHurting;
         Exiled.Events.Handlers.Player.SpawningRagdoll += CancelRagdoll;
-        Exiled.Events.Handlers.Scp0492.ConsumedCorpse += OnConsumed;
         base.RegisterEvents();
     }
 
@@ -36,7 +35,6 @@ public class Scp3005Role : CRole
     {
         Exiled.Events.Handlers.Player.Hurting -= OnHurting;
         Exiled.Events.Handlers.Player.SpawningRagdoll -= CancelRagdoll;
-        Exiled.Events.Handlers.Scp0492.ConsumedCorpse -= OnConsumed;
         base.UnregisterEvents();
     }
 
@@ -44,46 +42,47 @@ public class Scp3005Role : CRole
     {
         base.SpawnRole(player, roleSpawnFlags);
 
-        player!.Role.Set(RoleTypeId.Scp0492);
+        player!.Role.Set(RoleTypeId.NtfCaptain);
+        player.Role.Set(RoleTypeId.Scp049, RoleSpawnFlags.AssignInventory);
         player.UniqueRole = UniqueRoleKey;
-        player.SetCustomInfo("SCP-3005");
-        const int maxHealth = 55556;
+        player.SetCustomInfo("<color=#FF0090>SCP-3125</color>");
+        const int maxHealth = 55555;
         player.MaxHealth = maxHealth;
-        player.Health = maxHealth-1;
-        player.EnableEffect(EffectType.MovementBoost, 50);
+        player.Health = maxHealth;
+        player.EnableEffect(EffectType.Slowness, 30);
 
-        var spawnRoom = Room.Get(RoomType.LczPlants);
-        Vector3 offset = new(0f, 7.35f, 0f);
-        player.Position = spawnRoom.Position + spawnRoom.Rotation * offset;
-        player.Rotation = spawnRoom.Rotation;
+        player.AddAbility<MemeWaveAbility>();
 
-        // ★ Scale は触らない
-        LabApiHandler.Schem3005(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
-
-        player.AddAbility(new MagicMissileAbility(player));
-        player.AddAbility(new SoundOfFifthAbility(player));
-
-        Timing.RunCoroutine(Scp3005Coroutine(player));
+        // Timing.RunCoroutine(Scp3005Coroutine(player));
         Timing.CallDelayed(0.05f, () => player.ShowHint(
-            "<size=24><color=red>SCP-3005</color>\n第五的な光を放つ存在。\n普通はダメージを受けることはなく、\nアビリティで第五的なミサイルや閃光を引き起こせる。\n<color=#ff00fa>第五教会に道を示せ</color>",
+            $"<size=24><color={CTeam.Fifthists.GetTeamColor()}>SCP-3125</color>\nW.I.P",
             10));
+        Timing.CallDelayed(3f, () =>
+        {
+            Timing.RunCoroutine(Scp3125HintSyncCoroutine(player));
+        });
     }
     
     protected override void OnDying(DyingEventArgs ev)
     {
         if (LabApiHandler.Instance.ActivatedAntiMemeProtocol && ev.Attacker is null)
         {
-            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 0 0 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CTeam.Fifthists.GetTeamColor()}>アンチミームプロトコル</color>により正常に無効化されました。");
+            Exiled.API.Features.Cassie.MessageTranslated("SCP 3 1 2 5 Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.", $"<color={Team.GetTeamColor()}>{RoleName}</color> は<color={CTeam.Fifthists.GetTeamColor()}>アンチミームプロトコル</color>により正常に無効化されました。");
         }
         else
         {
-            CassieHelper.AnnounceTermination(ev, "SCP 3 0 0 5", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
+            CassieHelper.AnnounceTermination(ev, "SCP 3 1 2 5", $"<color={Team.GetTeamColor()}>{RoleName}</color>", true);
         }
         base.OnDying(ev);
     }
 
     private void OnHurting(HurtingEventArgs ev)
     {
+        if (Check(ev.Attacker))
+        {
+            ev.Amount = 55555f;
+            return;
+        }
         if (ev.Player?.GetCustomRole() == this.CRoleTypeId && ev.Attacker != null && ev.Attacker?.GetCustomRole() != this.CRoleTypeId)
         {
             var hasGoggles = ev.Attacker != null && ev.Attacker.Items
@@ -98,26 +97,34 @@ public class Scp3005Role : CRole
         }
     }
 
-    private void OnConsumed(ConsumedCorpseEventArgs ev)
-    {
-        if (!Check(ev.Player) || ev.Ragdoll.Owner.IsAlive) return;
-        ev.ConsumeHeal = 0f;
-        var target = ev.Ragdoll.Owner;
-        target?.SetRole(CRoleTypeId.FifthistMarionette);
-        Timing.CallDelayed(0.1f, () => target?.Position = ev.Ragdoll.Position + Vector3.up * 0.15f);
-    }
-
     private void CancelRagdoll(SpawningRagdollEventArgs ev)
     {
         if (!Check(ev.Player)) return;
         ev.IsAllowed = false;
     }
 
+    private IEnumerator<float> Scp3125HintSyncCoroutine(Player player)
+    {
+        while (true)
+        {
+            var marionWheeler = Player.List.First(p => p.GetCustomRole() is CRoleTypeId.MarionWheeler);
+            if (!Check(player) || marionWheeler.GetCustomRole() is not CRoleTypeId.MarionWheeler)
+            {
+                RoleSpecificTextProvider.Clear(player);
+                yield break;
+            }
+            
+            RoleSpecificTextProvider.Set(player, $"[マリオン・ホイーラートラッカー]\n階層：{marionWheeler.Zone}\n距離：{Vector3.Distance(player.Position, marionWheeler.Position):F1}\n\n\n\n\n\n\n\n\n\n");
+
+            yield return Timing.WaitForSeconds(0.5f);
+        }
+    }
+
     private static IEnumerator<float> Scp3005Coroutine(Player player)
     {
         for (;;)
         {
-            if (player.GetCustomRole() != CRoleTypeId.Scp3005)
+            if (player.GetCustomRole() != CRoleTypeId.Scp3125)
                 yield break;
 
             foreach (var target in Player.List)

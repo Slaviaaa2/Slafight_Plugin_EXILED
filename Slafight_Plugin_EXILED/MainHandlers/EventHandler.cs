@@ -180,7 +180,7 @@ public class EventHandler : IBootstrapHandler
     {
         var tagToField = new Dictionary<string, Action<Vector3>>
         {
-            { "Scp173SpawnPoint", pos => Scp173SpawnPoint = pos },
+            { "Scp173SpawnPoint", pos => Scp173SpawnPoint = pos + Vector3.up * 0.05f },
             { "Scp682SpawnPoint", pos => MapFlags.Scp682SpawnPoint = pos },
             { "FacilityManagerSpawnPoint", pos => MapFlags.FacilityManagerSpawnPoint = pos }
         };

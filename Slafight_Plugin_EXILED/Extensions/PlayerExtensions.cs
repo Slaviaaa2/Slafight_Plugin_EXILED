@@ -209,6 +209,9 @@ public static class PlayerExtensions
             case CRoleTypeId.FifthistMarionette:
                 new FifthistMarionetteRole().SpawnRole(player, roleSpawnFlags);
                 break;
+            case CRoleTypeId.Scp3125:
+                new Scp3125Role().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Chaos ====
             case CRoleTypeId.ChaosCommando:
                 new ChaosCommando().SpawnRole(player, roleSpawnFlags);
@@ -255,6 +258,10 @@ public static class PlayerExtensions
             case CRoleTypeId.SneOperator:
                 new SneOperator().SpawnRole(player, roleSpawnFlags);
                 break;
+            // ==== Ara Orun ====
+            case CRoleTypeId.AraOrun:
+                new AraOrun().SpawnRole(player, roleSpawnFlags);
+                break;
             // ==== Guards ====
             case CRoleTypeId.EvacuationGuard:
                 new EvacuationGuard().SpawnRole(player, roleSpawnFlags);
@@ -273,7 +280,7 @@ public static class PlayerExtensions
                 new FacilityManager().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.Engineer:
-                Engineer.Instance.SpawnRole(player, roleSpawnFlags);
+                new Engineer().SpawnRole(player, roleSpawnFlags);
                 break;
             case CRoleTypeId.ObjectObserver:
                 new ObjectObserver().SpawnRole(player, roleSpawnFlags);
@@ -283,6 +290,9 @@ public static class PlayerExtensions
                 break;
             case CRoleTypeId.CandyResearcher:
                 new CandyResearcher().SpawnRole(player, roleSpawnFlags);
+                break;
+            case CRoleTypeId.MarionWheeler:
+                new MarionWheeler().SpawnRole(player, roleSpawnFlags);
                 break;
             // ==== Class-D ====
             case CRoleTypeId.Janitor:

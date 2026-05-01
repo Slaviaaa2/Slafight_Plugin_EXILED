@@ -8,6 +8,8 @@ namespace Slafight_Plugin_EXILED.Extensions;
 
 public static class OnlyChecker
 {
+    private const bool IsDebug = false;
+
     public static bool IsOnlyTeam(this List<Player> checkPlayers, CTeam team, string specificTrigger = null)
     {
         // 生きている非スペクテイターが0人なら勝利なし
@@ -17,18 +19,21 @@ public static class OnlyChecker
             return false;
         }
 
-        //Log.Debug($"[IsOnlyTeam] Checking {checkPlayers.Count} players for team {team}");
+        if (IsDebug)
+            Log.Debug($"[IsOnlyTeam] Checking {checkPlayers.Count} players for team {team}");
 
         foreach (var player in checkPlayers.ToList())
         {
             if (player == null || !player.IsAlive || player.Role.Type == RoleTypeId.Spectator)
             {
-                //Log.Debug($"[IsOnlyTeam] SKIP: {player?.Nickname ?? "null"} (dead/spectator)");
+                if (IsDebug)
+                    Log.Debug($"[IsOnlyTeam] SKIP: {player?.Nickname ?? "null"} (dead/spectator)");
                 continue;
             }
 
             // 以下既存コードそのまま
-            //Log.Debug($"[IsOnlyTeam] CHECK: {player.Nickname} Team={player.GetTeam()} Custom={player.GetCustomRole()}");
+            if (IsDebug)
+                Log.Debug($"[IsOnlyTeam] CHECK: {player.Nickname} Team={player.GetTeam()} Custom={player.GetCustomRole()}");
 
             if (player.GetTeam() == team) continue;
 
@@ -40,11 +45,13 @@ public static class OnlyChecker
             if (team == CTeam.FoundationForces && specificTrigger == "nohumanity" && !player.IsHumanitist()) continue;
             if (player.GetCustomRole() == CRoleTypeId.Scp999) continue;
 
-            //Log.Debug($"[IsOnlyTeam] BLOCKED by {player.Nickname} (team={player.GetTeam()})");
+            if (IsDebug)
+                Log.Debug($"[IsOnlyTeam] BLOCKED by {player.Nickname} (team={player.GetTeam()})");
             return false;
         }
 
-        //Log.Debug($"[IsOnlyTeam] PASSED: Only {team} remaining");
+        if (IsDebug)
+            Log.Debug($"[IsOnlyTeam] PASSED: Only {team} remaining");
         return true;
     }
 }

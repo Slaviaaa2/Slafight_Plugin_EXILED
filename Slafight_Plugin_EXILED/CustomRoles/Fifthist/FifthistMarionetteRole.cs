@@ -1,3 +1,4 @@
+using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using MEC;
@@ -28,7 +29,11 @@ public class FifthistMarionetteRole : CRole
         player.ClearInventory();
         player.SetCustomInfo("<color=#FF0090>Fifthist Marionette</color>");
 
-        if (player.CurrentRoom is null)
+        if (Player.List.First(p => p.GetCustomRole() is CRoleTypeId.Scp3125) is not null)
+        {
+            player.Position = Player.List.First(p => p.GetCustomRole() is CRoleTypeId.Scp3125).Position + Vector3.up * 0.15f;
+        }
+        else if (player.CurrentRoom is null)
         {
             player.Position = Room.Random(ZoneType.HeavyContainment).WorldPosition(Vector3.up*1.05f);
         }

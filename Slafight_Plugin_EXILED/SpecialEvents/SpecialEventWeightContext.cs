@@ -28,6 +28,7 @@ public class SpecialEventWeightContext
         [SpecialEventType.SpeedUpEvent]          = 6,
         [SpecialEventType.DailyFoundation]       = 0,
         [SpecialEventType.CandyWarriersAttack]   = 10,
+        [SpecialEventType.CaseColourlessGreen]   = 10,
     };
 
     /// <summary>

@@ -34,13 +34,15 @@ public static class Tips
         "上層通信室の文字は実は毎ラウンド変わっています！"
     ];
 
+    private static List<string> ActiveList => TipsList2;
+
     public static string Get(int id)
     {
-        return TipsList2[id]; //TipsList[id];
+        return ActiveList[id]; //TipsList[id];
     }
     public static string GetRandomTip()
     {
-        int tipsRandom = Random.Range(0,TipsList.Count);
-        return TipsList[tipsRandom];
+        int tipsRandom = Random.Range(0,ActiveList.Count);
+        return ActiveList[tipsRandom];
     }
 }

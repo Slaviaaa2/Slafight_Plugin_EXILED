@@ -32,7 +32,7 @@ public class SergeyMakarovReturns : SpecialEvent
     // ===== 実行本体 =====
     public override bool IsReadyToExecute()
     {
-        return MapFlags.GetSeason() == SeasonTypeId.Sergey;
+        return MapFlags.GetSeason() == SeasonTypeId.FifthFestival;
     }
 
     protected override void OnExecute(int eventPid)

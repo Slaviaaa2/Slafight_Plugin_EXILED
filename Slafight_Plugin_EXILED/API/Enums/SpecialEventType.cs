@@ -54,4 +54,7 @@ public enum SpecialEventType
     
     /// <summary>Candyyyyyy!!! AprilとHalloweenで仕様が異なる</summary>
     CandyWarriersAttack,
+    
+    /// <summary>CASE COLOURLESS GREEN</summary>
+    CaseColourlessGreen,
 }

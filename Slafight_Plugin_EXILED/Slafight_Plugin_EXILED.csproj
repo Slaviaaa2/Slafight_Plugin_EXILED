@@ -161,6 +161,7 @@
         <Compile Include="Abilities\CreateSinkholeAbility.cs" />
         <Compile Include="Abilities\DropBiggerShitAbility.cs" />
         <Compile Include="Abilities\MagicMissileAbility.cs" />
+        <Compile Include="Abilities\MemeWaveAbility.cs" />
         <Compile Include="Abilities\PlaceTantrumAbility.cs" />
         <Compile Include="Abilities\Scp035TentacleAbility.cs" />
         <Compile Include="Abilities\Scp966SpeedAbility.cs" />
@@ -248,6 +249,7 @@
         <Compile Include="CustomItems\SlafightApiItems\CloakGenerator.cs" />
         <Compile Include="CustomItems\SlafightApiItems\CUA_SpyKit.cs" />
         <Compile Include="CustomItems\SlafightApiItems\DninoueMissile.cs" />
+        <Compile Include="CustomItems\SlafightApiItems\GunScp7381.cs" />
         <Compile Include="CustomItems\SlafightApiItems\NvgBlue.cs" />
         <Compile Include="CustomItems\SlafightApiItems\NvgRed.cs" />
         <Compile Include="CustomItems\SlafightApiItems\SchwarzschildRailbreaker.cs" />
@@ -312,6 +314,7 @@
         <Compile Include="CustomMaps\Features\WarheadBoomEffectHandler.cs" />
         <Compile Include="CustomMaps\Features\WarheadBoomEffectUtil.cs" />
         <Compile Include="CustomMaps\GateAEnding.cs" />
+        <Compile Include="CustomMaps\ObjectPrefabs\AntiMemeBomb.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\HIDTurretObject.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Document.cs" />
         <Compile Include="CustomMaps\ObjectPrefabs\Tentacle.cs" />
@@ -334,6 +337,7 @@
         <Compile Include="CustomRoles\FoundationForces\SneNeutralitist.cs" />
         <Compile Include="CustomRoles\FoundationForces\SneOperator.cs" />
         <Compile Include="CustomRoles\FoundationForces\SnePurify.cs" />
+        <Compile Include="CustomRoles\FoundationForces\AraOrun.cs" />
         <Compile Include="CustomRoles\GoC\GoCCommunications.cs" />
         <Compile Include="CustomRoles\GoC\GoCDeputy.cs" />
         <Compile Include="CustomRoles\GoC\GoCHoundDog.cs" />
@@ -353,6 +357,7 @@
         <Compile Include="CustomRoles\Others\SergeyMakarov\SergeySharedContents.cs" />
         <Compile Include="CustomRoles\Others\SnowWarrier.cs" />
         <Compile Include="CustomRoles\Scientist\CandyResearcher.cs" />
+        <Compile Include="CustomRoles\Scientist\MarionWheeler.cs" />
         <Compile Include="CustomRoles\Scientist\Object Observer.cs" />
         <Compile Include="CustomRoles\Scientist\Engineer.cs" />
         <Compile Include="CustomRoles\Scientist\Surveillance.cs" />
@@ -362,6 +367,7 @@
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp173Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
+        <Compile Include="CustomRoles\SCPs\Scp3125Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
         <Compile Include="CustomRoles\SCPs\ZombifiedRole.cs" />
         <Compile Include="Extensions\AbilityResetUtil.cs" />
@@ -430,6 +436,7 @@
         <Compile Include="ProximityChat\ActivateHandler.cs" />
         <Compile Include="ProximityChat\Handler.cs" />
         <Compile Include="SpecialEvents\Events\CandyWarriersAttack.cs" />
+        <Compile Include="SpecialEvents\Events\CaseColourlessGreen.cs" />
         <Compile Include="SpecialEvents\Events\ChaosInsurgencyRaid.cs" />
         <Compile Include="SpecialEvents\Events\ClassicEvent.cs" />
         <Compile Include="SpecialEvents\Events\DailyFoundation.cs" />

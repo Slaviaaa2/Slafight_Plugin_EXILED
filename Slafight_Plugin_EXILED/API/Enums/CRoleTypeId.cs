@@ -18,6 +18,7 @@ public enum CRoleTypeId
     Scp173,
     Scp035,
     Scp079,
+    Scp3125,
     
     // ==== Fifthists ====
     FifthistRescure,
@@ -60,6 +61,7 @@ public enum CRoleTypeId
     ObjectObserver,
     Surveillance,
     CandyResearcher,
+    MarionWheeler,
     
     // ==== Class-D ====
     Janitor,
@@ -82,5 +84,6 @@ public enum CRoleTypeId
     Sculpture,
     SergeyMakarov,
     SergeyMakarovAwaken,
+    AraOrun,
     HideAdmin,
 }

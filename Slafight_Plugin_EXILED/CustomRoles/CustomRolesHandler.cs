@@ -13,6 +13,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.CustomRoles;
 
@@ -21,13 +22,15 @@ public sealed class WinCondition(
     string debugName,
     Func<List<Player>, bool> checkFunc,
     Action executeAction,
-    Func<bool>? enableCondition = null)
+    Func<bool>? enableCondition = null,
+    bool isForEnd = true)
 {
     public CTeam Team { get; } = team;
     public string DebugName { get; } = debugName;
     private Func<List<Player>, bool> CheckFunc { get; } = checkFunc;
     public Action ExecuteAction { get; } = executeAction;
     public Func<bool>? EnableCondition { get; } = enableCondition;
+    public bool IsForEnd { get; } = isForEnd;
 
     public bool IsEnabled => EnableCondition?.Invoke() ?? true;
 
@@ -52,8 +55,6 @@ public class CustomRolesHandler : IBootstrapHandler
                 players => players.IsOnlyTeam(CTeam.Fifthists),
                 () => EndRound(CTeam.Fifthists)
             ),
-
-
             new(
                 CTeam.Others,
                 "SnowWarrierWin",
@@ -61,8 +62,6 @@ public class CustomRolesHandler : IBootstrapHandler
                 () => EndRound(CTeam.Others, "SW_WIN"),
                 () => MapFlags.GetSeason() == SeasonTypeId.Christmas
             ),
-
-
             new(
                 CTeam.Others,
                 "CandyWarrierWin",
@@ -70,13 +69,20 @@ public class CustomRolesHandler : IBootstrapHandler
                 () => EndRound(CTeam.Others, "CANDY_WIN"),
                 () => MapFlags.GetSeason() is SeasonTypeId.April or SeasonTypeId.Halloween
             ),
-
-
             new(
                 CTeam.SCPs,
                 "AIWin",
-                CheckAIWinCondition,
-                ExecuteAIWin
+                CheckAIKill,
+                ExecuteAIKill,
+                isForEnd: false
+            ),
+            new(
+                CTeam.FoundationForces,
+                "AraOrunDeath",
+                CheckAraorunKill,
+                ExecuteAraOrunKill,
+                () => SpecialEventsHandler.Instance.NowEvent is SpecialEventType.CaseColourlessGreen,
+                isForEnd: false
             )
         ];
 
@@ -107,15 +113,15 @@ public class CustomRolesHandler : IBootstrapHandler
     {
         Timing.CallDelayed(10f, () =>
         {
-            Timing.RunCoroutine(UniversalWinCoroutine());
+            Timing.RunCoroutine(UniversalConditionCoroutine());
         });
     }
 
-    private IEnumerator<float> UniversalWinCoroutine()
+    private IEnumerator<float> UniversalConditionCoroutine()
     {
         for (;;)
         {
-            if (!Round.IsStarted || Round.IsLobby)
+            if (Round.IsLobby)
                 yield break;
 
             var alivePlayers = Player.List
@@ -126,10 +132,15 @@ public class CustomRolesHandler : IBootstrapHandler
             {
                 if (condition.Check(alivePlayers))
                 {
-                    Log.Debug($"[WinCondition] {condition.DebugName} triggered");
-                    Round.IsLocked = false;
+                    Log.Debug($"[RoundCondition] {condition.DebugName} triggered");
+                    if (condition.IsForEnd)
+                    {
+                        Round.IsLocked = false;
+                        condition.ExecuteAction();
+                        yield break;
+                    }
+
                     condition.ExecuteAction();
-                    yield break;
                 }
             }
 
@@ -137,7 +148,7 @@ public class CustomRolesHandler : IBootstrapHandler
         }
     }
 
-    private static bool CheckAIWinCondition(List<Player> players)
+    private static bool CheckAIKill(List<Player> players)
     {
         int scpCount = 0;
         bool only079 = true;
@@ -166,7 +177,7 @@ public class CustomRolesHandler : IBootstrapHandler
         return scpSideIsOnly079 && nonScpTeams == 1;
     }
 
-    private static void ExecuteAIWin()
+    private static void ExecuteAIKill()
     {
         var scp079s = Player.List
             .Where(p => p != null && p.IsAlive && p.Role.Type == RoleTypeId.Scp079)
@@ -180,6 +191,51 @@ public class CustomRolesHandler : IBootstrapHandler
         }
         
         Exiled.API.Features.Cassie.MessageTranslated("SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.", "<color=red>SCP-079</color>は<color=yellow>C.A.S.S.I.E</color>により終了されました。");
+    }
+    
+    private static bool CheckAraorunKill(List<Player> players)
+    {
+        int scpCount = 0;
+        bool only079 = true;
+        List<Player> scp079s = [];
+
+        foreach (var player in players)
+        {
+            if (player.GetTeam().IsGoI())
+                continue;
+
+            scpCount++;
+
+            if (player.Role.Type == RoleTypeId.Scp079)
+                scp079s.Add(player);
+            else
+                only079 = false;
+        }
+
+        bool scpSideIsOnly079 = scpCount > 0 && only079 && scp079s.Count == scpCount;
+
+        var nonScpTeams = players
+            .Where(p => p.GetTeam().IsGoI())
+            .GroupBy(p => p.GetTeam())
+            .Count();
+
+        return scpSideIsOnly079 && nonScpTeams == 1;
+    }
+
+    private static void ExecuteAraOrunKill()
+    {
+        var scp079s = Player.List
+            .Where(p => p != null && p.IsAlive && p.Role.Type == RoleTypeId.Scp079)
+            .ToList();
+
+        foreach (var p in scp079s)
+        {
+            p.Kill(
+                "Terminated by Fifthists"
+            );
+        }
+        
+        Exiled.API.Features.Cassie.MessageTranslated("Unknown Subject has been terminated by SCP 3 1 2 5", $"<color=yellow>アラ・オルン</color>は<color={CTeam.Fifthists.GetTeamColor()}>SCP-3125</color>により終了されました。");
     }
 
     private static void CancelEnd(EndingRoundEventArgs ev)
@@ -285,6 +341,11 @@ public class CustomRolesHandler : IBootstrapHandler
 
     public static void EndRound(CTeam winnerTeam = CTeam.SCPs, string specificReason = null)
     {
+        foreach (var player in Player.List)
+        {
+            player?.ShowHint("");
+        }
+
         switch (winnerTeam)
         {
             case CTeam.SCPs:

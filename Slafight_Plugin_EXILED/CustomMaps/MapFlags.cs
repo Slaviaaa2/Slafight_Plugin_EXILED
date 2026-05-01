@@ -28,8 +28,7 @@ public static class MapFlags
             1 => SeasonTypeId.Halloween,
             2 => SeasonTypeId.Christmas,
             3 => SeasonTypeId.April,
-            4 => SeasonTypeId.Sergey,
-            5 => SeasonTypeId.FifthFestival,
+            4 => SeasonTypeId.FifthFestival,
             _ => SeasonTypeId.None
         };
     }
