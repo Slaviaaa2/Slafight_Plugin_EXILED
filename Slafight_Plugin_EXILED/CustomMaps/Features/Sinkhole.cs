@@ -35,6 +35,19 @@ public class Sinkhole : IBootstrapHandler
 
     private readonly Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio 
         = EventHandler.CreateAndPlayAudio;
+
+    private List<CTeam> DistargetTeams =
+    [
+        CTeam.SCPs
+    ];
+
+    private List<CRoleTypeId> DistargetRoles =
+    [
+        CRoleTypeId.SergeyMakarovAwaken,
+        CRoleTypeId.Sculpture,
+        CRoleTypeId.Scp3125,
+        CRoleTypeId.FifthistMarionette
+    ];
     
     private void RoundStartHole()
     {
@@ -67,7 +80,7 @@ public class Sinkhole : IBootstrapHandler
                 if (player == null || !player.IsConnected || !player.IsAlive)
                     continue;
 
-                if (player.GetTeam() == CTeam.SCPs || player.GetCustomRole() == CRoleTypeId.SergeyMakarovAwaken || player.GetCustomRole() == CRoleTypeId.Sculpture)
+                if (DistargetTeams.Contains(player.GetTeam()) || player.GetCustomRole() == CRoleTypeId.SergeyMakarovAwaken || player.GetCustomRole() == CRoleTypeId.Sculpture)
                     continue;
 
                 foreach (var sinkhole in Sinkholes)

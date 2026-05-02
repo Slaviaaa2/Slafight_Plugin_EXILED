@@ -92,17 +92,10 @@ public class Scp3125Role : CRole
             ev.Amount = 55555f;
             return;
         }
-        if (ev.Player?.GetCustomRole() == this.CRoleTypeId && ev.Attacker != null && ev.Attacker?.GetCustomRole() != this.CRoleTypeId)
-        {
-            var hasGoggles = ev.Attacker != null && ev.Attacker.Items
-                .OfType<Scp1344>()
-                .Any(i => CItem.TryGet(i, out var ci) && ci is AntiMemeGoggle && i.IsWorn);
-            if (ev.Player.IsEffectActive<CustomPlayerEffects.Sinkhole>() || hasGoggles) return;
-            ev.IsAllowed = false;
-            ev.Attacker?.Hurt(ev.Player, 20f, DamageType.Unknown,null,  "<color=#ff00fa>第五的</color>な力による影響");
 
-            if (ev.Attacker != null && ev.Attacker.GetTeam() == CTeam.Fifthists)
-                ev.Attacker.ShowHint("第五に反逆するとは何事か！？");
+        if (Check(ev.Player))
+        {
+            ev.IsAllowed = false;
         }
     }
 
@@ -123,7 +116,7 @@ public class Scp3125Role : CRole
                 yield break;
             }
             
-            RoleSpecificTextProvider.Set(player, $"[マリオン・ホイーラートラッカー]\n階層：{marionWheeler.Zone}\n距離：{Vector3.Distance(player.Position, marionWheeler.Position):F1}\n\n\n\n\n\n\n\n\n\n");
+            RoleSpecificTextProvider.Set(player, $"[ヘッドスペース]\n- マリオン・ホイーラー -\n階層：{marionWheeler.Zone}\n距離：{Vector3.Distance(player.Position, marionWheeler.Position):F1}\n\n\n\n\n\n\n\n\n\n");
 
             yield return Timing.WaitForSeconds(0.5f);
         }

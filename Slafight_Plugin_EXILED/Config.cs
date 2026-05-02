@@ -15,7 +15,7 @@ public class Config : IConfig
     [Description("Server Specific Season. 0=Normal,1=Halloween,2=Christmas,3=April,4=FifthFestival")]
     public int Season { get; set; } = 4;
     [Description("Server Is Beta Mode?")]
-    public bool IsBeta { get; set; } = true;
+    public bool IsBeta { get; set; } = false;
         
     [Description("")]
     private string _audioReferences;

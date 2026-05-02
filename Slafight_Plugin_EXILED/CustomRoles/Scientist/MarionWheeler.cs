@@ -59,7 +59,7 @@ public class MarionWheeler : CRole
         while (true)
         {
             if (!Check(player)) yield break;
-            player.EnableEffect<Slowness>(20, 5f);
+            player.EnableEffect<Slowness>(25, 5f);
             yield return Timing.WaitForSeconds(1f);
         }
     }
