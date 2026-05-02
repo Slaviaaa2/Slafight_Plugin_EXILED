@@ -47,6 +47,7 @@ public class MarionWheeler : CRole
         player.AddItem(ItemType.Medkit);
         player.AddItem(ItemType.Medkit);
         player.GiveCItem<GunScp7381>();
+        player.GiveCItem<ClassZMemoryForcePil>();
         player.Position = Door.Get(DoorType.Intercom).Position + Vector3.up * 1.25f;
 
         player.SetCustomInfo("Marion Wheeler");
