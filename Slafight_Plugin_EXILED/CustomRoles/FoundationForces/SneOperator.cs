@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class SneOperator : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#FF1493>シー・ノー・イービル オペレーター</color>";
+    protected override string Description { get; set; } = "部隊を指揮し、気狂いどもに正常性による一撃を与えよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SneOperator;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "SneOperator";
@@ -36,9 +38,5 @@ public class SneOperator : CRole
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("<color=#FF1493>See No Evil Operator</color>");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#FF1493>シー・ノー・イービル オペレーター</color>\n部隊を指揮し、気狂いどもに正常性による一撃を与えよ！",10f);
-        });
     }
 }

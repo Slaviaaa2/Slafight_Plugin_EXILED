@@ -23,6 +23,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class ZombifiedRole : CRole
 {
     protected override string RoleName { get; set; } = "Zombified Subject";
+    protected override string Description { get; set; } = "様々な要因によりゾンビと化してしまった人の成れの果て。\n" +
+                                                          "暴れまくって施設に混沌をもたらせよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Zombified;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Zombified";
@@ -55,11 +57,5 @@ public class ZombifiedRole : CRole
         {
             Handler.ActivatedPlayers.Add(player);
         }
-
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=red>Zombified Subject</color>\nいろんな要因によりゾンビになってしまった人間の成れの果て。\nSCPどもと共に施設中に混乱をもたらせ！\n近接チャットが使えるぞ！</size>",
-                6.5f);
-        });
     }
 }

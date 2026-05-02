@@ -15,6 +15,13 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp682Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-682";
+
+    protected override string Description { get; set; } = "不死身の爬虫類とまで恐れられた最強クラスのSCP。\n" +
+                                                          "その危険性から長い間眠らされていたが、大規模な収容違反の影響により\n" +
+                                                          "遂に目覚めることができた。今まで抑え込まれていた物を全て解き放ち、\n" +
+                                                          "<color=red>忌まわしき財団を破壊せよ！</color>";
+
+    protected override float DescriptionDuration { get; set; } = 8.5f;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp682;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp682";
@@ -67,7 +74,6 @@ public class Scp682Role : CRole
 
         yield return Timing.WaitForSeconds(0.05f);
         player.Position = MapFlags.Scp682SpawnPoint;
-        player.ShowHint("<size=24><color=red>SCP-682</color>\n長く眠っていた為視界がぼやけている。でも頑張って無双しろ！！！", 10f);
     }
 
     private IEnumerator<float> Coroutine(Player player)

@@ -14,6 +14,7 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 public class FifthistMarionetteRole : CRole
 {
     protected override string RoleName { get; set; } = "Fifthist Marionette";
+    protected override string Description { get; set; } = "ピンクの光によって作り替えられてしまった人間の成れの果て。\n第五教会に従い、生存者どもを騙しながら第五しろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FifthistMarionette;
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "FifthistMarionette";
@@ -50,11 +51,5 @@ public class FifthistMarionetteRole : CRole
         {
             Handler.ActivatedPlayers.Add(player);
         }
-
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint($"<size=23><color={CTeam.Fifthists.GetTeamColor()}>Fifthist Marionette</color>\nピンクの光によって作り替えられてしまった人間の成れの果て。\n第五教会に従い、生存者どもを騙しながら第五しろ！\n近接チャットが使えるぞ！</size>",
-                6.5f);
-        });
     }
 }

@@ -10,6 +10,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class SnePurify : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#FF1493>シー・ノー・イービル 修正兵</color>";
+    protected override string Description { get; set; } = "気狂いどもを正常しろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SnePurify;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "SnePurify";
@@ -35,9 +37,5 @@ public class SnePurify : CRole
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("<color=#FF1493>See No Evil Purify</color>");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#FF1493>シー・ノー・イービル 修正兵</color>\n気狂いどもを正常しろ！",10f);
-        });
     }
 }

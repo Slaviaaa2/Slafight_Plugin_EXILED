@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class HdMarshal : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#151515>ハンマーダウン 元帥</color>";
+    protected override string Description { get; set; } = "Nu-7の師団を指揮し、勝利へと導く。\n敗北など許されない。突き進め！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.HdMarshal;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "HdMarshal";
@@ -39,9 +41,5 @@ public class HdMarshal : CRole
         player.CustomInfo = "<color=#727472>Hammer Down Marshal</color>";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#151515>ハンマーダウン 元帥</color>\nNu-7の師団を指揮し、勝利へと導く。\n敗北など許されない。突き進め！",10f);
-        });
     }
 }

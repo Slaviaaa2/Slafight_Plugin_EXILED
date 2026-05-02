@@ -4,12 +4,15 @@ using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class ZoneManager : CRole
 {
+    protected override string RoleName { get; set; } = "区画管理官";
+    protected override string Description { get; set; } = "各区画に割り当てられた軽度な権限をもつ科学者";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ZoneManager;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "ZoneManager";
@@ -48,12 +51,6 @@ public class ZoneManager : CRole
             }
         }
             
-        player.CustomInfo = "Zone Manager";
-        player.InfoArea |= PlayerInfoArea.Nickname;
-        player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00ffff>区画管理官</color>\n各区画に割り当てられた軽度な権限をもつ科学者",10f);
-        });
+        player.SetCustomInfo("Zone Manager");
     }
 }

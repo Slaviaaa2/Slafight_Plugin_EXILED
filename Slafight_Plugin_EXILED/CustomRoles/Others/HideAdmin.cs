@@ -12,6 +12,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others;
 
 public class HideAdmin : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#FF1493><b>THE ADMINISTRATOR</b></color>";
+    protected override string Description { get; set; } = "なぁ～んでもできる！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.HideAdmin;
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "HideAdmin";
@@ -32,10 +34,6 @@ public class HideAdmin : CRole
             player.EnableEffect(EffectType.DamageReduction, 255);
             player.IsBypassModeEnabled = true;
             player.IsNoclipPermitted = true;
-
-            player.ShowHint(
-                "<size=24><color=#FF1493><b>THE ADMINISTRATOR</b></color>\nhaha",
-                10);
 
             CItem.Get<CloakGenerator>()?.Give(player);
             player.AddItem(ItemType.KeycardO5);

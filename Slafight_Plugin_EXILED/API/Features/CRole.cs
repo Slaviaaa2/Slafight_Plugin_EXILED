@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using HintServiceMeow.Core.Enum;
+using HintServiceMeow.Core.Extension;
 using JetBrains.Annotations;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
+using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
 // イベント系はエイリアス付けて衝突回避
 using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -213,7 +217,10 @@ public abstract class CRole
     public virtual void UnregisterEvents() { }
 
     // ==== メタ情報 ====
-    protected virtual string RoleName { get; set; } = string.Empty;
+    protected abstract string RoleName { get; set; }
+    protected abstract string Description { get; set; }
+    protected virtual float DescriptionDuration { get; set; } = 8f;
+    protected virtual bool DescriptionShowRoleName { get; set; } = true;
 
     protected abstract CRoleTypeId CRoleTypeId { get; set; }
 
@@ -331,5 +338,32 @@ public abstract class CRole
                 break;
             }
         }
+
+        Timing.CallDelayed(0.05f, () =>
+        {
+            if (DescriptionDuration <= 0f) return;
+            Hint hint;
+            if (DescriptionShowRoleName)
+            {
+                hint = new Hint()
+                {
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 780,
+                    Text = $"<size=24><color={Team.GetTeamColor()}>{RoleName}</color>\n{Description}</size>", Id = "CRoleSpawnedHint"
+                };
+            }
+            else
+            {
+                hint = new Hint()
+                {
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 780,
+                    Text = $"<size=24>{Description}</size>", Id = "CRoleSpawnedHint"
+                };
+            }
+            player.AddHint(hint);
+            Timing.CallDelayed(DescriptionDuration, () =>
+            {
+                player.RemoveHint(hint);
+            });
+        });
     }
 }

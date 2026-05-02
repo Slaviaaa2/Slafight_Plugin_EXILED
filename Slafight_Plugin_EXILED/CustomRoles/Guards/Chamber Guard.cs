@@ -12,6 +12,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Guards;
 
 public class ChamberGuard : CRole
 {
+    protected override string RoleName { get; set; } = "収容室警備";
+    protected override string Description { get; set; } = "Dクラス職員やオブジェクトの異常を監視する。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChamberGuard;
     protected override CTeam Team { get; set; } = CTeam.Guards;
     protected override string UniqueRoleKey { get; set; } = "ChamberGuard";
@@ -37,9 +39,5 @@ public class ChamberGuard : CRole
         Log.Debug($"RoomPos: {pos},CGuard pos: {player.Position}");
             
         player.SetCustomInfo("Chamber Guard");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>収容室警備</color>\nDクラス職員やオブジェクトの異常を監視する。",10f);
-        });
     }
 }

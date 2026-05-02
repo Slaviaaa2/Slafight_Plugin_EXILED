@@ -23,6 +23,16 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp035Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-035";
+    protected override string Description { get; set; } = "<size=23><color=red>SCP-035</color>\n" +
+                                                          "愚かな博士が仮面をつけて乗っ取れた！\n" +
+                                                          "但し、博士がなんとかしようと仮面に抵抗している為精神状態が不安定です。\n" +
+                                                          "あなたの最終的な目標は<color=red>施設の破壊</color>です。\n" +
+                                                          "精神が安定している時は比較的人間達に友好的に接し、そうでない時は\n" +
+                                                          "「触手」を用いて邪魔をさせないようにし、弾頭へと向かいましょう。\n" +
+                                                          "<color=yellow>※通常時は博士、発狂時はチュートリアルの見た目になります。" +
+                                                          "※RP性がとても高いため、不慣れな場合は取り合えず暴れまくることを推奨します。頑張って！</color></size>";
+    protected override float DescriptionDuration { get; set; } = 15f;
+    protected override bool DescriptionShowRoleName { get; set; } = false;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp035;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp035";
@@ -89,18 +99,6 @@ public class Scp035Role : CRole
         player.TryWear("SCP035", player.Transform, out var schematicObject, (Vector3.forward * 0.205f)+(Vector3.up*0.6f));
         schematicObject.Scale *= 1.185f;
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
-
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=red>SCP-035</color>\n" +
-                            "愚かな博士が仮面をつけて乗っ取れた！\n" +
-                            "但し、博士がなんとかしようと仮面に抵抗している為精神状態が不安定です。\n" +
-                            "あなたの最終的な目標は<color=red>施設の破壊</color>です。\n" +
-                            "精神が安定している時は比較的人間達に友好的に接し、そうでない時は\n「触手」を用いて邪魔をさせないようにし、弾頭へと向かいましょう。\n" +
-                            "<color=yellow>※通常時は博士、発狂時はチュートリアルの見た目になります。" +
-                            "※RPがとても重要となります。頑張って！</color></size>",
-                15f);
-        });
 
         // NPC生成（ここで一回だけ）
         CreateNpc(player);

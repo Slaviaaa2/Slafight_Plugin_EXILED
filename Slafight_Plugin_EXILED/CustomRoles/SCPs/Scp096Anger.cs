@@ -20,6 +20,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp096Anger : CRole  // 属性なしで自動登録
 {
     protected override string RoleName { get; set; } = "SCP-096";
+    protected override string Description { get; set; } =
+        "<size=24><color=red>SCP-096: Anger</color>\nSCP-096の怒りと悲しみが再び不安定化し、本来の力が戻ってきた！\n<color=red>自分を見てきた相手を地の底まで追いかけろ！！！</color>";
+
+    protected override float DescriptionDuration { get; set; } = 8.5f;
+    protected override bool DescriptionShowRoleName { get; set; } = false;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp096Anger;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp096_Anger";
@@ -116,9 +121,6 @@ public class Scp096Anger : CRole  // 属性なしで自動登録
         
         Log.Debug("Scp096: Anger was Spawned!");
         Timing.CallDelayed(0.1f, () => StartAnger(player));
-        Timing.CallDelayed(0.05f, () => player.ShowHint(
-            "<size=24><color=red>SCP-096: Anger</color>\nSCP-096の怒りと悲しみが再び不安定化し、本来の力が戻ってきた！\n<color=red>自分を見てきた相手を地の底まで追いかけろ！！！</color>",
-            10));
     }
 
     private Dictionary<Player, bool> InTryNotToCryAnim = [];  // そのまま

@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosTacticalUnit : CRole
 {
+    protected override string RoleName { get; set; } = "カオス・インサージェンシー 戦術兵";
+    protected override string Description { get; set; } = "特殊なリボルバーを用いて邪魔者を排除せよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosTacticalUnit;
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosTacticalUnit";
@@ -34,9 +36,5 @@ public class ChaosTacticalUnit : CRole
         player.AddAmmo(AmmoType.Ammo44Cal, 40);
             
         player.SetCustomInfo("Chaos Insurgency Tactical Unit");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 戦術兵</color>\n特殊なリボルバーを用いて邪魔者を排除せよ。",10f);
-        });
     }
 }

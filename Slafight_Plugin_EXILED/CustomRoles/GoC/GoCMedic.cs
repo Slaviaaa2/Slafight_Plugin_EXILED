@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
 
 public class GoCMedic : CRole
 {
+    protected override string RoleName { get; set; } = "GoC: Broken Dagger 医療スペシャリスト";
+    protected override string Description { get; set; } = "負傷した部隊の治療等を行う\nPassive: VERITAS\n遠くにいる敵等を認識できる";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.GoCMedic;
     protected override CTeam Team { get; set; } = CTeam.GoC;
     protected override string UniqueRoleKey { get; set; } = "GoCMedic";
@@ -39,10 +41,6 @@ public class GoCMedic : CRole
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("Global Occult Collision: Broken Dagger Medic");
         Timing.RunCoroutine(Coroutine(player));
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#0000c8>GoC: Broken Dagger 医療スペシャリスト</color>\n負傷した部隊の治療等を行う\nPassive: VERITAS\n遠くにいる敵等を認識できる",10f);
-        });
     }
     
     private IEnumerator<float> Coroutine(Player player)

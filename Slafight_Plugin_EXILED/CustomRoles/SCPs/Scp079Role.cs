@@ -20,6 +20,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp079Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-079";
+    protected override string Description { get; set; } = "施設制御システムを操り、施設に混沌を引き起こす。\n" +
+                                                          "巧みに立ち回り自身の目的を達成せよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp079;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp079";
@@ -52,8 +54,6 @@ public class Scp079Role : CRole
             role.MaxEnergy = 1000f;
             role.Scp2176LostTime = 5f;
         }
-        
-        player.ShowHint("<size=22><color=red>SCP-079</color>\n制御システムを操り、施設に混沌を引き起こす。",10f);
     }
     
     protected override void OnDying(DyingEventArgs ev)

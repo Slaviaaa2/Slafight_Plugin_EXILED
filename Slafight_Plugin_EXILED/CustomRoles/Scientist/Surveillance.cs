@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class Surveillance : CRole
 {
+    protected override string RoleName { get; set; } = "Surveillance";
+    protected override string Description { get; set; } = "W.I.P";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Surveillance;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "Surveillance";
@@ -39,10 +41,6 @@ public class Surveillance : CRole
         player.ClearInventory();
             
         player.SetCustomInfo("Surveillance");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00ffff>監視者</color>\nわーくいんぷろぐれすだにゃ",10f);
-        });
     }
 
     private void TrashMessages(ReceivingVoiceMessageEventArgs ev)

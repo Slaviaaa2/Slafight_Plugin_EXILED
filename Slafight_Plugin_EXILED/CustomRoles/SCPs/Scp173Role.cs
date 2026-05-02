@@ -17,6 +17,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp173Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-173";
+    protected override string Description { get; set; } = "相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。";
+    protected override float DescriptionDuration { get; set; } = 8.5f;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp173;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp173";
@@ -65,7 +67,6 @@ public class Scp173Role : CRole
 
         yield return Timing.WaitForSeconds(0.05f);
         player.Position = EventHandler.Scp173SpawnPoint;
-        player.ShowHint("<size=24><color=red>SCP-173</color>\n相手が瞬きしたときに超高速で移動し、首をへし折る。\nメインヴィランアビリティでランダムな場所にテレポートできる。\n汚物作戦アビリティで周囲5m以内に汚物を生成できる。",10f);
     }
 
     private void OnBlinking(BlinkingEventArgs ev)

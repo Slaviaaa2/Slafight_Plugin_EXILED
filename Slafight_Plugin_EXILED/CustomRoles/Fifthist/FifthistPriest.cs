@@ -18,6 +18,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
 public class FifthistPriest : CRole
 {
+    protected override string RoleName { get; set; } = "第五教会 司祭";
+    protected override string Description { get; set; } = "非常に<color=#ff00fa>第五的</color>な存在の恩寵を受けた第五主義者。\n施設を占領せよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FifthistPriest;
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } =  "F_Priest";
@@ -38,10 +40,6 @@ public class FifthistPriest : CRole
         player.InfoArea &= ~PlayerInfoArea.Role;
         player.MaxHealth = maxHealth;
         player.Health = maxHealth;
-
-        player.ShowHint(
-            "<size=24><color=#ff00fa>第五教会 司祭</color>\n非常に<color=#ff00fa>第五的</color>な存在の恩寵を受けた第五主義者。\n施設を占領せよ！",
-            10);
 
         Room spawnRoom = Room.Get(RoomType.Surface);
         Vector3 offset = Vector3.zero;

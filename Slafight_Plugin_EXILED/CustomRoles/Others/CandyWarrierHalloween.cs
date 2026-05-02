@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others;
 
 public class CandyWarrierHalloween : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#EE7600>CANDY WARRIER</color>";
+    protected override string Description { get; set; } = "非常に<color=#EE7600>お菓子的</color>である。そうは思わんかね？";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.CandyWarrierHalloween;
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "CandyWarrierHalloween";
@@ -33,10 +35,6 @@ public class CandyWarrierHalloween : CRole
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
             player.EnableEffect(EffectType.Slowness, 10);
-
-            player.ShowHint(
-                "<size=24><color=#EE7600>CANDY WARRIER</color>\n非常に<color=#EE7600>お菓子的</color>である。そうは思わんかね？",
-                10);
 
             player.ClearInventory();
             player.AddItem(ItemType.SCP1509);

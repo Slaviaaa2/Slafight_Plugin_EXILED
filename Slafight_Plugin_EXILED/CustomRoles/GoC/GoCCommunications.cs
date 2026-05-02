@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
 
 public class GoCCommunications : CRole
 {
+    protected override string RoleName { get; set; } = "GoC: Broken Dagger 通信スペシャリスト";
+    protected override string Description { get; set; } = "SNAVを用いて探索を行う\nPassive: VERITAS\n遠くにいる敵等を認識できる";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.GoCCommunications;
     protected override CTeam Team { get; set; } = CTeam.GoC;
     protected override string UniqueRoleKey { get; set; } = "GoCCommunications";
@@ -39,10 +41,6 @@ public class GoCCommunications : CRole
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("Global Occult Collision: Broken Dagger Communications");
         Timing.RunCoroutine(Coroutine(player));
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#0000c8>GoC: Broken Dagger 通信スペシャリスト</color>\nSNAVを用いて探索を行う\nPassive: VERITAS\n遠くにいる敵等を認識できる",10f);
-        });
     }
     
     private IEnumerator<float> Coroutine(Player player)

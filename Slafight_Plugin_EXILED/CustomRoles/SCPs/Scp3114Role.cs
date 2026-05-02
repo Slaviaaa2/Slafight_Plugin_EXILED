@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp3114Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-3114";
+    protected override string Description { get; set; } = "人の皮をかぶって擬態し、周りに溶け込む事が出来る骨。\n" +
+                                                          "混沌とした施設に絶大な恐怖の一撃を与えよ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3114;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp3114";
@@ -45,7 +47,6 @@ public class Scp3114Role : CRole
         player.Rotation = SpawnRoom.Rotation;
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=24><color=red>SCP-3114</color>\nSkeleton Pan for you!",10f);
             Ragdoll classd = Ragdoll.CreateAndSpawn(RoleTypeId.ClassD, "D-9341","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
             Ragdoll scientist = Ragdoll.CreateAndSpawn(RoleTypeId.Scientist, "Dr. Maynard","For You",SpawnRoom.Position + SpawnRoom.Rotation * offset,SpawnRoom.Rotation);
         });

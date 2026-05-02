@@ -16,6 +16,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others.SergeyMakarov;
 
 public class SergeyMakarovAwakenRole : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#c50000>呪詛 - セルゲイ・マカロフ</color>";
+    protected override string Description { get; set; } = "<size=25>" +
+                                                          "怨念に呑まれ、全てを排除せんと暴れ狂う嘗ての管理官。\n" +
+                                                          "アビリティ「怨みの沼, 呪詛, 管理官の祟り」が使用可能だ。\n" +
+                                                          "<color=red><b>邪魔者を滅ぼし、サイト-02から毒を浄化せよ。</b></color>";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SergeyMakarovAwaken;
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "TheSergeyHimSelfAwaken";
@@ -41,11 +46,6 @@ public class SergeyMakarovAwakenRole : CRole
         player.AddAbility(new SoundOfFifthAbility(player));
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=25>" +
-                            "<color=#c50000>呪詛 - セルゲイ・マカロフ</color>\n" +
-                            "怨念に呑まれ、全てを排除せんと暴れ狂う嘗ての管理官。\n" +
-                            "アビリティ「怨みの沼, 呪詛, 管理官の祟り」が使用可能だ。\n" +
-                            "<color=red><b>邪魔者を滅ぼし、サイト-02から毒を浄化せよ。</b></color>",10f);
             player.CustomName = $"セルゲイ・マカロフ ({player.Nickname})";
         });
     }

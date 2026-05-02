@@ -20,6 +20,18 @@ namespace Slafight_Plugin_EXILED.CustomRoles.GoC;
 
 public class GoCHoundDog : CRole
 {
+    protected override string RoleName { get; set; } = "GoC: Hound Dog マークⅡ戦闘強化服Combat Garment(ホワイト・スーツ)";
+
+    protected override string Description { get; set; } =
+        "GoC製のとても強い戦闘強化服。色んな機能・装備が盛り込まれている。\n" +
+        "Passive: ホワイトスーツ\n" +
+        "ホワイトスーツの超駆動により常時コーラ一本分の速度を提供する。\n" +
+        "Passive: VERITAS\n" +
+        "遠くにいる敵等を認識できる\n" +
+        "Passive: 自爆装置\n" +
+        "死亡、拘束され際に起動し、グレネード一個分の自爆を引き起こす。\n" +
+        "Passive: 自動認証\n" +
+        "施設内のすべてのキーカード認証等を素通りできる。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.GoCHoundDog;
     protected override CTeam Team { get; set; } = CTeam.GoC;
     protected override string UniqueRoleKey { get; set; } = "GoCHoundDog";
@@ -47,10 +59,6 @@ public class GoCHoundDog : CRole
 
         player.SetCustomInfo("Global Occult Collision: Hound Dog Mark II Combat Garment White Suit");
         Timing.RunCoroutine(Coroutine(player));
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=20><color=#0000c8>GoC: Hound Dog マークⅡ戦闘強化服Combat Garment(ホワイト・スーツ)</color>\nあーうーえーうーあーあー\nPassive: ホワイトスーツ\nホワイトスーツの超駆動により常時コーラ一本分の速度を提供する。\nPassive: VERITAS\n遠くにいる敵等を認識できる\nPassive: 自爆装置\n死亡、拘束され際に起動し、グレネード一個分の自爆を引き起こす。\nキーカード？知りませんそんなもの。顔パスって言葉がありましてね...",10f);
-        });
     }
 
     protected override void OnDying(DyingEventArgs ev)

@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class Sculpture : CRole
 {
+    protected override string RoleName { get; set; } = "Sculpture";
+    protected override string Description { get; set; } = "相手が瞬きしたときに高速で移動し、痛めつける。\n財団の味方である。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Sculpture;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "Sculpture";
@@ -48,11 +50,6 @@ public class Sculpture : CRole
         player.SetCustomInfo("<color=#00B7EB>Sculpture</color>");
 
         player.EnableEffect(EffectType.Slowness, 20);
-        
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>Sculpture</color>\n相手が瞬きしたときに高速で移動し、痛めつける。\n財団の味方である。",10f);
-        });
     }
 
     private void OnBlinking(BlinkingEventArgs ev)

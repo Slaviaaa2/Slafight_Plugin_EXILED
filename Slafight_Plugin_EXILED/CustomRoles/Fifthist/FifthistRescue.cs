@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
 public class FifthistRescure : CRole
 {
+    protected override string RoleName { get; set; } = "第五教会 救出師";
+    protected override string Description { get; set; } = "非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FifthistRescure;
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "FIFTHIST";
@@ -29,14 +31,9 @@ public class FifthistRescure : CRole
         player.MaxHealth = maxHealth;
         player.Health = maxHealth;
 
-        player.ShowHint(
-            "<size=24><color=#ff00fa>第五教会 救出師</color>\n非常に<color=#ff00fa>第五的</color>な存在を脱出させなければいけない",
-            10);
-
         Room spawnRoom = Room.Get(RoomType.Surface);
         Vector3 offset = Vector3.zero;
         player.Position = new Vector3(124f, 289f, 21f);
-        // player.Rotation = spawnRoom.Rotation;
 
         player.ClearInventory();
         Log.Debug("Giving Items to Fifthist");

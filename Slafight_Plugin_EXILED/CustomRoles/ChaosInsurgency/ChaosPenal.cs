@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosPenal : CRole
 {
+    protected override string RoleName { get; set; } = "カオス・インサージェンシー 懲罰兵";
+    protected override string Description { get; set; } = "貴方は問題を起こしてここに連れてこられてしまった哀れなカオスだ。\nとにかく大量に爆発物を持たされている。特攻しろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosPenal;
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosBreaker";
@@ -35,9 +37,5 @@ public class ChaosPenal : CRole
         player.TryAddCandy(CandyKindID.Pink);
             
         player.SetCustomInfo("Chaos Insurgency Penal");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 懲罰兵</color>\n貴方は問題を起こしてここに連れてこられてしまった哀れなカオスだ。\nとにかく大量に爆発物を持たされている。特攻しろ！",10f);
-        });
     }
 }

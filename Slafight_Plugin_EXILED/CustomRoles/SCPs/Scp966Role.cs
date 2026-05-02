@@ -15,6 +15,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp966Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-966";
+
+    protected override string Description { get; set; } = "通常不可視の体を持つ恐怖の存在。\n" +
+                                                          "眠りを貪り食い、財団に大打撃を与えよ！\n" +
+                                                          "死体をむさぼることで足を速くできるぞ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp966;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp966";
@@ -53,11 +57,6 @@ public class Scp966Role : CRole
         var offset = new Vector3(0f, 1.5f, 0f);
         player.Position = spawnRoom.Position + spawnRoom.Rotation * offset;
         player.Rotation = spawnRoom.Rotation;
-        
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=red>SCP-966</color>\n透明～！", 10f);
-        });
         Timing.RunCoroutine(Coroutine(player));
     }
 

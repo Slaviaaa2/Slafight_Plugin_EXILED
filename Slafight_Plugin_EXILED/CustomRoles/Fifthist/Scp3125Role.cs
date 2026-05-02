@@ -20,6 +20,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 public class Scp3125Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-3125";
+    protected override string Description { get; set; } =
+        $"あなたは反ミーム部門を壊滅させる事に成功した！\n" +
+        $"残るはかの部門長、<color=#ffa500>マリオンホイーラー</color>を<color=red>殺すだけ</color>だ。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3125;
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "SCP-3125";
@@ -52,11 +55,6 @@ public class Scp3125Role : CRole
         player.EnableEffect(EffectType.Slowness, 30);
 
         player.AddAbility<MemeWaveAbility>();
-
-        // Timing.RunCoroutine(Scp3005Coroutine(player));
-        Timing.CallDelayed(0.1f, () => player.ShowHint(
-            $"<size=24><color={CTeam.Fifthists.GetTeamColor()}>SCP-3125</color>\nW.I.P",
-            10));
         Timing.CallDelayed(3f, () =>
         {
             if (!Handler.CanUsePlayers.Contains(player))

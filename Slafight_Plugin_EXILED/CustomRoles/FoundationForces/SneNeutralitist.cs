@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class SneNeutralitist : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#FF1493>シー・ノー・イービル 破力兵</color>";
+    protected override string Description { get; set; } = "気狂いどもを食い止めろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SneNeutralitist;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "SneNeutralitist";
@@ -36,9 +38,5 @@ public class SneNeutralitist : CRole
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("<color=#FF1493>See No Evil Neutralitist</color>");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#FF1493>シー・ノー・イービル 破力兵</color>\n気狂いどもを食い止めろ！",10f);
-        });
     }
 }

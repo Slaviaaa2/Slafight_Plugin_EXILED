@@ -10,6 +10,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Guards;
 
 public class EvacuationGuard : CRole
 {
+    protected override string RoleName { get; set; } = "下層避難支援警備隊員";
+    protected override string Description { get; set; } = "下層の秩序を守り、職員の避難を助ける。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.EvacuationGuard;
     protected override CTeam Team { get; set; } = CTeam.Guards;
     protected override string UniqueRoleKey { get; set; } = "EvacuationGuard";
@@ -37,9 +39,5 @@ public class EvacuationGuard : CRole
         player.CustomInfo = "Emergency Evacuation Guard";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>避難支援警備員</color>\n下層の秩序を守り、職員の避難を助ける。",10f);
-        });
     }
 }

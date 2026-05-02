@@ -12,6 +12,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class FacilityManager : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#dc143c>施設管理官</color>";
+    protected override string Description { get; set; } = "施設を管理・運営する重要な科学者。\n" +
+                                                          "区画管理官や警備員たちに指示を出し、収容違反に対処する。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FacilityManager;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "FacilityManager";
@@ -36,7 +39,6 @@ public class FacilityManager : CRole
         Timing.CallDelayed(0.05f, () =>
         {
             player.Position = MapFlags.FacilityManagerSpawnPoint;
-            player.ShowHint("<size=24><color=#dc143c>施設管理官</color>\n施設を統括する重要な科学者",10f);
         });
     }
 }

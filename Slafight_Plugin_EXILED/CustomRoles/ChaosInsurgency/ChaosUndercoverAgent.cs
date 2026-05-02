@@ -12,21 +12,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosUndercoverAgent : CRole
 {
+    protected override string RoleName { get; set; } = "カオス・インサージェンシー 潜入工作員";
+    protected override string Description { get; set; } = "施設に潜入した先遣隊。施設の偵察や略奪を行え！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosUndercoverAgent;
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosUndercoverAgent";
-
-    public override void RegisterEvents()
-    {
-        //Exiled.Events.Handlers.Player.Dying += OnDying;
-        base.RegisterEvents();
-    }
-
-    public override void UnregisterEvents()
-    {
-        //Exiled.Events.Handlers.Player.Dying -= OnDying;
-        base.UnregisterEvents();
-    }
 
     public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
@@ -51,7 +41,6 @@ public class ChaosUndercoverAgent : CRole
         player.SetCustomInfo("Chaos Insurgency Undercover Agent");
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 潜入工作員</color>\n施設に潜入した先遣隊。施設の偵察や略奪を行え！",10f);
             var data = StaticUtils.GetWorldFromRoomLocal(RoomType.HczCrossRoomWater, new Vector3(-4.98f, -9.25f, 2.3f), new Vector3(0f, 270f, 0f));
             player.Position = data.worldPosition;
             player.Rotation = data.worldRotation;

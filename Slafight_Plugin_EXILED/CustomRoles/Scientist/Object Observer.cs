@@ -12,6 +12,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class ObjectObserver : CRole
 {
+    protected override string RoleName { get; set; } = "オブジェクト観測者";
+    protected override string Description { get; set; } = "SCPオブジェクトの状況を監視し、報告する。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ObjectObserver;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "ObjectObserver";
@@ -31,12 +33,7 @@ public class ObjectObserver : CRole
         var pos = Door.Get(DoorType.Scp173Connector).Position;
         pos += new Vector3(0f,0.35f,0f);
         player.Position = pos;
-        Log.Debug($"RoomPos: {pos},ObjectObserver pos: {player.Position}");
             
         player.SetCustomInfo("Object Observer");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>オブジェクト観測者</color>\nオブジェクトの異常を監視する。",10f);
-        });
     }
 }

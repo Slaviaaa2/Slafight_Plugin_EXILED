@@ -16,6 +16,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp999Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-999";
+    protected override string Description { get; set; } = "<size=24><color=#FF1493>SCP-999</color>\n全員とたわむれましょう！\n※勝敗には影響しません。可愛いペット的にふるまって\n攻撃してきた奴らに痛い一撃を喰らわせてやりましょう。";
+    protected override float DescriptionDuration { get; set; } = 10f;
+    protected override bool DescriptionShowRoleName { get; set; } = false;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp999;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "Scp999";
@@ -51,7 +54,6 @@ public class Scp999Role : CRole
         Timing.CallDelayed(0.045f, () =>
         {
             LabApiHandler.Schem999(LabApi.Features.Wrappers.Player.Get(player.ReferenceHub));
-            player.ShowHint("<size=24><color=#FF1493>SCP-999</color>\n全員とたわむれましょう！\n※勝敗には影響しません。可愛いペット的にふるまって\n攻撃してきた奴らに痛い一撃を喰らわせてやりましょう。", 10f);
         });
     }
     

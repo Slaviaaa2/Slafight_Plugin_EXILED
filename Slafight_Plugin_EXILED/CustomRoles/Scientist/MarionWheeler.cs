@@ -23,6 +23,10 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class MarionWheeler : CRole
 {
+    protected override string RoleName { get; set; } = "マリオン・ホイーラー";
+    protected override string Description { get; set; } = "現在貴方の部門は壊滅状態に陥っている...\n" +
+                                                          "下層のDクラス収容房最奥にある反ミーム爆弾を起動してこのアウトブレイクをリセットしなければならない。\n" +
+                                                          "<color=red>例え命を落とそうとも</color>";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.MarionWheeler;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "MarionWheeler";
@@ -50,7 +54,6 @@ public class MarionWheeler : CRole
         Timing.CallDelayed(0.1f, () =>
         {
             Timing.RunCoroutine(Coroutine(player));
-            player.ShowHint("<size=24><color=#00ffff>マリオン・ホイーラー</color>\nW.I.P", 8f);
         });
     }
 

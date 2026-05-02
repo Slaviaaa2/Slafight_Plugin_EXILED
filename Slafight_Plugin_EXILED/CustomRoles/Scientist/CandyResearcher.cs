@@ -14,6 +14,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class CandyResearcher : CRole
 {
+    protected override string RoleName { get; set; } = "お菓子研究者";
+    protected override string Description { get; set; } = "兎に角甘いものが好きな科学者。\nキャンディー大好き！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.CandyResearcher;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "CandyResearcher";
@@ -52,9 +54,5 @@ public class CandyResearcher : CRole
         player.Position = Door.Get(DoorType.Scp330).Position + (Vector3.up * 0.8f);
             
         player.SetCustomInfo("Candy Researcher");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>菓子研究員</color>\nレアなキャンディーいっぱい！！！",10f);
-        });
     }
 }

@@ -81,7 +81,7 @@ public static class Handler
                 Log.Debug($"CanUsePlayers Updated. List: {listText}");
                 var hint = new Hint()
                 {
-                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 825,
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 865,
                     Text = "<color=yellow><size=24>近接チャット機能が利用可能です！</size></color>", Id = "ProximityHint"
                 };
                 ev.Player?.AddHint(hint);

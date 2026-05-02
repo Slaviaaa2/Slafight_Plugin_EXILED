@@ -15,6 +15,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ClassD;
 
 public class CandySubject : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#ee7600>菓子被験者</color>";
+    protected override string Description { get; set; } = "お菓子が大好きな変な博士の実験に巻き込まれた可愛そうなDクラス職員。\n" +
+                                                          "いっぱいキャンディーを持たされている。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.CandySubject;
     protected override CTeam Team { get; set; } = CTeam.ClassD;
     protected override string UniqueRoleKey { get; set; } = "CandySubject";
@@ -53,9 +56,5 @@ public class CandySubject : CRole
         player.Position = Door.Get(DoorType.Scp330Chamber).Position + (Vector3.up * 0.8f);
             
         player.SetCustomInfo("Candy Subject");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#ee7600>菓子被験者</color>\nレアなキャンディーいっぱい！！！",10f);
-        });
     }
 }

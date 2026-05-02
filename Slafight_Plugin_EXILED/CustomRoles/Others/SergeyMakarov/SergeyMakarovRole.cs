@@ -13,6 +13,13 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others.SergeyMakarov;
 
 public class SergeyMakarovRole : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#dc143c>施設管理官 - セルゲイ・マカロフ</color>";
+    protected override string Description { get; set; } = "<size=25>" +
+                                                          "部下に疎まれ、裏切り者に殺され、復讐に憑りつかれ蘇った施設管理官。\n" +
+                                                          "彼は戻ってきた。自身を蔑ろにした全てに復讐するために...\n" +
+                                                          "<b><color=red>持てる全てを使い、奴らへの復讐を果たせ</color></b>";
+
+    protected override float DescriptionDuration { get; set; } = 10f;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SergeyMakarov;
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "TheSergeyHimSelf";
@@ -65,11 +72,6 @@ public class SergeyMakarovRole : CRole
         
         Timing.CallDelayed(0.05f, () =>
         {
-            player.ShowHint("<size=25>" +
-                            "<color=#dc143c>施設管理官 - セルゲイ・マカロフ</color>\n" +
-                            "部下に疎まれ、裏切り者に殺され、復讐に憑りつかれ蘇った施設管理官。\n" +
-                            "彼は戻ってきた。自身を蔑ろにした全てに復讐するために...\n" +
-                            "<b><color=red>持てる全てを使い、奴らへの復讐を果たせ</color></b>",10f);
             player.CustomName = $"セルゲイ・マカロフ ({player.Nickname})";
         });
         Timing.RunCoroutine(SergeySharedContents.SergeySharedCoroutine(player));

@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class SneGears : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#FF1493>シー・ノー・イービル 対圧兵</color>";
+    protected override string Description { get; set; } = "気狂いどもに一撃を与えろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SneGears;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "SneGears";
@@ -35,9 +37,5 @@ public class SneGears : CRole
 
         //PlayerExtensions.OverrideRoleName(player,$"{player.GroupName}","Hammer Down Infantry");
         player.SetCustomInfo("<color=#FF1493>See No Evil Gears</color>");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#FF1493>シー・ノー・イービル 対圧兵</color>\n気狂いどもに一撃を与えろ！",10f);
-        });
     }
 }

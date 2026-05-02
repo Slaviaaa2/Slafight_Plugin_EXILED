@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class NtfGeneral : CRole
 {
+    protected override string RoleName { get; set; } = "<color=blue>九尾狐 司令官</color>";
+    protected override string Description { get; set; } = "Epsilon-11を率いる高位の司令官。\n隊長等と連携し、確実に施設に安定をもたらせ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.NtfGeneral;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "NtfGeneral";
@@ -39,9 +41,5 @@ public class NtfGeneral : CRole
         player.CustomInfo = "Nine-tailed Fox General";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=blue>九尾狐 司令官</color>\nEpsilon-11を率いる高位の司令官。\n隊長等と連携し、確実に施設に安定をもたらせ！",10f);
-        });
     }
 }

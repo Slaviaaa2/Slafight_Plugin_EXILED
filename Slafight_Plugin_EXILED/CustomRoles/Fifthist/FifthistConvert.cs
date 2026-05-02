@@ -11,6 +11,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
 public class FifthistConvert : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#ff5ffa>第五教会 改宗者</color>";
+    protected override string Description { get; set; } = "貴方は新たに第五教会に加わった。全てを第五に捧げるのです。\nSCP-1425を使って、更に第五を広めろ！";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.FifthistConvert;
     protected override CTeam Team { get; set; } = CTeam.Fifthists;
     protected override string UniqueRoleKey { get; set; } = "FifthistConvert";
@@ -27,7 +29,6 @@ public class FifthistConvert : CRole
         player.MaxHealth = maxHealth;
         player.Health = maxHealth;
             
-        player.ShowHint("<size=24><color=#ff5ffa>第五教会 改宗者</color>\n貴方は新たに第五教会に加わった。全てを第五に捧げるのです。\nSCP-1425を使って、更に第五を広めろ！",10f);
         Room spawnRoom = Room.Get(RoomType.Surface);
         Log.Debug(spawnRoom.Position);
         offset = new Vector3(0f,0f,0f);

@@ -20,6 +20,12 @@ namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
 public class Scp3005Role : CRole
 {
     protected override string RoleName { get; set; } = "SCP-3005";
+    protected override string Description { get; set; } =
+        "第五的なピンクの光を放つ、謎に包まれた存在。\n" +
+        "普通はダメージを受けることはなく、アビリティを使用することで\n" +
+        "第五的なミサイルや閃光を引き起こせる。\n" +
+        "<color=#ff00fa>第五教会に道を示し、施設を第五せよ！</color>";
+    protected override float DescriptionDuration { get; set; } = 8f;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp3005;
     protected override CTeam Team { get; set; } = CTeam.SCPs;
     protected override string UniqueRoleKey { get; set; } = "SCP-3005";
@@ -64,9 +70,6 @@ public class Scp3005Role : CRole
         player.AddAbility(new SoundOfFifthAbility(player));
 
         Timing.RunCoroutine(Scp3005Coroutine(player));
-        Timing.CallDelayed(0.05f, () => player.ShowHint(
-            "<size=24><color=red>SCP-3005</color>\n第五的な光を放つ存在。\n普通はダメージを受けることはなく、\nアビリティで第五的なミサイルや閃光を引き起こせる。\n<color=#ff00fa>第五教会に道を示せ</color>",
-            10));
     }
     
     protected override void OnDying(DyingEventArgs ev)

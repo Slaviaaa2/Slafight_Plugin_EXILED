@@ -21,6 +21,9 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Scientist;
 
 public class Engineer : CRole
 {
+    protected override string RoleName { get; set; } = "エンジニア";
+    protected override string Description { get; set; } = "施設内の様々なシステム等を整備する職員。\n" +
+                                                          "Toolboxを用いてSCPを食い止めたり、他職員の脱出等をサポートせよ。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Engineer;
     protected override CTeam Team { get; set; } = CTeam.Scientists;
     protected override string UniqueRoleKey { get; set; } = "Engineer";
@@ -46,10 +49,5 @@ public class Engineer : CRole
         player.Position = pos;
 
         player.SetCustomInfo("Engineer");
-
-        Timing.CallDelayed(0.1f, () =>
-        {
-            player.ShowHint("<size=24><color=#00ffff>エンジニア</color>\nToolboxを用いて施設中を駆け巡れ！", 8f);
-        });
     }
 }

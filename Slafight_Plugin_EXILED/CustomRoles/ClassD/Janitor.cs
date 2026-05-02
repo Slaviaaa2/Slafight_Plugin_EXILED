@@ -13,6 +13,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ClassD;
 
 public class Janitor : CRole
 {
+    protected override string RoleName { get; set; } = "<color=#ee7600>用務員</color>";
+    protected override string Description { get; set; } = "特殊グレネードで近くの汚れを清掃できる";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Janitor;
     protected override CTeam Team { get; set; } = CTeam.ClassD;
     protected override string UniqueRoleKey { get; set; } = "Janitor";
@@ -42,9 +44,5 @@ public class Janitor : CRole
         player.CustomInfo = "Janitor";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#ee7600>用務員</color>\n特殊グレネードで近くの汚れを清掃できる",10f);
-        });
     }
 }

@@ -11,21 +11,11 @@ namespace Slafight_Plugin_EXILED.CustomRoles.ChaosInsurgency;
 
 public class ChaosSignal : CRole
 {
+    protected override string RoleName { get; set; } = "カオス・インサージェンシー 通信兵";
+    protected override string Description { get; set; } = "S-Nav 300を用いてユニークな部屋を捜索する。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.ChaosSignal;
     protected override CTeam Team { get; set; } = CTeam.ChaosInsurgency;
     protected override string UniqueRoleKey { get; set; } = "ChaosSignal";
-
-    public override void RegisterEvents()
-    {
-        //Exiled.Events.Handlers.Player.Dying += OnDying;
-        base.RegisterEvents();
-    }
-
-    public override void UnregisterEvents()
-    {
-        //Exiled.Events.Handlers.Player.Dying -= OnDying;
-        base.UnregisterEvents();
-    }
 
     public override void SpawnRole(Player? player, RoleSpawnFlags roleSpawnFlags = RoleSpawnFlags.All)
     {
@@ -47,9 +37,5 @@ public class ChaosSignal : CRole
         player.AddAmmo(AmmoType.Nato762, 150);
             
         player.SetCustomInfo("Chaos Insurgency Signal");
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#228b22>カオス・インサージェンシー 通信兵</color>\nS-Nav 300を用いてユニークな部屋を捜索する。",10f);
-        });
     }
 }

@@ -8,6 +8,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.FoundationForces;
 
 public class NtfAide : CRole
 {
+    protected override string RoleName { get; set; } = "九尾狐 副官";
+    protected override string Description { get; set; } = "隊長の補佐を目的とし、万一の際は代理・臨時隊長として指示を下せる。";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.NtfLieutenant;
     protected override CTeam Team { get; set; } = CTeam.FoundationForces;
     protected override string UniqueRoleKey { get; set; } = "NtfAide";
@@ -34,9 +36,5 @@ public class NtfAide : CRole
         player.CustomInfo = "Nine-tailed Fox Lieutenant";
         player.InfoArea |= PlayerInfoArea.Nickname;
         player.InfoArea &= ~PlayerInfoArea.Role;
-        Timing.CallDelayed(0.05f, () =>
-        {
-            player.ShowHint("<size=24><color=#00b7eb>九尾狐 補佐官</color>\n隊長の補佐を目的とし、万一の際は代理・臨時隊長として指示を下せる。",10f);
-        });
     }
 }

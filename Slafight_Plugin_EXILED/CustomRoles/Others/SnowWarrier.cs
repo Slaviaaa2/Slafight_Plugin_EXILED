@@ -10,6 +10,8 @@ namespace Slafight_Plugin_EXILED.CustomRoles.Others;
 
 public class SnowWarrier : CRole
 {
+    protected override string RoleName { get; set; } = "<color=white>SNOW WARRIER</color>";
+    protected override string Description { get; set; } = "<size=24>非常に<color=#ffffff>雪玉的</color>である。そうは思わんかね？";
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.SnowWarrier;
     protected override CTeam Team { get; set; } = CTeam.Others;
     protected override string UniqueRoleKey { get; set; } = "SnowWarrier";
@@ -34,10 +36,6 @@ public class SnowWarrier : CRole
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
             player.EnableEffect(EffectType.Slowness, 10);
-
-            player.ShowHint(
-                "<size=24><color=white>SNOW WARRIER</color>\n非常に<color=#ffffff>雪玉的</color>である。そうは思わんかね？",
-                10);
 
             player.AddItem(ItemType.SCP1509);
             player.AddItem(ItemType.GunCOM18);
