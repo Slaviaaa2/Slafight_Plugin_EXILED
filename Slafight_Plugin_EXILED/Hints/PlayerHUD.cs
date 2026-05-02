@@ -115,15 +115,31 @@ public class PlayerHUD : IBootstrapHandler
         var display = TryGetDisplay(ev.Player);
         if (display == null) return;
 
-        Hint ServerInfo = new Hint
+        Hint ServerInfo = null;
+        if (Plugin.Singleton.Config.IsBeta)
         {
-            Id = "ServerInfo",
-            Text = "[<color=#008cff>Sharp Server</color>]",
-            Alignment = HintAlignment.Center,
-            SyncSpeed = HintSyncSpeed.UnSync,
-            FontSize = 18,
-            YCoordinate = 1050
-        };
+            ServerInfo = new Hint
+            {
+                Id = "ServerInfo",
+                Text = "[<color=#008cff>Sharp Server</color> - <color=red>BETA</color>]",
+                Alignment = HintAlignment.Center,
+                SyncSpeed = HintSyncSpeed.UnSync,
+                FontSize = 18,
+                YCoordinate = 1050
+            };
+        }
+        else
+        {
+            ServerInfo = new Hint
+            {
+                Id = "ServerInfo",
+                Text = "[<color=#008cff>Sharp Server</color>]",
+                Alignment = HintAlignment.Center,
+                SyncSpeed = HintSyncSpeed.UnSync,
+                FontSize = 18,
+                YCoordinate = 1050
+            };
+        }
         display.AddHint(ServerInfo);
 
         // ラウンド中に途中参加した場合は HUD も作る + ロール同期
