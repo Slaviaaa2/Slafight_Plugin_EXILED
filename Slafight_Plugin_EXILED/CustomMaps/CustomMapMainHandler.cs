@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.CustomItems.API.Features;
@@ -106,7 +107,10 @@ public class CustomMapMainHandler : CustomEventsHandler, IBootstrapHandler
 
     private void OnGeneratorGenerating()
     {
-        Generator.List.Where(generator => generator.Room.Type == RoomType.HczServerRoom).ToList().ForEach(generator => generator.IsEngaged = true);
+        Generator.List.Where(generator => generator.Room.Type == RoomType.HczServerRoom).ToList().ForEach(generator =>
+        {
+            generator.IsEngaged = true;
+        });
     }
 
     private void OnRoundStarted()

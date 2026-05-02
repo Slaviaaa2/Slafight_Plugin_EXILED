@@ -84,6 +84,8 @@ public static class FacilityLightHandler
         }
     }
 
+    public static void TurnToNormal() => InitLight();
+
     public static void OnWarhead(StartingEventArgs ev)
     {
         if (!ev.IsAllowed) return;

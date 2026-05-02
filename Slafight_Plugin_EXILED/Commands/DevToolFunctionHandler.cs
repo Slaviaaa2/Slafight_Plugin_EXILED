@@ -147,7 +147,7 @@ public class DevToolFunctionHandler
         OmegaWarhead.StartProtocol(SpecialEventsHandler.Instance.EventPID);
     }
 
-    public void DebugRoundStart([NotNull] Player startedPlayer)
+    public void DebugRoundStart(Player startedPlayer)
     {
         SpecialEventsHandler.Instance.SetQueueEvent(SpecialEventType.None);
         Npc roundLock = Npc.Spawn("RoundLocker", RoleTypeId.ClassD);

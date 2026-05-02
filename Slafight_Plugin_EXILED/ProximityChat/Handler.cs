@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
+using HintServiceMeow.Core.Enum;
+using HintServiceMeow.Core.Extension;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.Spectating;
@@ -10,6 +12,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using VoiceChat;
 using VoiceChat.Networking;
+using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 using SpectatorRole = PlayerRoles.Spectating.SpectatorRole;
 
 namespace Slafight_Plugin_EXILED.ProximityChat;
@@ -39,6 +42,7 @@ public static class Handler
         CRoleTypeId.Zombified,
         CRoleTypeId.Scp3114,
         CRoleTypeId.FifthistMarionette,
+        CRoleTypeId.Scp3125,
     ];
     public static readonly List<CRoleTypeId> OnlyProximityUnique = [
         CRoleTypeId.Zombified,
@@ -75,14 +79,13 @@ public static class Handler
             {
                 var listText = string.Join(", ", CanUsePlayers.ConvertAll(p => $"{p.Nickname}({p.Id})"));
                 Log.Debug($"CanUsePlayers Updated. List: {listText}");
-                if (ev.Player?.GetCustomRole() != CRoleTypeId.Zombified)
+                var hint = new Hint()
                 {
-                    ev.Player.ShowHint("近接チャット機能が利用可能です！",5f);
-                }
-                else
-                {
-                    ev.Player.ShowHint("近接チャットしか利用できません！",5f);
-                }
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 825,
+                    Text = "<color=yellow><size=24>近接チャット機能が利用可能です！</size></color>", Id = "ProximityHint"
+                };
+                ev.Player?.AddHint(hint);
+                Timing.CallDelayed(5f, () => ev.Player?.RemoveHint(hint));
             }
         });
     }

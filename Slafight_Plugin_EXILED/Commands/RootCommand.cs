@@ -31,6 +31,7 @@ public class RootCommand : ParentCommand
         RegisterCommand(new SpawnWave());
         RegisterCommand(new PlaySurfaceAttack());
         RegisterCommand(new PlayOmegaWarhead());
+        RegisterCommand(new ActivateGenerator());
     }
     protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
     {

@@ -33,6 +33,7 @@ internal static class RoleHintsDictionary
 
         // ── Fifthists ─────────────────────────────────────────────────────
         [CRoleTypeId.Scp3005]            = ("<color=#ff00fa>SCP-3005</color>",              ScpTeam + " - " + FifthTeam, "第五教会に道を示し、施設を占領せよ"),
+        [CRoleTypeId.Scp3125]            = ("<color=#ff00fa>SCP-3125</color>",              FifthTeam, "マリオン・ホイーラーを探し出し第五せよ"),
         [CRoleTypeId.FifthistRescure]    = ("<color=#ff00fa>Fifthist: Rescue</color>",      FifthTeam, "第五を探し出し、救出し、従い、施設を占領せよ。"),
         [CRoleTypeId.FifthistPriest]     = ("<color=#ff00fa>Fifthist: Priest</color>",      FifthTeam, "あなたは幸福な事に第五の加護を受けている。全てを第五せよ！"),
         [CRoleTypeId.FifthistConvert]    = ("<color=#ff5ffa>Fifthist: Convert</color>",     FifthTeam, "あなたは第五教会の新入りだ。第五とは何かについて考え、理解し、そして従いなさい。"),
@@ -47,15 +48,16 @@ internal static class RoleHintsDictionary
         [CRoleTypeId.ChaosUndercoverAgent] = ("<color=#228b22>Chaos Insurgency Undercover Agent</color>",ChaosTeam, ChaosObj),
 
         // ── Foundation Forces ─────────────────────────────────────────────
-        [CRoleTypeId.NtfLieutenant]  = ("<color=#00b7eb>MTF E-11: Lieutenant</color>",  FoundTeam, FoundObj),
-        [CRoleTypeId.NtfGeneral]     = ("<color=blue>MTF E-11: General</color>",        FoundTeam, FoundObj),
-        [CRoleTypeId.HdInfantry]     = ("<color=#353535>MTF Nu-7: Infantry</color>",    FoundTeam, FoundObj),
-        [CRoleTypeId.HdCommander]    = ("<color=#252525>MTF Nu-7: Commander</color>",   FoundTeam, FoundObj),
-        [CRoleTypeId.HdMarshal]      = ("<color=#151515>MTF Nu-7: Marshal</color>",     FoundTeam, FoundObj),
-        [CRoleTypeId.SnePurify]      = ("<color=#FF1493>MTF Eta-10: Purify</color>",      FoundTeam, FoundObj),
-        [CRoleTypeId.SneNeutralitist]= ("<color=#FF1493>MTF Eta-10: Neutralitist</color>",FoundTeam, FoundObj),
-        [CRoleTypeId.SneGears]       = ("<color=#FF1493>MTF Eta-10: Gears</color>",       FoundTeam, FoundObj),
-        [CRoleTypeId.SneOperator]    = ("<color=#FF1493>MTF Eta-10: Operator</color>",    FoundTeam, FoundObj),
+        [CRoleTypeId.NtfLieutenant]  = ("<color=#00b7eb>MTF E-11: Lieutenant</color>",     FoundTeam, FoundObj),
+        [CRoleTypeId.NtfGeneral]     = ("<color=blue>MTF E-11: General</color>",           FoundTeam, FoundObj),
+        [CRoleTypeId.HdInfantry]     = ("<color=#353535>MTF Nu-7: Infantry</color>",       FoundTeam, FoundObj),
+        [CRoleTypeId.HdCommander]    = ("<color=#252525>MTF Nu-7: Commander</color>",      FoundTeam, FoundObj),
+        [CRoleTypeId.HdMarshal]      = ("<color=#151515>MTF Nu-7: Marshal</color>",        FoundTeam, FoundObj),
+        [CRoleTypeId.SnePurify]      = ("<color=#FF1493>MTF Eta-10: Purify</color>",       FoundTeam, FoundObj),
+        [CRoleTypeId.SneNeutralitist]= ("<color=#FF1493>MTF Eta-10: Neutralitist</color>", FoundTeam, FoundObj),
+        [CRoleTypeId.SneGears]       = ("<color=#FF1493>MTF Eta-10: Gears</color>",        FoundTeam, FoundObj),
+        [CRoleTypeId.SneOperator]    = ("<color=#FF1493>MTF Eta-10: Operator</color>",     FoundTeam, FoundObj),
+        [CRoleTypeId.AraOrun]        = ("<color=#ffff00>MTF Omega-0: Ará Orún</color>",    FoundTeam, "マリオン・ホイーラーを手助けし、反ミーム爆弾へと導け！"),
 
         // ── Guards ────────────────────────────────────────────────────────
         [CRoleTypeId.EvacuationGuard] = ("<color=#00b7eb>Emergency Evacuation Guard</color>", FoundTeam, "職員達を上部階層へ避難させ、施設の秩序を守護せよ。"),
@@ -65,8 +67,9 @@ internal static class RoleHintsDictionary
         // ── Scientists / Neutral-Foundation ───────────────────────────────
         [CRoleTypeId.ZoneManager]    = ("<color=#00ffff>Zone Manager</color>",      NeutFoundTeam, "施設からの脱出を目指しながら、警備職員達を監督せよ"),
         [CRoleTypeId.FacilityManager]= ("<color=#dc143c>Facility Manager</color>",  NeutFoundTeam, "施設からの脱出を目指しながら、サイトの行く末を監督せよ"),
-        [CRoleTypeId.Engineer]       = ("<color=#faff86>Engineer</color>",           NeutFoundTeam, "様々なタスクをこなし、最強の弾頭を起動せよ！"),
+        [CRoleTypeId.Engineer]       = ("<color=#faff86>Engineer</color>",          NeutFoundTeam, "様々なタスクをこなし、最強の弾頭を起動せよ！"),
         [CRoleTypeId.ObjectObserver] = ("<color=#faff86>Object Observer</color>",   NeutFoundTeam, "オブジェクトに注意しながら、施設から脱出せよ。"),
+        [CRoleTypeId.MarionWheeler]  = ("<color=#ffa500>Marion Wheeler</color>",    NeutFoundTeam, "第五の目を搔い潜り、反ミーム爆弾を起爆しろ！"),
 
         // ── Class-D / Neutral-Chaos ───────────────────────────────────────
         [CRoleTypeId.Janitor] = ("<color=#ee7600>Janitor</color>", NeutChaosTeam, "施設から脱出せよ。また、汚物をグレネードで清掃せよ。"),

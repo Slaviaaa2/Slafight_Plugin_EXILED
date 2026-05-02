@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp079;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Features;
@@ -52,11 +53,13 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
     public override void RegisterEvents()
     {
+        Exiled.Events.Handlers.Scp079.Recontaining += OnRecontained;
         Exiled.Events.Handlers.Player.TriggeringTesla += DisableTesla;
     }
 
     public override void UnregisterEvents()
     {
+        Exiled.Events.Handlers.Scp079.Recontaining -= OnRecontained;
         Exiled.Events.Handlers.Player.TriggeringTesla -= DisableTesla;
     }
 
@@ -68,7 +71,8 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         // Warhead ロックなど
         Warhead.IsLocked = true;
         evHandler.DeadmanDisable = true;
-
+        
+        yield return Timing.WaitForSeconds(1f);
         if (CancelIfOutdated()) yield break;
 
         // カオスに変える対象を抽選
@@ -120,7 +124,6 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
             "インサージェンシーのエージェント達よ、働く時間だ。",
             false);
 
-        // 攻防フェーズ（400秒）
         yield return Timing.WaitForSeconds(1000f);
         if (CancelIfOutdated()) yield break;
 
@@ -214,11 +217,18 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
     private void HandleCiFailure()
     {
         if (CancelIfOutdated()) return;
-
+        _teslaDisabled = false;
         Exiled.API.Features.Cassie.MessageTranslated(
             "$pitch_.2 .g3 $pitch_.7 .g2 $pitch_.4 .g4 .g5 .g5 $pitch_1 .g1 .g2 .g3 Attention . All personnel . the Foundation Forces Successfully Terminated All Chaos Insurgency Forces . All System now backed to the Foundation . All Delta Command Orders Now Terminated . Please back to normal Containment Breach Security Mode",
             "全職員に報告します。財団の部隊は全カオス・インサージェンシー勢力の排除に成功しました。全てのDELTA COMMANDの指令は正常に終了。全職員は収容違反の対応モデルに復帰してください。",
             true);
+    }
+
+    private void OnRecontained(RecontainingEventArgs ev)
+    {
+        if (CancelIfOutdated() || !ev.IsAllowed) return;
+        _teslaDisabled = false;
+        FacilityLightHandler.TurnToNormal();
     }
 
     // ===== Tesla 無効化 =====

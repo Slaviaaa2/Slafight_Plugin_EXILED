@@ -9,9 +9,9 @@ namespace Slafight_Plugin_EXILED.SpecialEvents.Events;
 public class OperationBlackout : SpecialEvent
 {
     // ===== メタ情報 =====
-    public override SpecialEventType EventType => SpecialEventType.RevolverBattles;
+    public override SpecialEventType EventType => SpecialEventType.OperationBlackout;
     public override int MinPlayersRequired => 0;
-    public override string LocalizedName => "Revolver Battles";
+    public override string LocalizedName => "Operation Blackout";
     public override string TriggerRequirement => "無し";
 
     private Action<string, string, Vector3, bool, Transform, bool, float, float> CreateAndPlayAudio =>
@@ -19,6 +19,11 @@ public class OperationBlackout : SpecialEvent
     // ===== 実行エントリポイント & Register & Unregister =====
     public override void RegisterEvents() { }
     public override void UnregisterEvents() { }
+    public override bool IsReadyToExecute()
+    {
+        return false;
+    }
+
     protected override void OnExecute(int eventPID)
     {
         if (CancelIfOutdated())

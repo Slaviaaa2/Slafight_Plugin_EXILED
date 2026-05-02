@@ -1,4 +1,6 @@
 using Exiled.API.Enums;
+using Exiled.API.Features.Pickups;
+using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs.Scp914;
 using MEC;
 using PlayerRoles;
@@ -395,14 +397,45 @@ public static class Scp914Changes
             Coarse   = Scp914Rule.ToVanilla(ItemType.Jailbird),
             OneToOne = Scp914Rule.ToCItem<CaneOfTheStars>(),
             Fine     = Scp914Rule.Keep,
+            VeryFine = Scp914Rule.ToCItem<SchwarzschildRailbreaker>()
+        });
+        
+        Scp914Registry.RegisterCItem<SchwarzschildRailbreaker>(new()
+        {
+            Rough    = Scp914Rule.ToCItem<SchwarzschildQuasar>(),
+            Coarse   = Scp914Rule.ToCItem<GunGoCRailgunFull>(),
+            OneToOne = Scp914Rule.Keep,
+            Fine     = Scp914Rule.Keep,
             VeryFine = Scp914Rule.Custom(ctx =>
             {
-                OmegaWarhead.StartProtocol();
-                if (ctx.IsInventory)
-                    ctx.Owner!.RemoveItem(ctx.Item!, true);
-                else
-                    ctx.Pickup?.Destroy();
-            })
+                FullyRemoveItem(ctx);
+                for (int i = 0; i < 5; i++)
+                {
+                    if (Pickup.CreateAndSpawn(ItemType.GrenadeHE, ctx.OutputPosition) is GrenadePickup grenade)
+                    {
+                        grenade.Explode();
+                    }
+                }
+            }),
+        });
+
+        Scp914Registry.RegisterCItem<GunScp7381>(new()
+        {
+            Rough    = Scp914Rule.Destroy,
+            Coarse   = Scp914Rule.Destroy,
+            OneToOne = Scp914Rule.Keep,
+            Fine     = Scp914Rule.ToCItem<GunGoCRailgunFull>(),
+            VeryFine = Scp914Rule.Custom(ctx =>
+            {
+                FullyRemoveItem(ctx);
+                for (int i = 0; i < 5; i++)
+                {
+                    if (Pickup.CreateAndSpawn(ItemType.GrenadeHE, ctx.OutputPosition) is GrenadePickup grenade)
+                    {
+                        grenade.Explode();
+                    }
+                }
+            }),
         });
     }
 
@@ -494,6 +527,14 @@ public static class Scp914Changes
         {
             Scp914Dispatcher.ApplyInventory(vanillaRule, ev);
         }
+    }
+
+    private static void FullyRemoveItem(Scp914Context ctx)
+    {
+        if (ctx.IsInventory)
+            ctx.Owner!.RemoveItem(ctx.Item!, true);
+        else
+            ctx.Pickup?.Destroy();
     }
 
     // ==== プレイヤー本体 (VeryFine で稀にゾンビ化) ====

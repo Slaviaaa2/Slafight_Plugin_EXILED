@@ -233,6 +233,7 @@
         <Compile Include="Changes\Scp1509Handler.cs" />
         <Compile Include="Changes\Scp914Changes.cs" />
         <Compile Include="Commands\DevTools\AbilityUniversal.cs" />
+        <Compile Include="Commands\DevTools\ActivateGenerator.cs" />
         <Compile Include="Commands\DevTools\AddQueue.cs" />
         <Compile Include="Commands\DevTools\DebugStart.cs" />
         <Compile Include="Commands\DevTools\GetQueue.cs" />
@@ -330,6 +331,7 @@
         <Compile Include="CustomRoles\Fifthist\FifthistConvert.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistGuidance.cs" />
         <Compile Include="CustomRoles\Fifthist\FifthistMarionetteRole.cs" />
+        <Compile Include="CustomRoles\Fifthist\Scp3125Role.cs" />
         <Compile Include="CustomRoles\FoundationForces\HdMarshal.cs" />
         <Compile Include="CustomRoles\FoundationForces\NtfGeneral.cs" />
         <Compile Include="CustomRoles\FoundationForces\Sculpture.cs" />
@@ -367,7 +369,6 @@
         <Compile Include="CustomRoles\SCPs\Scp106Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp173Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp3005Role.cs" />
-        <Compile Include="CustomRoles\SCPs\Scp3125Role.cs" />
         <Compile Include="CustomRoles\SCPs\Scp999Role.cs" />
         <Compile Include="CustomRoles\SCPs\ZombifiedRole.cs" />
         <Compile Include="Extensions\AbilityResetUtil.cs" />
@@ -392,6 +393,7 @@
         <Compile Include="MainHandlers\EventHandler.cs" />
         <Compile Include="MainHandlers\FirstRolesHandler.cs" />
         <Compile Include="MainHandlers\LabApiHandler.cs" />
+        <Compile Include="MainHandlers\NewEventHandler.cs" />
         <Compile Include="MainHandlers\RPNameSetter.cs" />
         <Compile Include="MainHandlers\ServerSpecificsHandler.cs" />
         <Compile Include="MainHandlers\SpawningHandler.cs" />

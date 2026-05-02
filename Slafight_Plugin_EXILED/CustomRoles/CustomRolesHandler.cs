@@ -13,6 +13,7 @@ using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Hints;
+using Slafight_Plugin_EXILED.MainHandlers;
 using Slafight_Plugin_EXILED.SpecialEvents;
 
 namespace Slafight_Plugin_EXILED.CustomRoles;
@@ -191,6 +192,7 @@ public class CustomRolesHandler : IBootstrapHandler
         }
         
         Exiled.API.Features.Cassie.MessageTranslated("SCP-079 has been terminated by Central Autonomic Service System for Internal Emergencies.", "<color=red>SCP-079</color>は<color=yellow>C.A.S.S.I.E</color>により終了されました。");
+        NewEventHandler.RecoverControl(FacilityControlRecoverType.DisableTesla);
     }
     
     private static bool CheckAraorunKill(List<Player> players)
@@ -293,6 +295,7 @@ public class CustomRolesHandler : IBootstrapHandler
         ev.Player!.UniqueRole = null;
         ev.Player.CustomInfo = null;
         ev.Player.Scale = new Vector3(1f, 1f, 1f);
+        ev.Player.IsSpectatable = true;
         ev.Player.IsGodModeEnabled = false;
         ev.Player.IsNoclipPermitted = false;
         ev.Player.IsBypassModeEnabled = false;

@@ -40,14 +40,15 @@ public class AraOrun : CRole
         player.ClearInventory();
             
         player.SetCustomInfo("Ara Orun");
-        Timing.CallDelayed(0.05f, () =>
+        Timing.CallDelayed(1f, () =>
         {
             if (player.Role is Scp079Role scp079Role)
             {
                 scp079Role.Level = 5;
-                scp079Role.Energy = scp079Role.MaxEnergy;
+                scp079Role.MaxEnergy = 200f;
+                scp079Role.Energy = 200f;
             }
-            player.ShowHint($"<size=24><color={CTeam.FoundationForces.GetTeamColor()}>アラ・オルン</color>\nわーくいんぷろぐれすだにゃ",10f);
+            player.ShowHint($"<size=24><color={CTeam.FoundationForces.GetTeamColor()}>アラ・オルン</color>\nW.I.P",10f);
         });
     }
 

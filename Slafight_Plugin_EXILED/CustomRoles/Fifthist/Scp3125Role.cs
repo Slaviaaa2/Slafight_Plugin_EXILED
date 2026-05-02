@@ -4,7 +4,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
-using Exiled.Events.EventArgs.Scp0492;
 using MEC;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.Abilities;
@@ -13,9 +12,10 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.CustomItems.SlafightApiItems;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.MainHandlers;
+using Slafight_Plugin_EXILED.ProximityChat;
 using UnityEngine;
 
-namespace Slafight_Plugin_EXILED.CustomRoles.SCPs;
+namespace Slafight_Plugin_EXILED.CustomRoles.Fifthist;
 
 public class Scp3125Role : CRole
 {
@@ -54,11 +54,20 @@ public class Scp3125Role : CRole
         player.AddAbility<MemeWaveAbility>();
 
         // Timing.RunCoroutine(Scp3005Coroutine(player));
-        Timing.CallDelayed(0.05f, () => player.ShowHint(
+        Timing.CallDelayed(0.1f, () => player.ShowHint(
             $"<size=24><color={CTeam.Fifthists.GetTeamColor()}>SCP-3125</color>\nW.I.P",
             10));
         Timing.CallDelayed(3f, () =>
         {
+            if (!Handler.CanUsePlayers.Contains(player))
+            {
+                Handler.CanUsePlayers.Add(player);
+            }
+
+            if (!Handler.ActivatedPlayers.Contains(player))
+            {
+                Handler.ActivatedPlayers.Add(player);
+            }
             Timing.RunCoroutine(Scp3125HintSyncCoroutine(player));
         });
     }

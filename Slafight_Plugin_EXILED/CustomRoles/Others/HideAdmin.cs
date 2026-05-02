@@ -26,7 +26,7 @@ public class HideAdmin : CRole
 
         Timing.CallDelayed(0.05f, () =>
         {
-            player.SetCustomInfo("<color=black>THE ADMINISTRATOR</color>");
+            player.SetCustomInfo("<color=#FF1493>THE ADMINISTRATOR</color>");
             player.MaxHealth = maxHealth;
             player.Health = maxHealth;
             player.EnableEffect(EffectType.DamageReduction, 255);
@@ -34,7 +34,7 @@ public class HideAdmin : CRole
             player.IsNoclipPermitted = true;
 
             player.ShowHint(
-                "<size=24><color=black><b>THE ADMINISTRATOR</b></color>\nhaha",
+                "<size=24><color=#FF1493><b>THE ADMINISTRATOR</b></color>\nhaha",
                 10);
 
             CItem.Get<CloakGenerator>()?.Give(player);

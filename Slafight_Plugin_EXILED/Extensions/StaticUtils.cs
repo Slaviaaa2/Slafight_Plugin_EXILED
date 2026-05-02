@@ -9,6 +9,7 @@ using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
 using JetBrains.Annotations;
 using MEC;
+using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Enums;
 using UnityEngine;
 using Random = System.Random;
@@ -217,10 +218,18 @@ public static class StaticUtils
         return player.GetCustomRole() is CRoleTypeId.CandyWarrierApril or CRoleTypeId.CandyWarrierHalloween;
     }
 
-    public static uint GetNetId([CanBeNull] this Player? player)
+    public static uint GetNetId(this Player? player)
     {
         if (player == null || player.ReferenceHub == null) return 0;
         return player.NetId;
+    }
+
+    public static bool IsVanillaOrCustom(this Player? player, RoleTypeId roleTypeId, CRoleTypeId cRoleTypeId)
+    {
+        if (player == null) return false;
+        if (player.GetCustomRole() == CRoleTypeId.None && player.Role.Type == roleTypeId) return true;
+        if (player.GetCustomRole() == cRoleTypeId) return true;
+        return false;
     }
 
     // ───────────────────────────────
