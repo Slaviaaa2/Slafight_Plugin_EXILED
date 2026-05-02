@@ -29,8 +29,9 @@ public class Scp035Role : CRole
                                                           "あなたの最終的な目標は<color=red>施設の破壊</color>です。\n" +
                                                           "精神が安定している時は比較的人間達に友好的に接し、そうでない時は\n" +
                                                           "「触手」を用いて邪魔をさせないようにし、弾頭へと向かいましょう。\n" +
-                                                          "<color=yellow>※通常時は博士、発狂時はチュートリアルの見た目になります。" +
-                                                          "※RP性がとても高いため、不慣れな場合は取り合えず暴れまくることを推奨します。頑張って！</color></size>";
+                                                          "<color=yellow>※通常時は博士、発狂時はチュートリアルの見た目になります。\n" +
+                                                          "※RP性がとても高いため、不慣れな場合は取り合えず\n" +
+                                                          "暴れまくることを推奨します。頑張って！</color></size>";
     protected override float DescriptionDuration { get; set; } = 15f;
     protected override bool DescriptionShowRoleName { get; set; } = false;
     protected override CRoleTypeId CRoleTypeId { get; set; } = CRoleTypeId.Scp035;

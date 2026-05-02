@@ -347,7 +347,7 @@ public abstract class CRole
             {
                 hint = new Hint()
                 {
-                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 780,
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 770,
                     Text = $"<size=24><color={Team.GetTeamColor()}>{RoleName}</color>\n{Description}</size>", Id = "CRoleSpawnedHint"
                 };
             }
@@ -355,7 +355,7 @@ public abstract class CRole
             {
                 hint = new Hint()
                 {
-                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 780,
+                    Alignment = HintAlignment.Center, XCoordinate = 0, YCoordinate = 770,
                     Text = $"<size=24>{Description}</size>", Id = "CRoleSpawnedHint"
                 };
             }
