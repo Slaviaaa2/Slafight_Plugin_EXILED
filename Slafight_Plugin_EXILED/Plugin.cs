@@ -191,6 +191,8 @@ public class Plugin : Plugin<Config>
         Scp513.Unregister();
         ModerationEventsHandler.Unregister();
         OmegaWarhead.Shutdown();
+        SnakeMediaApi.ClearCache();
+        AudioClipApi.ClearCache();
         
         AutoHandlerBootstrapRegister.Unregister();
         ServerSpecificsHandler.Unregister();

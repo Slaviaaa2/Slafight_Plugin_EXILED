@@ -223,9 +223,13 @@ public sealed class SnakeMediaPlayback : IDisposable
 /// </summary>
 public static class SnakeMediaApi
 {
+    // Keep a small reuse window without allowing decoded frame/PCM arrays to grow without bound
+    // when different sources or render options are used over several rounds.
+    private const int MaximumCachedClips = 2;
     private static readonly object CacheLock = new();
     private static readonly Dictionary<string, Task<SnakeMediaClip>> ClipCache =
         new(StringComparer.Ordinal);
+    private static readonly LinkedList<string> CacheRecency = new();
     private static readonly Dictionary<ushort, SnakeMediaPlayback> ActivePlaybacks = new();
 
     public static IReadOnlyCollection<SnakeMediaPlayback> Active =>
@@ -382,6 +386,27 @@ public static class SnakeMediaApi
             playback.Stop(restoreSnake, killCoroutine: true);
     }
 
+    /// <summary>
+    /// Stops all active media and drops every cached load task, including
+    /// completed and faulted tasks. In-flight loads cannot be canceled; once
+    /// this method returns they are no longer reachable through the cache,
+    /// are not inserted again when they complete, and become eligible for GC
+    /// after any remaining worker references are released.
+    /// </summary>
+    /// <returns>The number of cache entries removed.</returns>
+    public static int ClearCache()
+    {
+        StopAll(restoreSnake: false);
+
+        lock (CacheLock)
+        {
+            int removed = ClipCache.Count;
+            ClipCache.Clear();
+            CacheRecency.Clear();
+            return removed;
+        }
+    }
+
     internal static void Remove(SnakeMediaPlayback playback)
     {
         if (ActivePlaybacks.TryGetValue(playback.Serial, out var current) &&
@@ -398,17 +423,35 @@ public static class SnakeMediaApi
         string key = BuildCacheKey(source, image);
         lock (CacheLock)
         {
-            if (ClipCache.TryGetValue(key, out Task<SnakeMediaClip>? existing) &&
-                !existing.IsCanceled &&
-                !existing.IsFaulted)
+            if (ClipCache.TryGetValue(key, out Task<SnakeMediaClip>? existing))
             {
-                return existing;
+                if (!existing.IsCanceled && !existing.IsFaulted)
+                {
+                    TouchCacheKey(key);
+                    return existing;
+                }
+
+                ClipCache.Remove(key);
+                CacheRecency.Remove(key);
             }
 
             Task<SnakeMediaClip> loadTask = Task.Run(() => LoadClip(source, image));
             ClipCache[key] = loadTask;
+            TouchCacheKey(key);
+            while (CacheRecency.Count > MaximumCachedClips)
+            {
+                string oldest = CacheRecency.First!.Value;
+                CacheRecency.RemoveFirst();
+                ClipCache.Remove(oldest);
+            }
             return loadTask;
         }
+    }
+
+    private static void TouchCacheKey(string key)
+    {
+        CacheRecency.Remove(key);
+        CacheRecency.AddLast(key);
     }
 
     private static SnakeMediaClip LoadClip(

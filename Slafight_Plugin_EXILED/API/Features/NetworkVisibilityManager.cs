@@ -135,6 +135,7 @@ public static class NetworkVisibilityManager
 
     private static readonly Dictionary<uint, NetworkShowState>   _states         = new();
     private static readonly Dictionary<uint, NetworkIdentity>    _identityCache  = new();
+    private static bool _registered;
 
     // =========================================================
     // Show 拒否フック
@@ -166,18 +167,27 @@ public static class NetworkVisibilityManager
 
     public static void Register()
     {
+        if (_registered)
+            return;
+
         Server.RoundStarted            += OnRoundStarted;
         Exiled.Events.Handlers.Player.Verified                += OnVerified;
         Exiled.Events.Handlers.Player.Spawned                 += OnSpawned;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += OnChangingSpectatedPlayer;
+        _registered = true;
     }
 
     public static void Unregister()
     {
-        Server.RoundStarted            -= OnRoundStarted;
-        Exiled.Events.Handlers.Player.Verified                -= OnVerified;
-        Exiled.Events.Handlers.Player.Spawned                 -= OnSpawned;
-        Exiled.Events.Handlers.Player.ChangingSpectatedPlayer -= OnChangingSpectatedPlayer;
+        if (_registered)
+        {
+            Server.RoundStarted            -= OnRoundStarted;
+            Exiled.Events.Handlers.Player.Verified                -= OnVerified;
+            Exiled.Events.Handlers.Player.Spawned                 -= OnSpawned;
+            Exiled.Events.Handlers.Player.ChangingSpectatedPlayer -= OnChangingSpectatedPlayer;
+            _registered = false;
+        }
+
         ShowVeto = null;
         _states.Clear();
         _identityCache.Clear();

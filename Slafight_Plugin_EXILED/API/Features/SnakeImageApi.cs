@@ -459,7 +459,7 @@ public static class SnakeImageApi
         if (!_eventsRegistered)
             return;
 
-        SnakeMediaApi.StopAll(restoreSnake: false);
+        SnakeMediaApi.ClearCache();
         Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
         SnakePlayer.SnakeMove -= OnSnakeMove;
         _eventsRegistered = false;
@@ -872,7 +872,7 @@ public static class SnakeImageApi
 
     private static void OnWaitingForPlayers()
     {
-        SnakeMediaApi.StopAll(restoreSnake: false);
+        SnakeMediaApi.ClearCache();
         StopAll(restoreSnake: false);
     }
 
