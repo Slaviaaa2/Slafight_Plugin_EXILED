@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CentralAuth;
 using Exiled.API.Features;
 using MEC;
 using UnityEngine;
@@ -751,7 +752,7 @@ public static class SpeakerApi
         {
             try
             {
-                if (target?.connectionToClient == null)
+                if (!IsReadyClient(target))
                     continue;
 
                 var validPlayers = playback.Speaker.ValidPlayers;
@@ -822,7 +823,7 @@ public static class SpeakerApi
             speaker.MaxDistance = maxDistance;
             speaker.MinDistance = minDistance;
             speaker.Volume = volume;
-            speaker.ValidPlayers = null;
+            speaker.ValidPlayers = IsReadyAudioClient;
 
             // Force SyncVar values on the base NetworkBehaviour so they are synchronized to clients during Spawn
             speaker.Base.NetworkControllerId = speaker.ControllerId;
@@ -884,7 +885,10 @@ public static class SpeakerApi
 
         if (listeners == null)
         {
-            speaker.ValidPlayers = null;
+            // LabAPI's null predicate broadcasts to every non-unverified hub, including the
+            // dedicated-server hub and dummy/NPC hubs. One invalid connection then terminates the
+            // AudioTransmitter coroutine, silencing this speaker for every real client.
+            speaker.ValidPlayers = IsReadyAudioClient;
             var identity = speaker.Base.netIdentity;
             if (identity.GetShowState() != null)
             {
@@ -898,6 +902,9 @@ public static class SpeakerApi
 
         speaker.ValidPlayers = labPlayer =>
         {
+            if (!IsReadyAudioClient(labPlayer))
+                return false;
+
             var player = labPlayer == null ? null : Player.Get(labPlayer.ReferenceHub);
             return player != null && MatchesListener(listeners, player);
         };
@@ -906,6 +913,24 @@ public static class SpeakerApi
         {
             VisibilityPredicate = player => MatchesListener(listeners, player),
         });
+    }
+
+    private static bool IsReadyAudioClient(LabApi.Features.Wrappers.Player? player)
+        => player != null && IsReadyClient(player.ReferenceHub);
+
+    private static bool IsReadyClient(ReferenceHub? hub)
+    {
+        try
+        {
+            return hub != null &&
+                   hub.Mode == ClientInstanceMode.ReadyClient &&
+                   hub.netId != 0 &&
+                   hub.connectionToClient is { isReady: true };
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static bool MatchesListener(Predicate<Player> listeners, Player player)
