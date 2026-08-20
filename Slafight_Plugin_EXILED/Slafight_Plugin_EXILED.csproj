@@ -36,6 +36,14 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 
+    <!--
+        SL_References は通常環境変数で与えられるが、未設定の環境でも
+        兄弟リポジトリとしてチェックアウトされた SL_References を参照できるようにする。
+    -->
+    <PropertyGroup Condition=" '$(SL_References)' == '' ">
+        <SL_References Condition="Exists('$(MSBuildProjectDirectory)\..\..\SL_References\mscorlib.dll')">$(MSBuildProjectDirectory)\..\..\SL_References</SL_References>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="ExMod.Exiled" Version="9.14.2" />
         <PackageReference Include="Lib.Harmony" Version="2.2.2" />
@@ -127,10 +135,21 @@
         <None Include="App.config" />
     </ItemGroup>
 
-    <Target Name="CopyToExiledPlugins" AfterTargets="Build">
+    <!--
+        %APPDATA% は Windows のみ。Linux では Mono の SpecialFolder.ApplicationData と
+        同じ場所（XDG_CONFIG_HOME、既定は $HOME/.config）に EXILED のプラグインツリーがある。
+        どちらも解決できない環境ではコピー先が無いのでターゲットごとスキップする。
+    -->
+    <PropertyGroup>
+        <ExiledAppDataDir Condition="'$(APPDATA)' != ''">$(APPDATA)</ExiledAppDataDir>
+        <ExiledAppDataDir Condition="'$(ExiledAppDataDir)' == '' And '$(XDG_CONFIG_HOME)' != ''">$(XDG_CONFIG_HOME)</ExiledAppDataDir>
+        <ExiledAppDataDir Condition="'$(ExiledAppDataDir)' == '' And '$(HOME)' != ''">$(HOME)/.config</ExiledAppDataDir>
+    </PropertyGroup>
+
+    <Target Name="CopyToExiledPlugins" AfterTargets="Build" Condition="'$(ExiledAppDataDir)' != ''">
         <PropertyGroup>
-            <ExiledPluginsDir>$(APPDATA)\EXILED\Plugins\7777</ExiledPluginsDir>
-            <ExiledDependenciesDir>$(APPDATA)\EXILED\Plugins\dependencies</ExiledDependenciesDir>
+            <ExiledPluginsDir>$(ExiledAppDataDir)\EXILED\Plugins\7777</ExiledPluginsDir>
+            <ExiledDependenciesDir>$(ExiledAppDataDir)\EXILED\Plugins\dependencies</ExiledDependenciesDir>
         </PropertyGroup>
         <ItemGroup>
             <ExiledDependencyFiles Include="$(OutputPath)Microsoft.Bcl.AsyncInterfaces.dll" Condition="Exists('$(OutputPath)Microsoft.Bcl.AsyncInterfaces.dll')" />
@@ -148,6 +167,27 @@
         <MakeDir Directories="$(ExiledPluginsDir);$(ExiledDependenciesDir)" />
         <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ExiledPluginsDir)" SkipUnchangedFiles="false" />
         <Copy SourceFiles="@(ExiledDependencyFiles)" DestinationFolder="$(ExiledDependenciesDir)" SkipUnchangedFiles="false" />
+    </Target>
+
+    <!--
+        Linux では net48 のターゲットパックが Microsoft.NETFramework.ReferenceAssemblies
+        パッケージとして暗黙に導入される。その mscorlib は上記の Reference:mscorlib と
+        競合するが、パッケージ側にファイルバージョンが無いため競合解決で勝者が決まらず、
+        パッケージ側が採用されてしまう（netstandard は 2.1 > 2.0 で解決できるため問題ない）。
+        採用された net48 参照アセンブリの mscorlib には
+        RuntimeFeature.DefaultImplementationsOfInterfaces が存在しないため、
+        インターフェースの静的メンバー実装が CS8701 になる。
+        サーバー実体（Unity Mono）と同じ mscorlib を明示的に採用し直して Windows と揃える。
+    -->
+    <Target Name="PreferServerMscorlib" AfterTargets="ResolveAssemblyReferences"
+            Condition="Exists('$(SL_References)\mscorlib.dll')">
+        <ItemGroup>
+            <ReferencePath Remove="@(ReferencePath->WithMetadataValue('Filename', 'mscorlib'))" />
+            <ReferencePath Include="$(SL_References)\mscorlib.dll">
+                <Private>false</Private>
+                <ReferenceSourceTarget>ResolveAssemblyReference</ReferenceSourceTarget>
+            </ReferencePath>
+        </ItemGroup>
     </Target>
 
 </Project>
