@@ -16,8 +16,6 @@ public class Config : IConfig
     [Description("サーバーが満員になった時に待機時間を飛ばしてラウンドを自動開始する処理を無効化します")]
     public bool DisableFullServerRoundStart { get; set; } = true;
 
-    [Description("サーバーのシーズンを設定します。0=通常, 1=ハロウィン, 2=クリスマス, 3=エイプリルフール, 4=第五祭, 5=夏")]
-    public int Season { get; set; } = 0;
 
     [Description("ベータモードを有効にするかどうか")]
     public bool IsBeta { get; set; } = false;
@@ -35,14 +33,8 @@ public class Config : IConfig
     [Description("ProximityChat のスピーカー音量倍率。1.0 が通常音量、2.0 で約2倍です")]
     public float ProximityChatVolume { get; set; } = 2f;
 
-    [Description("SpecialEvent（ゲーム中に低確率で発生するイベント）の有効/無効を設定します")]
-    public bool EventAllowed { get; set; } = true;
 
-    [Description("Omega Warhead が爆発するまでの時間（秒）")]
-    public float OwBoomTime { get; set; } = 160f;
 
-    [Description("Delta Warhead が爆発するまでの時間（秒）")]
-    public float DwBoomTime { get; set; } = 100f;
 
     [Description("Discord Bot連携(bot.py)のFlask APIエンドポイント。通常は変更不要")]
     public string DiscordBotApiUrl { get; set; } = "http://localhost:5000";
