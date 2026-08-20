@@ -124,6 +124,12 @@ public abstract class CustomRole : IPlayerOwn
     public virtual IReadOnlyList<ItemType> Items => [];
 
     /// <summary>
+    /// 支給するカスタムアイテムの型です。同じ型を複数並べれば、その個数だけ新規生成します。
+    /// 文字列キーや ID ではなく <c>typeof(MyItem)</c> で指定してください。
+    /// </summary>
+    public virtual IReadOnlyList<Type> CustomItems => [];
+
+    /// <summary>
     /// 支給する予備弾薬です。
     /// </summary>
     public virtual IReadOnlyDictionary<AmmoType, ushort> Ammo => EmptyAmmo;
@@ -329,7 +335,7 @@ public abstract class CustomRole : IPlayerOwn
         // 位置を指定するならバニラのスポーン地点も要らない。
         RoleSpawnFlags flags = RoleSpawnFlags.None;
 
-        if (Items.Count == 0)
+        if (Items.Count == 0 && CustomItems.Count == 0)
             flags |= RoleSpawnFlags.AssignInventory;
 
         if (!SpawnPosition.HasValue)
@@ -476,13 +482,18 @@ public abstract class CustomRole : IPlayerOwn
             Player.Health = maxHealth;
         }
 
-        if (Items.Count > 0)
+        if (Items.Count > 0 || CustomItems.Count > 0)
         {
             Player.ClearInventory();
 
             foreach (ItemType item in Items)
             {
                 Player.AddItem(item);
+            }
+
+            foreach (Type itemType in CustomItems)
+            {
+                CustomItem.Give(itemType, Player);
             }
         }
 
