@@ -1,0 +1,249 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Exiled.API.Features;
+using Slafight_Plugin_EXILED.Extensions;
+
+using ServerHandlers = Exiled.Events.Handlers.Server;
+
+namespace Slafight_Plugin_EXILED.API.Core.Features;
+
+/// <summary>
+/// そのラウンド 1 回だけ走る特殊ルールです (旧 <c>SpecialEvent</c>)。
+///
+/// 打ち切り判定は基底が持ちます。コルーチンの中で <see cref="IsCanceled"/> を見るか、
+/// <see cref="Scope"/> に載せておけばラウンド終了で勝手に止まります。
+/// <b>旧実装のように各イベントが世代カウンタ (EventPID) を自前で持つ必要はありません。</b>
+/// </summary>
+/// <example>
+/// <code>
+/// public sealed class ChaosRaid : GameMode
+/// {
+///     public override string Name => "Chaos Insurgency Raid";
+///
+///     public override int MinimumPlayers => 8;
+///
+///     protected override void OnStarted()
+///     {
+///         new ChaosRaidSet().Spawn();
+///
+///         Scope.Delay(120f, () => Cassie.Message("evacuate"));
+///     }
+/// }
+/// </code>
+/// </example>
+public abstract class GameMode
+{
+    private static bool hooked;
+
+    /// <summary>
+    /// 現在走っているゲームモードです。無ければ null。
+    /// </summary>
+    public static GameMode Current { get; private set; }
+
+    /// <summary>
+    /// 表示名です。
+    /// </summary>
+    public abstract string Name { get; }
+
+    /// <summary>
+    /// 説明です。ロビー表示などに使います。
+    /// </summary>
+    public virtual string Description => string.Empty;
+
+    /// <summary>
+    /// 抽選対象になる最小人数です。
+    /// </summary>
+    public virtual int MinimumPlayers => 0;
+
+    /// <summary>
+    /// 抽選の重みです。0 なら抽選に出ません (手動起動のみ)。
+    /// </summary>
+    public virtual int Weight => 1;
+
+    /// <summary>
+    /// このモードが今のサーバー状態で選べるかどうかです。
+    /// 季節限定などの条件をここに書きます。
+    /// </summary>
+    public virtual bool IsAvailable => Player.List.Count(player => player.IsSafePlayer()) >= MinimumPlayers;
+
+    /// <summary>
+    /// このモードが動いている間、核を使えるかどうかです。
+    /// </summary>
+    public virtual bool AllowsWarhead => true;
+
+    /// <summary>
+    /// ラウンド開始時の収容違反アナウンスと照明の明滅を出すかどうかです。
+    /// 自前の導入演出を持つモードは false にします。
+    /// </summary>
+    public virtual bool AllowsBreachAnnouncement => true;
+
+    /// <summary>
+    /// ラウンド開始直後にゲート A / B を一時封鎖するかどうかです。
+    /// 地上へ出ることが前提のモードは false にします。
+    /// </summary>
+    public virtual bool AllowsGateLockdown => true;
+
+    /// <summary>
+    /// このモードが動いている間、勝利表示を差し替える文言です。null なら陣営のものを使います。
+    /// </summary>
+    /// <remarks>
+    /// 同じ陣営でもモードによって名乗りが変わることがあります
+    /// (「戦士達の勝利」を、季節ごとに「雪の戦士達の勝利」などへ)。
+    /// 陣営側に季節を持たせるとモードの都合が陣営に漏れるので、名乗るのはモードの側です。
+    /// </remarks>
+    public virtual string VictoryText(CustomTeam winner) => null;
+
+    /// <summary>
+    /// 起動済みで、まだ打ち切られていないかどうか。
+    /// </summary>
+    public bool IsRunning => ReferenceEquals(Current, this);
+
+    /// <summary>
+    /// このモードがもう有効でないかどうか。
+    /// 遅延処理やコルーチンの先頭でこれを見て打ち切ってください。
+    ///
+    /// 別のモードに差し替わった場合と、ラウンドが終わった場合の両方で true になります。
+    /// </summary>
+    public bool IsCanceled => !IsRunning;
+
+    /// <summary>
+    /// このモードに紐づくコルーチン置き場です。ラウンド終了で止まります。
+    /// </summary>
+    protected RoundScope Scope => RoundScope.Current;
+
+    /// <summary>
+    /// 宣言されているゲームモードをすべて返します。呼ぶたびに新しいインスタンスです。
+    /// </summary>
+    public static IReadOnlyList<GameMode> All()
+    {
+        List<GameMode> modes = [];
+
+        foreach (Type type in TypeParser.FindTypes<GameMode>())
+        {
+            try
+            {
+                modes.Add((GameMode)Activator.CreateInstance(type));
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"[Slafight] ゲームモード {type.FullName} を生成できませんでした: {exception}");
+            }
+        }
+
+        return modes;
+    }
+
+    /// <summary>
+    /// 起動可能なモードから重み付き抽選で 1 つ選びます。候補が無ければ null。
+    /// </summary>
+    public static GameMode Roll(Random random = null)
+    {
+        List<GameMode> candidates = All()
+            .Where(mode => mode.Weight > 0 && mode.IsAvailable)
+            .ToList();
+
+        if (candidates.Count == 0) return null;
+
+        int total = candidates.Sum(mode => mode.Weight);
+        int roll = (random ?? new Random()).Next(total);
+
+        foreach (GameMode mode in candidates)
+        {
+            roll -= mode.Weight;
+
+            if (roll < 0) return mode;
+        }
+
+        return candidates[candidates.Count - 1];
+    }
+
+    /// <summary>
+    /// 現在のモードを打ち切ります。
+    /// </summary>
+    public static void StopCurrent()
+    {
+        if (Current is not { } mode) return;
+
+        Current = null;
+
+        try
+        {
+            mode.OnStopped();
+        }
+        catch (Exception exception)
+        {
+            Log.Error($"[Slafight] {mode.GetType().Name} の OnStopped で例外が発生しました: {exception}");
+        }
+    }
+
+    /// <summary>
+    /// 現在のモードが指定アセンブリ由来なら停止します。
+    /// </summary>
+    public static void StopAssembly(Assembly assembly)
+    {
+        if (assembly is not null && Current?.GetType().Assembly == assembly)
+            StopCurrent();
+    }
+
+    /// <summary>
+    /// 現在のモードを停止し、静的イベント購読を解除します。
+    /// </summary>
+    public static void Shutdown()
+    {
+        StopCurrent();
+
+        if (!hooked) return;
+
+        ServerHandlers.RestartingRound -= StopCurrent;
+        hooked = false;
+    }
+
+    /// <summary>
+    /// このモードを起動します。走っているモードがあれば先に打ち切ります。
+    /// </summary>
+    public bool Start()
+    {
+        StopCurrent();
+
+        Current = this;
+        Hook();
+
+        try
+        {
+            OnStarted();
+
+            return true;
+        }
+        catch (Exception exception)
+        {
+            Log.Error($"[Slafight] {GetType().Name} の起動に失敗しました: {exception}");
+            StopCurrent();
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 起動時に呼ばれます。役職配布や演出をここで行います。
+    /// </summary>
+    protected abstract void OnStarted();
+
+    /// <summary>
+    /// 打ち切り時・ラウンド終了時に呼ばれます。
+    /// <see cref="Scope"/> に載せたものは自動で止まるので、ここに書く必要はありません。
+    /// </summary>
+    protected virtual void OnStopped()
+    {
+    }
+
+    private static void Hook()
+    {
+        if (hooked) return;
+
+        hooked = true;
+
+        ServerHandlers.RestartingRound += StopCurrent;
+    }
+}
