@@ -624,22 +624,114 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
     }
 
     /// <summary>
-    /// 能力欄の中身です。現在は常に空を返します。
+    /// 能力欄の中身です。
     /// </summary>
     /// <remarks>
-    /// 旧 <c>AbilityBase</c> / <c>AbilityManager</c> / <c>AbilityLoadout</c> を土台に
-    /// 組み立てていましたが、それらは新 API への移行で削除されました。
-    ///
-    /// <b>HUD の見た目には手を入れていません。</b> 表示枠 (<c>HudConstId.PlayerHUD_Ability</c>) も
-    /// その座標・フォントサイズ・同期速度も、他の欄の文言もそのままです。
-    /// ここは参照を外して空文字を返すだけにとどめてあります。
-    ///
-    /// 能力を新 API (<c>API.Core.Features.AbilityBase</c>) で作り直すときに、
-    /// この 1 メソッドだけを埋め直してください。
+    /// 表示の書式は移行前のままです。読む先だけが
+    /// 旧 <c>AbilityManager</c> / <c>AbilityLoadout</c> / <c>AbilityLocalization</c> から
+    /// <see cref="AbilityBase"/> に変わりました。枠順は付与順そのもので、
+    /// 呼び名は配った側が <c>Rename</c> したものが出ます。
     /// </remarks>
     private static ServerSpecificUserSettings.KeybindHintContent BuildAbilityHud(Player target)
     {
-        return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
+        if (!IsPlayerValid(target))
+            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
+
+        if (!target.IsAlive)
+            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
+
+        var entries = AbilityBase.Of(target);
+        if (entries.Count == 0)
+            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
+
+        var activeEntryIndex = AbilityBase.ActiveIndexOf(target);
+        var active = entries[activeEntryIndex];
+        var abilityName = active.DisplayName;
+
+        var statusText = FormatAbilityState(active, out var usesText);
+        var countText = $"{activeEntryIndex + 1}/{entries.Count}";
+        var parameters = new List<HintParameter>
+        {
+            new SSKeybindHintParameter(ServerSpecifics.AbilityUseKeybindSettingId)
+        };
+        var controlParts = new List<string> { "<color=#aaffaa>{0}</color>:使用" };
+        var parameterIndex = 1;
+
+        if (entries.Count > 1)
+        {
+            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilitySwitchKeybindSettingId));
+            controlParts.Add($"<color=#aaffaa>{{{parameterIndex++}}}</color>:切替");
+        }
+        else
+        {
+            controlParts.Add("所持:1");
+        }
+
+        var controlText = string.Join(" / ", controlParts);
+
+        var slotSummary = BuildAbilitySlotSummary(entries, activeEntryIndex);
+
+        return new ServerSpecificUserSettings.KeybindHintContent(
+            $"<size=22><color=#ffcc00>Ability {countText}</color> {abilityName} {statusText} Uses:{usesText}</size>\n" +
+            $"<size=18>{controlText} | {slotSummary}</size>",
+            parameters.ToArray());
+    }
+
+    private static string BuildAbilitySlotSummary(
+        IReadOnlyList<AbilityBase> entries,
+        int activeEntryIndex)
+    {
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            if (i > 0)
+                sb.Append(" | ");
+
+            var ability = entries[i];
+            var marker = i == activeEntryIndex
+                ? $"<color=#ffcc00>*{i + 1}</color>"
+                : (i + 1).ToString();
+            var name = ShortenAbilityName(ability.DisplayName, 8);
+
+            sb.Append(marker)
+                .Append(':')
+                .Append(name)
+                .Append(' ')
+                .Append(FormatCompactAbilityState(ability));
+        }
+
+        return sb.ToString();
+    }
+
+    private static string FormatAbilityState(AbilityBase ability, out string usesText)
+    {
+        usesText = ability.MaxUses < 0 ? "∞" : Math.Max(0, ability.RemainingUses).ToString();
+
+        if (ability.MaxUses >= 0 && ability.RemainingUses <= 0)
+            return "<color=#ff6666>DONE</color>";
+
+        return ability.IsReady
+            ? "<color=#38ff6b>READY</color>"
+            : $"<color=#ffd966>CD {Mathf.CeilToInt(ability.RemainingCooldown)}s</color>";
+    }
+
+    private static string FormatCompactAbilityState(AbilityBase ability)
+    {
+        if (ability.MaxUses >= 0 && ability.RemainingUses <= 0)
+            return "<color=#ff6666>0</color>";
+
+        return ability.IsReady
+            ? "<color=#38ff6b>OK</color>"
+            : $"<color=#ffd966>{Mathf.CeilToInt(ability.RemainingCooldown)}s</color>";
+    }
+
+    private static string ShortenAbilityName(string name, int maxLength)
+    {
+        if (string.IsNullOrEmpty(name) || name.Length <= maxLength)
+            return name;
+
+        return name.Substring(0, Math.Max(1, maxLength - 3)) + "...";
     }
 
     // =========================================================

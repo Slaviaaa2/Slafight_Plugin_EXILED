@@ -60,6 +60,9 @@ public sealed class SampleRole : CustomRole
 
     protected override void OnSpawned()
     {
+        // 能力は型で配ります。同じ能力を別の呼び名で使わせたいなら Rename を重ねます。
+        AbilityBase.Give<SampleAbility>(Player);
+
         // Scope に載せたものは、役職が外れた時点・退出・ラウンド再開のいずれでも必ず止まります。
         // コルーチンハンドルを自分で抱えて Dispose で消す、という手当ては要りません。
         Scope.RunLoop(5f, _ =>

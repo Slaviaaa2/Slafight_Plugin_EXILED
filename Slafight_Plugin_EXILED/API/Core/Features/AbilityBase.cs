@@ -39,6 +39,16 @@ public abstract class AbilityBase
 {
     private static readonly Dictionary<uint, List<AbilityBase>> Granted = new Dictionary<uint, List<AbilityBase>>();
 
+    /// <summary>
+    /// プレイヤーごとに、いま選んでいる能力の位置です。
+    /// </summary>
+    /// <remarks>
+    /// 旧実装はこれを <c>AbilityManager.Loadouts</c> という別のマネージャと
+    /// <c>AbilityLoadout</c> という固定 3 枠の器に持たせていました。
+    /// 付与された順がそのまま枠順なので、器も枠数の上限も要りません。
+    /// </remarks>
+    private static readonly Dictionary<uint, int> ActiveIndexes = new Dictionary<uint, int>();
+
     private float readyAt;
 
     private string renamed;
@@ -134,7 +144,11 @@ public abstract class AbilityBase
             Granted[netId] = abilities;
 
             // 寿命は PlayerScope に任せる。独自のイベントフックは増やさない。
-            PlayerScope.Of(player).OnDispose(_ => Granted.Remove(netId));
+            PlayerScope.Of(player).OnDispose(_ =>
+            {
+                Granted.Remove(netId);
+                ActiveIndexes.Remove(netId);
+            });
         }
 
         abilities.Add(ability);
@@ -159,6 +173,67 @@ public abstract class AbilityBase
     /// このプレイヤーが持っている T の能力です。無ければ null。
     /// </summary>
     public static T Get<T>(Player player) where T : AbilityBase => Of(player).OfType<T>().FirstOrDefault();
+
+    /// <summary>
+    /// このプレイヤーがいま選んでいる能力です。1 つも持っていなければ null。
+    /// </summary>
+    public static AbilityBase Active(Player player)
+    {
+        IReadOnlyList<AbilityBase> abilities = Of(player);
+
+        if (abilities.Count == 0) return null;
+
+        return abilities[ActiveIndexOf(player)];
+    }
+
+    /// <summary>
+    /// いま選んでいる位置です。持っている数に収まるよう丸めて返します。
+    /// </summary>
+    public static int ActiveIndexOf(Player player)
+    {
+        IReadOnlyList<AbilityBase> abilities = Of(player);
+
+        if (abilities.Count == 0) return 0;
+
+        if (player is null || !ActiveIndexes.TryGetValue(player.GetNetId(), out int index))
+            return 0;
+
+        // 取り上げられて数が減っている場合があるので、読むたびに丸める。
+        return Mathf.Clamp(index, 0, abilities.Count - 1);
+    }
+
+    /// <summary>
+    /// 選んでいる能力を次に送ります。末尾まで行ったら先頭に戻ります。
+    /// </summary>
+    /// <returns>切り替えたら true。持っている能力が 1 つ以下なら false。</returns>
+    public static bool SelectNext(Player player)
+    {
+        IReadOnlyList<AbilityBase> abilities = Of(player);
+
+        if (abilities.Count <= 1) return false;
+
+        return Select(player, (ActiveIndexOf(player) + 1) % abilities.Count);
+    }
+
+    /// <summary>
+    /// 位置を指定して選び直します。
+    /// </summary>
+    public static bool Select(Player player, int index)
+    {
+        if (player is null) return false;
+
+        IReadOnlyList<AbilityBase> abilities = Of(player);
+
+        if (abilities.Count == 0 || index < 0 || index >= abilities.Count) return false;
+
+        uint netId = player.GetNetId();
+
+        if (netId == 0) return false;
+
+        ActiveIndexes[netId] = index;
+
+        return true;
+    }
 
     /// <summary>
     /// 能力を 1 つ取り上げます。
