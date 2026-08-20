@@ -40,6 +40,11 @@ namespace Slafight_Plugin_EXILED.API.Core.Features;
 public abstract class SpawnSet
 {
     /// <summary>
+    /// <see cref="SpawnFor"/> の間だけ差し替わる対象一覧です。
+    /// </summary>
+    private List<Player> forcedCandidates;
+
+    /// <summary>
     /// 表示名です。
     /// </summary>
     public abstract string Name { get; }
@@ -65,6 +70,49 @@ public abstract class SpawnSet
     /// </summary>
     public abstract IReadOnlyList<SpawnSetRoleDefinition> SpawnRoles { get; }
 
+    // ───────────────────────────────
+    // リスポーンウェーブとして使うときの宣言
+    //
+    // 波を表す中間基底クラスも、波を指す enum も作りません。
+    // 波は SpawnSet の派生クラスそのもので、下の virtual を override して名乗ります。
+    // ラウンド開始時の一括割り当てのように波ではない SpawnSet は、何も override しません。
+    // ───────────────────────────────
+
+    /// <summary>
+    /// この波が属する陣営です。<see cref="RespawnWeight"/> が 0 なら使われません。
+    /// </summary>
+    public virtual Faction RespawnFaction => Faction.Unclassified;
+
+    /// <summary>
+    /// 本隊ではなく増援 (ミニウェーブ) かどうか。
+    /// </summary>
+    public virtual bool IsMiniWave => false;
+
+    /// <summary>
+    /// リスポーン抽選での重みです。
+    /// <b>既定の 0 は「抽選に出ない」= 波ではない、という意味です。</b>
+    /// 波として使いたい SpawnSet だけがここを override します。
+    /// </summary>
+    public virtual int RespawnWeight => 0;
+
+    /// <summary>
+    /// 待機者のうち実際に出す割合です。1 なら全員。
+    /// </summary>
+    public virtual float RespawnRatio => 1f;
+
+    /// <summary>
+    /// 出撃時に流す曲のパスです。null なら無音。
+    /// </summary>
+    public virtual string Theme => null;
+
+    /// <summary>
+    /// 出撃時のアナウンスです。既定は無し。
+    /// </summary>
+    /// <remarks>
+    /// 旧実装はこれを 24 分岐の switch 2 つで引いていました。波が自分で名乗れば表は要りません。
+    /// </remarks>
+    public virtual (string Cassie, string Subtitle) Announcement(int spawnCount) => default;
+
     /// <summary>
     /// この SpawnSet の割り当て対象になりうるプレイヤーです。
     /// 既定では「まだ役職が割り当てられていない実プレイヤー」を返します。
@@ -80,10 +128,38 @@ public abstract class SpawnSet
     /// </remarks>
     protected virtual List<Player> TargetPlayers()
     {
+        if (forcedCandidates is { } forced)
+            return new List<Player>(forced);
+
         return Player.List
             .Where(player => player.IsSafePlayer() &&
                              player.Role.Type is RoleTypeId.None or RoleTypeId.Spectator)
             .Shuffled();
+    }
+
+    /// <summary>
+    /// 対象を指定して割り当てを実行します。リスポーンシステムから使います。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="RespawnRatio"/> はここでだけ効きます。
+    /// 渡した一覧は呼び出しの間だけ使われ、終われば元の <see cref="TargetPlayers"/> に戻ります。
+    /// </remarks>
+    /// <returns>実際に割り当てた人数。</returns>
+    public int SpawnFor(IReadOnlyList<Player> candidates)
+    {
+        if (candidates is null || candidates.Count == 0)
+            return 0;
+
+        forcedCandidates = new List<Player>(candidates);
+
+        try
+        {
+            return Spawn();
+        }
+        finally
+        {
+            forcedCandidates = null;
+        }
     }
 
     /// <summary>
@@ -126,9 +202,11 @@ public abstract class SpawnSet
         if (candidates.Count == 0)
             return 0;
 
+        int allowed = ResolveAllowedCount(candidates.Count);
+
         // TargetPlayers はシャッフル済みなので、先頭から必要人数を取るだけでランダム選出になる。
-        if (AllowedPlayerCount > 0 && candidates.Count > AllowedPlayerCount)
-            candidates = candidates.Take(AllowedPlayerCount).ToList();
+        if (allowed > 0 && candidates.Count > allowed)
+            candidates = candidates.Take(allowed).ToList();
 
         List<SpawnRoleState> states = SpawnRoles
             .Shuffled()
@@ -141,6 +219,21 @@ public abstract class SpawnSet
         assigned += Assign(states.Where(state => !state.Definition.IsForced).ToList(), candidates);
 
         return assigned;
+    }
+
+    /// <summary>
+    /// 実際に何人まで配るかを決めます。
+    /// 波として呼ばれたときだけ <see cref="RespawnRatio"/> が効きます。
+    /// </summary>
+    private int ResolveAllowedCount(int candidateCount)
+    {
+        if (forcedCandidates is null || RespawnRatio >= 1f)
+            return AllowedPlayerCount;
+
+        // 割合を掛けても 0 人にはしない。呼ばれた以上は最低 1 人出す。
+        int byRatio = Mathf.Max(1, (int)(candidateCount * Mathf.Max(0f, RespawnRatio)));
+
+        return AllowedPlayerCount < 0 ? byRatio : Mathf.Min(AllowedPlayerCount, byRatio);
     }
 
     /// <returns>この呼び出しで割り当てた人数。</returns>

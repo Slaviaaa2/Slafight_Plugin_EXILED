@@ -29,6 +29,8 @@ public sealed class SampleStatusCommand : CommandBase
         builder.AppendLine($"  現在の役職       : {CustomRole.Active.Count}");
         builder.AppendLine($"  追跡中アイテム   : {CustomItem.Tracked.Count}");
         builder.AppendLine($"  ゲームモード     : {GameMode.Current?.Name ?? "なし"}");
+        builder.AppendLine($"  スポーン状況     : {SpawnContext.Active.Name}");
+        builder.AppendLine($"  宣言済みウェーブ : {SpawnContext.AllWaves.Count}");
 
         if (EventHandlerBase.Active.Count > 0)
         {
