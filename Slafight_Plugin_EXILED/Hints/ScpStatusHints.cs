@@ -305,16 +305,32 @@ public class ScpStatusHints : IBootstrapHandler
     }
 
     /// <summary>
-    /// 既定のチャンネルを登録します。現在は何も登録しません。
+    /// 味方一覧を出すと名乗っている陣営のチャンネルを登録します。
     /// </summary>
     /// <remarks>
-    /// 以前は SCP / 第五教会 / Warriors の 3 つをここで作っていましたが、
-    /// どれも陣営と役職に依存した<b>コンテンツ</b>でした。
-    /// チャンネルの機構 (<see cref="StatusHintChannel"/>・重ね合わせ・更新ループ) はそのままなので、
-    /// 陣営側から <see cref="RegisterChannel"/> を呼んで自分のチャンネルを名乗ってください。
+    /// <b>陣営ごとの分岐はありません。</b>
+    /// 一覧を出すか (<see cref="CustomTeam.ShowsRoster"/>)、見出しに何と出すか
+    /// (<see cref="CustomTeam.HudName"/>)、末尾に何を添えるか
+    /// (<see cref="CustomTeam.RosterFooter"/>) は陣営自身が名乗ります。
+    /// 陣営を足すのにこのファイルを触る必要はありません。
+    ///
+    /// 以前はここで SCP / 第五教会 / Warriors の 3 つを直接組み立てていました。
     /// </remarks>
     private static void RegisterDefaultChannels()
     {
+        foreach (CustomTeam team in CustomTeam.All)
+        {
+            if (!team.ShowsRoster) continue;
+
+            CustomTeam captured = team;
+
+            RegisterChannel(new StatusHintChannel(captured.GetType().Name, captured.Includes)
+            {
+                Title = captured.HudName,
+                Color = captured.Color,
+                FooterBuilder = context => captured.RosterFooter(context.Viewer),
+            });
+        }
     }
 
     private static void OnRoundStarted()

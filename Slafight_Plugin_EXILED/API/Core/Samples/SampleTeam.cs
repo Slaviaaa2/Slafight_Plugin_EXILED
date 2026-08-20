@@ -26,5 +26,15 @@ public sealed class SampleTeam : CustomTeam
     /// </summary>
     public override VictoryCondition Victory => VictoryCondition.LastStanding(priority: 1);
 
+    /// <summary>
+    /// 味方一覧を出すかどうかも陣営が名乗ります。表示層に陣営ごとの分岐は要りません。
+    /// </summary>
+    public override bool ShowsRoster => true;
+
+    /// <summary>
+    /// 一覧の末尾に添える、この陣営だけの状況表示です。
+    /// </summary>
+    public override string RosterFooter(Player viewer) => "<color=#00b7eb>動作確認中</color>";
+
     protected override bool IncludesVanilla(Player player) => player.Role.Type is RoleTypeId.Tutorial;
 }
