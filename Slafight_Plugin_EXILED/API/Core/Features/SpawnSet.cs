@@ -128,8 +128,10 @@ public abstract class SpawnSet
     /// </remarks>
     protected virtual List<Player> TargetPlayers()
     {
+        // Assign は「先頭から取れば無作為」を前提にしているので、
+        // 外から渡された一覧もここでシャッフルする。
         if (forcedCandidates is { } forced)
-            return new List<Player>(forced);
+            return forced.Shuffled();
 
         return Player.List
             .Where(player => player.IsSafePlayer() &&
