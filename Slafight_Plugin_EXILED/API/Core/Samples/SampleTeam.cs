@@ -1,0 +1,30 @@
+using Exiled.API.Features;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.API.Enums;
+
+namespace Slafight_Plugin_EXILED.API.Core.Samples;
+
+/// <summary>
+/// 陣営の書き方の見本です。
+///
+/// 見どころは <see cref="IncludesVanilla"/> が
+/// 「<b>カスタム役職を持たない</b>プレイヤーだけ」を判定していることです。
+/// カスタム役職を持つプレイヤーは、その役職が名乗る <see cref="CustomRole.Team"/> が答えになるので、
+/// ここに「ただし SCP-3005 は除く」のような例外を書く必要がありません。
+/// </summary>
+public sealed class SampleTeam : CustomTeam
+{
+    public override string Name => "Sample Team";
+
+    public override string Color => ServerColors.Cyan;
+
+    public override string Objective => "動作確認用の陣営です。";
+
+    /// <summary>
+    /// 敵対する側が全滅したら勝ち、という最も普通の条件です。
+    /// </summary>
+    public override VictoryCondition Victory => VictoryCondition.LastStanding(priority: 1);
+
+    protected override bool IncludesVanilla(Player player) => player.Role.Type is RoleTypeId.Tutorial;
+}
