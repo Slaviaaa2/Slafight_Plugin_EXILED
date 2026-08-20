@@ -73,17 +73,12 @@ public abstract class GameMode
     /// </summary>
     public virtual bool AllowsWarhead => true;
 
-    /// <summary>
-    /// ラウンド開始時の収容違反アナウンスと照明の明滅を出すかどうかです。
-    /// 自前の導入演出を持つモードは false にします。
-    /// </summary>
-    public virtual bool AllowsBreachAnnouncement => true;
-
-    /// <summary>
-    /// ラウンド開始直後にゲート A / B を一時封鎖するかどうかです。
-    /// 地上へ出ることが前提のモードは false にします。
-    /// </summary>
-    public virtual bool AllowsGateLockdown => true;
+    // 移植元には AllowsBreachAnnouncement / AllowsGateLockdown もありましたが、
+    // ここには持ち込んでいません。<b>コンテンツが無いからではなく、
+    // それが止めるはずの挙動 (ラウンド開始時の収容違反アナウンスとゲート封鎖) が
+    // このコードベースに存在しない</b>ためです。読み手のいない宣言は、
+    // false にしても何も起きない罠になります。
+    // 導入演出を作るときに、その実装と一緒に足してください。
 
     /// <summary>
     /// このモードが動いている間、勝利表示を差し替える文言です。null なら陣営のものを使います。
