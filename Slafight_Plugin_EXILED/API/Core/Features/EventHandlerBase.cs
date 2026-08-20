@@ -64,6 +64,13 @@ public abstract class EventHandlerBase : CustomEventsHandler, IDisposable
     private static bool lifetimeHooked;
 
     /// <summary>
+    /// 一度でも有効化されたか。<see cref="EventHandlerRegistry"/> は
+    /// <see cref="Lifetime"/> を読むためだけにインスタンスを作って捨てるので、
+    /// その「試しに作っただけ」の実体で <see cref="OnDisposed"/> を走らせないための印です。
+    /// </summary>
+    private bool wasEnabled;
+
+    /// <summary>
     /// 現在有効になっているハンドラの一覧です。
     /// </summary>
     public static IReadOnlyList<EventHandlerBase> Active => ActiveHandlers;
@@ -172,6 +179,7 @@ public abstract class EventHandlerBase : CustomEventsHandler, IDisposable
         }
 
         IsEnabled = true;
+        wasEnabled = true;
         Track(this);
         SafeInvoke(OnEnabled, nameof(OnEnabled));
     }
@@ -201,7 +209,11 @@ public abstract class EventHandlerBase : CustomEventsHandler, IDisposable
 
         Disable();
         IsDisposed = true;
-        SafeInvoke(OnDisposed, nameof(OnDisposed));
+
+        // 一度も購読していないなら後始末するものは無い。
+        // ここで呼ぶと、Lifetime を読むためだけに作られた実体でも利用者の処理が走る。
+        if (wasEnabled)
+            SafeInvoke(OnDisposed, nameof(OnDisposed));
     }
 
     /// <summary>
