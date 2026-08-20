@@ -140,6 +140,15 @@ public abstract class CustomRole : IPlayerOwn
     public virtual IReadOnlyList<RoleEffect> Effects => [];
 
     /// <summary>
+    /// この役職の声の扱いです。近接ボイスの可否と、独自の伝達経路を名乗ります。
+    /// </summary>
+    /// <remarks>
+    /// 経路を持つ役職は、その役職を見に行く側 (<c>VoiceRoutingApi</c>) ではなく
+    /// <b>役職自身</b>がここで名乗ります。声の届き方を足すのに配線側は触りません。
+    /// </remarks>
+    public virtual RoleVoiceSettings Voice => RoleVoiceSettings.None;
+
+    /// <summary>
     /// ネームプレートに出す追加情報です。null なら変更しません。
     /// </summary>
     public virtual string CustomInfo => null;

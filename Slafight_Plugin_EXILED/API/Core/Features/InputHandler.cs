@@ -1,4 +1,5 @@
 using Exiled.API.Features;
+using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
@@ -57,7 +58,35 @@ public sealed class InputHandler : EventHandlerBase
         if (keybind.SettingId == ServerSpecifics.AbilitySwitchKeybindSettingId)
         {
             AbilityBase.SelectNext(player);
+
+            return;
         }
+
+        if (keybind.SettingId == ServerSpecifics.AbilityOptionPreviousKeybindSettingId)
+        {
+            SwitchOption(player, AbilityOptionDirection.Previous);
+
+            return;
+        }
+
+        if (keybind.SettingId == ServerSpecifics.AbilityOptionNextKeybindSettingId)
+        {
+            SwitchOption(player, AbilityOptionDirection.Next);
+        }
+    }
+
+    /// <summary>
+    /// いま選んでいる能力の選択肢を送ります。
+    /// </summary>
+    private static void SwitchOption(Player player, AbilityOptionDirection direction)
+    {
+        if (AbilityBase.Active(player) is not { } ability) return;
+
+        if (!ability.TrySwitchOption(direction)) return;
+
+        player.ShowHint(
+            $"<size=22>{ability.DisplayName}: <color=#8fdcff>{ability.SelectedOption?.Name}</color></size>",
+            2f);
     }
 
     /// <summary>

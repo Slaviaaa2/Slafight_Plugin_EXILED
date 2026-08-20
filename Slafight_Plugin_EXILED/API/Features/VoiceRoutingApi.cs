@@ -367,16 +367,29 @@ public static class VoiceRoutingApi
     }
 
     /// <summary>
-    /// 登録済みのルールを順に見て、最初に決まったものを返します。
+    /// 送り手の役職が持つ経路を先に見て、次に登録済みのルールを見ます。
+    /// 最初に決まったものを返します。
     /// </summary>
-    /// <remarks>
-    /// 以前はここで役職固有のルート (<c>CRole.Voice.Routes</c>) を先に見ていましたが、
-    /// 役職ごとの声設定はコンテンツ側の持ち物でした。新 API の役職はまだそれを持たないため、
-    /// 判定は <see cref="Register"/> で登録されたルールだけになります。
-    /// 役職固有の経路が要るようになったら、その役職が起動時に自分のルールを登録してください。
-    /// </remarks>
     private static VoiceRouteDecision? Resolve(VoiceRouteContext context)
     {
+        // 役職が自分で名乗る経路が最優先。
+        if (CustomRole.Of(context.Sender) is { } role)
+        {
+            foreach (var route in role.Voice.Routes)
+            {
+                try
+                {
+                    var decision = route.Evaluate(context);
+                    if (decision != null)
+                        return decision;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[VoiceRouting] Role route failed for '{role.Name}': {ex}");
+                }
+            }
+        }
+
         foreach (var entry in OrderedRules())
         {
             try

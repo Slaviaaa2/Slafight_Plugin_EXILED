@@ -8,6 +8,7 @@ using MEC;
 using PlayerRoles;
 using PlayerRoles.Spectating;
 using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -136,15 +137,16 @@ public static class Handler
         if (ForcedCanUsePlayers.Contains(player.Id))
             return true;
 
-        // 役職ごとの可否は、以前は CRole.Voice が持っていた。
-        // 新 API の役職はまだ声の設定を持たないので、当面はバニラ役職の一覧だけで判定する。
+        // 役職が自分で名乗っていればそれに従う。
+        if (CustomRole.Of(player) is { } role)
+            return role.Voice.Proximity.IsAvailable;
+
         return AllowedRoleTypes.Contains(player.Role);
     }
 
     public static bool ShouldEnableProximityChatByDefault(Player player)
     {
-        // 既定で有効にするかどうかも、以前は CRole.Voice が持っていた。
-        return false;
+        return CustomRole.Of(player) is { } role && role.Voice.Proximity.EnabledByDefault;
     }
 
     public static bool IsProximityChatForced(Player player)

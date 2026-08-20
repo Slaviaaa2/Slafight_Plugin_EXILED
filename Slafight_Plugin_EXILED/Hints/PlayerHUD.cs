@@ -39,17 +39,6 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         Instance = null;
     }
 
-    /// <summary>
-    /// デバッグ HUD を出すかどうかです。当面は常に false です。
-    /// </summary>
-    /// <remarks>
-    /// 誰にデバッグ表示を出すかは <c>DebugModeHandler</c> が持っていましたが、
-    /// 新 API への移行で削除されました。表示の組み立て (<see cref="BuildDebugHud"/>) と
-    /// 表示枠はそのまま残してあるので、切り替えの持ち主を新 API 側に作ったら
-    /// ここを差し替えるだけで戻せます。
-    /// </remarks>
-    public static bool DebugHudEnabled { get; set; }
-
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
@@ -647,6 +636,9 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         var activeEntryIndex = AbilityBase.ActiveIndexOf(target);
         var active = entries[activeEntryIndex];
         var abilityName = active.DisplayName;
+        var optionName = active.SelectedOption?.Name;
+        if (!string.IsNullOrWhiteSpace(optionName))
+            abilityName += $" <color=#8fdcff>[{optionName}]</color>";
 
         var statusText = FormatAbilityState(active, out var usesText);
         var countText = $"{activeEntryIndex + 1}/{entries.Count}";
@@ -665,6 +657,13 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         else
         {
             controlParts.Add("所持:1");
+        }
+
+        if (active.HasSelectableOptions)
+        {
+            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilityOptionPreviousKeybindSettingId));
+            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilityOptionNextKeybindSettingId));
+            controlParts.Add($"<color=#aaffaa>{{{parameterIndex++}}}</color>/<color=#aaffaa>{{{parameterIndex++}}}</color>:オプション");
         }
 
         var controlText = string.Join(" / ", controlParts);
@@ -869,7 +868,7 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             foreach (var player in Player.List)
             {
                 if (!IsPlayerValid(player)) continue;
-                if (!DebugHudEnabled) continue;
+                if (!DebugMode.IsEnabled(player)) continue;
 
                 ForceDebugHudSync(player);
             }

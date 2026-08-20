@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
+using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -53,6 +54,8 @@ public abstract class AbilityBase
 
     private string renamed;
 
+    private int selectedOptionIndex;
+
     /// <summary>
     /// この能力の持ち主です。
     /// </summary>
@@ -103,6 +106,35 @@ public abstract class AbilityBase
     /// 残り使用回数です。無制限なら -1。
     /// </summary>
     public int RemainingUses => MaxUses < 0 ? -1 : Mathf.Max(0, MaxUses - UsedCount);
+
+    /// <summary>
+    /// 切り替えられる選択肢です。空なら選択肢を持たない普通の能力です。
+    /// </summary>
+    /// <remarks>
+    /// 選択肢は<b>それ自身が振る舞いを持ちます</b>。
+    /// <see cref="OnUsed"/> は <c>SelectedOption?.Use(Player)</c> と書くだけで済みます。
+    /// </remarks>
+    public virtual IReadOnlyList<AbilityOption> Options => [];
+
+    /// <summary>
+    /// 2 つ以上の選択肢を持っているか。表示層が切替の案内を出すかどうかに使います。
+    /// </summary>
+    public bool HasSelectableOptions => Options.Count > 1;
+
+    /// <summary>
+    /// いま選ばれている選択肢の位置です。持っている数に収まるよう丸めて返します。
+    /// </summary>
+    public int SelectedOptionIndex =>
+        Options.Count == 0 ? 0 : Mathf.Clamp(selectedOptionIndex, 0, Options.Count - 1);
+
+    /// <summary>
+    /// いま選ばれている選択肢です。選択肢を持たなければ null。
+    /// </summary>
+    /// <remarks>
+    /// この能力はプレイヤー 1 人につき 1 インスタンスなので、
+    /// 選択状態はただのフィールドで足ります。誰の選択かを持ち回る必要はありません。
+    /// </remarks>
+    public AbilityOption SelectedOption => Options.Count == 0 ? null : Options[SelectedOptionIndex];
 
     /// <summary>
     /// 今すぐ使える状態かどうか。
@@ -277,6 +309,33 @@ public abstract class AbilityBase
     public void Rename(string name) => renamed = name;
 
     /// <summary>
+    /// 選択肢を 1 つ送ります。端まで行ったら反対側へ回ります。
+    /// </summary>
+    /// <returns>切り替えたら true。選択肢が 1 つ以下なら false。</returns>
+    public bool TrySwitchOption(AbilityOptionDirection direction)
+    {
+        int count = Options.Count;
+
+        if (count <= 1) return false;
+
+        selectedOptionIndex = ((SelectedOptionIndex + (int)direction) % count + count) % count;
+
+        return true;
+    }
+
+    /// <summary>
+    /// 位置を指定して選択肢を選び直します。
+    /// </summary>
+    public bool SelectOption(int index)
+    {
+        if (index < 0 || index >= Options.Count) return false;
+
+        selectedOptionIndex = index;
+
+        return true;
+    }
+
+    /// <summary>
     /// 能力を使います。使えなかった場合は理由を返します。
     /// </summary>
     public bool TryUse(out string failureReason)
@@ -319,6 +378,10 @@ public abstract class AbilityBase
 
             return false;
         }
+
+        // 選択肢だけの条件は選択肢自身が持つ。
+        if (SelectedOption is { } option && !option.CanUse(Player, out failureReason))
+            return false;
 
         failureReason = null;
 
