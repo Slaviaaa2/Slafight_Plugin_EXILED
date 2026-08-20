@@ -4,6 +4,7 @@ using System.Linq;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using PlayerRoles.Voice;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -188,8 +189,8 @@ public sealed class VoiceRouteRule
     /// </summary>
     public static VoiceRouteRule BetweenTeams(
         string id,
-        IEnumerable<CTeam> senderTeams,
-        IEnumerable<CTeam> receiverTeams,
+        IEnumerable<CustomTeam> senderTeams,
+        IEnumerable<CustomTeam> receiverTeams,
         VoiceRouteDecision decision,
         Predicate<VoiceRouteContext> condition = null,
         int priority = 0,
@@ -200,8 +201,8 @@ public sealed class VoiceRouteRule
         if (receiverTeams == null)
             throw new ArgumentNullException(nameof(receiverTeams));
 
-        var senderSet = new HashSet<CTeam>(senderTeams);
-        var receiverSet = new HashSet<CTeam>(receiverTeams);
+        var senderSet = new HashSet<CustomTeam>(senderTeams);
+        var receiverSet = new HashSet<CustomTeam>(receiverTeams);
 
         return new VoiceRouteRule(
             id,
@@ -210,8 +211,8 @@ public sealed class VoiceRouteRule
                 if (!includeSender && context.Sender.Id == context.Receiver.Id)
                     return null;
 
-                return senderSet.Contains(context.Sender.GetTeam()) &&
-                       receiverSet.Contains(context.Receiver.GetTeam()) &&
+                return senderSet.Contains(CustomTeam.Of(context.Sender)) &&
+                       receiverSet.Contains(CustomTeam.Of(context.Receiver)) &&
                        (condition == null || condition(context))
                     ? decision
                     : null;
@@ -365,27 +366,17 @@ public static class VoiceRoutingApi
             args.IsAllowed = false;
     }
 
+    /// <summary>
+    /// 登録済みのルールを順に見て、最初に決まったものを返します。
+    /// </summary>
+    /// <remarks>
+    /// 以前はここで役職固有のルート (<c>CRole.Voice.Routes</c>) を先に見ていましたが、
+    /// 役職ごとの声設定はコンテンツ側の持ち物でした。新 API の役職はまだそれを持たないため、
+    /// 判定は <see cref="Register"/> で登録されたルールだけになります。
+    /// 役職固有の経路が要るようになったら、その役職が起動時に自分のルールを登録してください。
+    /// </remarks>
     private static VoiceRouteDecision? Resolve(VoiceRouteContext context)
     {
-        if (!string.IsNullOrEmpty(context.Sender.UniqueRole) &&
-            CRole.TryGetByUniqueRole(context.Sender.UniqueRole, out var role) &&
-            role != null)
-        {
-            foreach (var route in role.Voice.Routes)
-            {
-                try
-                {
-                    var decision = route.Evaluate(context);
-                    if (decision != null)
-                        return decision;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[VoiceRouting] CRole route failed for '{role.UniqueRoleName}': {ex}");
-                }
-            }
-        }
-
         foreach (var entry in OrderedRules())
         {
             try

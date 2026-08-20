@@ -14,6 +14,7 @@ using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Structs;
 using UnityEngine;
 using Random = System.Random;
+using CoreCustomItem = Slafight_Plugin_EXILED.API.Core.Features.CustomItem;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 
@@ -27,31 +28,6 @@ public static class StaticUtils
     // ───────────────────────────────
     // Player 選出
     // ───────────────────────────────
-
-    /// <summary>
-    /// 指定のCTeamだけ/以外のPlayer選出リストを作成します。
-    /// </summary>
-    public static List<Player> CandidatePlayersByCTeam(CTeam team, bool elseMode = false)
-    {
-        var allPlayers = Player.List;
-        return elseMode
-            ? allPlayers.Where(p => p != null && p.GetTeam() != team).ToList()
-            : allPlayers.Where(p => p != null && p.GetTeam() == team).ToList();
-    }
-
-    /// <summary>
-    /// 指定のCTeam選出リストをランダムにシャッフルしてからreturnします。
-    /// </summary>
-    public static List<Player> SelectRandomPlayersByRatio(CTeam excludeTeam, float ratio, bool elseMode = false)
-    {
-        var allPlayers = Player.List.Where(p => p.IsSafePlayer()).ToList();
-        if (allPlayers.Count == 0) return [];
-
-        var candidates = CandidatePlayersByCTeam(excludeTeam, elseMode);
-        int targetCount = Math.Min((int)Math.Truncate(allPlayers.Count * ratio), candidates.Count);
-
-        return candidates.ShuffleTake(targetCount).ToList();
-    }
 
     // ───────────────────────────────
     // IEnumerable<T> 拡張
@@ -95,48 +71,29 @@ public static class StaticUtils
             player.AddItem(itemType);
     }
 
-    public static void GiveOrDrop(this Player player, uint customId)
+    /// <summary>
+    /// 型でカスタムアイテムを渡します。インベントリが満杯なら足元に落とします。
+    /// </summary>
+    public static CoreCustomItem? GiveOrDrop<T>(this Player? player) where T : CoreCustomItem, new()
     {
-        if (player.IsInventoryFull)
-            CustomItem.TrySpawn(customId, player.Position + Vector3.up * 0.5f, out _);
-        else
-            player.TryAddCustomItem(customId);
+        if (player is null) return null;
+
+        return player.IsInventoryFull
+            ? CoreCustomItem.Spawn<T>(player.Position + Vector3.up * 0.5f)
+            : CoreCustomItem.Give<T>(player);
     }
 
-    /// <summary>型引数でカスタムアイテムを付与 or ドロップします。</summary>
-    public static void GiveOrDrop<T>(this Player player) where T : CustomItem
+    /// <summary>
+    /// 型を実行時に決めて渡します。コマンドやマップデータのように、
+    /// 文字列から型を引いてくる経路で使います。
+    /// </summary>
+    public static CoreCustomItem? GiveOrDrop(this Player? player, Type type)
     {
-        if (!CustomItemExtensions.TryGet<T>(out var item) || item is null) return;
+        if (player is null || type is null) return null;
 
-        if (player.IsInventoryFull)
-            CustomItem.TrySpawn(item.Id, player.Position + Vector3.up * 0.5f, out _);
-        else
-            player.TryAddCustomItem<T>();
-    }
-    
-    /// <summary>型引数でCItemを付与 or ドロップします。</summary>
-    public static ItemInfo GiveOrDrop<T>(this Player player, bool showHint = false) where T : CItem
-        => player.GiveOrDrop(CItem.Get<T>(), showHint);
-
-    /// <summary>解決済みCItemインスタンスを付与 or ドロップします。</summary>
-    public static ItemInfo GiveOrDrop(this Player player, CItem? item, bool showHint = false)
-    {
-        ItemInfo info = new ItemInfo();
-        if (item == null)
-            return info;
-
-        if (player.IsInventoryFull)
-        {
-            var instance = item.Spawn(player.Position + Vector3.up * 0.5f);
-            info.Pickup = instance;
-        }
-        else
-        {
-            var instance = item.Give(player, showHint);
-            info.Item = instance;
-        }
-        
-        return info;
+        return player.IsInventoryFull
+            ? CoreCustomItem.Spawn(type, player.Position + Vector3.up * 0.5f)
+            : CoreCustomItem.Give(type, player);
     }
 
     // ───────────────────────────────
@@ -191,13 +148,6 @@ public static class StaticUtils
     // カスタムアイテム確認 (Player 拡張)
     // ───────────────────────────────
 
-    public static bool HasWornGoggle<T>(this Player player) where T : CustomGoggles
-    {
-        return player.Items
-            .OfType<Scp1344>()
-            .Any(i => i.TryGetCustomItem(out var ci) && ci is T && i.IsWorn);
-    }
-
     // ───────────────────────────────
     // SaveItems (Player 拡張)
     // ───────────────────────────────
@@ -229,36 +179,10 @@ public static class StaticUtils
     // チーム判定 (Player? 拡張)
     // ───────────────────────────────
 
-    public static bool IsFifthist(this Player? player)
-    {
-        if (player == null) return false;
-        return player.GetTeam() == CTeam.Fifthists || player.GetCustomRole() == CRoleTypeId.Scp3005;
-    }
-
-    public static bool IsHumanitist(this Player? player)
-    {
-        if (player == null) return false;
-        return player.GetTeam() != CTeam.FoundationForces && player.GetTeam() != CTeam.Guards;
-    }
-
-    public static bool IsCandyWarrior(this Player? player)
-    {
-        if (player == null) return false;
-        return player.GetCustomRole() is CRoleTypeId.CandyWarriorApril or CRoleTypeId.CandyWarriorHalloween;
-    }
-
     public static uint GetNetId(this Player? player)
     {
         if (player == null || player.ReferenceHub == null) return 0;
         return player.NetId;
-    }
-
-    public static bool IsVanillaOrCustom(this Player? player, RoleTypeId roleTypeId, CRoleTypeId cRoleTypeId)
-    {
-        if (player == null) return false;
-        if (player.GetCustomRole() == CRoleTypeId.None && player.Role.Type == roleTypeId) return true;
-        if (player.GetCustomRole() == cRoleTypeId) return true;
-        return false;
     }
 
     // ───────────────────────────────
@@ -274,12 +198,6 @@ public static class StaticUtils
     public static bool IsValid(Player? player) =>
         player != null &&
         player.IsAlive &&
-        Round.InProgress;
-
-    public static bool IsValid(Player? player, CRoleTypeId roleId) =>
-        player != null &&
-        player.IsAlive &&
-        player.GetCustomRole() == roleId &&
         Round.InProgress;
 
     // ───────────────────────────────

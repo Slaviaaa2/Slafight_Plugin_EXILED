@@ -1,5 +1,6 @@
 using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Player;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 
@@ -150,7 +151,7 @@ public static class CassieHelper
     {
         Exiled.API.Features.Cassie.MessageTranslated(
             "Attention All personnel . Security Team has entered the facility .",
-            $"全職員に通達。<color={CTeam.Guards.GetTeamColor()}>保安部隊</color>が施設に到着しました。",
+            $"全職員に通達。<color={ServerColors.Silver}>保安部隊</color>が施設に到着しました。",
             true);
     }
 
@@ -189,7 +190,9 @@ public static class CassieHelper
         if (IsHidTurretKill(ev))
             return TerminationCause.Hid();
         if (ev.Attacker != null)
-            return TerminationCause.ByTeam(ev.Attacker.GetTeam());
+            return CustomTeam.Of(ev.Attacker) is { } attackerTeam
+                ? TerminationCause.ByTeam(attackerTeam)
+                : TerminationCause.Unknown();
         return TerminationCause.Unknown();
     }
 
@@ -220,12 +223,11 @@ public readonly struct TerminationCause
     }
 
     /// <summary>指定チームによる正常な収容として放送する。</summary>
-    public static TerminationCause ByTeam(CTeam team)
+    public static TerminationCause ByTeam(CustomTeam team)
     {
-        var info = team.GetTeamInfo();
         return new TerminationCause(
-            $"contained successfully by {info.CassieString}",
-            $"は、<color={info.TeamColor}>{info.TeamName}</color>によって正常に収容されました。");
+            $"contained successfully by {team.CassieName}",
+            $"は、<color={team.Color}>{team.Name}</color>によって正常に収容されました。");
     }
 
     /// <summary>H.I.D Turret による終了として放送する。</summary>
@@ -236,7 +238,7 @@ public readonly struct TerminationCause
     /// <summary>アンチミームプロトコルによる無効化として放送する。</summary>
     public static TerminationCause AntiMeme() => new(
         "Successfully neutralized by $pitch_.85 Anti- $pitch_1 Me mu Protocol.",
-        $"は、<color={CTeam.Fifthists.GetTeamColor()}>アンチミームプロトコル</color>により正常に無効化されました。");
+        $"は、<color={ServerColors.Magenta}>アンチミームプロトコル</color>により正常に無効化されました。");
 
     /// <summary>原因不明の終了として放送する。</summary>
     public static TerminationCause Unknown() => new(

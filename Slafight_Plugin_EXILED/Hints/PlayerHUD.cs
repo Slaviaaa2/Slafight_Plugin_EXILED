@@ -11,14 +11,11 @@ using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.Core.Utilities;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Interface;
-using Slafight_Plugin_EXILED.CustomMaps;
-using Slafight_Plugin_EXILED.CustomMaps.Core;
 using Slafight_Plugin_EXILED.Extensions;
-using Slafight_Plugin_EXILED.MainHandlers;
-using Slafight_Plugin_EXILED.SpecialEvents;
 using UnityEngine;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 using HintParameter = Hints.HintParameter;
@@ -41,6 +38,17 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         Instance?.Dispose();
         Instance = null;
     }
+
+    /// <summary>
+    /// デバッグ HUD を出すかどうかです。当面は常に false です。
+    /// </summary>
+    /// <remarks>
+    /// 誰にデバッグ表示を出すかは <c>DebugModeHandler</c> が持っていましたが、
+    /// 新 API への移行で削除されました。表示の組み立て (<see cref="BuildDebugHud"/>) と
+    /// 表示枠はそのまま残してあるので、切り替えの持ち主を新 API 側に作ったら
+    /// ここを差し替えるだけで戻せます。
+    /// </remarks>
+    public static bool DebugHudEnabled { get; set; }
 
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _abilityHudLoop;
@@ -334,24 +342,12 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         {
             string roleText, teamText, objectiveText;
 
-            // FacilityTermination 中は勝利条件と同じ人類/正常性の陣営表示に寄せる
-            if (SpecialEventsHandler.Instance.NowEvent == SpecialEventType.FacilityTermination)
+            // 役職が自分で名乗るものをそのまま読む。表示層は表を引かない。
+            if (CustomRole.Of(sourcePlayer) is { } customRole)
             {
-                (roleText, teamText, objectiveText) = GetFacilityTerminationInfo(sourcePlayer);
-                HintSync(SyncType.PHUD_Role,      roleText,      targetForHint);
-                HintSync(SyncType.PHUD_Team,      teamText,      targetForHint);
-                HintSync(SyncType.PHUD_Objective, objectiveText, targetForHint);
-                HintSync(SyncType.PHUD_Event,     SpecialEventsHandler.Instance.LocalizedEventName, targetForHint);
-                return;
-            }
-
-            var custom = sourcePlayer.GetCustomRole();
-
-            if (RoleHintsDictionary.TryResolve(custom, out var data))
-            {
-                roleText      = data.Role;
-                teamText      = data.Team;
-                objectiveText = data.Objective;
+                roleText      = customRole.HudLabel;
+                teamText      = customRole.TeamLabel ?? customRole.Team?.HudName ?? string.Empty;
+                objectiveText = customRole.Objective ?? customRole.Team?.Objective ?? string.Empty;
             }
             else
             {
@@ -361,47 +357,12 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             HintSync(SyncType.PHUD_Role,      roleText,      targetForHint);
             HintSync(SyncType.PHUD_Objective, objectiveText, targetForHint);
             HintSync(SyncType.PHUD_Team,      teamText,      targetForHint);
-            HintSync(SyncType.PHUD_Event,     SpecialEventsHandler.Instance.LocalizedEventName, targetForHint);
+            HintSync(SyncType.PHUD_Event,     GameMode.Current?.Name ?? string.Empty, targetForHint);
         }
         catch (Exception e)
         {
             Log.Debug($"[ApplyRoleInfo] Exception for {sourcePlayer?.Nickname}: {e.Message}");
         }
-    }
-
-    private static (string role, string team, string objective) GetFacilityTerminationInfo(Player player)
-    {
-        var custom = player.GetCustomRole();
-        var cteam = player.GetTeam();
-        var name = player.Role?.Name ?? "";
-
-        var roleText = RoleHintsDictionary.TryResolve(custom, out var data)
-            ? data.Role
-            : $"<color={(player.IsHumanitist() ? "#0000c8" : "red")}>{name}</color>";
-
-        if (!player.IsHumanitist())
-        {
-            if (custom == CRoleTypeId.Sculpture)
-                roleText = "<color=red>Sculpture</color>";
-            else if (cteam is CTeam.FoundationForces or CTeam.Guards)
-                roleText = $"<color=red>{name}</color>";
-
-            return (
-                roleText,
-                "<color=red>正常性</color>",
-                "財団に従い、人類を根絶させよ。"
-            );
-        }
-
-        var objective = cteam is CTeam.Scientists or CTeam.ClassD
-            ? "施設の方針変更に巻き込まれた。生き延び、正常性陣営から逃れろ。"
-            : "人類第一に、正常性陣営に抵抗せよ。";
-
-        return (
-            roleText,
-            "<color=#0000c8>人類</color>",
-            objective
-        );
     }
 
     private static (string role, string team, string objective) GetTeamFallback(Player player)
@@ -662,165 +623,23 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         abilityHint.Parameters = content.Parameters;
     }
 
+    /// <summary>
+    /// 能力欄の中身です。現在は常に空を返します。
+    /// </summary>
+    /// <remarks>
+    /// 旧 <c>AbilityBase</c> / <c>AbilityManager</c> / <c>AbilityLoadout</c> を土台に
+    /// 組み立てていましたが、それらは新 API への移行で削除されました。
+    ///
+    /// <b>HUD の見た目には手を入れていません。</b> 表示枠 (<c>HudConstId.PlayerHUD_Ability</c>) も
+    /// その座標・フォントサイズ・同期速度も、他の欄の文言もそのままです。
+    /// ここは参照を外して空文字を返すだけにとどめてあります。
+    ///
+    /// 能力を新 API (<c>API.Core.Features.AbilityBase</c>) で作り直すときに、
+    /// この 1 メソッドだけを埋め直してください。
+    /// </remarks>
     private static ServerSpecificUserSettings.KeybindHintContent BuildAbilityHud(Player target)
     {
-        if (!IsPlayerValid(target))
-            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []); // FIX: nullガード
-
-        if (!target.IsAlive)
-            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
-
-        if (!AbilityManager.TryGetLoadout(target, out var loadout))
-            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
-
-        var entries = GetAbilityEntries(loadout);
-        if (entries.Count == 0)
-            return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
-
-        var activeEntryIndex = entries.FindIndex(e => e.SlotIndex == loadout.ActiveIndex);
-        if (activeEntryIndex < 0)
-        {
-            loadout.ActiveIndex = entries[0].SlotIndex;
-            activeEntryIndex = 0;
-        }
-
-        var active = entries[activeEntryIndex].Ability;
-        var abilityName = AbilityLocalization.GetDisplayName(active.GetType().Name, target);
-        var optionName = active.GetSelectedOptionName(target);
-        if (!string.IsNullOrWhiteSpace(optionName))
-            abilityName += $" <color=#8fdcff>[{optionName}]</color>";
-
-        var statusText = FormatAbilityState(target, active, out var usesText);
-        var countText = $"{activeEntryIndex + 1}/{entries.Count}";
-        var parameters = new List<HintParameter>
-        {
-            new SSKeybindHintParameter(ServerSpecifics.AbilityUseKeybindSettingId)
-        };
-        var controlParts = new List<string> { "<color=#aaffaa>{0}</color>:使用" };
-        var parameterIndex = 1;
-
-        if (entries.Count > 1)
-        {
-            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilitySwitchKeybindSettingId));
-            controlParts.Add($"<color=#aaffaa>{{{parameterIndex++}}}</color>:切替");
-        }
-        else
-        {
-            controlParts.Add("所持:1");
-        }
-
-        if (active.HasSelectableOptions)
-        {
-            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilityOptionPreviousKeybindSettingId));
-            parameters.Add(new SSKeybindHintParameter(ServerSpecifics.AbilityOptionNextKeybindSettingId));
-            controlParts.Add($"<color=#aaffaa>{{{parameterIndex++}}}</color>/<color=#aaffaa>{{{parameterIndex++}}}</color>:オプション");
-        }
-
-        var controlText = string.Join(" / ", controlParts);
-
-        var slotSummary = BuildAbilitySlotSummary(target, entries, activeEntryIndex);
-
-        return new ServerSpecificUserSettings.KeybindHintContent(
-            $"<size=22><color=#ffcc00>Ability {countText}</color> {abilityName} {statusText} Uses:{usesText}</size>\n" +
-            $"<size=18>{controlText} | {slotSummary}</size>",
-            parameters.ToArray());
-    }
-
-    private static List<(int SlotIndex, AbilityBase Ability)> GetAbilityEntries(AbilityLoadout loadout)
-    {
-        var entries = new List<(int SlotIndex, AbilityBase Ability)>();
-
-        for (var i = 0; i < AbilityLoadout.MaxSlots; i++)
-        {
-            var ability = loadout.Slots[i];
-            if (ability != null)
-                entries.Add((i, ability));
-        }
-
-        return entries;
-    }
-
-    private static string BuildAbilitySlotSummary(
-        Player player,
-        IReadOnlyList<(int SlotIndex, AbilityBase Ability)> entries,
-        int activeEntryIndex)
-    {
-        var sb = new StringBuilder();
-
-        for (var i = 0; i < entries.Count; i++)
-        {
-            if (i > 0)
-                sb.Append(" | ");
-
-            var ability = entries[i].Ability;
-            var marker = i == activeEntryIndex
-                ? $"<color=#ffcc00>*{i + 1}</color>"
-                : (i + 1).ToString();
-            var name = ShortenAbilityName(
-                AbilityLocalization.GetDisplayName(ability.GetType().Name, player),
-                8);
-
-            sb.Append(marker)
-                .Append(':')
-                .Append(name)
-                .Append(' ')
-                .Append(FormatCompactAbilityState(player, ability));
-        }
-
-        return sb.ToString();
-    }
-
-    private static string FormatAbilityState(
-        Player player,
-        AbilityBase ability,
-        out string usesText)
-    {
-        usesText = "?";
-
-        if (!AbilityBase.TryGetAbilityState(
-                player,
-                ability,
-                out var canUse,
-                out var cdRemain,
-                out var usesLeft,
-                out var maxUses))
-            return "<color=#aaaaaa>?</color>";
-
-        usesText = maxUses < 0 ? "∞" : Math.Max(0, usesLeft).ToString();
-
-        if (maxUses >= 0 && usesLeft <= 0)
-            return "<color=#ff6666>DONE</color>";
-
-        return canUse
-            ? "<color=#38ff6b>READY</color>"
-            : $"<color=#ffd966>CD {Mathf.CeilToInt(cdRemain)}s</color>";
-    }
-
-    private static string FormatCompactAbilityState(Player player, AbilityBase ability)
-    {
-        if (!AbilityBase.TryGetAbilityState(
-                player,
-                ability,
-                out var canUse,
-                out var cdRemain,
-                out var usesLeft,
-                out var maxUses))
-            return "<color=#aaaaaa>?</color>";
-
-        if (maxUses >= 0 && usesLeft <= 0)
-            return "<color=#ff6666>0</color>";
-
-        return canUse
-            ? "<color=#38ff6b>OK</color>"
-            : $"<color=#ffd966>{Mathf.CeilToInt(cdRemain)}s</color>";
-    }
-
-    private static string ShortenAbilityName(string name, int maxLength)
-    {
-        if (string.IsNullOrEmpty(name) || name.Length <= maxLength)
-            return name;
-
-        return name.Substring(0, Math.Max(1, maxLength - 3)) + "...";
+        return new ServerSpecificUserSettings.KeybindHintContent(string.Empty, []);
     }
 
     // =========================================================
@@ -958,7 +777,7 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             foreach (var player in Player.List)
             {
                 if (!IsPlayerValid(player)) continue;
-                if (!DebugModeHandler.IsDebugMode(player)) continue;
+                if (!DebugHudEnabled) continue;
 
                 ForceDebugHudSync(player);
             }
@@ -976,8 +795,8 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         sb.AppendLine(
             $"<color=#aaaaaa>Role:</color> {player.Role?.Name ?? "None"}  " +
             $"<color=#aaaaaa>Team:</color> {player.Role?.Team.ToString() ?? "None"}  " +
-            $"<color=#aaaaaa>CRole:</color> {player.GetCustomRole()}  " +
-            $"<color=#aaaaaa>CTeam:</color> {player.GetTeam()}"
+            $"<color=#aaaaaa>CRole:</color> {CustomRole.Of(player)?.Name ?? "None"}  " +
+            $"<color=#aaaaaa>CTeam:</color> {CustomTeam.Of(player)?.Name ?? "None"}"
         );
 
         // ── 座標・ルーム情報（リアルタイム） ─────────────────────────
@@ -1001,27 +820,6 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             sb.AppendLine(
                 $"<color=#aaaaaa>RoomRot:</color> ({roomEuler.x:F1}, {roomEuler.y:F1}, {roomEuler.z:F1})"
             );
-        }
-
-        // ── 最後に触ったドア情報 ─────────────────────────────────────
-        if (DebugModeHandler.TryGetDoor(player, out var door))
-        {
-            sb.AppendLine(
-                $"<color=#aaaaaa>Door:</color> {door.DoorType}  " +
-                $"<color=#aaaaaa>Name:</color> {door.DoorName}  " +
-                $"<color=#aaaaaa>Room:</color> {door.RoomType}"
-            );
-            sb.AppendLine(
-                $"<color=#aaaaaa>DoorLocal:</color> ({door.LocalPos.x:F2}, {door.LocalPos.y:F2}, {door.LocalPos.z:F2})  " +
-                $"<color=#aaaaaa>DoorRot:</color> ({door.LocalEuler.x:F1}, {door.LocalEuler.y:F1}, {door.LocalEuler.z:F1})"
-            );
-            sb.AppendLine(
-                $"<color=#aaaaaa>DoorRoomRot:</color> ({door.RoomEuler.x:F1}, {door.RoomEuler.y:F1}, {door.RoomEuler.z:F1})"
-            );
-        }
-        else
-        {
-            sb.AppendLine("<color=#666666>Door: -- (ドアに触れると更新)</color>");
         }
 
         // ── ラウンド状態フラグ ────────────────────────────────────────
@@ -1050,8 +848,7 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
                 $"<color=#ff4444>Warhead:</color> " +
                 $"DetonationTimer={Warhead.DetonationTimer:F1}  " +
                 $"RealTimer={Warhead.RealDetonationTimer:F1}  " +
-                $"IsLocked={Bool(Warhead.IsLocked)} " +
-                $"IsBooming={Bool(MapFlags.IsWarheadBooming)} "
+                $"IsLocked={Bool(Warhead.IsLocked)}"
             );
         }
         else
@@ -1074,31 +871,13 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
                 $"<color=#aaaaaa>Weight:</color> {currentItem.Weight:F2}"
             );
 
-            // ── CItem 情報 ─────────────────────────────────────────────
-            if (CItem.TryGet(currentItem, out var cItem) && cItem != null)
+            // カスタムアイテム情報
+            if (CustomItem.Of(currentItem.Serial) is { } custom)
             {
                 sb.AppendLine(
-                    $"<color=#88ffcc>[CItem]</color> " +
-                    $"<color=#aaaaaa>Key:</color> {cItem.UniqueKeyName}  " +
-                    $"<color=#aaaaaa>Type:</color> {cItem.GetType().Name}  " +
-                    $"<color=#aaaaaa>Display:</color> {cItem.DisplayName}"
-                );
-                string desc = cItem.Description;
-                if (!string.IsNullOrEmpty(desc))
-                    sb.AppendLine($"  <color=#aaaaaa>Desc:</color> {desc}");
-
-                // ★ Hybrid なら内部トラッキング状態も出す
-                if (cItem is CItemHybrid hybrid)
-                {
-                    try
-                    {
-                        sb.AppendLine(hybrid.GetDebugStateFor(player, currentItem.Serial));
-                    }
-                    catch (Exception e)
-                    {
-                        sb.AppendLine($"<color=#ff4444>[Hybrid Debug Error]</color> {e.Message}");
-                    }
-                }
+                    $"<color=#88ffcc>[CustomItem]</color> " +
+                    $"<color=#aaaaaa>Type:</color> {custom.GetType().Name}  " +
+                    $"<color=#aaaaaa>Display:</color> {custom.Name}");
             }
 
             // ── Firearm 情報 ───────────────────────────────────────────
@@ -1165,7 +944,7 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             foreach (var it in items)
             {
                 bool isCurrent = it.Serial == currentItem.Serial;
-                bool isCItem   = CItem.TryGet(it, out var itCi);
+                bool isCItem   = CustomItem.Of(it.Serial) is not null;
                 string tag     = isCItem ? "<color=#88ffcc>[C]</color>" : "";
                 string cur     = isCurrent ? "<color=yellow>▶</color>" : "  ";
                 sb.Append($" {cur}{tag}{it.Type}");
@@ -1193,34 +972,6 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
                     $"| Intensity: {effect.Intensity,-3} Duration: {duration}"
                 );
             }
-        }
-
-        // ── EXPERIMENTAL FEATURES ───────────────────────────────────
-        var expectedTeam = RoundHandler.GetExpectedTeam();
-        float elapsed = RoundHandler.ElapsedTime;
-        float waitFor = RoundHandler.WaitForSpawnTime;
-        float rawRemaining = waitFor - elapsed;
-        float remaining = Math.Max(0f, rawRemaining);
-
-        if (RoundHandler.IsAlreadySpawned)
-        {
-            sb.AppendLine(
-                $"<color=#666666>FirstTeam: {expectedTeam} already spawned.</color>"
-            );
-        }
-        else
-        {
-            string teamColor = RoundHandler.IsSecurityTeamExpected() ? "#00b7eb" : "#228b22";
-            string urgency = remaining <= 30f ? "<color=#ff4444>" : "<color=#ffcc00>";
-            string status = rawRemaining <= 0f
-                ? $"spawn requested {urgency}{remaining:F1}s</color>"
-                : $"spawns in {urgency}{remaining:F1}s</color>";
-
-            sb.AppendLine(
-                $"{urgency}FirstTeam:</color> " +
-                $"<color={teamColor}>{expectedTeam}</color> {status} " +
-                $"<color=#666666>({elapsed:F1} / {waitFor:F0})</color>"
-            );
         }
 
         // ────────────────────────────────────────────────────────────

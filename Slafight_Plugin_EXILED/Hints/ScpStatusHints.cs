@@ -12,12 +12,10 @@ using HintServiceMeow.Core.Extension;
 using HintServiceMeow.Core.Utilities;
 using MEC;
 using PlayerRoles;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.API.Interface;
-using Slafight_Plugin_EXILED.CustomMaps;
-using Slafight_Plugin_EXILED.CustomMaps.Core;
-using Slafight_Plugin_EXILED.CustomMaps.Features.FacilityControlRoomFunctions;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using AbstractHint = HintServiceMeow.Core.Models.Hints.AbstractHint;
@@ -306,66 +304,17 @@ public class ScpStatusHints : IBootstrapHandler
             RefreshSoon();
     }
 
+    /// <summary>
+    /// 既定のチャンネルを登録します。現在は何も登録しません。
+    /// </summary>
+    /// <remarks>
+    /// 以前は SCP / 第五教会 / Warriors の 3 つをここで作っていましたが、
+    /// どれも陣営と役職に依存した<b>コンテンツ</b>でした。
+    /// チャンネルの機構 (<see cref="StatusHintChannel"/>・重ね合わせ・更新ループ) はそのままなので、
+    /// 陣営側から <see cref="RegisterChannel"/> を呼んで自分のチャンネルを名乗ってください。
+    /// </remarks>
     private static void RegisterDefaultChannels()
     {
-        RegisterChannel(CreateScpChannel());
-        RegisterChannel(CreateFifthistsChannel());
-        RegisterChannel(CreateWarriorsChannel());
-    }
-
-    private static StatusHintChannel CreateScpChannel()
-    {
-        return new StatusHintChannel("scp", IsScpStatusMember)
-        {
-            Title = "SCP",
-            Color = CTeam.SCPs.GetTeamColor(),
-            Priority = 0,
-            IncludeGeneratorStatus = true,
-            CanReceive = IsScpStatusRecipient,
-        };
-    }
-
-    private static StatusHintChannel CreateFifthistsChannel()
-    {
-        return new StatusHintChannel("fifthists", IsFifthistStatusMember)
-        {
-            Title = "第五教会",
-            Color = CTeam.Fifthists.GetTeamColor(),
-            Priority = 10,
-            CanReceive = IsFifthistStatusMember,
-            FooterBuilder = BuildFifthistsFooter,
-        };
-    }
-
-    private static StatusHintChannel CreateWarriorsChannel()
-    {
-        return new StatusHintChannel("warriors", player => player.GetTeam() == CTeam.Warriors)
-        {
-            Title = "Warriors",
-            Color = CTeam.Warriors.GetTeamColor(),
-            Priority = 20,
-            CanReceive = player => player.GetTeam() == CTeam.Warriors,
-            FooterBuilder = BuildWarriorsFooter,
-        };
-    }
-
-    private static bool IsScpStatusMember(Player player)
-    {
-        return (player.GetTeam() == CTeam.SCPs ||
-                player.GetCustomRole() == CRoleTypeId.Scp3005) &&
-               !CRole.IsTeamNpc(player) && player.IsSafePlayer();
-    }
-
-    private static bool IsScpStatusRecipient(Player player)
-    {
-        return IsScpStatusMember(player) && !player.IsNPC;
-    }
-
-    private static bool IsFifthistStatusMember(Player player)
-    {
-        return (player.GetTeam() == CTeam.Fifthists ||
-                player.GetCustomRole() == CRoleTypeId.Scp3005) &&
-               !CRole.IsTeamNpc(player) && player.IsSafePlayer();
     }
 
     private static void OnRoundStarted()
@@ -581,7 +530,6 @@ public class ScpStatusHints : IBootstrapHandler
         var members = players
             .Where(player => IsPlayerValid(player))
             .Where(player => channel.IncludeNpcMembers || !player.IsNPC)
-            .Where(player => !CRole.IsTeamNpc(player))
             .Where(player => SafeInvoke(channel.IncludesMember, player, false))
             .ToList();
 
@@ -711,12 +659,8 @@ public class ScpStatusHints : IBootstrapHandler
         if (context.Channel.SubjectNameBuilder != null)
             return SafeInvoke(context.Channel.SubjectNameBuilder, context, string.Empty);
 
-        var customRole = context.Subject.GetCustomRole();
-
-        if (customRole is not CRoleTypeId.None &&
-            CRole.TryGet(customRole, out var cRole) &&
-            cRole != null)
-            return cRole.RoleDisplayName;
+        if (CustomRole.Of(context.Subject) is { } customRole)
+            return customRole.Name;
 
         return context.Subject.Role?.Name ?? "Unknown";
     }
@@ -792,67 +736,6 @@ public class ScpStatusHints : IBootstrapHandler
         return player.Role is Scp079Role scp079Role
             ? scp079Role.CameraPosition
             : player.Position;
-    }
-
-    private static string BuildFifthistsFooter(StatusHintBuildContext context)
-    {
-        var sb = new StringBuilder();
-        var marion = context.AllPlayers.FirstOrDefault(player =>
-            IsPlayerValid(player) &&
-            player.IsAlive &&
-            player.GetCustomRole() == CRoleTypeId.MarionWheeler);
-
-        if (marion != null)
-        {
-            sb.Append("<color=")
-                .Append(context.Channel.Color)
-                .Append(">第五目標:</color> Marion Wheeler / ")
-                .Append(marion.Zone);
-
-            if (marion != context.Viewer)
-            {
-                var distance = (int)Vector3.Distance(GetStatusPosition(context.Viewer), marion.Position);
-                sb.Append(" / ")
-                    .Append(distance)
-                    .Append("m");
-            }
-
-            sb.AppendLine();
-        }
-
-        if (FacilityControlRoom.IsAntiMemeProtocolActive)
-            sb.AppendLine("<color=red>反ミームプロトコル: 起動中</color>");
-        else if (FacilityControlRoom.HasAntiMemeProtocolActivatedInPast)
-            sb.AppendLine("<color=orange>反ミームプロトコル: 起動履歴あり</color>");
-
-        return sb.ToString();
-    }
-
-    private static string BuildWarriorsFooter(StatusHintBuildContext context)
-    {
-        var operation = MapFlags.GetSeason() switch
-        {
-            SeasonTypeId.Christmas => "SNOW DIVISION",
-            SeasonTypeId.April => "CANDY DIVISION",
-            SeasonTypeId.Halloween => "HALLOWEEN CANDY DIVISION",
-            _ => "DIVISION COMMAND",
-        };
-
-        var sb = new StringBuilder();
-        sb.Append("<color=")
-            .Append(context.Channel.Color)
-            .Append(">COMMAND:</color> ")
-            .Append(operation)
-            .AppendLine();
-
-        if (Warhead.IsInProgress)
-        {
-            sb.Append("<color=red>ALPHA WARHEAD:</color> T-")
-                .Append(Warhead.DetonationTimer.ToString("F0", CultureInfo.InvariantCulture))
-                .AppendLine("s");
-        }
-
-        return sb.ToString();
     }
 
     public static string BuildGeneratorText()

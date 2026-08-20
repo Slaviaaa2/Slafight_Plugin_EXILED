@@ -136,20 +136,15 @@ public static class Handler
         if (ForcedCanUsePlayers.Contains(player.Id))
             return true;
 
-        if (!string.IsNullOrEmpty(player.UniqueRole))
-            return CRole.TryGetByUniqueRole(player.UniqueRole, out var role) &&
-                   role.Voice.Proximity.IsAvailable;
-
+        // 役職ごとの可否は、以前は CRole.Voice が持っていた。
+        // 新 API の役職はまだ声の設定を持たないので、当面はバニラ役職の一覧だけで判定する。
         return AllowedRoleTypes.Contains(player.Role);
     }
 
     public static bool ShouldEnableProximityChatByDefault(Player player)
     {
-        if (player == null || string.IsNullOrEmpty(player.UniqueRole))
-            return false;
-
-        return CRole.TryGetByUniqueRole(player.UniqueRole, out var role) &&
-               role.Voice.Proximity.EnabledByDefault;
+        // 既定で有効にするかどうかも、以前は CRole.Voice が持っていた。
+        return false;
     }
 
     public static bool IsProximityChatForced(Player player)

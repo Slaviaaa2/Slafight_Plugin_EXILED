@@ -8,6 +8,7 @@ using Exiled.API.Features.Lockers;
 using Exiled.API.Features.Pickups;
 using Mirror;
 using ProjectMER.Features;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 using PrefabType = Exiled.API.Enums.PrefabType;
@@ -263,13 +264,13 @@ public static class LockerExtensions
 
         ItemSpawnSpec spec = ItemSpawnSpec.Parse(itemSpec, null);
 
-        if (spec.AllowsCustom && CItem.TryResolve(spec.Name, out CItem? cItem) && cItem != null)
+        // カスタムアイテムは型で解決する。TypeParser が型名から引き当てる。
+        if (spec.AllowsCustom && TypeParser.TryParse<CustomItem>(spec.Name, out Type? customType))
         {
-            Pickup? custom = cItem.Spawn(position);
-            if (custom != null)
-                return custom;
+            if (CustomItem.Spawn(customType!, position) is { Pickup: not null } custom)
+                return Pickup.Get(custom.Pickup.Base);
 
-            Log.Warn($"[LockerExtensions] CItem '{spec.Name}' failed to spawn.");
+            Log.Warn($"[LockerExtensions] CustomItem '{spec.Name}' failed to spawn.");
             return null;
         }
 

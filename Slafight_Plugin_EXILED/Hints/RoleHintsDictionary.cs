@@ -207,17 +207,9 @@ internal static class RoleHintsDictionary
         if (ResolvedFromRole.TryGetValue(roleTypeId, out data))
             return true;
 
-        if (CRole.TryGet(roleTypeId, out var role))
-        {
-            var color = role.TeamId.GetTeamColor();
-            data = (
-                $"<color={color}>{role.RoleDisplayName}</color>",
-                $"<color={color}>{role.TeamId.GetTeamName()}</color>",
-                role.RoleDescription);
-
-            ResolvedFromRole[roleTypeId] = data;
-            return true;
-        }
+        // 旧 CRole からの解決はここにありました。役職が自分で HudLabel / TeamLabel /
+        // Objective を名乗る新 API では、この表を引く必要そのものがありません。
+        // 表示層は CustomRole.Of(player) を直接読んでください。
 
         data = default;
         return false;
