@@ -180,6 +180,7 @@ public class PlayerHUD : EventHandlerBase
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Specific, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate + 350, 880);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Ability, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 22, XCordinate + 350, 800);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_EffectedInfo, string.Empty, HintAlignment.Center, HintSyncSpeed.Fastest, 22, 0, 930);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Forces, string.Empty, HintAlignment.Center, HintSyncSpeed.Fast, 23, 600, 0);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 24, XCordinate, 345);
     }
 
@@ -309,6 +310,10 @@ public class PlayerHUD : EventHandlerBase
                 case SyncType.PHUD_EffectedInfo:
                     var effected = display.GetHint(HudConstId.PlayerHUD_EffectedInfo);
                     if (effected != null) effected.Text = hintText;
+                    break;
+                case SyncType.PHUD_Forces:
+                    var forces = display.GetHint(HudConstId.PlayerHUD_Forces);
+                    if (forces != null) forces.Text = hintText;
                     break;
                 case SyncType.PHUD_Debug:
                     var db = display.GetHint(HudConstId.PlayerHUD_Debug);

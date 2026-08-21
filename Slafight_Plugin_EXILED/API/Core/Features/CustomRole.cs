@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -222,6 +223,20 @@ public abstract class CustomRole : IPlayerOwn
     /// 現在有効なカスタム役職の一覧です。
     /// </summary>
     public static IReadOnlyCollection<CustomRole> Active => ActiveRoles.Values;
+
+    /// <summary>
+    /// いま有効な <typeparamref name="T"/> の役職インスタンスです。派生役職も含みます。
+    /// </summary>
+    /// <remarks>
+    /// 反復中に役職を外しても壊れないよう、その場でスナップショットを取ります。
+    /// </remarks>
+    public static IReadOnlyList<T> AllOf<T>() where T : CustomRole => ActiveRoles.Values.OfType<T>().ToArray();
+
+    /// <summary>
+    /// <typeparamref name="T"/> の役職を持っているプレイヤーです。
+    /// </summary>
+    public static IReadOnlyList<Player> PlayersOf<T>() where T : CustomRole =>
+        AllOf<T>().Select(role => role.Player).Where(player => player.IsSafePlayer()).ToArray();
 
     /// <summary>
     /// 指定したアセンブリで定義された役職だけを解除します。

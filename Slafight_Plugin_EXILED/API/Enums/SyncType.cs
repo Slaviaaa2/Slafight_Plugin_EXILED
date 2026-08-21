@@ -10,5 +10,6 @@ public enum SyncType
     PHUD_Specific,
     PHUD_Ability,
     PHUD_EffectedInfo,
+    PHUD_Forces,
     PHUD_Debug
 }

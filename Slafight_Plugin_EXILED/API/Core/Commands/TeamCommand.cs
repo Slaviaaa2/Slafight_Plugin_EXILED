@@ -32,9 +32,9 @@ public sealed class TeamCommand : CommandBase
                 return false;
             }
 
-            if (CustomTeam.All.FirstOrDefault(team => team.GetType() == teamType) is not { } target)
+            if (CustomTeam.Get(teamType) is not { } target)
             {
-                response = $"{teamType.Name} は生成されていません。";
+                response = $"{teamType.Name} を生成できませんでした。";
 
                 return false;
             }

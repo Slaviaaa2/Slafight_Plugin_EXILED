@@ -135,6 +135,18 @@
         <None Include="App.config" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="CustomItems\" />
+      <Folder Include="CustomRoles\ChaosInsurgents\" />
+      <Folder Include="CustomRoles\Fifthists\" />
+      <Folder Include="CustomRoles\FoundationForces\Guards\SecurityTeams\" />
+      <Folder Include="CustomRoles\FoundationForces\MTFs\Epsilon11\" />
+      <Folder Include="CustomRoles\FoundationForces\MTFs\Eta10\" />
+      <Folder Include="CustomRoles\FoundationForces\MTFs\Nu7\" />
+      <Folder Include="CustomRoles\Neutrals\ClassD\" />
+      <Folder Include="CustomRoles\Neutrals\Scientists\" />
+    </ItemGroup>
+
     <!--
         %APPDATA% は Windows のみ。Linux では Mono の SpecialFolder.ApplicationData と
         同じ場所（XDG_CONFIG_HOME、既定は $HOME/.config）に EXILED のプラグインツリーがある。

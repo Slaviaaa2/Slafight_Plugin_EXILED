@@ -139,6 +139,40 @@ public abstract class CustomTeam
     }
 
     /// <summary>
+    /// 実行時に決まった型のチームインスタンスを返します。
+    /// コマンドや設定など、型を値として持ち回る経路から使います。
+    /// </summary>
+    public static CustomTeam Get(Type type)
+    {
+        if (type is null || !typeof(CustomTeam).IsAssignableFrom(type) || type.IsAbstract)
+        {
+            Log.Error($"[Slafight] {type?.FullName ?? "null"} はチームとして生成できません。");
+
+            return null;
+        }
+
+        if (Instances.TryGetValue(type, out CustomTeam cached))
+            return cached;
+
+        try
+        {
+            CustomTeam instance = (CustomTeam)Activator.CreateInstance(type);
+            Instances[type] = instance;
+
+            // All を作り直させて、明示生成した分も一覧に載るようにする。
+            all = null;
+
+            return instance;
+        }
+        catch (Exception exception)
+        {
+            Log.Error($"[Slafight] チーム {type.FullName} を生成できませんでした: {exception}");
+
+            return null;
+        }
+    }
+
+    /// <summary>
     /// このプレイヤーが属しているチームです。どこにも属していなければ null。
     /// <see cref="CustomRole.Of"/> と対になります。
     /// </summary>
