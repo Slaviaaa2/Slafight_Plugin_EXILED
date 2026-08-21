@@ -9,6 +9,12 @@ namespace Slafight_Plugin_EXILED.API.Core.Structs;
 /// <summary>
 /// 役職が名乗る近接ボイスの扱いです。
 /// </summary>
+/// <remarks>
+/// <b>近接ボイスは「SCP チャットを近くの人にも聞こえるようにする」仕組みです。</b>
+/// つまり <see cref="Features.CustomRole.BaseRole"/> が SCP チャットで話せる役職でなければ、
+/// ここで <see cref="Toggle"/> を宣言しても発声経路そのものが無いので何も起きません。
+/// 人間ベースの役職に付けると、「使えます」の案内だけ出て声が乗らない状態になります。
+/// </remarks>
 public readonly struct RoleProximitySettings
 {
     public RoleProximitySettings(bool isAvailable, bool enabledByDefault = true)
@@ -133,7 +139,11 @@ public readonly struct RoleVoiceSettings
     /// <summary>何も指定しません。</summary>
     public static RoleVoiceSettings None => default;
 
-    /// <summary>近接ボイスだけ使えるようにします。</summary>
+    /// <summary>
+    /// 近接ボイスだけ使えるようにします。
+    /// <b><see cref="Features.CustomRole.BaseRole"/> が SCP チャットを持つ役職のときだけ意味があります</b>
+    /// (<see cref="RoleProximitySettings"/> の注記を参照)。
+    /// </summary>
     public static RoleVoiceSettings WithProximity(bool enabledByDefault = true)
         => new(RoleProximitySettings.Toggle(enabledByDefault));
 }

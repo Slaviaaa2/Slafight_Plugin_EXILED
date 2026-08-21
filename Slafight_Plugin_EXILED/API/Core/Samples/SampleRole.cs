@@ -58,11 +58,6 @@ public sealed class SampleRole : CustomRole
 
     public override string CustomInfo => "Sample";
 
-    /// <summary>
-    /// 声の扱いも役職が名乗ります。配線側 (VoiceRoutingApi / ProximityChat) は触りません。
-    /// </summary>
-    public override RoleVoiceSettings Voice => RoleVoiceSettings.WithProximity();
-
     protected override void OnSpawned()
     {
         // 能力は型で配ります。同じ能力を別の呼び名で使わせたいなら Rename を重ねます。
