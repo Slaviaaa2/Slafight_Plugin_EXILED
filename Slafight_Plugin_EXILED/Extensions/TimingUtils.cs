@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using MEC;
+using Slafight_Plugin_EXILED.API.Core.Features;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 
-public class TimingUtils : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public class TimingUtils : EventHandlerBase
 {
     public struct ManagedCoroutine
     {

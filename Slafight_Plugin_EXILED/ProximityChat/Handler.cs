@@ -294,7 +294,7 @@ public static class Handler
 /// このクラスはどこからも登録されていません。<c>EventHandlerBase</c> を
 /// 継承しているだけで <c>EventHandlerRegistry</c> が生成・購読させます。
 /// </remarks>
-public sealed class HandlerLifecycle : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public sealed class HandlerLifecycle : EventHandlerBase
 {
     /// <inheritdoc />
     public override void RegisterEvents() => Handler.RegisterEvents();

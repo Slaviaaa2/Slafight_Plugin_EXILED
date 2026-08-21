@@ -24,7 +24,7 @@ using SSKeybindHintParameter = Hints.SSKeybindHintParameter;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public class PlayerHUD : EventHandlerBase
 {
     /// <summary>
     /// ゲームモードが走っていないときに [Event] 欄へ出す文字列です。
@@ -55,10 +55,10 @@ public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBa
         Instance = this;
 
         Exiled.Events.Handlers.Player.Verified += ServerInfoHint;
-        Server.RoundStarted += PlayerHUDMain;
+        Exiled.Events.Handlers.Server.RoundStarted += PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole += AllSyncHUD;
-        Server.RoundStarted += AllSyncHUD_;
-        Server.RestartingRound += DestroyHints;
+        Exiled.Events.Handlers.Server.RoundStarted += AllSyncHUD_;
+        Exiled.Events.Handlers.Server.RestartingRound += DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += Spectate;
         Exiled.Events.Handlers.Player.Left += OnLeft;
 
@@ -76,10 +76,10 @@ public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBa
             Instance = null;
 
         Exiled.Events.Handlers.Player.Verified -= ServerInfoHint;
-        Server.RoundStarted -= PlayerHUDMain;
+        Exiled.Events.Handlers.Server.RoundStarted -= PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole -= AllSyncHUD;
-        Server.RoundStarted -= AllSyncHUD_;
-        Server.RestartingRound -= DestroyHints;
+        Exiled.Events.Handlers.Server.RoundStarted -= AllSyncHUD_;
+        Exiled.Events.Handlers.Server.RestartingRound -= DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer -= Spectate;
         Exiled.Events.Handlers.Player.Left -= OnLeft;
 

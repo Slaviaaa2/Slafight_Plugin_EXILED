@@ -6,6 +6,7 @@ using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Scp079;
 using Exiled.Events.Handlers;
 using MEC;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Extensions;
@@ -13,7 +14,7 @@ using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public sealed class Scp079PingHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public sealed class Scp079PingHints : EventHandlerBase
 {
     private const float DisplaySeconds = 5f;
 
@@ -22,15 +23,15 @@ public sealed class Scp079PingHints : Slafight_Plugin_EXILED.API.Core.Features.E
     /// <inheritdoc />
     public override void RegisterEvents()
     {
-        Scp079.Pinging += OnPinging;
-        Server.RestartingRound += ClearAll;
+        Exiled.Events.Handlers.Scp079.Pinging += OnPinging;
+        Exiled.Events.Handlers.Server.RestartingRound += ClearAll;
     }
 
     /// <inheritdoc />
     public override void UnregisterEvents()
     {
-        Scp079.Pinging -= OnPinging;
-        Server.RestartingRound -= ClearAll;
+        Exiled.Events.Handlers.Scp079.Pinging -= OnPinging;
+        Exiled.Events.Handlers.Server.RestartingRound -= ClearAll;
         ClearAll();
     }
 

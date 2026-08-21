@@ -24,7 +24,7 @@ using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public class ScpStatusHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public class ScpStatusHints : EventHandlerBase
 {
     private const string HintIdPrefix = "ScpStatusHints_Status_";
     private const float UpdateInterval = 0.5f;
@@ -217,8 +217,8 @@ public class ScpStatusHints : Slafight_Plugin_EXILED.API.Core.Features.EventHand
         _registered = true;
         _updateVersion++;
 
-        Server.RoundStarted += OnRoundStarted;
-        Server.RestartingRound += OnRestartingRound;
+        Exiled.Events.Handlers.Server.RoundStarted += OnRoundStarted;
+        Exiled.Events.Handlers.Server.RestartingRound += OnRestartingRound;
         Exiled.Events.Handlers.Player.Verified += OnVerified;
         Exiled.Events.Handlers.Player.Left += OnLeft;
         Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
@@ -233,8 +233,8 @@ public class ScpStatusHints : Slafight_Plugin_EXILED.API.Core.Features.EventHand
         _registered = false;
         _updateVersion++;
 
-        Server.RoundStarted -= OnRoundStarted;
-        Server.RestartingRound -= OnRestartingRound;
+        Exiled.Events.Handlers.Server.RoundStarted -= OnRoundStarted;
+        Exiled.Events.Handlers.Server.RestartingRound -= OnRestartingRound;
         Exiled.Events.Handlers.Player.Verified -= OnVerified;
         Exiled.Events.Handlers.Player.Left -= OnLeft;
         Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;

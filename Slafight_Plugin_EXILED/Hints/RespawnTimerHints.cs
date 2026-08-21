@@ -10,13 +10,14 @@ using MEC;
 using PlayerRoles;
 using Respawning;
 using Respawning.Waves;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Interface;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public sealed class RespawnTimerHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public sealed class RespawnTimerHints : EventHandlerBase
 {
     private const string TimerHintId = "RespawnTimer_Time";
     private const string StateHintId = "RespawnTimer_State";
@@ -33,8 +34,8 @@ public sealed class RespawnTimerHints : Slafight_Plugin_EXILED.API.Core.Features
     {
         Exiled.Events.Handlers.Player.Verified += OnVerified;
         Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
-        Server.RoundStarted += EnsureAll;
-        Server.RestartingRound += ClearAll;
+        Exiled.Events.Handlers.Server.RoundStarted += EnsureAll;
+        Exiled.Events.Handlers.Server.RestartingRound += ClearAll;
         _loop = Timing.RunCoroutine(UpdateLoop());
     }
 
@@ -43,8 +44,8 @@ public sealed class RespawnTimerHints : Slafight_Plugin_EXILED.API.Core.Features
     {
         Exiled.Events.Handlers.Player.Verified -= OnVerified;
         Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;
-        Server.RoundStarted -= EnsureAll;
-        Server.RestartingRound -= ClearAll;
+        Exiled.Events.Handlers.Server.RoundStarted -= EnsureAll;
+        Exiled.Events.Handlers.Server.RestartingRound -= ClearAll;
 
         if (_loop.IsRunning)
             Timing.KillCoroutines(_loop);
