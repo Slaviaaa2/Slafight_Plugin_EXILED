@@ -81,7 +81,7 @@ public sealed class RoundEndHandler : EventHandlerBase
         {
             foreach (Player player in Player.List.Where(candidate => candidate.IsSafePlayer()))
             {
-                player.ShowHint(text, EndDelay);
+                CoreHints.Show(player, text, EndDelay, yCoordinate: 500, fontSize: 40);
             }
         }
 

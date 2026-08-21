@@ -127,7 +127,8 @@ public sealed class InputHandler : EventHandlerBase
 
         if (!ability.TrySwitchOption(direction)) return;
 
-        player.ShowHint(
+        CoreHints.Show(
+            player,
             $"<size=22>{ability.DisplayName}: <color=#8fdcff>{ability.SelectedOption?.Name}</color></size>",
             2f);
     }
@@ -159,6 +160,6 @@ public sealed class InputHandler : EventHandlerBase
             return;
 
         if (!ability.TryUse(out string failureReason) && failureReason is { Length: > 0 })
-            player.ShowHint($"<size=22>{ability.DisplayName}: {failureReason}</size>", 2f);
+            CoreHints.Show(player, $"<size=22>{ability.DisplayName}: {failureReason}</size>", 2f);
     }
 }

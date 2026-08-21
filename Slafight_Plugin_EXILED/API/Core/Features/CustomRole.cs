@@ -46,7 +46,7 @@ namespace Slafight_Plugin_EXILED.API.Core.Features;
 ///     protected override void OnSpawned()
 ///     {
 ///         // Scope は退出・ラウンド再開・役職変更で自動的に閉じる
-///         Scope.RunLoop(5f, p => p.ShowHint("狙撃手として動け", 2f));
+///         Scope.RunLoop(5f, p => CoreHints.Show(p, "狙撃手として動け", 2f));
 ///     }
 /// }
 /// </code>
@@ -425,7 +425,10 @@ public abstract class CustomRole : IPlayerOwn
     /// </remarks>
     protected virtual void ShowHint()
     {
-        Player.ShowHint($"<size=24>{Name}\n{Description}</size>", HintDuration);
+        CoreHints.ShowRoleDescription(
+            Player,
+            $"<size=24><color={Team?.Color ?? "#ffffff"}>{Name}</color>\n{Description}</size>",
+            HintDuration);
     }
 
     /// <summary>

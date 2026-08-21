@@ -38,12 +38,12 @@ public sealed class SampleItem : CustomItem
 
         if (charges > 0)
         {
-            Owner?.ShowHint($"{Name}: 残り {charges} 回", 3f);
+            CoreHints.Show(Owner, $"{Name}: 残り {charges} 回", 3f);
 
             return;
         }
 
-        Owner?.ShowHint($"{Name} を使い切りました。", 3f);
+        CoreHints.Show(Owner, $"{Name} を使い切りました。", 3f);
         Destroy();
     }
 }

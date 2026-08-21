@@ -46,7 +46,7 @@ namespace Slafight_Plugin_EXILED.API.Core.Features;
 ///     protected override void OnShot()
 ///     {
 ///         if (charges-- &lt;= 0)
-///             Owner?.ShowHint("チャージ切れ", 3f);
+///             CoreHints.Show(Owner, "チャージ切れ", 3f);
 ///     }
 /// }
 ///
@@ -563,7 +563,7 @@ public abstract class CustomItem
     {
         if (ToExiled(player) is not { } target || string.IsNullOrEmpty(text)) return;
 
-        target.ShowHint(text, duration);
+        CoreHints.Show(target, text, duration);
     }
 
     private void Attach(ushort serial)
