@@ -77,3 +77,22 @@ public static class Scp914ProcessorFix
         processor._fireUpgradeTrigger = false;
     }
 }
+
+/// <summary>
+/// <see cref="Scp914ProcessorFix"/>（SCP-914 の処理器を持たないアイテムへの差し込み）の寿命を持ちます。
+/// </summary>
+/// <remarks>
+/// <see cref="Scp914ProcessorFix"/> は static クラスなので自分で
+/// <c>EventHandlerBase</c> を継承できません。起動と停止だけをここが引き受けます。
+///
+/// このクラスはどこからも登録されていません。<c>EventHandlerBase</c> を
+/// 継承しているだけで <c>EventHandlerRegistry</c> が生成・購読させます。
+/// </remarks>
+public sealed class Scp914ProcessorFixLifecycle : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+{
+    /// <inheritdoc />
+    public override void RegisterEvents() => Scp914ProcessorFix.Register();
+
+    /// <inheritdoc />
+    public override void UnregisterEvents() => Scp914ProcessorFix.Unregister();
+}

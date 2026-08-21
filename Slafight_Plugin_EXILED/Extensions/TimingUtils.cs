@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using MEC;
-using Slafight_Plugin_EXILED.API.Interface;
 
 namespace Slafight_Plugin_EXILED.Extensions;
 
-public class TimingUtils : IBootstrapHandler
+public class TimingUtils : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     public struct ManagedCoroutine
     {
@@ -13,20 +12,14 @@ public class TimingUtils : IBootstrapHandler
         public string Key;
     }
 
-    private static TimingUtils? _instance;
-
     public static readonly List<ManagedCoroutine> ManagedCoroutines = [];
 
-    public static void Register()
-    {
-        _instance = new TimingUtils();
-    }
-
-    public static void Unregister()
+    /// <inheritdoc />
+    /// <remarks>購読するイベントはありません。管理対象コルーチンの後始末だけを担います。</remarks>
+    public override void UnregisterEvents()
     {
         ManagedCoroutines.ForEach(x => Timing.KillCoroutines(x.CoroutineHandle));
         ManagedCoroutines.Clear();
-        _instance = null;
     }
 
     public static CoroutineHandle CreateManagedCoroutine(string key, Func<bool> predicate, Action action, float returnInterval, float killTime = -1f)

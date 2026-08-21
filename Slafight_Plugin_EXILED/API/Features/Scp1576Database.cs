@@ -20,16 +20,16 @@ public class Scp1576Instance
     public Player? Player { get; init; }
     public Scp1576? Scp1576 { get; init; }
 }
-public class Scp1576DatabaseHandler : IBootstrapHandler
+public class Scp1576DatabaseHandler : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
-    public static void Register()
+    public override void RegisterEvents()
     {
         Server.WaitingForPlayers += OnWaitingForPlayers;
         Exiled.Events.Handlers.Player.Scp1576TransmissionEnded += OnTransmissionEnded;
         Exiled.Events.Handlers.Player.Left += OnLeft;
     }
 
-    public static void Unregister()
+    public override void UnregisterEvents()
     {
         Server.WaitingForPlayers -= OnWaitingForPlayers;
         Exiled.Events.Handlers.Player.Scp1576TransmissionEnded -= OnTransmissionEnded;

@@ -9,26 +9,27 @@ using WarheadHandler = Exiled.Events.Handlers.Warhead;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
-public sealed class RoundHazardController : IBootstrapHandler, IDisposable
+public sealed class RoundHazardController : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     private const string DefaultDecontaminationCancelMessage = "除染は取り消されました";
 
-    private static RoundHazardController _instance;
     private static string _lightDecontaminationCancelMessage = DefaultDecontaminationCancelMessage;
     private static DecontaminationSnapshot? _decontaminationSnapshot;
 
-    private readonly EventSubscriptionScope _subscriptions = new();
-    private bool _disposed;
-
-    private RoundHazardController()
+    /// <inheritdoc />
+    public override void RegisterEvents()
     {
-        _subscriptions.Add(
-            () => WarheadHandler.DeadmanSwitchInitiating += OnDeadmanSwitchInitiating,
-            () => WarheadHandler.DeadmanSwitchInitiating -= OnDeadmanSwitchInitiating);
+        WarheadHandler.DeadmanSwitchInitiating += OnDeadmanSwitchInitiating;
+        MapHandler.Decontaminating += OnDecontaminating;
+    }
 
-        _subscriptions.Add(
-            () => MapHandler.Decontaminating += OnDecontaminating,
-            () => MapHandler.Decontaminating -= OnDecontaminating);
+    /// <inheritdoc />
+    public override void UnregisterEvents()
+    {
+        WarheadHandler.DeadmanSwitchInitiating -= OnDeadmanSwitchInitiating;
+        MapHandler.Decontaminating -= OnDecontaminating;
+
+        ResetRoundState();
     }
 
     public static bool IsDeadmanSwitchBlocked { get; private set; }
@@ -36,29 +37,6 @@ public sealed class RoundHazardController : IBootstrapHandler, IDisposable
     public static bool IsLightDecontaminationBlocked { get; private set; }
 
     public static bool IsLightDecontaminationControllerDisableRequested { get; private set; }
-
-    public static void Register()
-    {
-        Unregister();
-        _instance = new RoundHazardController();
-    }
-
-    public static void Unregister()
-    {
-        _instance?.Dispose();
-        _instance = null;
-    }
-
-    public void Dispose()
-    {
-        if (_disposed)
-            return;
-
-        _disposed = true;
-        _subscriptions.Dispose();
-        ResetRoundState();
-        GC.SuppressFinalize(this);
-    }
 
     public static void SetAlphaWarheadDisarmLocked(bool locked)
     {

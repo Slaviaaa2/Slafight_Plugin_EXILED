@@ -13,42 +13,25 @@ using Player = Exiled.API.Features.Player;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public sealed class Scp079PingHints : IBootstrapHandler, IDisposable
+public sealed class Scp079PingHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     private const float DisplaySeconds = 5f;
-    private static Scp079PingHints? _instance;
 
     private readonly Dictionary<int, int> _versions = new();
-    private bool _disposed;
 
-    public static void Register()
-    {
-        Unregister();
-        _instance = new Scp079PingHints();
-    }
-
-    public static void Unregister()
-    {
-        _instance?.Dispose();
-        _instance = null;
-    }
-
-    private Scp079PingHints()
+    /// <inheritdoc />
+    public override void RegisterEvents()
     {
         Scp079.Pinging += OnPinging;
         Server.RestartingRound += ClearAll;
     }
 
-    public void Dispose()
+    /// <inheritdoc />
+    public override void UnregisterEvents()
     {
-        if (_disposed)
-            return;
-
-        _disposed = true;
         Scp079.Pinging -= OnPinging;
         Server.RestartingRound -= ClearAll;
         ClearAll();
-        GC.SuppressFinalize(this);
     }
 
     private void OnPinging(PingingEventArgs? ev)

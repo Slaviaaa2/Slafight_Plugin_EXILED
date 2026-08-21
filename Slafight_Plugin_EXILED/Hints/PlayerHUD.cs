@@ -24,20 +24,16 @@ using SSKeybindHintParameter = Hints.SSKeybindHintParameter;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public class PlayerHUD : IBootstrapHandler, IDisposable
+public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
+    /// <summary>
+    /// 現在動いている HUD です。表示を差し込む側 (<c>EffectedInfoTextProvider</c> など) が参照します。
+    /// </summary>
+    /// <remarks>
+    /// 生成は <c>EventHandlerRegistry</c> が行います。ここは購読が始まった実体を指すだけで、
+    /// <c>Lifetime</c> を読むために作られて捨てられる実体は入りません。
+    /// </remarks>
     public static PlayerHUD? Instance { get; private set; }
-    public static void Register()
-    {
-        Unregister();
-        Instance = new();
-    }
-
-    public static void Unregister()
-    {
-        Instance?.Dispose();
-        Instance = null;
-    }
 
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _abilityHudLoop;
@@ -46,10 +42,12 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
 
     // 観戦者ID → 現在見ているプレイヤー
     private readonly Dictionary<int, Player> _spectateTargets = new();
-    private bool _disposed;
 
-    public PlayerHUD()
+    /// <inheritdoc />
+    public override void RegisterEvents()
     {
+        Instance = this;
+
         Exiled.Events.Handlers.Player.Verified += ServerInfoHint;
         Server.RoundStarted += PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole += AllSyncHUD;
@@ -65,12 +63,12 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
         _debugHudLoop = Timing.RunCoroutine(DebugHudLoop());
     }
 
-    public void Dispose()
+    /// <inheritdoc />
+    public override void UnregisterEvents()
     {
-        if (_disposed)
-            return;
+        if (ReferenceEquals(Instance, this))
+            Instance = null;
 
-        _disposed = true;
         Exiled.Events.Handlers.Player.Verified -= ServerInfoHint;
         Server.RoundStarted -= PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole -= AllSyncHUD;
@@ -92,7 +90,6 @@ public class PlayerHUD : IBootstrapHandler, IDisposable
             Timing.KillCoroutines(_debugHudLoop);
 
         _spectateTargets.Clear();
-        GC.SuppressFinalize(this);
     }
 
 

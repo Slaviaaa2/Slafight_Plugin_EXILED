@@ -24,7 +24,7 @@ using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public class ScpStatusHints : IBootstrapHandler
+public class ScpStatusHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     private const string HintIdPrefix = "ScpStatusHints_Status_";
     private const float UpdateInterval = 0.5f;
@@ -208,9 +208,9 @@ public class ScpStatusHints : IBootstrapHandler
 
     public static IReadOnlyCollection<StatusHintChannel> RegisteredChannels => Channels.Values.ToList();
 
-    public static void Register()
+    /// <inheritdoc />
+    public override void RegisterEvents()
     {
-        Unregister();
 
         RegisterDefaultChannels();
 
@@ -227,7 +227,8 @@ public class ScpStatusHints : IBootstrapHandler
             StartUpdateCoroutine();
     }
 
-    public static void Unregister()
+    /// <inheritdoc />
+    public override void UnregisterEvents()
     {
         _registered = false;
         _updateVersion++;

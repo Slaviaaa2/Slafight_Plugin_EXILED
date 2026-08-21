@@ -11,13 +11,13 @@ using LabPlayerEvents = LabApi.Events.Handlers.PlayerEvents;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
-public class KillCounter : IBootstrapHandler
+public class KillCounter : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     private static readonly Dictionary<int, int> RoundKillCounts = new();
     private static readonly Dictionary<int, int> RoleSessionKillCounts = new();
     private static bool _registered;
 
-    public static void Register()
+    public override void RegisterEvents()
     {
         if (_registered)
             return;
@@ -32,7 +32,7 @@ public class KillCounter : IBootstrapHandler
         _registered = true;
     }
 
-    public static void Unregister()
+    public override void UnregisterEvents()
     {
         if (!_registered)
             return;

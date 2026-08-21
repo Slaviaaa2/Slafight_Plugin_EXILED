@@ -820,9 +820,9 @@ public static class IntercomApi
     }
 }
 
-public sealed class IntercomApiHandler : IBootstrapHandler
+public sealed class IntercomApiHandler : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
-    public static void Register()
+    public override void RegisterEvents()
     {
         PlayerHandler.IntercomSpeaking += IntercomApi.HandleIntercomSpeaking;
         PlayerHandler.Left += OnPlayerLeft;
@@ -831,7 +831,7 @@ public sealed class IntercomApiHandler : IBootstrapHandler
         ServerHandler.RoundStarted += OnRoundStarted;
     }
 
-    public static void Unregister()
+    public override void UnregisterEvents()
     {
         PlayerHandler.IntercomSpeaking -= IntercomApi.HandleIntercomSpeaking;
         PlayerHandler.Left -= OnPlayerLeft;

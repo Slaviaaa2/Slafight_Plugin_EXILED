@@ -447,3 +447,22 @@ public static class VoiceRoutingApi
         public List<ReferenceHub> Targets { get; } = [];
     }
 }
+
+/// <summary>
+/// <see cref="VoiceRoutingApi"/>（声の経路制御）の寿命を持ちます。
+/// </summary>
+/// <remarks>
+/// <see cref="VoiceRoutingApi"/> は static クラスなので自分で
+/// <c>EventHandlerBase</c> を継承できません。起動と停止だけをここが引き受けます。
+///
+/// このクラスはどこからも登録されていません。<c>EventHandlerBase</c> を
+/// 継承しているだけで <c>EventHandlerRegistry</c> が生成・購読させます。
+/// </remarks>
+public sealed class VoiceRoutingApiLifecycle : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+{
+    /// <inheritdoc />
+    public override void RegisterEvents() => VoiceRoutingApi.RegisterEvents();
+
+    /// <inheritdoc />
+    public override void UnregisterEvents() => VoiceRoutingApi.UnregisterEvents();
+}

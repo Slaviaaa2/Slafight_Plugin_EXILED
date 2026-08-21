@@ -106,7 +106,32 @@ public static class EventHandlerRegistry
 
         PendingAssemblies.Clear();
 
+        WarnAboutSkipped();
+
         Log.Debug($"[Slafight] 自動登録対象を検出しました: 常駐 {ManualTypes.Count} 件 / ラウンド {RoundTypes.Count} 件");
+    }
+
+    /// <summary>
+    /// 自動登録の条件を満たさなかった派生クラスを報告します。
+    /// </summary>
+    /// <remarks>
+    /// public な引数なしコンストラクタが無い型は自動登録できません。
+    /// 黙って捨てると<b>継承しただけで動かない</b>状態になり、原因が分からなくなります。
+    /// 意図的に外すなら <see cref="NoAutoRegisterAttribute"/> を付けてください。
+    /// </remarks>
+    private static void WarnAboutSkipped()
+    {
+        foreach (Type type in TypeParser.FindAllTypes<EventHandlerBase>())
+        {
+            if (type.IsAbstract || type.IsGenericTypeDefinition) continue;
+            if (type.IsDefined(typeof(NoAutoRegisterAttribute), false)) continue;
+            if (type.GetConstructor(Type.EmptyTypes) is not null) continue;
+
+            Log.Warn(
+                $"[Slafight] {type.FullName} は EventHandlerBase を継承していますが、" +
+                "public な引数なしコンストラクタが無いため自動登録されません。" +
+                "意図的なら [NoAutoRegister] を付けてください。");
+        }
     }
 
     /// <summary>

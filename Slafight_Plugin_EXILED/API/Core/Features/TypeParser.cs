@@ -132,6 +132,12 @@ public static class TypeParser
     }
 
     /// <summary>
+    /// <typeparamref name="TBase"/> を継承している具象型を、コンストラクタの有無を問わず返します。
+    /// 「継承しているのに登録されていない」型を見つける用途に使います。
+    /// </summary>
+    public static IReadOnlyList<Type> FindAllTypes<TBase>() => Concrete<TBase>().ToArray();
+
+    /// <summary>
     /// <typeparamref name="TBase"/> を継承している具象型を、決定的な順序で列挙します。
     /// </summary>
     private static IEnumerable<Type> Concrete<TBase>()

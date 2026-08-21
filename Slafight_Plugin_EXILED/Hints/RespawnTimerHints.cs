@@ -16,33 +16,20 @@ using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.Hints;
 
-public sealed class RespawnTimerHints : IBootstrapHandler, IDisposable
+public sealed class RespawnTimerHints : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     private const string TimerHintId = "RespawnTimer_Time";
     private const string StateHintId = "RespawnTimer_State";
     private const string FoundationColor = "#00b7eb";
     private const string ChaosColor = "#228b22";
     private const string BalanceColor = "#FFD700";
-    private static RespawnTimerHints? _instance;
 
     private readonly int _timerY = 90;
     private readonly int _stateY = 110;
     private CoroutineHandle _loop;
-    private bool _disposed;
 
-    public static void Register()
-    {
-        Unregister();
-        _instance = new RespawnTimerHints();
-    }
-
-    public static void Unregister()
-    {
-        _instance?.Dispose();
-        _instance = null;
-    }
-
-    private RespawnTimerHints()
+    /// <inheritdoc />
+    public override void RegisterEvents()
     {
         Exiled.Events.Handlers.Player.Verified += OnVerified;
         Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
@@ -51,12 +38,9 @@ public sealed class RespawnTimerHints : IBootstrapHandler, IDisposable
         _loop = Timing.RunCoroutine(UpdateLoop());
     }
 
-    public void Dispose()
+    /// <inheritdoc />
+    public override void UnregisterEvents()
     {
-        if (_disposed)
-            return;
-
-        _disposed = true;
         Exiled.Events.Handlers.Player.Verified -= OnVerified;
         Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;
         Server.RoundStarted -= EnsureAll;
@@ -66,7 +50,6 @@ public sealed class RespawnTimerHints : IBootstrapHandler, IDisposable
             Timing.KillCoroutines(_loop);
 
         ClearAll();
-        GC.SuppressFinalize(this);
     }
 
     private void OnVerified(VerifiedEventArgs? ev)
