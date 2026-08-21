@@ -5,6 +5,7 @@ using Exiled.API.Features;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Core.Structs;
+using VoiceChat;
 
 namespace Slafight_Plugin_EXILED.API.Core.Samples;
 
@@ -46,6 +47,7 @@ public sealed class SampleRole : CustomRole
         ItemType.GunCOM18,
         ItemType.Medkit,
         ItemType.Flashlight,
+        ItemType.Radio,
     ];
 
     public override IReadOnlyDictionary<AmmoType, ushort> Ammo =>
@@ -57,6 +59,17 @@ public sealed class SampleRole : CustomRole
     ];
 
     public override string CustomInfo => "Sample";
+
+    /// <summary>
+    /// 声の扱いも役職が名乗ります。配線側 (VoiceRoutingApi / ProximityChat) は触りません。
+    /// </summary>
+    /// <remarks>
+    /// これは人間ベースの役職なので SCP チャットでは話せません。
+    /// 代わりに<b>無線の声を周囲にも漏らす</b>形にしています。
+    /// 流すチャンネルは、その土台の役職が実際に話せるものを指すのが要点です。
+    /// </remarks>
+    public override RoleVoiceSettings Voice =>
+        RoleVoiceSettings.WithProximity(sourceChannel: VoiceChatChannel.Radio);
 
     protected override void OnSpawned()
     {

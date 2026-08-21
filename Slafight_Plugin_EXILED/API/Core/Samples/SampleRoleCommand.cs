@@ -68,7 +68,9 @@ public sealed class SampleRoleCommand : CommandBase
         {
             if (Activator.CreateInstance(type) is not CustomRole probe) continue;
 
-            string voice = probe.Voice.Proximity.IsAvailable ? " / 近接ボイス可" : string.Empty;
+            string voice = probe.Voice.Proximity.IsAvailable
+                ? $" / 近接ボイス:{probe.Voice.Proximity.SourceChannel}"
+                : string.Empty;
 
             builder.AppendLine(
                 $"  <b>{type.Name}</b> — {probe.Name} [{probe.BaseRole} / {probe.Team?.Name ?? "陣営なし"}{voice}]");

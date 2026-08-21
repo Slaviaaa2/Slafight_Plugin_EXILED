@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Exiled.API.Features;
 using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Features;
+using VoiceChat;
 
 namespace Slafight_Plugin_EXILED.API.Core.Structs;
 
@@ -10,17 +11,34 @@ namespace Slafight_Plugin_EXILED.API.Core.Structs;
 /// 役職が名乗る近接ボイスの扱いです。
 /// </summary>
 /// <remarks>
-/// <b>近接ボイスは「SCP チャットを近くの人にも聞こえるようにする」仕組みです。</b>
-/// つまり <see cref="Features.CustomRole.BaseRole"/> が SCP チャットで話せる役職でなければ、
-/// ここで <see cref="Toggle"/> を宣言しても発声経路そのものが無いので何も起きません。
-/// 人間ベースの役職に付けると、「使えます」の案内だけ出て声が乗らない状態になります。
+/// <para>
+/// 近接ボイスは「<b>ある発声チャンネルを、近くに居る人にも空間音声として届ける</b>」仕組みです。
+/// どのチャンネルを流すかは <see cref="SourceChannel"/> で役職が決めます。
+/// 既定は <see cref="VoiceChatChannel.ScpChat"/> — SCP 同士の会話を周囲にも聞かせる、という
+/// 一番よくある使い方です。
+/// </para>
+/// <para>
+/// <b>土台の役職がそのチャンネルで話せることが前提です。</b>
+/// 人間ベースの役職に <see cref="VoiceChatChannel.ScpChat"/> を指定しても発声経路が無いので
+/// 何も起きず、「使えます」の案内だけが出ます。人間なら
+/// <see cref="VoiceChatChannel.Radio"/> や <see cref="VoiceChatChannel.Intercom"/> を、
+/// 幽霊役なら <see cref="VoiceChatChannel.Spectator"/> を指してください。
+/// </para>
+/// <para>
+/// <see cref="VoiceChatChannel.Proximity"/> は指定しないでください。
+/// 人間の通常の声は元から空間音声なので、二重に鳴るだけです。
+/// </para>
 /// </remarks>
 public readonly struct RoleProximitySettings
 {
-    public RoleProximitySettings(bool isAvailable, bool enabledByDefault = true)
+    public RoleProximitySettings(
+        bool isAvailable,
+        bool enabledByDefault = true,
+        VoiceChatChannel sourceChannel = VoiceChatChannel.ScpChat)
     {
         IsAvailable = isAvailable;
         EnabledByDefault = isAvailable && enabledByDefault;
+        SourceChannel = sourceChannel;
     }
 
     /// <summary>この役職が近接ボイスを使えるか。</summary>
@@ -29,11 +47,19 @@ public readonly struct RoleProximitySettings
     /// <summary>スポーン直後から有効にするか。</summary>
     public bool EnabledByDefault { get; }
 
+    /// <summary>
+    /// 近くの人へ流す発声チャンネルです。既定は <see cref="VoiceChatChannel.ScpChat"/>。
+    /// </summary>
+    public VoiceChatChannel SourceChannel { get; }
+
     /// <summary>使えません。</summary>
     public static RoleProximitySettings Disabled => default;
 
     /// <summary>切り替えで使えるようにします。</summary>
-    public static RoleProximitySettings Toggle(bool enabledByDefault = true) => new(true, enabledByDefault);
+    public static RoleProximitySettings Toggle(
+        bool enabledByDefault = true,
+        VoiceChatChannel sourceChannel = VoiceChatChannel.ScpChat)
+        => new(true, enabledByDefault, sourceChannel);
 }
 
 /// <summary>
@@ -141,9 +167,11 @@ public readonly struct RoleVoiceSettings
 
     /// <summary>
     /// 近接ボイスだけ使えるようにします。
-    /// <b><see cref="Features.CustomRole.BaseRole"/> が SCP チャットを持つ役職のときだけ意味があります</b>
+    /// 流すチャンネルは土台の役職が実際に話せるものを指してください
     /// (<see cref="RoleProximitySettings"/> の注記を参照)。
     /// </summary>
-    public static RoleVoiceSettings WithProximity(bool enabledByDefault = true)
-        => new(RoleProximitySettings.Toggle(enabledByDefault));
+    public static RoleVoiceSettings WithProximity(
+        bool enabledByDefault = true,
+        VoiceChatChannel sourceChannel = VoiceChatChannel.ScpChat)
+        => new(RoleProximitySettings.Toggle(enabledByDefault, sourceChannel));
 }

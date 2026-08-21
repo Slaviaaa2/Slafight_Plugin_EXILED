@@ -186,8 +186,8 @@ public static class Handler
 
         PrunePlayerLists();
 
-        // SCP チャットだけを Proximity にミラー
-        if (context.SourceChannel != VoiceChatChannel.ScpChat)
+        // どのチャンネルを流すかは役職が名乗る。ここでチャンネルを決め打ちしない。
+        if (context.SourceChannel != ResolveSourceChannel(context.Sender))
             return null;
 
         if (!CanPlayerUseProximityChat(context.Sender))
@@ -208,6 +208,21 @@ public static class Handler
     }
 
     // ====== 近接送信処理 ======
+
+    /// <summary>
+    /// この送り手について、近接に流すべき発声チャンネルです。
+    /// </summary>
+    /// <remarks>
+    /// カスタム役職が名乗っていればそれに従います。
+    /// 名乗っていない (= <see cref="AllowedRoleTypes"/> のバニラ SCP) 場合は SCP チャットです。
+    /// </remarks>
+    private static VoiceChatChannel ResolveSourceChannel(Player sender)
+    {
+        if (CustomRole.Of(sender) is { } role && role.Voice.Proximity.IsAvailable)
+            return role.Voice.Proximity.SourceChannel;
+
+        return VoiceChatChannel.ScpChat;
+    }
 
     private static bool CanReceiveProximity(Player speakerPlayer, Player receiver, float maxRange)
     {

@@ -10,9 +10,9 @@ namespace Slafight_Plugin_EXILED.API.Core.Samples;
 /// SCP 側のカスタム役職の見本です。近接ボイスを名乗る役職はこちらが例になります。
 /// </summary>
 /// <remarks>
-/// 近接ボイスは<b>SCP チャットを近くの人にも届ける</b>仕組みなので、
-/// 土台がSCPチャットを持つ役職でなければ機能しません。
-/// <see cref="SampleRole"/> は ClassD 土台なので宣言していません。
+/// 近接ボイスは「ある発声チャンネルを近くの人にも届ける」仕組みです。
+/// この役職は SCP 土台なので <b>SCP チャット</b>を流します。
+/// 人間土台で無線を流す例は <see cref="SampleRole"/> を見てください。
 /// </remarks>
 public sealed class SampleScpRole : CustomRole
 {
