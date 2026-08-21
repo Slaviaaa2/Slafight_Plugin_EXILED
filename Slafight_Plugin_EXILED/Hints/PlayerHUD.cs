@@ -27,6 +27,12 @@ namespace Slafight_Plugin_EXILED.Hints;
 public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
 {
     /// <summary>
+    /// ゲームモードが走っていないときに [Event] 欄へ出す文字列です。
+    /// </summary>
+    /// <remarks>移行前の <c>SpecialEventsHandler.LocalizedEventName</c> の既定値と同じです。</remarks>
+    private const string NoGameModeText = "無し";
+
+    /// <summary>
     /// 現在動いている HUD です。表示を差し込む側 (<c>EffectedInfoTextProvider</c> など) が参照します。
     /// </summary>
     /// <remarks>
@@ -343,7 +349,7 @@ public class PlayerHUD : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBa
             HintSync(SyncType.PHUD_Role,      roleText,      targetForHint);
             HintSync(SyncType.PHUD_Objective, objectiveText, targetForHint);
             HintSync(SyncType.PHUD_Team,      teamText,      targetForHint);
-            HintSync(SyncType.PHUD_Event,     GameMode.Current?.Name ?? string.Empty, targetForHint);
+            HintSync(SyncType.PHUD_Event,     GameMode.Current?.Name ?? NoGameModeText, targetForHint);
         }
         catch (Exception e)
         {
