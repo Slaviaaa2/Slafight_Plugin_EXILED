@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using Exiled.API.Interfaces;
+using Slafight_Plugin_EXILED.API.Enums;
 
 namespace Slafight_Plugin_EXILED;
 
@@ -16,6 +17,8 @@ public class Config : IConfig
     [Description("サーバーが満員になった時に待機時間を飛ばしてラウンドを自動開始する処理を無効化します")]
     public bool DisableFullServerRoundStart { get; set; } = true;
 
+    [Description("SeasonTypeIdを用いた季節指定をします。デフォルトはNoneです。")]
+    public SeasonTypeId Season { get; set; } = SeasonTypeId.None;
 
     [Description("ベータモードを有効にするかどうか")]
     public bool IsBeta { get; set; } = false;
