@@ -42,7 +42,7 @@ public class Plugin : Plugin<Config>
 
     public override string Prefix => "Slafight_Plugin_EXILED";
 
-    public override Version Version => new(1, 9, 0, 2);
+    public override Version Version => new(2, 0, 0, 0);
 
     public override Version RequiredExiledVersion { get; } = new(9, 14, 2);
 

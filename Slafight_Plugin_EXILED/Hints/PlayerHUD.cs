@@ -185,9 +185,10 @@ public class PlayerHUD : EventHandlerBase
 
     private static string BuildServerInfoText()
     {
+        string versionInfoString = $"v{Plugin.Singleton.Version}";
         return Plugin.Singleton.Config.IsBeta
-            ? "[<color=#008cff>Sharp Server</color> - <color=red>BETA</color>]"
-            : "[<color=#008cff>Sharp Server</color>]";
+            ? $"[<color=#008cff>Sharp Server</color> - <color=red>BETA</color> | {versionInfoString}]"
+            : $"[<color=#008cff>Sharp Server</color> | {versionInfoString}]";
     }
 
     private static AbstractHint EnsureServerInfoHint(PlayerDisplay display)
