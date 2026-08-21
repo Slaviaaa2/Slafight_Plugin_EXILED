@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.API.Features;
+using Slafight_Plugin_EXILED.ProximityChat;
 
 namespace Slafight_Plugin_EXILED.API.Core.Samples;
 
@@ -31,6 +33,10 @@ public sealed class SampleStatusCommand : CommandBase
         builder.AppendLine($"  ゲームモード     : {GameMode.Current?.Name ?? "なし"}");
         builder.AppendLine($"  スポーン状況     : {SpawnContext.Active.Name}");
         builder.AppendLine($"  宣言済みウェーブ : {SpawnContext.AllWaves.Count}");
+        builder.AppendLine($"  ボイス経路ルール : {VoiceRoutingApi.RegisteredRules.Count}");
+        builder.AppendLine(
+            $"  近接チャット     : 使用可 {Handler.CanUsePlayers.Count} 人 / " +
+            $"有効化 {Handler.ActivatedPlayers.Count} 人");
 
         if (EventHandlerBase.Active.Count > 0)
         {

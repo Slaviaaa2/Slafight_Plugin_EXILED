@@ -1,4 +1,7 @@
+using System;
+using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
 using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
@@ -72,7 +75,39 @@ public sealed class InputHandler : EventHandlerBase
         if (keybind.SettingId == ServerSpecifics.AbilityOptionNextKeybindSettingId)
         {
             SwitchOption(player, AbilityOptionDirection.Next);
+
+            return;
         }
+
+        if (keybind.SettingId == ServerSpecifics.SuicideButtonKeybindSettingId)
+        {
+            Suicide(player);
+        }
+    }
+
+    /// <summary>
+    /// 銃を構えている間だけ、自害できます。
+    /// </summary>
+    private static void Suicide(Player player)
+    {
+        if (player.CurrentItem is not Firearm firearm)
+            return;
+
+        try
+        {
+            if (firearm.FirearmType is not (FirearmType.None or FirearmType.ParticleDisruptor))
+            {
+                player.PlayGunSound(firearm.FirearmType);
+                SpeakerApi.Play("suicide_shot.ogg", $"{player.NetId}_suicideShotSound", player.Position, true);
+            }
+        }
+        catch (Exception exception)
+        {
+            // 音が出せなくても自害そのものは通す。
+            Log.Warn($"[Slafight] 自害音の再生に失敗しました ({player.Nickname}): {exception.Message}");
+        }
+
+        player.Kill("自害した");
     }
 
     /// <summary>
