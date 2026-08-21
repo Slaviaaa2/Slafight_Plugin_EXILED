@@ -5,20 +5,24 @@ using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.ProximityChat;
 
-namespace Slafight_Plugin_EXILED.API.Core.Samples;
+namespace Slafight_Plugin_EXILED.API.Core.Commands;
 
 /// <summary>
-/// 自動登録が生きているかを実機で確かめるためのコマンドです。
-///
-/// <c>slcore status</c> として並びます。<see cref="SampleRootCommand"/> 側は無変更です。
+/// 土台がいま何を掴んでいるかを表示します。
 /// </summary>
-public sealed class SampleStatusCommand : CommandBase
+/// <remarks>
+/// 自動登録が生きているか、ラウンド用ハンドラが作り直されたか、
+/// 役職やアイテムが取り残されていないかを、実機で確かめるための窓口です。
+/// </remarks>
+public sealed class StatusCommand : CommandBase
 {
-    public override Type Parent => typeof(SampleRootCommand);
+    public override Type Parent => typeof(RootCommand);
 
     public override string Command => "status";
 
-    public override string Description => "自動登録されたハンドラと、現在のカスタム役職・アイテムを表示します。";
+    public override string[] Aliases { get; } = ["info"];
+
+    public override string Description => "登録状況と実行中の状態を表示します。";
 
     protected override bool OnExecute(out string response)
     {
@@ -38,15 +42,33 @@ public sealed class SampleStatusCommand : CommandBase
             $"  近接チャット     : 使用可 {Handler.CanUsePlayers.Count} 人 / " +
             $"有効化 {Handler.ActivatedPlayers.Count} 人");
 
-        if (EventHandlerBase.Active.Count > 0)
+        if (!TryGetArgument(0, out string verbose) || verbose is not ("-v" or "full"))
         {
-            builder.AppendLine("  内訳:");
+            builder.AppendLine("  (-v で内訳)");
 
-            foreach (string name in EventHandlerBase.Active
-                         .Select(handler => handler.GetType().Name)
-                         .OrderBy(name => name, StringComparer.Ordinal))
+            response = builder.ToString().TrimEnd();
+
+            return true;
+        }
+
+        builder.AppendLine();
+        builder.AppendLine("<b>Handlers</b>");
+
+        foreach (string name in EventHandlerBase.Active
+                     .Select(handler => handler.GetType().Name)
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            builder.AppendLine($"  - {name}");
+        }
+
+        if (CustomRole.Active.Count > 0)
+        {
+            builder.AppendLine();
+            builder.AppendLine("<b>Roles</b>");
+
+            foreach (CustomRole role in CustomRole.Active)
             {
-                builder.AppendLine($"    - {name}");
+                builder.AppendLine($"  - {role.Player?.Nickname ?? "?"} : {role.GetType().Name}");
             }
         }
 

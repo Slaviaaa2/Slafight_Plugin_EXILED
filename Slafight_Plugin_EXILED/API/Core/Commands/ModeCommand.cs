@@ -3,25 +3,22 @@ using System.Linq;
 using System.Text;
 using Slafight_Plugin_EXILED.API.Core.Features;
 
-namespace Slafight_Plugin_EXILED.API.Core.Samples;
+namespace Slafight_Plugin_EXILED.API.Core.Commands;
 
 /// <summary>
-/// ゲームモードを一覧・起動・停止するコマンドです。
-///
-/// <c>slcore mode</c> で一覧、<c>slcore mode &lt;クラス名&gt;</c> で起動、
-/// <c>slcore mode stop</c> で停止します。
+/// ゲームモードを一覧・起動・停止します。
 /// </summary>
 /// <remarks>
 /// <see cref="GameMode.Weight"/> が 0 のモードは抽選に出ないので、
-/// 起動する手段はこれになります。
+/// 起動する手段はこのコマンドになります。
 /// </remarks>
-public sealed class SampleModeCommand : CommandBase
+public sealed class ModeCommand : CommandBase
 {
-    public override Type Parent => typeof(SampleRootCommand);
+    public override Type Parent => typeof(RootCommand);
 
     public override string Command => "mode";
 
-    public override string Usage => "mode [クラス名|stop]";
+    public override string Usage => "mode [クラス名|stop|roll]";
 
     public override string Description => "ゲームモードの一覧・起動・停止。";
 
@@ -29,7 +26,7 @@ public sealed class SampleModeCommand : CommandBase
     {
         if (!TryGetArgument(0, out string name))
         {
-            response = BuildList();
+            response = BuildOverview();
 
             return true;
         }
@@ -49,13 +46,30 @@ public sealed class SampleModeCommand : CommandBase
             return true;
         }
 
-        if (!TypeParser.TryCreate<GameMode>(name, out GameMode mode) || mode is null)
+        if (string.Equals(name, "roll", StringComparison.OrdinalIgnoreCase))
         {
-            response = $"'{name}' というモードは見つかりません。\n{BuildList()}";
+            if (GameMode.Roll() is not { } rolled)
+            {
+                response = "起動できるモードがありません (重み 0 か条件未達)。";
+
+                return false;
+            }
+
+            return Start(rolled, out response);
+        }
+
+        if (!CoreCatalog.TryResolve<GameMode>(name, out Type modeType, out string failure))
+        {
+            response = failure;
 
             return false;
         }
 
+        return Start((GameMode)Activator.CreateInstance(modeType), out response);
+    }
+
+    private static bool Start(GameMode mode, out string response)
+    {
         if (!mode.Start())
         {
             response = $"'{mode.Name}' を開始できませんでした。";
@@ -68,13 +82,14 @@ public sealed class SampleModeCommand : CommandBase
         return true;
     }
 
-    private static string BuildList()
+    private static string BuildOverview()
     {
         StringBuilder builder = new StringBuilder();
+        var modes = GameMode.All();
 
-        builder.AppendLine($"<b>Game Modes</b>  (実行中: {GameMode.Current?.Name ?? "なし"})");
+        builder.AppendLine(CoreCatalog.Header($"Game Modes (実行中: {GameMode.Current?.Name ?? "なし"})", modes.Count));
 
-        foreach (GameMode mode in GameMode.All().OrderBy(mode => mode.GetType().Name, StringComparer.Ordinal))
+        foreach (GameMode mode in modes.OrderBy(mode => mode.GetType().Name, StringComparer.Ordinal))
         {
             string availability = mode.Weight <= 0
                 ? "手動のみ"

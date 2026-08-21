@@ -60,6 +60,12 @@ public abstract class SpawnContext
     public static void Activate<T>() where T : SpawnContext, new() => Active = new T();
 
     /// <summary>
+    /// 生成済みの状況に切り替えます。
+    /// 実行時に型が決まる経路 (コマンド・マップデータ) で使います。
+    /// </summary>
+    public static void Apply(SpawnContext context) => Active = context ?? new DefaultContext();
+
+    /// <summary>
     /// 既定の状況に戻します。
     /// </summary>
     public static void Reset() => Active = new DefaultContext();

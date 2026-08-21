@@ -2,14 +2,14 @@ using System;
 using Exiled.API.Features;
 using Slafight_Plugin_EXILED.API.Core.Features;
 
-namespace Slafight_Plugin_EXILED.API.Core.Samples;
+namespace Slafight_Plugin_EXILED.API.Core.Commands;
 
 /// <summary>
-/// デバッグ表示を切り替えるコマンドです。<c>slcore debug [対象]</c>。
+/// デバッグ HUD の表示を切り替えます。
 /// </summary>
-public sealed class SampleDebugCommand : CommandBase
+public sealed class DebugCommand : CommandBase
 {
-    public override Type Parent => typeof(SampleRootCommand);
+    public override Type Parent => typeof(RootCommand);
 
     public override string Command => "debug";
 
