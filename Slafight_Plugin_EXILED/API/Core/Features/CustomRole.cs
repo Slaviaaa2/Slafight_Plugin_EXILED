@@ -8,6 +8,7 @@ using LabApi.Events.Arguments.PlayerEvents;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Core.Interfaces;
 using Slafight_Plugin_EXILED.API.Core.Structs;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 
@@ -151,7 +152,17 @@ public abstract class CustomRole : IPlayerOwn
     /// <summary>
     /// ネームプレートに出す追加情報です。null なら変更しません。
     /// </summary>
+    /// <remarks>
+    /// 生の <c>Player.CustomInfo</c> ではなく <see cref="CustomInfoDisplay"/> を通します。
+    /// あちらが名前欄・役職欄・部隊名の出し分け (<c>InfoArea</c> のフラグ) まで面倒を見るので、
+    /// 直接代入すると<b>バニラの名前と役職が残ったまま追記される</b>ことになります。
+    /// </remarks>
     public virtual string CustomInfo => null;
+
+    /// <summary>
+    /// ネームプレートの組み立て方です。並び順や部隊名の扱いを変えたい役職だけ override します。
+    /// </summary>
+    public virtual CustomInfoDisplayOptions CustomInfoOptions => CustomInfoDisplayOptions.Default;
 
     /// <summary>
     /// HUD の役職欄に出す整形済みの文字列です。
@@ -517,7 +528,7 @@ public abstract class CustomRole : IPlayerOwn
         }
 
         if (CustomInfo is { } info)
-            Player.CustomInfo = info;
+            CustomInfoDisplay.Apply(Player, info, CustomInfoOptions);
     }
 
     private static void RemoveInternal(uint netId, CustomRole role)
@@ -537,7 +548,7 @@ public abstract class CustomRole : IPlayerOwn
                 player.Scale = Vector3.one;
 
             if (role.CustomInfo is not null)
-                player.CustomInfo = string.Empty;
+                CustomInfoDisplay.Clear(player);
         }
 
         try

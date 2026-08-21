@@ -37,9 +37,17 @@ public sealed class InputHandler : EventHandlerBase
 
     private static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase setting)
     {
-        if (setting is not SSKeybindSetting { SyncIsPressed: true } keybind) return;
-
         if (Player.Get(hub) is not { } player || !player.IsSafePlayer()) return;
+
+        // テキスト欄は押下ではなく入力確定で届く。キーバインドとは別に拾う。
+        if (setting is SSPlaintextSetting { SyncInputText: not null } text)
+        {
+            HandleText(player, text.SettingId, text.SyncInputText);
+
+            return;
+        }
+
+        if (setting is not SSKeybindSetting { SyncIsPressed: true } keybind) return;
 
         // ボイスの切り替えは死んでいても許可する。
         if (keybind.SettingId == ServerSpecifics.ProximityChatKeybindSettingId)
@@ -122,6 +130,24 @@ public sealed class InputHandler : EventHandlerBase
         player.ShowHint(
             $"<size=22>{ability.DisplayName}: <color=#8fdcff>{ability.SelectedOption?.Name}</color></size>",
             2f);
+    }
+
+    /// <summary>
+    /// テキスト設定の入力を受け取ります。
+    /// </summary>
+    private static void HandleText(Player player, int settingId, string text)
+    {
+        if (settingId == ServerSpecifics.RpNameSettingId)
+        {
+            RPNameSetter.SetInputName(player, text);
+
+            return;
+        }
+
+        if (settingId == ServerSpecifics.SecretPasscodeSettingId)
+        {
+            RPNameSetter.SetPasscode(player, text);
+        }
     }
 
     /// <summary>
