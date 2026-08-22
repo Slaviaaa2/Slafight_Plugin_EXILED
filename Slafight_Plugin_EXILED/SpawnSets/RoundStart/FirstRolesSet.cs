@@ -7,16 +7,16 @@ using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Core.Structs;
 using Slafight_Plugin_EXILED.Extensions;
 
-namespace Slafight_Plugin_EXILED.SpawnSets;
+namespace Slafight_Plugin_EXILED.SpawnSets.RoundStart;
 
 public class FirstRolesHumanSet : SpawnSet
 {
     public override string Name => "First Spawn Human Roles";
     public override IReadOnlyList<SpawnSetRoleDefinition> SpawnRoles =>
     [
-        SpawnSetRoleDefinition.Vanilla(RoleTypeId.ClassD, count: 99, weight: 4f),
-        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scientist, count: 99, weight: 2f),
-        SpawnSetRoleDefinition.Vanilla(RoleTypeId.FacilityGuard, count: 99, weight: 3f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.ClassD, count: 99),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scientist, count: 99),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.FacilityGuard, count: 99),
     ];
 }
 
@@ -33,6 +33,17 @@ public class FirstRolesSCPsSet : SpawnSet
 
     public override IReadOnlyList<SpawnSetRoleDefinition> SpawnRoles =>
     [
+        // 重みは master の RoleTableContext.DefaultScpRoles() に準拠。
+        // SCP は 1 体につき 1 人なので count はすべて 1。
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp173, count: 1, weight: 1.15f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp106, count: 1, weight: 1.1f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp939, count: 1, weight: 1.1f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp049, count: 1, weight: 1.08f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp079, count: 1, weight: 1.05f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp3114, count: 1, weight: 0.95f),
+        SpawnSetRoleDefinition.Vanilla(RoleTypeId.Scp096, count: 1, weight: 0.85f),
+
+        // ▼ カスタム SCP を実装したらここを開ける
         // SpawnSetRoleDefinition.Custom<Scp173>(),
         // SpawnSetRoleDefinition.Custom<Scp106>(),
         // SpawnSetRoleDefinition.Custom<Scp049>(),

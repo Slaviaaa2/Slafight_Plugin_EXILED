@@ -47,6 +47,11 @@ public readonly struct SpawnSetRoleDefinition
     /// <summary>
     /// 他の行より先に必ず埋めるかどうかです。
     /// </summary>
+    /// <remarks>
+    /// 重み抽選を通らず、1 人ずつ順番に確保されます。
+    /// <see cref="Count"/> が大きい行に付けると、他の行に人が回りません。
+    /// 「残りを全部この役職にする」なら <see cref="Weight"/> を上げてください。
+    /// </remarks>
     public bool IsForced { get; }
 
     /// <summary>

@@ -25,7 +25,7 @@ namespace Slafight_Plugin_EXILED.API.Core.Extensions;
 /// if (player.IsInTeam&lt;ScpTeam&gt;()) { }
 ///
 /// foreach (Player ally in player.GetAllies())
-///     CoreHints.Show(ally, player.GetTeam().Colorize("援護しろ"), 3f);
+///     ally.ShowHint(player.GetTeam().Colorize("援護しろ"), 3f);
 /// </code>
 /// </example>
 public static class CustomTeamExtensions

@@ -17,6 +17,5 @@ public static class HudConstId
     public const string SpawnTimerHUD_FoundationStaff = "SpawnTimerHUD_FoundationStaff";
     public const string SpawnTimerHUD_FoundationEnemy = "SpawnTimerHUD_FoundationEnemy";
     public const string SpawnTimerHUD_ExpectedSpawn = "SpawnTimerHUD_ExpectedSpawn";
-    public const string CRoleSpawned = "CRoleSpawnedHint";
     public const string ProximityChat = "ProximityHint";
 }

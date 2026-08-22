@@ -25,14 +25,14 @@ public sealed class SampleWave : SpawnSet
 
     public override Faction RespawnFaction => Faction.FoundationStaff;
 
-    public override int RespawnWeight => 10;
+    public override int RespawnWeight => 0;
 
     /// <summary>
     /// 待機者の 6 割だけ出します。0 人になることはありません。
     /// </summary>
     public override float RespawnRatio => 0.6f;
 
-    public override (string Cassie, string Subtitle) Announcement(int spawnCount) =>
+    public override (string Cassie, string Subtitle) Announcement(int spawnCount, string unitName) =>
         ("MtfUnit Epsilon 11 Designated Sample HasEntered AllRemaining",
          $"<color=#00b7eb>見本部隊</color>が施設に到着しました。({spawnCount}名)");
 

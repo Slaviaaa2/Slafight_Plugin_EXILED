@@ -12,7 +12,8 @@ public sealed class SpawningEventArgs(
     SpawnSet wave,
     SpawnContext context,
     IReadOnlyList<Player> candidates,
-    RespawningTeamEventArgs source) : EventArgs
+    RespawningTeamEventArgs source,
+    byte? unitId) : EventArgs
 {
     /// <summary>
     /// 出そうとしている波です。<b>差し替えられます。</b>
@@ -33,6 +34,17 @@ public sealed class SpawningEventArgs(
     /// 元になったバニラのウェーブ情報です。<c>ForceSpawn</c> 経由なら null。
     /// </summary>
     public RespawningTeamEventArgs Source { get; } = source;
+
+    /// <summary>
+    /// この波に割り当てる予定の部隊番号 (UnitId) です。
+    /// <see cref="SpawnSet.RespawnFaction"/> が <c>FoundationStaff</c> でなければ null。
+    /// </summary>
+    /// <remarks>
+    /// <b>まだ確定していません。</b>ここで <see cref="Wave"/> を別陣営の波に差し替えたり
+    /// <see cref="IsAllowed"/> を false にしたりすれば、この番号は使われません。
+    /// 実際に配られた番号は <see cref="SpawnedEventArgs.UnitId"/> を見てください。
+    /// </remarks>
+    public byte? UnitId { get; } = unitId;
 
     /// <summary>
     /// false にすると、この波は出ません。

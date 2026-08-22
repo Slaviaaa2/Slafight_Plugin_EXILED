@@ -1,0 +1,138 @@
+using System.Collections.Generic;
+using System.Linq;
+using Exiled.API.Features;
+using PlayerRoles;
+using Slafight_Plugin_EXILED.Extensions;
+
+namespace Slafight_Plugin_EXILED.ForceSystem;
+
+/// <summary>
+/// いま生きている隊と隊員をまとめて持ちます。
+/// </summary>
+/// <remarks>
+/// 隊員の引きは netId キーです。AGENTS.md が求めるとおり、
+/// 破棄され得る <see cref="Player"/> を辞書のキーにしません。
+/// </remarks>
+public static class ForceRegistry
+{
+    private static readonly List<ForceBase> Forces = [];
+    private static readonly Dictionary<uint, ForceMember> MembersByNetId = new();
+
+    /// <summary>
+    /// いま存在する隊です。本隊も分隊も含みます。
+    /// </summary>
+    public static IReadOnlyList<ForceBase> All => Forces;
+
+    /// <summary>
+    /// このプレイヤーの隊員状態です。まだ登録されていなければ作ります。
+    /// </summary>
+    public static ForceMember MemberOf(Player player)
+    {
+        if (!player.IsSafePlayer()) return null;
+
+        uint netId = player.GetNetId();
+
+        if (netId == 0) return null;
+
+        // 同じ枠に別人が入っている場合は作り直す。netId まで見ないと取り違える。
+        if (MembersByNetId.TryGetValue(netId, out ForceMember existing) &&
+            ReferenceEquals(existing.Player, player))
+            return existing;
+
+        ForceMember member = new ForceMember(player);
+        MembersByNetId[netId] = member;
+
+        return member;
+    }
+
+    /// <summary>
+    /// このプレイヤーの隊員状態です。無ければ null。新しくは作りません。
+    /// </summary>
+    public static ForceMember FindMember(Player player)
+    {
+        if (player is null) return null;
+
+        return MembersByNetId.TryGetValue(player.GetNetId(), out ForceMember member) &&
+               ReferenceEquals(member.Player, player)
+            ? member
+            : null;
+    }
+
+    /// <summary>
+    /// このプレイヤーが属している隊です。無ければ null。
+    /// </summary>
+    public static ForceBase ForceOf(Player player) => FindMember(player)?.Force;
+
+    /// <summary>
+    /// 隊を登録します。
+    /// </summary>
+    public static void Register(ForceBase force)
+    {
+        if (force is null || Forces.Contains(force)) return;
+
+        Forces.Add(force);
+    }
+
+    /// <summary>
+    /// 隊を解散します。所属していた隊員は無所属に戻ります。
+    /// </summary>
+    public static void Dissolve(ForceBase force)
+    {
+        if (force is null || !Forces.Remove(force)) return;
+
+        foreach (ForceMember member in force.Members.ToArray())
+            force.Remove(member);
+
+        // この隊を親にしていた分隊は独立させる。昇格の対象になる。
+        foreach (ForceBase squad in Forces.Where(candidate => ReferenceEquals(candidate.Parent, force)))
+            squad.Parent = null;
+    }
+
+    /// <summary>
+    /// この陣営の隊です。HUD の表示範囲を絞るのに使います。
+    /// </summary>
+    public static IEnumerable<ForceBase> OfFaction(Faction faction) =>
+        Forces.Where(force => force.Faction == faction);
+
+    /// <summary>
+    /// この隊に属する分隊です。
+    /// </summary>
+    public static IEnumerable<ForceBase> SquadsOf(ForceBase parent) =>
+        Forces.Where(force => !force.IsMainForce && ReferenceEquals(force.Parent, parent));
+
+    /// <summary>
+    /// 死亡・退出した隊員と、空になった隊を掃除します。
+    /// </summary>
+    internal static void Prune()
+    {
+        foreach (ForceBase force in Forces.ToArray())
+        {
+            force.PruneDead();
+
+            if (force.Members.Count == 0)
+                Dissolve(force);
+        }
+
+        foreach (KeyValuePair<uint, ForceMember> pair in MembersByNetId.ToArray())
+        {
+            if (!pair.Value.IsAlive)
+                MembersByNetId.Remove(pair.Key);
+        }
+    }
+
+    /// <summary>
+    /// ラウンドをまたいで状態を持ち越さないようにします。
+    /// </summary>
+    internal static void Reset()
+    {
+        foreach (ForceBase force in Forces)
+        {
+            foreach (ForceMember member in force.Members)
+                member.Force = null;
+        }
+
+        Forces.Clear();
+        MembersByNetId.Clear();
+        ForceNaming.Reset();
+    }
+}

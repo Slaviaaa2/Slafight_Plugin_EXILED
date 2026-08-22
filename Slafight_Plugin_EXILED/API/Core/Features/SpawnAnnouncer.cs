@@ -65,9 +65,9 @@ public sealed class SpawnAnnouncer : EventHandlerBase
         }
     }
 
-    private static void OnSpawned(object sender, SpawnedEventArgs ev)
+    private static void OnSpawned(SpawnedEventArgs ev)
     {
-        (string cassie, string subtitle) = ev.Wave.Announcement(ev.SpawnCount);
+        (string cassie, string subtitle) = ev.Wave.Announcement(ev.SpawnCount, ev.UnitName);
 
         if (cassie is { Length: > 0 })
             CassieExtensions.CassieTranslated(cassie, subtitle ?? string.Empty, false);

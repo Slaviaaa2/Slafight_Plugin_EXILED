@@ -79,9 +79,11 @@ public sealed class RoundEndHandler : EventHandlerBase
 
         if (text is { Length: > 0 })
         {
+            // 大きさは VictoryText 側が <size=80> を持っているのでそちらに任せる。
+            // 縦位置は互換アダプタが Y≈700 中心に決めるため、ここでは指定できない。
             foreach (Player player in Player.List.Where(candidate => candidate.IsSafePlayer()))
             {
-                CoreHints.Show(player, text, EndDelay, yCoordinate: 500, fontSize: 40);
+                player.ShowHint(text, EndDelay);
             }
         }
 

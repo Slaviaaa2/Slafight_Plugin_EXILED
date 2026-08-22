@@ -4,6 +4,7 @@ using System.Linq;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Server;
 using PlayerRoles;
+using Respawning.NamingRules;
 using Slafight_Plugin_EXILED.Extensions;
 
 using ServerHandlers = Exiled.Events.Handlers.Server;
@@ -32,15 +33,25 @@ public sealed class SpawnSystem : EventHandlerBase
     private static bool spawning;
 
     /// <summary>
+    /// 割り当て中の波に配る部隊番号です。<see cref="Summon"/> の間だけ入ります。
+    /// </summary>
+    private static byte? pendingUnitId;
+
+    /// <summary>
+    /// 直近にこちらが配った部隊番号です。まだ 1 度も配っていなければ -1。
+    /// </summary>
+    private static int lastIssuedUnitId = -1;
+
+    /// <summary>
     /// 波を出す直前に呼ばれます。<see cref="SpawningEventArgs.Wave"/> を差し替えれば別の波になり、
     /// <see cref="SpawningEventArgs.IsAllowed"/> を false にすれば出ません。
     /// </summary>
-    public static event EventHandler<SpawningEventArgs> Spawning;
+    public static event Action<SpawningEventArgs> Spawning;
 
     /// <summary>
     /// 波を出した直後に呼ばれます。演出はここで拾ってください。
     /// </summary>
-    public static event EventHandler<SpawnedEventArgs> Spawned;
+    public static event Action<SpawnedEventArgs> Spawned;
 
     /// <summary>
     /// 一時的にリスポーンを止めます。
@@ -100,8 +111,8 @@ public sealed class SpawnSystem : EventHandlerBase
     /// <summary>
     /// バニラのタイマーを待たず、いますぐ波を出します。
     /// </summary>
-    /// <returns>実際に割り当てた人数。</returns>
-    public static int ForceSpawn(SpawnSet wave) => Summon(wave, null);
+    /// <returns>実際に出たプレイヤー。割り当てた順。</returns>
+    public static List<Player> ForceSpawn(SpawnSet wave) => Summon(wave, null);
 
     /// <summary>
     /// この波の対象になりうるプレイヤーです。
@@ -167,43 +178,152 @@ public sealed class SpawnSystem : EventHandlerBase
     /// <summary>
     /// 波を実際に出します。
     /// </summary>
-    private static int Summon(SpawnSet wave, RespawningTeamEventArgs source)
+    private static List<Player> Summon(SpawnSet wave, RespawningTeamEventArgs source)
     {
-        if (wave is null) return 0;
+        if (wave is null) return [];
 
         List<Player> candidates = Candidates();
 
-        if (candidates.Count == 0) return 0;
+        if (candidates.Count == 0) return [];
 
-        SpawningEventArgs spawningArgs = new SpawningEventArgs(wave, SpawnContext.Active, candidates, source);
-        Spawning?.Invoke(null, spawningArgs);
+        SpawningEventArgs spawningArgs = new SpawningEventArgs(wave, SpawnContext.Active, candidates, source, PeekUnitId(wave));
+        Spawning?.Invoke(spawningArgs);
 
-        if (!spawningArgs.IsAllowed || spawningArgs.Wave is null) return 0;
+        if (!spawningArgs.IsAllowed || spawningArgs.Wave is null) return [];
+
+        // 波が差し替えられていることがあるので、実際に出す波で採番する。
+        (byte? unitId, string unitName) = CommitUnit(spawningArgs.Wave);
 
         spawning = true;
+        pendingUnitId = unitId;
 
-        int assigned;
+        if (unitId is not null)
+            PlayerRoleManager.OnRoleChanged += ApplyUnitId;
+
+        List<Player> spawned;
 
         try
         {
-            assigned = spawningArgs.Wave.SpawnFor(candidates);
+            spawned = spawningArgs.Wave.SpawnFor(candidates);
         }
         catch (Exception exception)
         {
             Log.Error($"[Slafight] ウェーブ '{wave.Name}' の割り当てで例外が発生しました: {exception}");
 
-            return 0;
+            return [];
         }
         finally
         {
+            if (unitId is not null)
+                PlayerRoleManager.OnRoleChanged -= ApplyUnitId;
+
+            pendingUnitId = null;
             spawning = false;
         }
 
-        if (assigned == 0) return 0;
+        if (spawned.Count == 0) return spawned;
 
-        Spawned?.Invoke(null, new SpawnedEventArgs(spawningArgs.Wave, assigned));
+        Spawned?.Invoke(new SpawnedEventArgs(spawningArgs.Wave, spawned, unitId, unitName));
 
-        return assigned;
+        return spawned;
+    }
+
+    /// <summary>
+    /// この波に配る部隊番号を決めます。名前はまだ作りません。
+    /// FoundationStaff の波でなければ null。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="NamingRulesManager.GeneratedNames"/> はホストクライアントが
+    /// <c>UnitNameMessage</c> を処理してから増えます。つまり
+    /// <see cref="NamingRulesManager.ServerGenerateName"/> を呼んだ直後は、
+    /// いま作った名前がまだ載っていません。反映待ちの分を踏み越えて
+    /// 同じ番号を 2 度配らないよう、こちらが配った番号も覚えておいて大きい方を採ります。
+    /// </remarks>
+    private static byte? PeekUnitId(SpawnSet wave)
+    {
+        if (wave?.RespawnFaction is not Faction.FoundationStaff) return null;
+
+        return NextUnitId();
+    }
+
+    /// <summary>
+    /// 次に配れる部隊番号です。まだ確定させません。使える番号が無ければ null。
+    /// </summary>
+    /// <remarks>
+    /// <b>部隊システムの命名もここを基点にします。</b>分隊名や非 NTF 部隊の名前を
+    /// 別に採番すると、バニラが既に表示している部隊名と衝突します。
+    /// 採番の基点を 2 箇所に持たせないため、<c>ForceNaming</c> からもこれを呼びます。
+    ///
+    /// <see cref="NamingRulesManager.GeneratedNames"/> はホストクライアントが
+    /// <c>UnitNameMessage</c> を処理してから増えます。つまり
+    /// <see cref="NamingRulesManager.ServerGenerateName"/> を呼んだ直後は、
+    /// いま作った名前がまだ載っていません。反映待ちの分を踏み越えて
+    /// 同じ番号を 2 度配らないよう、こちらが配った番号も覚えておいて大きい方を採ります。
+    /// </remarks>
+    internal static byte? NextUnitId()
+    {
+        if (!NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out _)) return null;
+
+        int generated = NamingRulesManager.GeneratedNames.TryGetValue(Team.FoundationForces, out List<string> names)
+            ? names.Count
+            : 0;
+
+        int next = lastIssuedUnitId < 0 ? generated : Math.Max(generated, lastIssuedUnitId + 1);
+
+        // UnitNameId は byte 1 つ。溢れるならこちらでは触らず、バニラの採番に任せる。
+        return next > byte.MaxValue ? null : (byte)next;
+    }
+
+    /// <summary>
+    /// 次の部隊番号を確定し、その番号の部隊名をバニラに作らせます。使える番号が無ければ null。
+    /// </summary>
+    /// <remarks>
+    /// 波の採番と部隊システムの採番はここを共有します。
+    /// 名前を作った時点で <see cref="lastIssuedUnitId"/> を進めるので、
+    /// <see cref="NamingRulesManager.GeneratedNames"/> の反映を待たずに次を採れます。
+    /// </remarks>
+    internal static (byte? Id, string Name) IssueUnit()
+    {
+        if (NextUnitId() is not { } unitId) return (null, null);
+
+        if (!NamingRulesManager.TryGetNamingRule(Team.FoundationForces, out UnitNamingRule rule)) return (null, null);
+
+        NamingRulesManager.ServerGenerateName(Team.FoundationForces, rule);
+        lastIssuedUnitId = unitId;
+
+        // GeneratedNames はホストクライアントの受信待ちで遅れるが、
+        // LastGeneratedName は GenerateNew が同期で入れるのでここで確実に読める。
+        return (unitId, rule.LastGeneratedName);
+    }
+
+    /// <summary>
+    /// この波に配る部隊番号と部隊名を確定します。FoundationStaff の波でなければどちらも null。
+    /// </summary>
+    private static (byte? Id, string Name) CommitUnit(SpawnSet wave)
+    {
+        if (wave?.RespawnFaction is not Faction.FoundationStaff) return (null, null);
+
+        return IssueUnit();
+    }
+
+    /// <summary>
+    /// 割り当て中のプレイヤーに、この波の部隊番号を書き込みます。
+    /// </summary>
+    /// <remarks>
+    /// バニラの <c>HumanRole.Init</c> は <c>GeneratedNames.Count - 1</c>
+    /// (理由が Respawn/RespawnMiniwave なら <c>Count</c>) を勝手に入れます。
+    /// こちらは <c>Role.Set</c> 経由の ForceClass なので、放っておくと 1 つ前の部隊名になります。
+    ///
+    /// <see cref="PlayerRoleManager.OnRoleChanged"/> は <c>InitializeNewRole</c> の中、
+    /// <c>SendNewRoleInfo</c> の手前で走ります。ここで書き換えれば
+    /// <b>最初の RoleSyncInfo に載る</b>ので、同期を 2 度送らずに済みます。
+    /// </remarks>
+    private static void ApplyUnitId(ReferenceHub hub, PlayerRoleBase previous, PlayerRoleBase current)
+    {
+        if (pendingUnitId is not { } unitId) return;
+
+        if (current is HumanRole { UsesUnitNames: true } humanRole)
+            humanRole.UnitNameId = unitId;
     }
 
     private static void ResetRuntimeState()
@@ -211,6 +331,8 @@ public sealed class SpawnSystem : EventHandlerBase
         Overrides.Clear();
         IsSuspended = false;
         spawning = false;
+        pendingUnitId = null;
+        lastIssuedUnitId = -1;
         SpawnContext.Reset();
     }
 

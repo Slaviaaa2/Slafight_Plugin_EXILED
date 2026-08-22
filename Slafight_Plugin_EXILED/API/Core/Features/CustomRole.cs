@@ -47,7 +47,7 @@ namespace Slafight_Plugin_EXILED.API.Core.Features;
 ///     protected override void OnSpawned()
 ///     {
 ///         // Scope は退出・ラウンド再開・役職変更で自動的に閉じる
-///         Scope.RunLoop(5f, p => CoreHints.Show(p, "狙撃手として動け", 2f));
+///         Scope.RunLoop(5f, p => p.ShowHint("狙撃手として動け", 2f));
 ///     }
 /// }
 /// </code>
@@ -99,6 +99,20 @@ public abstract class CustomRole : IPlayerOwn
     /// 土台になるバニラ役職です。
     /// </summary>
     public abstract RoleTypeId BaseRole { get; }
+
+    /// <summary>
+    /// 部隊システムでの役職優先度です。大きいほど上位で、0 なら名乗りません。
+    /// </summary>
+    /// <remarks>
+    /// TopLead が死んだときや隊が昇格するとき、貢献度より先にこれが見られます。
+    /// 草案の「元帥がスポーンしたときは隊長級を差し置いて TopLead になる」がこれにあたります。
+    ///
+    /// 0 のままならバニラ役職の優先度 (<see cref="Slafight_Plugin_EXILED.ForceSystem.ForceRolePower"/>) にフォールバックするので、
+    /// 見た目だけを変えた役職はここを触らなくて構いません。
+    /// 値の目安はバニラに合わせて 二等兵 1 / 軍曹・特殊 2 / 隊長 3 です。
+    /// それより上位の役職を作るときは 4 以上を返してください。
+    /// </remarks>
+    public virtual int ForceRolePower => 0;
 
     /// <summary>
     /// スポーン位置です。null ならバニラのスポーン地点を使います。
@@ -434,14 +448,17 @@ public abstract class CustomRole : IPlayerOwn
     /// 役職の説明を本人に見せます。
     /// </summary>
     /// <remarks>
-    /// 既定は EXILED のヒントです。HUD の常設表示は <see cref="HudLabel"/> /
-    /// <see cref="Objective"/> / <see cref="Status"/> を表示層が読む形にしてあるので、
-    /// ここを HintServiceMeow へ差し替えるときも役職側の記述は変わりません。
+    /// EXILED のヒントをそのまま使います。HSM の互換アダプタが吸収するので、
+    /// バニラの <c>HintDisplay</c> へ素通しされることはありません。
+    /// HUD の常設表示は <see cref="HudLabel"/> / <see cref="Objective"/> /
+    /// <see cref="Status"/> を表示層が読む形にしてあります。
+    ///
+    /// 縦位置は互換アダプタが Y≈700 中心に決めるので、こちらからは指定できません。
+    /// 大きさと行送りは下のリッチテキストから読まれます。
     /// </remarks>
     protected virtual void ShowHint()
     {
-        CoreHints.ShowRoleDescription(
-            Player,
+        Player.ShowHint(
             $"<size=24><color={Team?.Color ?? "#ffffff"}>{Name}</color>\n{Description}</size>",
             HintDuration);
     }

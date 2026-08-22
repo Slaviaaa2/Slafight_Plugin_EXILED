@@ -32,6 +32,34 @@ public class PlayerHUD : EventHandlerBase
     /// <remarks>移行前の <c>SpecialEventsHandler.LocalizedEventName</c> の既定値と同じです。</remarks>
     private const string NoGameModeText = "無し";
 
+    /// <summary>部隊表示で並べる行数の上限です。</summary>
+    /// <remarks>
+    /// <c>ForceHud.Rows</c> が返しうる最大行数より多めに取ってあります。
+    /// 足りないと下の行が黙って消えるので、増やすときはこちらも上げてください。
+    /// </remarks>
+    private const int ForceHudMaxRows = 16;
+
+    /// <summary>部隊表示の文字の大きさです。</summary>
+    private const int ForceHudFontSize = 23;
+
+    /// <summary>部隊表示の横位置です。0 が中央、負で左、正で右。</summary>
+    /// <remarks>
+    /// <c>Alignment.Left</c> と組で使います。<c>Center</c> だと HSM が
+    /// <c>&lt;align&gt;</c> を書かず、TMP の中央揃えが <c>&lt;pos&gt;</c> に勝つため位置が効きません。
+    /// 画面右上はバニラの <c>UnitNamingHud</c> が使うので、そこは避けています。
+    /// </remarks>
+    private const int ForceHudX = 0;
+
+    /// <summary>部隊表示の 1 行目の縦位置です。0 が画面上端。</summary>
+    private const int ForceHudTopY = 60;
+
+    /// <summary>部隊表示の行送りです。</summary>
+    /// <remarks>
+    /// 各行は独立した Hint なので、HSM は行送りを自動計算しません。
+    /// <see cref="ForceHudFontSize"/> より少し大きい値にして行が重ならないようにします。
+    /// </remarks>
+    private const int ForceHudLineHeight = 26;
+
     /// <summary>
     /// 現在動いている HUD です。表示を差し込む側 (<c>EffectedInfoTextProvider</c> など) が参照します。
     /// </summary>
@@ -42,6 +70,7 @@ public class PlayerHUD : EventHandlerBase
     public static PlayerHUD? Instance { get; private set; }
 
     private CoroutineHandle _specificAbilityLoop;
+    private CoroutineHandle _forceHudLoop;
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
     private CoroutineHandle _debugHudLoop;
@@ -64,6 +93,7 @@ public class PlayerHUD : EventHandlerBase
 
         // 旧仕様と同じく、コルーチンはプラグイン生存中ずっと回す
         _specificAbilityLoop = Timing.RunCoroutine(SpecificInfoHudLoop());
+        _forceHudLoop = Timing.RunCoroutine(ForceHudLoop());
         _abilityHudLoop = Timing.RunCoroutine(AbilityHudLoop());
         _taskSyncLoop = Timing.RunCoroutine(TaskSync());
         _debugHudLoop = Timing.RunCoroutine(DebugHudLoop());
@@ -94,6 +124,9 @@ public class PlayerHUD : EventHandlerBase
         
         if (_debugHudLoop.IsRunning)
             Timing.KillCoroutines(_debugHudLoop);
+
+        if (_forceHudLoop.IsRunning)
+            Timing.KillCoroutines(_forceHudLoop);
 
         _spectateTargets.Clear();
     }
@@ -180,7 +213,6 @@ public class PlayerHUD : EventHandlerBase
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Specific, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate + 350, 880);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Ability, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 22, XCordinate + 350, 800);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_EffectedInfo, string.Empty, HintAlignment.Center, HintSyncSpeed.Fastest, 22, 0, 930);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Forces, string.Empty, HintAlignment.Center, HintSyncSpeed.Fast, 23, 600, 0);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 24, XCordinate, 345);
     }
 
@@ -310,10 +342,6 @@ public class PlayerHUD : EventHandlerBase
                 case SyncType.PHUD_EffectedInfo:
                     var effected = display.GetHint(HudConstId.PlayerHUD_EffectedInfo);
                     if (effected != null) effected.Text = hintText;
-                    break;
-                case SyncType.PHUD_Forces:
-                    var forces = display.GetHint(HudConstId.PlayerHUD_Forces);
-                    if (forces != null) forces.Text = hintText;
                     break;
                 case SyncType.PHUD_Debug:
                     var db = display.GetHint(HudConstId.PlayerHUD_Debug);
@@ -811,6 +839,92 @@ public class PlayerHUD : EventHandlerBase
             yield return Timing.WaitForSeconds(0.5f);
         }
     }
+
+    /// <summary>
+    /// 右上の部隊一覧を 1 秒ごとに描き直すループ。
+    /// </summary>
+    /// <remarks>
+    /// <b>1 行 = 1 Hint</b> に分けています。<c>HintAlignment.Right</c> は
+    /// HSM 側で <c>&lt;margin-right&gt;</c> とアスペクト比補正を通るため解像度で位置が動きます。
+    /// Center + <c>XCoordinate</c> なら <c>&lt;pos&gt;</c> だけで済み、どの解像度でも同じ列に揃います。
+    ///
+    /// 使わなくなった行は空文字にせず <c>RemoveHint</c> で消します。
+    /// 空の Hint を残すと、隊が減ったときに詰まらず穴が空いて見えます。
+    /// </remarks>
+    private IEnumerator<float> ForceHudLoop()
+    {
+        yield return Timing.WaitForSeconds(1f);
+
+        for (;;)
+        {
+            if (Round.IsLobby)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                continue;
+            }
+
+            foreach (var player in Player.List)
+            {
+                if (!IsPlayerValid(player)) continue;
+
+                // 観戦中は見ている相手の部隊を出す。他のループと同じ扱い。
+                var hudTarget = player;
+                if (player.Role?.Team == Team.Dead &&
+                    _spectateTargets.TryGetValue(player.Id, out var spectated) &&
+                    IsPlayerValid(spectated) && spectated.IsAlive)
+                    hudTarget = spectated;
+
+                var display = TryGetDisplay(player);
+                if (display == null) continue;
+
+                try
+                {
+                    ApplyForceRows(display, ForceHud.Rows(hudTarget));
+                }
+                catch (Exception e)
+                {
+                    Log.Debug($"[ForceHudLoop] Exception for {player.Nickname}: {e.Message}");
+                }
+            }
+
+            yield return Timing.WaitForSeconds(1f);
+        }
+    }
+
+    /// <summary>
+    /// 行の一覧を、行ごとの Hint に反映します。
+    /// </summary>
+    private static void ApplyForceRows(PlayerDisplay display, IReadOnlyList<string> rows)
+    {
+        for (int index = 0; index < ForceHudMaxRows; index++)
+        {
+            string id = ForceRowId(index);
+
+            if (index >= rows.Count)
+            {
+                if (display.GetHint(id) is { } stale)
+                    display.RemoveHint(stale);
+
+                continue;
+            }
+
+            EnsurePlayerHudHint(
+                display,
+                id,
+                string.Empty,
+                HintAlignment.Right,
+                HintSyncSpeed.Fast,
+                ForceHudFontSize,
+                ForceHudX,
+                ForceHudTopY + (index * ForceHudLineHeight));
+
+            if (display.GetHint(id) is { } hint)
+                hint.Text = rows[index];
+        }
+    }
+
+    /// <summary>行ごとの Hint の Id です。</summary>
+    private static string ForceRowId(int index) => $"{HudConstId.PlayerHUD_Forces}_{index}";
 
     private IEnumerator<float> SpecificInfoHudLoop()
     {

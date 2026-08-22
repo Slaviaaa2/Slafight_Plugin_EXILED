@@ -147,6 +147,17 @@ to object lifetime and authentication state.
   client must also be `ClientInstanceMode.ReadyClient`.
 - HSM is the central last-line guard for hint delivery. Do not scatter redundant
   NPC checks through every HUD loop.
+- `Player.ShowHint` is allowed and is the intended way to show a one-shot hint. It
+  works only because HSM's `use_hint_compatibility_adapter` is enabled in
+  `%APPDATA%\EXILED\Configs\Plugins\HintServiceMeow\7777.yml`, which absorbs
+  EXILED/vanilla `TextHint` calls into HSM. If that setting is turned off, hints fall
+  back to the vanilla `HintDisplay` and flicker against the HUD. The adapter fixes the
+  Y position near 700 and reads size and per-line alignment from the rich text, so a
+  caller cannot pass coordinates; adjust with `<size>`, newlines, or `<voffset>`.
+  Keep `Slafight_Plugin_EXILED` out of HSM's `DisabledCompatAdapter` list.
+- Do not use `HintAlignment.Right` for HSM hints. Only the Right path goes through
+  `<margin-right>` plus aspect-ratio correction, so the column drifts with resolution.
+  Use `Center` with an `XCoordinate`, or split the block into one hint per line.
 - Use `PlayerSafetyExtensions.IsSafePlayer` / `IsNotHost` for Slafight player
   targeting. Non-NPC players must be verified; legitimate NPC flows remain
   supported.

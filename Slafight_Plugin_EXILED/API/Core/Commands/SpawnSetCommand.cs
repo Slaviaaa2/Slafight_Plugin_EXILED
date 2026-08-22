@@ -45,7 +45,7 @@ public sealed class SpawnSetCommand : CommandBase
             return false;
         }
 
-        int assigned = set.Spawn();
+        int assigned = set.Spawn().Count;
 
         response = assigned > 0
             ? $"'{set.Name}' で {assigned} 人に割り当てました。"

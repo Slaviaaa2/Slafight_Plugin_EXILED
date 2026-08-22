@@ -136,7 +136,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CustomItems\" />
+      <Folder Include="CustomItems\Accesibilities\InventoryChat\" />
+      <Folder Include="CustomItems\Keycards\" />
       <Folder Include="CustomRoles\ChaosInsurgents\" />
       <Folder Include="CustomRoles\Fifthists\" />
       <Folder Include="CustomRoles\FoundationForces\Guards\SecurityTeams\" />

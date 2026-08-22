@@ -6,6 +6,7 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Core.Extensions;
 using Slafight_Plugin_EXILED.API.Core.Structs;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.ForceSystem;
 using UnityEngine;
 
 namespace Slafight_Plugin_EXILED.API.Core.Features;
@@ -111,7 +112,26 @@ public abstract class SpawnSet
     /// <remarks>
     /// 旧実装はこれを 24 分岐の switch 2 つで引いていました。波が自分で名乗れば表は要りません。
     /// </remarks>
-    public virtual (string Cassie, string Subtitle) Announcement(int spawnCount) => default;
+    /// <param name="spawnCount">実際に出た人数。</param>
+    /// <param name="unitName">
+    /// この波に付いた部隊名 (<c>ALPHA-01</c> 形式)。FoundationStaff の波でなければ null。
+    /// 読み上げに混ぜたい場合は <c>UnitNamingRule.TranslateToCassie</c> で
+    /// CASSIE 用の綴り (<c>NATO_A 01</c>) に直してください。
+    /// </param>
+    public virtual (string Cassie, string Subtitle) Announcement(int spawnCount, string unitName) => default;
+
+    /// <summary>
+    /// この波が作る隊です。null なら陣営から自動で決まります。
+    /// </summary>
+    /// <remarks>
+    /// ほとんどの波は override 不要です。<c>ForceManager</c> が
+    /// <see cref="RespawnFaction"/> を見て機動部隊かカオスかを決めます。
+    /// 独自の派生システム (呼称や貢献度ルールが違う隊) に乗せたい波だけがここを名乗ります。
+    ///
+    /// 部隊システムに乗せたくない波は、<c>ForceBase</c> を返さずに
+    /// <see cref="RespawnFaction"/> を <see cref="Faction.Unclassified"/> のままにしてください。
+    /// </remarks>
+    public virtual ForceBase CreateForce(byte? unitId, string unitName) => null;
 
     /// <summary>
     /// この SpawnSet の割り当て対象になりうるプレイヤーです。
@@ -146,11 +166,11 @@ public abstract class SpawnSet
     /// <see cref="RespawnRatio"/> はここでだけ効きます。
     /// 渡した一覧は呼び出しの間だけ使われ、終われば元の <see cref="TargetPlayers"/> に戻ります。
     /// </remarks>
-    /// <returns>実際に割り当てた人数。</returns>
-    public int SpawnFor(IReadOnlyList<Player> candidates)
+    /// <returns>実際に役職を割り当てたプレイヤー。割り当てた順。</returns>
+    public List<Player> SpawnFor(IReadOnlyList<Player> candidates)
     {
         if (candidates is null || candidates.Count == 0)
-            return 0;
+            return [];
 
         forcedCandidates = new List<Player>(candidates);
 
@@ -167,8 +187,8 @@ public abstract class SpawnSet
     /// <summary>
     /// 割り当てを実行します。
     /// </summary>
-    /// <returns>実際に割り当てた人数。</returns>
-    public int Spawn()
+    /// <returns>実際に役職を割り当てたプレイヤー。割り当てた順。</returns>
+    public List<Player> Spawn()
     {
         bool alreadyLocked = Round.IsLocked;
 
@@ -187,22 +207,22 @@ public abstract class SpawnSet
         }
     }
 
-    private int SpawnInternal()
+    private List<Player> SpawnInternal()
     {
         if (AllowedPlayerCount < -1)
         {
             Log.Error($"[Slafight] SpawnSet '{Name}' の AllowedPlayerCount が不正です: {AllowedPlayerCount} (-1 以上にしてください)");
 
-            return 0;
+            return [];
         }
 
         if (SpawnRoles is null || SpawnRoles.Count == 0 || AllowedPlayerCount == 0)
-            return 0;
+            return [];
 
         List<Player> candidates = TargetPlayers();
 
         if (candidates.Count == 0)
-            return 0;
+            return [];
 
         int allowed = ResolveAllowedCount(candidates.Count);
 
@@ -215,12 +235,14 @@ public abstract class SpawnSet
             .Select(role => new SpawnRoleState(role))
             .ToList();
 
+        List<Player> spawned = [];
+
         // 必須の行を先に埋めてから、残りを回す。
-        int assigned = Assign(states.Where(state => state.Definition.IsForced).ToList(), candidates);
+        AssignForced(states.Where(state => state.Definition.IsForced).ToList(), candidates, spawned);
 
-        assigned += Assign(states.Where(state => !state.Definition.IsForced).ToList(), candidates);
+        Assign(states.Where(state => !state.Definition.IsForced).ToList(), candidates, spawned);
 
-        return assigned;
+        return spawned;
     }
 
     /// <summary>
@@ -238,44 +260,82 @@ public abstract class SpawnSet
         return AllowedPlayerCount < 0 ? byRatio : Mathf.Min(AllowedPlayerCount, byRatio);
     }
 
-    /// <returns>この呼び出しで割り当てた人数。</returns>
-    private int Assign(IReadOnlyList<SpawnRoleState> states, List<Player> candidates)
+    /// <summary>
+    /// <see cref="SpawnSetRoleDefinition.IsForced"/> の行を、行ごとに 1 人ずつ順番に埋めます。
+    /// </summary>
+    /// <remarks>
+    /// 重み抽選にしないのは、確率で漏れると「必ず埋める」にならないためです。
+    /// 埋まった行は次の巡から外れます。
+    /// </remarks>
+    private void AssignForced(IReadOnlyList<SpawnRoleState> states, List<Player> candidates, List<Player> spawned)
     {
-        int assigned = 0;
+        if (states.Count == 0) return;
 
+        bool assignedAny = true;
+
+        // 1 巡で各行 1 人ずつ。埋まった行は次の巡から外れる。
+        while (assignedAny && candidates.Count > 0)
+        {
+            assignedAny = false;
+
+            foreach (SpawnRoleState state in states)
+            {
+                if (!state.IsAvailable || candidates.Count == 0) continue;
+
+                if (!TryTake(state, candidates, spawned)) continue;
+
+                assignedAny = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 候補を 1 人取って、この行に割り当てます。
+    /// </summary>
+    /// <returns>割り当てられたら true。行が壊れていれば false。</returns>
+    private bool TryTake(SpawnRoleState state, List<Player> candidates, List<Player> spawned)
+    {
+        // TargetPlayers はシャッフル済みなので、先頭から取れば無作為に選んだのと同じ。
+        Player target = candidates[0];
+        candidates.RemoveAt(0);
+
+        if (!TrySpawn(state, target))
+        {
+            // 割り当てに失敗した行は以後選ばない。無限ループを避ける。
+            state.IsBroken = true;
+
+            // この対象はまだ役職を持っていない。別の行が拾えるよう列の先頭へ戻す。
+            candidates.Insert(0, target);
+
+            return false;
+        }
+
+        // 役職側の SpawnPosition より SpawnSet 側の指定を優先する。
+        if (OverridePosition is { } position)
+            target.Position = position;
+
+        state.AssignedCount++;
+        spawned.Add(target);
+
+        return true;
+    }
+
+    /// <summary>
+    /// 割り当てた分を <paramref name="spawned"/> に積んでいきます。
+    /// </summary>
+    private void Assign(IReadOnlyList<SpawnRoleState> states, List<Player> candidates, List<Player> spawned)
+    {
         if (states.Count == 0)
-            return assigned;
+            return;
 
         while (candidates.Count > 0)
         {
+            // 全行が壊れたら PickNext が null を返して抜けるので、回り続けない。
             if (PickNext(states) is not { } state)
                 break;
 
-            // TargetPlayers はシャッフル済みなので、先頭から取れば無作為に選んだのと同じ。
-            Player target = candidates[0];
-            candidates.RemoveAt(0);
-
-            if (!TrySpawn(state, target))
-            {
-                // 割り当てに失敗した行は以後選ばない。無限ループを避ける。
-                state.IsBroken = true;
-
-                // この対象はまだ役職を持っていない。別の行が拾えるよう列の先頭へ戻す。
-                // 全行が壊れたら PickNext が null を返して while が抜けるので、回り続けない。
-                candidates.Insert(0, target);
-
-                continue;
-            }
-
-            // 役職側の SpawnPosition より SpawnSet 側の指定を優先する。
-            if (OverridePosition is { } position)
-                target.Position = position;
-
-            state.AssignedCount++;
-            assigned++;
+            TryTake(state, candidates, spawned);
         }
-
-        return assigned;
     }
 
     /// <summary>

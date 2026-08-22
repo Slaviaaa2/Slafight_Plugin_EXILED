@@ -43,7 +43,7 @@ public sealed class WaveCommand : CommandBase
             return false;
         }
 
-        int assigned = SpawnSystem.ForceSpawn(wave);
+        int assigned = SpawnSystem.ForceSpawn(wave).Count;
 
         response = assigned > 0
             ? $"'{wave.Name}' で {assigned} 人に割り当てました。"
