@@ -214,9 +214,37 @@ public abstract class ForceBase
     /// </summary>
     public virtual byte MovementBoost()
     {
-        int count = Mathf.Min(AliveCount, IsMainForce ? 5 : 4);
+        if (AliveCount < 2) return 0;
 
-        return (byte)Mathf.Max(0, IsMainForce ? count * 2 : count);
+        int count = Mathf.Min(AliveCount, IsMainForce ? 5 : 4);
+        int value = IsMainForce ? count * 2 : count;
+
+        // 分隊は補佐が居ると強化される。
+        if (!IsMainForce && HasSubLead) value += 2;
+
+        return (byte)Mathf.Max(0, value);
+    }
+
+    /// <summary>
+    /// 補佐が在籍しているかどうか。
+    /// </summary>
+    public bool HasSubLead =>
+        members.Any(member => member.IsAlive && member.Rank is ForceClassLevel.SubLead);
+
+    /// <summary>
+    /// この隊が配る自然回復の強さです。0 なら付けません。
+    /// </summary>
+    /// <remarks>
+    /// 草案の「隊員の合計数によって強さや効果数が変動します」の
+    /// 「効果数」にあたります。人数が増えると効果の種類そのものが増えます。
+    /// </remarks>
+    public virtual byte Regeneration()
+    {
+        int need = IsMainForce ? 6 : 4;
+
+        if (AliveCount < need) return 0;
+
+        return (byte)(IsMainForce ? 2 : 1);
     }
 
     /// <summary>
@@ -230,11 +258,9 @@ public abstract class ForceBase
     public virtual byte DamageBoost()
     {
         if (IsMainForce)
-            return (byte)Mathf.Min(2, AliveCount / 2);
+            return AliveCount < 4 ? (byte)0 : (byte)Mathf.Min(2, AliveCount / 2);
 
-        bool hasSubLead = members.Any(member => member.IsAlive && member.Rank is ForceClassLevel.SubLead);
-
-        return hasSubLead ? (byte)1 : (byte)0;
+        return HasSubLead ? (byte)1 : (byte)0;
     }
 
     // ───────────────────────────────
@@ -253,6 +279,7 @@ public abstract class ForceBase
         members.Add(member);
         member.Force = this;
         member.JoinedAt = Time.time;
+        member.AloneSince = null;
     }
 
     /// <summary>
@@ -263,7 +290,10 @@ public abstract class ForceBase
         if (member is null || !members.Remove(member)) return;
 
         if (ReferenceEquals(member.Force, this))
+        {
             member.Force = null;
+            member.AloneSince = Time.time;
+        }
     }
 
     /// <summary>
@@ -280,7 +310,10 @@ public abstract class ForceBase
             members.RemoveAt(index);
 
             if (ReferenceEquals(member.Force, this))
+            {
                 member.Force = null;
+                member.AloneSince = Time.time;
+            }
         }
     }
 
@@ -291,5 +324,6 @@ public abstract class ForceBase
         members.Where(member => member.IsAlive && predicate(member))
             .OrderByDescending(member => ForceRolePower.Of(member.Player))
             .ThenByDescending(member => member.Contribution)
+            .ThenBy(member => member.AloneSince ?? 0f)
             .FirstOrDefault();
 }

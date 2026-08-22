@@ -20,6 +20,7 @@ public sealed class ForceMember
         Player = player;
         NetId = player.GetNetId();
         JoinedAt = Time.time;
+        AloneSince = Time.time;
     }
 
     /// <summary>
@@ -62,6 +63,16 @@ public sealed class ForceMember
     /// いまの隊に加わった時刻です (<see cref="Time.time"/> 基準)。
     /// </summary>
     public float JoinedAt { get; internal set; }
+
+    /// <summary>
+    /// 単独行動になった時刻です。隊に属していれば null。
+    /// </summary>
+    /// <remarks>
+    /// 分隊を組むときの隊長選びに使います。これが無いと候補の順が
+    /// <c>Player.List</c> (接続順) のままになり、先に単独だった人ではなく
+    /// たまたま並び順が前の人が隊長になります。
+    /// </remarks>
+    public float? AloneSince { get; internal set; }
 
     /// <summary>
     /// この隊での累計貢献度です。

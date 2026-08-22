@@ -104,7 +104,7 @@ public sealed class ForceManager : EventHandlerBase
                 return new MobileTaskForce(ForceNaming.Adopt(unitName), unitId);
 
             case Faction.FoundationEnemy:
-                return new ChaosForce(ForceNaming.IssueLocalName());
+                return new ChaosForce(ForceNaming.IssueLocalName(Team.ChaosInsurgency, isMainForce: true));
 
             default:
                 return null;

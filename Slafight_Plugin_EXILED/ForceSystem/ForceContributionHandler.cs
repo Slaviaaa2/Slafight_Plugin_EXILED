@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
@@ -6,6 +7,8 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
+using Respawning;
+using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Core.Extensions;
 using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Core.Features;
@@ -46,6 +49,9 @@ public sealed class ForceContributionHandler : EventHandlerBase
     /// <summary>集結していると見なす距離 (m)。</summary>
     private const float GatheredRadius = 15f;
 
+    /// <summary>貢献 1 点あたり、次の波を早める秒数。</summary>
+    private const float WaveSecondsPerPoint = -0.5f;
+
     private static readonly float NoEnemyRadiusSqr = NoEnemyRadius * NoEnemyRadius;
     private static readonly float GatheredRadiusSqr = GatheredRadius * GatheredRadius;
 
@@ -60,6 +66,10 @@ public sealed class ForceContributionHandler : EventHandlerBase
         PlayerHandlers.PickingUpItem += OnPickingUpItem;
         Scp914Handlers.UpgradingInventoryItem += OnUpgradingInventoryItem;
         Scp914Handlers.UpgradingPickup += OnUpgradingPickup;
+        PlayerHandlers.ThrownProjectile += OnThrownProjectile;
+        PlayerHandlers.Escaping += OnEscaping;
+        PlayerHandlers.ActivatingGenerator += OnActivatingGenerator;
+        PlayerHandlers.Died += OnDied;
 
         ServerHandlers.RoundStarted += OnRoundStarted;
     }
@@ -89,6 +99,10 @@ public sealed class ForceContributionHandler : EventHandlerBase
         PlayerHandlers.PickingUpItem -= OnPickingUpItem;
         Scp914Handlers.UpgradingInventoryItem -= OnUpgradingInventoryItem;
         Scp914Handlers.UpgradingPickup -= OnUpgradingPickup;
+        PlayerHandlers.ThrownProjectile -= OnThrownProjectile;
+        PlayerHandlers.Escaping -= OnEscaping;
+        PlayerHandlers.ActivatingGenerator -= OnActivatingGenerator;
+        PlayerHandlers.Died -= OnDied;
         ServerHandlers.RoundStarted -= OnRoundStarted;
 
         LastCommunicationReward.Clear();
@@ -258,6 +272,81 @@ public sealed class ForceContributionHandler : EventHandlerBase
     /// </remarks>
     private static bool IsArmed(Player player) =>
         player.Items.Any(item => item is Firearm);
+
+    /// <summary>
+    /// SCP-018 を投げたら意図的な FF として減点します。
+    /// </summary>
+    /// <remarks>
+    /// 草案が SCP-018 の使用を「意図的な FF」に名指ししています。
+    /// 跳ね回って味方を巻き込むため、当たったかどうかに関係なく使用自体を見ます。
+    /// </remarks>
+    private static void OnThrownProjectile(ThrownProjectileEventArgs ev)
+    {
+        if (ev?.Player is null || ev.Item?.Type is not ItemType.SCP018) return;
+
+        if (ev.Player.GetForceMember() is not { Force: { } force } member) return;
+
+        ForceContribution.Penalize(member, force.FriendlyFirePenalty);
+    }
+
+    // ───────────────────────────────
+    // SL 標準の貢献
+    //
+    // 草案の「もちろん SL 標準の貢献度の機会も用いますが」にあたります。
+    // バニラの influence は陣営単位で個人の内訳を持たないので、
+    // 同じ機会をこちらでも拾って個人に付けます。
+    // ───────────────────────────────
+
+    private static void OnEscaping(EscapingEventArgs ev)
+    {
+        if (!ev.IsAllowed || ev.Player.GetForceMember() is not { Force: { } force } member) return;
+
+        ForceContribution.Reward(member, ForceImpact.Medium);
+        GrantWaveProgress(force, ForceImpact.Medium);
+    }
+
+    private static void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
+    {
+        if (!ev.IsAllowed || ev.Player.GetForceMember() is not { Force: { } force } member) return;
+
+        ForceContribution.Reward(member, ForceImpact.Medium);
+        GrantWaveProgress(force, ForceImpact.Medium);
+    }
+
+    /// <summary>
+    /// SCP を倒した人に加点します。
+    /// </summary>
+    private static void OnDied(DiedEventArgs ev)
+    {
+        if (ev?.Attacker is not { } attacker || ev.Player is not { } victim) return;
+
+        if (ReferenceEquals(attacker, victim) || !victim.IsScp) return;
+
+        if (attacker.GetForceMember() is not { Force: { } force } member) return;
+
+        ForceContribution.Reward(member, ForceImpact.Large);
+        GrantWaveProgress(force, ForceImpact.Large);
+    }
+
+    /// <summary>
+    /// 隊の働きをリスポーンウェーブに反映します。
+    /// </summary>
+    /// <remarks>
+    /// 草案の「チケットやスポーンに関連する」にあたります。
+    /// 陣営の influence を足し、次の波のタイマーを少し早めます。
+    /// </remarks>
+    private static void GrantWaveProgress(ForceBase force, ForceImpact impact)
+    {
+        try
+        {
+            FactionInfluenceManager.Add(force.Faction, (int)impact);
+            WaveManager.AdvanceTimer(force.Faction, (int)impact * WaveSecondsPerPoint);
+        }
+        catch (Exception exception)
+        {
+            Log.Debug($"[Force] ウェーブへの反映に失敗しました: {exception.Message}");
+        }
+    }
 
     private static bool IsKeycard(ItemType type) => type.IsKeycard();
 }

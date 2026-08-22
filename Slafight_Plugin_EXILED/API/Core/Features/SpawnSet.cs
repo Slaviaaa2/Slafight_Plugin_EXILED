@@ -71,6 +71,16 @@ public abstract class SpawnSet
     /// </summary>
     public abstract IReadOnlyList<SpawnSetRoleDefinition> SpawnRoles { get; }
 
+    /// <summary>
+    /// 役職を重み抽選ではなく、行ごとに 1 人ずつ順番に配るかどうか。
+    /// </summary>
+    /// <remarks>
+    /// 人数が少なくても各役職が 1 人ずつ揃うので、編成を安定させたい波に向きます。
+    /// <see cref="SpawnSetRoleDefinition.Weight"/> は無視され、
+    /// <see cref="SpawnSetRoleDefinition.Count"/> の上限だけが効きます。
+    /// </remarks>
+    public virtual bool RoundRobin => false;
+
     // ───────────────────────────────
     // リスポーンウェーブとして使うときの宣言
     //
@@ -238,9 +248,14 @@ public abstract class SpawnSet
         List<Player> spawned = [];
 
         // 必須の行を先に埋めてから、残りを回す。
-        AssignForced(states.Where(state => state.Definition.IsForced).ToList(), candidates, spawned);
+        AssignRoundRobin(states.Where(state => state.Definition.IsForced).ToList(), candidates, spawned);
 
-        Assign(states.Where(state => !state.Definition.IsForced).ToList(), candidates, spawned);
+        List<SpawnRoleState> rest = states.Where(state => !state.Definition.IsForced).ToList();
+
+        if (RoundRobin)
+            AssignRoundRobin(rest, candidates, spawned);
+        else
+            Assign(rest, candidates, spawned);
 
         return spawned;
     }
@@ -261,13 +276,13 @@ public abstract class SpawnSet
     }
 
     /// <summary>
-    /// <see cref="SpawnSetRoleDefinition.IsForced"/> の行を、行ごとに 1 人ずつ順番に埋めます。
+    /// 行ごとに 1 人ずつ順番に埋めます。
     /// </summary>
     /// <remarks>
     /// 重み抽選にしないのは、確率で漏れると「必ず埋める」にならないためです。
     /// 埋まった行は次の巡から外れます。
     /// </remarks>
-    private void AssignForced(IReadOnlyList<SpawnRoleState> states, List<Player> candidates, List<Player> spawned)
+    private void AssignRoundRobin(IReadOnlyList<SpawnRoleState> states, List<Player> candidates, List<Player> spawned)
     {
         if (states.Count == 0) return;
 
