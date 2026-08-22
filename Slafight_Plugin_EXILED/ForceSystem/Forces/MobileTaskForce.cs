@@ -12,17 +12,25 @@ namespace Slafight_Plugin_EXILED.ForceSystem.Forces;
 /// </remarks>
 public sealed class MobileTaskForce : ForceBase
 {
-    internal MobileTaskForce(string name, byte? unitId)
+    private readonly string vanillaName;
+
+    internal MobileTaskForce(string vanillaName, byte? unitId)
     {
-        Name = name;
+        this.vanillaName = vanillaName;
         UnitId = unitId;
     }
 
     /// <inheritdoc />
-    public override string Name { get; }
-
-    /// <inheritdoc />
     public override byte? UnitId { get; }
+
+    /// <summary>
+    /// 本隊はバニラが採番した部隊名をそのまま使います。
+    /// </summary>
+    /// <remarks>
+    /// 名札に出る <c>(ALPHA-01)</c> と食い違わせないためです。
+    /// 分隊にはバニラの番号が無いので、既定どおり新しい NATO 名を取ります。
+    /// </remarks>
+    protected override string BuildMainName() => ForceNaming.Adopt(vanillaName);
 
     /// <inheritdoc />
     public override Faction Faction => Faction.FoundationStaff;

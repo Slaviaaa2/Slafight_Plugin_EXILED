@@ -45,11 +45,11 @@ public static class ForceKinds
     /// <summary>
     /// この陣営に合った隊を作ります。対象外なら null。
     /// </summary>
-    public static ForceBase Create(Team team, string name) => team switch
+    public static ForceBase Create(Team team) => team switch
     {
-        Team.FoundationForces => new MobileTaskForce(name, null),
-        Team.ChaosInsurgency => new ChaosForce(name),
-        Team.ClassD => new ClassDGang(name),
+        Team.FoundationForces => new MobileTaskForce(null, null),
+        Team.ChaosInsurgency => new ChaosForce(),
+        Team.ClassD => new ClassDGang(),
         _ => null,
     };
 }

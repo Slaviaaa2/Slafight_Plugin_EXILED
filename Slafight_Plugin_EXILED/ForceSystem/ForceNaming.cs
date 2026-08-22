@@ -26,20 +26,6 @@ namespace Slafight_Plugin_EXILED.ForceSystem;
 public static class ForceNaming
 {
     /// <summary>
-    /// 名前の作り方を差し替えます。null なら既定の NATO 採番を使います。
-    /// </summary>
-    /// <remarks>
-    /// 引数は (陣営, 本隊かどうか)。既に使われている名前を返した場合は既定に戻ります。
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// ForceNaming.Generator = (team, isMain) =>
-    ///     team == Team.ClassD ? $"GANG-{UnityEngine.Random.Range(1, 99):00}" : null;
-    /// </code>
-    /// </example>
-    public static Func<Team, bool, string> Generator { get; set; }
-
-    /// <summary>
     /// バニラと同じ NATO コードです。見た目を揃えるために同じ表を使います。
     /// </summary>
     private static readonly string[] Codes = NineTailedFoxNamingRule.PossibleCodes;
@@ -87,32 +73,8 @@ public static class ForceNaming
     /// 代わりに<b>バニラが実際に配った名前を突き合わせて</b>、
     /// 空いている組み合わせだけを返します。これなら確実に重なりません。
     /// </remarks>
-    public static string IssueLocalName() => IssueLocalName(null, false);
-
-    /// <summary>
-    /// 隊の種類を指定して名前を作ります。
-    /// </summary>
-    /// <remarks>
-    /// <see cref="Generator"/> が差さっていればそちらを使います。
-    /// 返り値が空か、既に使われている名前だった場合は既定の採番に戻します。
-    /// </remarks>
-    public static string IssueLocalName(Team? team, bool isMainForce)
+    public static string IssueLocalName()
     {
-        if (Generator is { } generator)
-        {
-            try
-            {
-                string custom = generator(team ?? Team.Dead, isMainForce);
-
-                if (!string.IsNullOrEmpty(custom) && Issued.Add(custom))
-                    return custom;
-            }
-            catch
-            {
-                // 差し替え側が落ちても採番は続ける。
-            }
-        }
-
         SyncVanillaNames();
 
         // バニラと同じ体系からランダムに選ぶ。見た目を揃えるため。
@@ -152,6 +114,17 @@ public static class ForceNaming
     /// <c>UnitNameMessage</c> を処理してから増えるので、採番直後は載っていないことがあります。
     /// そのぶんは <see cref="Adopt"/> 側が先に登録しているので取りこぼしません。
     /// </remarks>
+    /// <summary>
+    /// 名前をそのまま表示できる形にします。
+    /// </summary>
+    /// <remarks>
+    /// タグの記号が入っているとリッチテキストとして解釈され、HUD と名札が崩れます。
+    /// 名札はバニラの検証も通らなくなります。
+    /// <see cref="ForceBase.Name"/> が自動で通すので、隊の側で呼ぶ必要はありません。
+    /// </remarks>
+    internal static string Sanitize(string name) =>
+        string.IsNullOrEmpty(name) ? name : name.Replace("<", "＜").Replace(">", "＞");
+
     private static void SyncVanillaNames()
     {
         if (!NamingRulesManager.GeneratedNames.TryGetValue(Team.FoundationForces, out List<string> names))

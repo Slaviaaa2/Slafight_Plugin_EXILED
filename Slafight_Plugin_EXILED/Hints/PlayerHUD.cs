@@ -37,7 +37,7 @@ public class PlayerHUD : EventHandlerBase
     /// <c>ForceHud.Rows</c> が返しうる最大行数より多めに取ってあります。
     /// 足りないと下の行が黙って消えるので、増やすときはこちらも上げてください。
     /// </remarks>
-    private const int ForceHudMaxRows = 16;
+    private const int ForceHudMaxRows = 18;
 
     /// <summary>部隊表示の文字の大きさです。</summary>
     private const int ForceHudFontSize = 23;

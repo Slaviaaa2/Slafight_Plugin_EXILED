@@ -128,6 +128,19 @@ public static class ForceHud
 
         if (NextPromotion(member, force) is { Length: > 0 } promotion)
             yield return $"<size=18><color={MutedColor}>{promotion}</color></size>";
+
+        if (MergeCountdown(force) is { Length: > 0 } merge)
+            yield return $"<size=18>{merge}</size>";
+    }
+
+    /// <summary>
+    /// 本隊に吸収されるまでの残り時間です。寄り添っていなければ空文字。
+    /// </summary>
+    private static string MergeCountdown(ForceBase force)
+    {
+        if (ForceEvaluator.MergeSecondsLeft(force) is not { } left) return string.Empty;
+
+        return $"<color={BuffColor}>{force.MainForceName}へ合流まで {Mathf.CeilToInt(left)}秒</color>";
     }
 
     /// <summary>
@@ -141,15 +154,28 @@ public static class ForceHud
     {
         yield return $"<color={MutedColor}>単独行動中</color>";
 
+        // 近くに隊があるならそちらへ合流できる。単独どうしなら分隊を組む。
+        ForceBase joinable = ForceVisibility.VisibleTo(viewer)
+            .FirstOrDefault(force => force.AliveCount > 0 && force.Members.Any(other =>
+                other.IsAlive && other.Player.IsAlive &&
+                Vector3.Distance(other.Player.Position, viewer.Position) <= 15f));
+
+        if (joinable is not null)
+        {
+            yield return $"<size=18><color={BuffColor}>{joinable.Name} に合流できます</color></size>";
+
+            yield break;
+        }
+
         int nearby = Player.List.Count(other =>
             other.IsSafePlayer() && other.IsAlive && !ReferenceEquals(other, viewer) &&
             other.GetForceMember() is { Force: null } &&
-            other.Role.Team == viewer.Role.Team &&
+            ForceKinds.For(other) == ForceKinds.For(viewer) &&
             Vector3.Distance(other.Position, viewer.Position) <= 15f);
 
         yield return nearby > 0
             ? $"<size=18><color={BuffColor}>近くに単独 {nearby}名 ・まもなく分隊を編成</color></size>"
-            : $"<size=18><color={MutedColor}>味方ともう1人以上が近づくと分隊を編成</color></size>";
+            : $"<size=18><color={MutedColor}>味方が近づくと分隊を編成 / 隊に合流</color></size>";
     }
 
     /// <summary>
@@ -180,15 +206,13 @@ public static class ForceHud
     /// </remarks>
     private static string Buffs(ForceBase force)
     {
-        byte movement = force.MovementBoost();
-        byte damage = force.DamageBoost();
-
         List<string> parts = [];
 
-        if (movement > 0) parts.Add($"移動+{movement}");
-        if (damage > 0) parts.Add($"攻撃+{damage}");
+        if (force.MovementBoost() is > 0 and var movement) parts.Add($"移動+{movement}");
+        if (force.DamageBoost() is > 0 and var damage) parts.Add($"攻撃+{damage}");
+        if (force.Regeneration() is > 0 and var heal) parts.Add($"回復+{heal}");
 
-        return parts.Count == 0 ? "隊の効果なし (人数不足)" : string.Join(" ", parts);
+        return parts.Count == 0 ? "なし (2名から発動)" : string.Join(" ", parts);
     }
 
     /// <summary>
@@ -217,6 +241,13 @@ public static class ForceHud
     private static string NextPromotion(ForceMember member, ForceBase force)
     {
         if (member.Rank is not ForceClassLevel.Member) return string.Empty;
+
+        if (force.AliveCount < ForceEvaluator.MinMembersForPromotion)
+            return $"{force.SubLeadName}昇進は {ForceEvaluator.MinMembersForPromotion}名から";
+
+        if (member.Contribution < ForceEvaluator.MinContributionForPromotion)
+            return $"{force.SubLeadName}まで 貢献 {ForceEvaluator.MinContributionForPromotion} " +
+                   $"(現在 {member.Contribution})";
 
         int need = Mathf.RoundToInt((member.HasRelaxedPromotion ? 0.60f : 0.70f) * 100f);
         int now = Mathf.RoundToInt(ForceContribution.ShareOf(member) * 100f);

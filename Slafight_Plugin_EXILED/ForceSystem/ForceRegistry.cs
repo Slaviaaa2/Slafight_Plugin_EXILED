@@ -17,6 +17,7 @@ public static class ForceRegistry
 {
     private static readonly List<ForceBase> Forces = [];
     private static readonly Dictionary<uint, ForceMember> MembersByNetId = new();
+    private static readonly Dictionary<(System.Type Kind, bool IsMainForce), int> Ordinals = new();
 
     /// <summary>
     /// いま存在する隊です。本隊も分隊も含みます。
@@ -69,6 +70,21 @@ public static class ForceRegistry
     public static void Register(ForceBase force)
     {
         if (force is null || Forces.Contains(force)) return;
+
+        // 名前は遅延生成なので、番号は登録の時点で決めておく。
+        if (!force.IsMainForce && force.Parent is { } parent)
+        {
+            // 親が居る分隊はその本隊ごとの番号。「第 1 分隊」が本隊ごとに始まる。
+            force.Ordinal = parent.NextSquadOrdinal();
+        }
+        else
+        {
+            (System.Type, bool) key = (force.GetType(), force.IsMainForce);
+
+            Ordinals.TryGetValue(key, out int issued);
+            Ordinals[key] = ++issued;
+            force.Ordinal = issued;
+        }
 
         Forces.Add(force);
     }
@@ -133,6 +149,7 @@ public static class ForceRegistry
 
         Forces.Clear();
         MembersByNetId.Clear();
+        Ordinals.Clear();
         ForceNaming.Reset();
     }
 }

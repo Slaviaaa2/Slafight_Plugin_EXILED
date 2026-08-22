@@ -101,10 +101,10 @@ public sealed class ForceManager : EventHandlerBase
         {
             case Faction.FoundationStaff:
                 // NTF はバニラが採番した部隊名をそのまま名乗る。名札との食い違いを避けるため。
-                return new MobileTaskForce(ForceNaming.Adopt(unitName), unitId);
+                return new MobileTaskForce(unitName, unitId);
 
             case Faction.FoundationEnemy:
-                return new ChaosForce(ForceNaming.IssueLocalName(Team.ChaosInsurgency, isMainForce: true));
+                return new ChaosForce();
 
             default:
                 return null;

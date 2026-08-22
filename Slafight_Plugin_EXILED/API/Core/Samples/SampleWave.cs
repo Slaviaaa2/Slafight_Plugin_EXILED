@@ -13,9 +13,9 @@ namespace Slafight_Plugin_EXILED.API.Core.Samples;
 /// 陣営・重み・割合・アナウンスは、この波が自分で名乗ります。
 /// </summary>
 /// <remarks>
-/// <see cref="SpawnSet.RespawnWeight"/> を 0 より大きくしたことで、
-/// この <see cref="SpawnSet"/> は抽選対象の波になります。
-/// 逆に <see cref="SampleSpawnSet"/> は 0 のままなので波にはなりません。
+/// <see cref="SpawnSet.RespawnWeight"/> が 0 より大きい <see cref="SpawnSet"/> が抽選対象の波になります。
+/// この見本は本番の抽選に混ざらないよう 0 にしてあるので、実際には出ません。
+/// 試すときは <c>slc wave SampleWave</c> で重みに関係なく出せます。
 /// </remarks>
 public sealed class SampleWave : SpawnSet
 {

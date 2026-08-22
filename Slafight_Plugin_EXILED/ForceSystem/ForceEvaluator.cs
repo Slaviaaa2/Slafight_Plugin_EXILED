@@ -38,7 +38,7 @@ public static class ForceEvaluator
     private const float MergeDistance = 20f;
 
     /// <summary>吸収に必要な同行時間 (秒)。</summary>
-    private const float MergeSeconds = 60f;
+    internal const float MergeSeconds = 60f;
 
     /// <summary>SubLead に昇進するのに必要な貢献度の内訳。</summary>
     private const float SubLeadShare = 0.70f;
@@ -52,15 +52,27 @@ public static class ForceEvaluator
     /// <summary>昇進条件が緩和されているときの保持時間 (秒)。</summary>
     private const float RelaxedHoldSeconds = 40f;
 
+    /// <summary>
+    /// この分隊が本隊に吸収されるまでの残り秒数です。寄り添っていなければ null。
+    /// </summary>
+    internal static float? MergeSecondsLeft(ForceBase squad)
+    {
+        if (squad is null || squad.IsMainForce) return null;
+
+        return MergeSince.TryGetValue(squad, out float since)
+            ? Mathf.Max(0f, MergeSeconds - (Time.time - since))
+            : null;
+    }
+
     /// <summary>Member から SubLead へ昇進できる最小の隊員数。</summary>
     /// <remarks>
     /// 1〜2 人の隊では貢献度シェアが簡単に 100% になり、
     /// 実質無条件で昇進してしまうため下限を設けています。
     /// </remarks>
-    private const int MinMembersForPromotion = 3;
+    internal const int MinMembersForPromotion = 3;
 
     /// <summary>Member から SubLead へ昇進できる最小の貢献度。</summary>
-    private const int MinContributionForPromotion = 30;
+    internal const int MinContributionForPromotion = 30;
 
     /// <summary>編成の見直し間隔 (秒)。</summary>
     private const float StructureInterval = 2f;
@@ -316,6 +328,10 @@ public static class ForceEvaluator
 
             if (squad is null) continue;
 
+            // どの本隊から分かれたのかを決めてから登録する。
+            // 親が決まっていないと HUD でぶら下がらず、番号も本隊ごとに振れない。
+            squad.Parent = NearestParentFor(seed);
+
             squad.Add(seed);
 
             foreach (ForceMember member in nearby)
@@ -333,6 +349,40 @@ public static class ForceEvaluator
     }
 
     /// <summary>
+    /// この人が分かれてきたと見なせる本隊です。無ければ null。
+    /// </summary>
+    /// <remarks>
+    /// 同じ種類の本隊のうち、いちばん近いものを親にします。
+    /// 距離で足切りはしません。施設内で離れていても、分かれた先は元の本隊だからです。
+    /// </remarks>
+    private static ForceBase NearestParentFor(ForceMember seed)
+    {
+        Type kind = ForceKinds.For(seed.Player);
+
+        if (kind is null) return null;
+
+        Vector3 origin = seed.Player.Position;
+        ForceBase best = null;
+        float bestSqr = float.MaxValue;
+
+        foreach (ForceBase force in ForceRegistry.All)
+        {
+            if (!force.IsMainForce || force.GetType() != kind || force.AliveCount == 0) continue;
+
+            if (force.TopLead is not { IsAlive: true } lead) continue;
+
+            float sqr = (lead.Player.Position - origin).sqrMagnitude;
+
+            if (sqr >= bestSqr) continue;
+
+            best = force;
+            bestSqr = sqr;
+        }
+
+        return best;
+    }
+
+    /// <summary>
     /// 分隊の実体を作ります。呼称は元の隊に揃えます。
     /// </summary>
     /// <remarks>
@@ -341,9 +391,7 @@ public static class ForceEvaluator
     /// </remarks>
     private static ForceBase CreateSquad(ForceMember seed)
     {
-        string name = ForceNaming.IssueLocalName(seed.Player.Role.Team, isMainForce: false);
-
-        ForceBase squad = ForceKinds.Create(seed.Player.Role.Team, name);
+        ForceBase squad = ForceKinds.Create(seed.Player.Role.Team);
 
         if (squad is null) return null;
 

@@ -14,14 +14,6 @@ namespace Slafight_Plugin_EXILED.ForceSystem.Forces;
 /// </remarks>
 public sealed class ClassDGang : ForceBase
 {
-    internal ClassDGang(string name)
-    {
-        Name = name;
-    }
-
-    /// <inheritdoc />
-    public override string Name { get; }
-
     /// <inheritdoc />
     public override byte? UnitId => null;
 
@@ -65,4 +57,7 @@ public sealed class ClassDGang : ForceBase
 
     /// <inheritdoc />
     public override ForceImpact KeycardPickupReward => ForceImpact.Small;
+
+    /// <inheritdoc />
+    protected override string BuildSquadName() => $"第{Ordinal}{SquadName}";
 }

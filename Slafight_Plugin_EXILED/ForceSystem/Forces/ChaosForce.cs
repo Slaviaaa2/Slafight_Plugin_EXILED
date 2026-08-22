@@ -15,14 +15,6 @@ namespace Slafight_Plugin_EXILED.ForceSystem.Forces;
 /// </remarks>
 public sealed class ChaosForce : ForceBase
 {
-    internal ChaosForce(string name)
-    {
-        Name = name;
-    }
-
-    /// <inheritdoc />
-    public override string Name { get; }
-
     /// <summary>
     /// カオス側にバニラの部隊名はありません。
     /// </summary>
@@ -47,4 +39,10 @@ public sealed class ChaosForce : ForceBase
     /// </summary>
     /// <remarks>草案「SCP-914 の使用が減点対象から外れ」。</remarks>
     public override ForceImpact Scp914KeycardPenalty => ForceImpact.None;
+
+    /// <summary>
+    /// 分隊は通し番号で名乗ります。
+    /// </summary>
+    /// <remarks>本隊は既定どおり NATO 名です。</remarks>
+    protected override string BuildSquadName() => $"第{Ordinal}{SquadName}";
 }

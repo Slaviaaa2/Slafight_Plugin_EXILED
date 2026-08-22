@@ -24,10 +24,53 @@ public abstract class ForceBase
 {
     private readonly List<ForceMember> members = [];
 
+    private string name;
+
+    private int issuedSquads;
+
     /// <summary>
     /// この隊の表示名です。<c>ALPHA-01</c> のような形式です。
     /// </summary>
-    public abstract string Name { get; }
+    /// <remarks>
+    /// 初めて読まれたときに <see cref="BuildName"/> で作られ、以後は変わりません。
+    /// 遅延なのは、<see cref="IsMainForce"/> が確定してから名前を決められるようにするためです。
+    /// </remarks>
+    public string Name => name ??= ForceNaming.Sanitize(IsMainForce ? BuildMainName() : BuildSquadName());
+
+    /// <summary>
+    /// 同じ種類・同じ区分 (本隊/分隊) の中で何番目に作られたかです。1 始まり。
+    /// </summary>
+    /// <remarks>
+    /// 「第 3 分隊」のような通し番号の名前に使います。
+    /// 親を持つ分隊は<b>その本隊ごと</b>の番号、持たない隊は種類ごとの通し番号です。
+    /// </remarks>
+    public int Ordinal { get; internal set; }
+
+    /// <summary>
+    /// この隊から分かれた分隊に配る次の番号です。
+    /// </summary>
+    /// <remarks>解散しても番号を再利用しないよう、作った数を数え続けます。</remarks>
+    internal int NextSquadOrdinal() => ++issuedSquads;
+
+    /// <summary>
+    /// 本隊の名前を作ります。
+    /// </summary>
+    /// <remarks>既定はバニラと同じ <c>ALPHA-01</c> 形式です。</remarks>
+    protected virtual string BuildMainName() => ForceNaming.IssueLocalName();
+
+    /// <summary>
+    /// 分隊の名前を作ります。
+    /// </summary>
+    /// <remarks>
+    /// 既定は本隊と同じ形式です。本隊と分けたい隊はここだけ override してください。
+    /// 返り値は自動で無害化されます。
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// protected override string BuildSquadName() => $"第{Ordinal}{SquadName}";
+    /// </code>
+    /// </example>
+    protected virtual string BuildSquadName() => ForceNaming.IssueLocalName();
 
     /// <summary>
     /// バニラの部隊番号です。NTF の本隊だけが持ち、それ以外は null。
