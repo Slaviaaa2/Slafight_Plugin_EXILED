@@ -19,17 +19,34 @@ public static class StringUtils
         return string.IsNullOrEmpty(value) ? fallback : value;
     }
     
-    /// <summary>
-    /// UnityのRichTextタグ（例：color, size, bold, italicなど）を除去して、平らなテキストを返します。
-    /// </summary>
     public static string RemoveUnityRichTextTag(this string text)
     {
         if (string.IsNullOrEmpty(text))
             return text;
-        
-        // <...> 形式のタグを除去（ネストされていないことを仮定）
-        // UnityのRichTextタグは <tag> または <tag=value> 形式
-        return Regex.Replace(text, "<[^>]*>", "");
+
+        var result = new StringBuilder(text.Length);
+        bool inTag = false;
+
+        foreach (char c in text)
+        {
+            if (c == '<')
+            {
+                inTag = true;
+                continue;
+            }
+
+            if (inTag)
+            {
+                if (c == '>')
+                    inTag = false;
+
+                continue;
+            }
+
+            result.Append(c);
+        }
+
+        return result.ToString();
     }
     
     public static string InsertLineBreaks(string input, int maxCharsPerLine)

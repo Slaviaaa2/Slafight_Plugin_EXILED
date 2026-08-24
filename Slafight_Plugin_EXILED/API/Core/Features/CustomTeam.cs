@@ -92,6 +92,36 @@ public abstract class CustomTeam
     public virtual SpawnSetRoleDefinition? Resurrection => null;
 
     /// <summary>
+    /// この陣営のプレイヤーが脱出したとき、何になるかです。null なら脱出しません。
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 行き先が護送してきた相手で変わるなら <paramref name="escape"/> に聞いてください。
+    /// 旧実装は「自陣営 × 護送元 × 優先度」を 25 行の表とレジストリと定義ソース走査で
+    /// 持っていましたが、行き先を知っているのは陣営自身なので表は要りません。
+    /// </para>
+    /// <para>
+    /// 陣営より先に役職 (<see cref="CustomRole.Escape"/>) に聞かれます。
+    /// どちらも名乗らなければ、バニラの脱出判定 (D クラス・研究員) がそのまま使われます。
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// public override SpawnSetRoleDefinition? Escape(EscapeContext escape)
+    /// {
+    ///     if (escape.IsEscortedByAllyOf&lt;FoundationTeam&gt;())
+    ///         return SpawnSetRoleDefinition.Vanilla(RoleTypeId.NtfPrivate);
+    ///
+    ///     if (escape.IsEscortedBy&lt;FifthistTeam&gt;())
+    ///         return SpawnSetRoleDefinition.Custom&lt;FifthistConvert&gt;();
+    ///
+    ///     return SpawnSetRoleDefinition.Vanilla(RoleTypeId.ChaosConscript);
+    /// }
+    /// </code>
+    /// </example>
+    public virtual SpawnSetRoleDefinition? Escape(EscapeContext escape) => null;
+
+    /// <summary>
     /// 表示層が陣営欄に出す表記です。既定は表示名そのまま。
     /// </summary>
     public virtual string HudName => Name;

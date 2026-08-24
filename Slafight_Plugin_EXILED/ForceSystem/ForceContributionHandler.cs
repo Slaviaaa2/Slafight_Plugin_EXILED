@@ -12,7 +12,9 @@ using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Core.Extensions;
 using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.API.Core.Structs;
 using Slafight_Plugin_EXILED.Extensions;
+using Slafight_Plugin_EXILED.Handlers;
 using UnityEngine;
 
 using PlayerHandlers = Exiled.Events.Handlers.Player;
@@ -67,7 +69,7 @@ public sealed class ForceContributionHandler : EventHandlerBase
         Scp914Handlers.UpgradingInventoryItem += OnUpgradingInventoryItem;
         Scp914Handlers.UpgradingPickup += OnUpgradingPickup;
         PlayerHandlers.ThrownProjectile += OnThrownProjectile;
-        PlayerHandlers.Escaping += OnEscaping;
+        EscapeHandler.Escaped += OnEscaped;
         PlayerHandlers.ActivatingGenerator += OnActivatingGenerator;
         PlayerHandlers.Died += OnDied;
 
@@ -100,7 +102,7 @@ public sealed class ForceContributionHandler : EventHandlerBase
         Scp914Handlers.UpgradingInventoryItem -= OnUpgradingInventoryItem;
         Scp914Handlers.UpgradingPickup -= OnUpgradingPickup;
         PlayerHandlers.ThrownProjectile -= OnThrownProjectile;
-        PlayerHandlers.Escaping -= OnEscaping;
+        EscapeHandler.Escaped -= OnEscaped;
         PlayerHandlers.ActivatingGenerator -= OnActivatingGenerator;
         PlayerHandlers.Died -= OnDied;
         ServerHandlers.RoundStarted -= OnRoundStarted;
@@ -297,9 +299,15 @@ public sealed class ForceContributionHandler : EventHandlerBase
     // 同じ機会をこちらでも拾って個人に付けます。
     // ───────────────────────────────
 
-    private static void OnEscaping(EscapingEventArgs ev)
+    /// <remarks>
+    /// バニラの <c>Escaping</c> ではなく <see cref="EscapeHandler"/> の通知を見ます。
+    /// 脱出の可否と行き先はあちらが決めるので、こちらが <c>IsAllowed</c> を読んでも
+    /// 最終結果とは限らないためです。隊員の引きは netId キーで、役職が変わっても
+    /// 直前の隊が残っているので、脱出した本人の隊に加点されます。
+    /// </remarks>
+    private static void OnEscaped(EscapeContext escape)
     {
-        if (!ev.IsAllowed || ev.Player.GetForceMember() is not { Force: { } force } member) return;
+        if (escape.Player.GetForceMember() is not { Force: { } force } member) return;
 
         ForceContribution.Reward(member, ForceImpact.Medium);
         GrantWaveProgress(force, ForceImpact.Medium);

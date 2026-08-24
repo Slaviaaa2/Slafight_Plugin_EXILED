@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Exiled.API.Features;
@@ -43,6 +44,8 @@ public class Plugin : Plugin<Config>
     public override string Prefix => "Slafight_Plugin_EXILED";
 
     public override Version Version => new(2, 0, 0, 0);
+
+    public List<string> SpecificVersionTags => ["260824a"];
 
     public override Version RequiredExiledVersion { get; } = new(9, 14, 2);
 

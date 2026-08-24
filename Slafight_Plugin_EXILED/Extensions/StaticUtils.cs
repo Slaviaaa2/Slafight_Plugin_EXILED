@@ -278,40 +278,6 @@ public static class StaticUtils
     }
     
     /// <summary>
-    /// Unity Rich Text タグ (<b>, <i>, <color>, <size>, etc.) を削除して Raw Text だけ返す
-    /// </summary>
-    public static string RemoveRichText(this string text)
-    {
-        if (string.IsNullOrEmpty(text))
-            return text;
-
-        // <...> 形式のタグを削除 (閉じタグ <> も含む)
-        // グリーディング: < の後に > までがタグ
-        var result = new StringBuilder(text.Length);
-        int i = 0;
-            
-        while (i < text.Length)
-        {
-            if (text[i] == '<')
-            {
-                // 태그의 끝을 찾음
-                int closeIndex = text.IndexOf('>', i);
-                if (closeIndex != -1)
-                {
-                    // 태그가 닫혔으므로跳过 (삭제)
-                    i = closeIndex + 1;
-                    continue;
-                }
-            }
-                
-            result.Append(text[i]);
-            i++;
-        }
-
-        return result.ToString();
-    }
-    
-    /// <summary>
     /// ColorA から ColorB まで、進行度合い (0.0〜1.0) でグラデーション_color を取得します
     /// </summary>
     /// <param name="colorA">開始色</param>

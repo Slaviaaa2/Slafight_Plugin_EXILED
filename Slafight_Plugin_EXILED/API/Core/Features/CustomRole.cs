@@ -187,6 +187,16 @@ public abstract class CustomRole : IPlayerOwn
     public virtual string HudLabel => $"<color={Team?.Color ?? "#ffffff"}>{Name}</color>";
 
     /// <summary>
+    /// この役職で脱出したとき、何になるかです。null なら陣営 (<see cref="CustomTeam.Escape"/>) に任せます。
+    /// </summary>
+    /// <remarks>
+    /// 陣営の既定と違う行き先を持つ役職だけが override します。
+    /// 「SCP-3005 が脱出したら第五教会の司祭になる」のような、
+    /// 役職 1 つのために陣営側へ例外を書き足したくなるものがこれにあたります。
+    /// </remarks>
+    public virtual SpawnSetRoleDefinition? Escape(EscapeContext escape) => null;
+
+    /// <summary>
     /// HUD の陣営欄に出す文字列です。null ならチームが名乗るものを使います。
     /// 2 つの陣営にまたがる役職だけ override します。
     /// </summary>
