@@ -302,14 +302,19 @@ public sealed class ForceContributionHandler : EventHandlerBase
     /// <remarks>
     /// バニラの <c>Escaping</c> ではなく <see cref="EscapeHandler"/> の通知を見ます。
     /// 脱出の可否と行き先はあちらが決めるので、こちらが <c>IsAllowed</c> を読んでも
-    /// 最終結果とは限らないためです。隊員の引きは netId キーで、役職が変わっても
-    /// 直前の隊が残っているので、脱出した本人の隊に加点されます。
+    /// 最終結果とは限らないためです。
+    ///
+    /// <b>いまの所属は見ません。</b>脱出は役職変更なので、この通知が届く時点では
+    /// <c>ForceRegistry.Refresh</c> が隊から外し終えています。加点先は
+    /// <see cref="EscapeContext"/> が写し取った<b>脱出する前</b>の隊です。
     /// </remarks>
     private static void OnEscaped(EscapeContext escape)
     {
-        if (escape.Player.GetForceMember() is not { Force: { } force } member) return;
+        if (escape.Force is not { } force) return;
 
-        ForceContribution.Reward(member, ForceImpact.Medium);
+        if (escape.ForceMember is { } member)
+            ForceContribution.Reward(member, ForceImpact.Medium);
+
         GrantWaveProgress(force, ForceImpact.Medium);
     }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Exiled.API.Features;
+using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 
 namespace Slafight_Plugin_EXILED.API.Core.Features;
@@ -8,12 +9,18 @@ namespace Slafight_Plugin_EXILED.API.Core.Features;
 /// プレイヤーごとのデバッグ表示の切り替えです。
 /// </summary>
 /// <remarks>
+/// <b>ここが唯一の状態です。</b>コマンドと Server Specifics のどちらから切り替えても
+/// 最後はここに入り、描画側 (<c>PlayerHUD</c> のデバッグループ) はここだけを見ます。
+///
 /// 寿命は <see cref="PlayerScope"/> に相乗りするので、退出・ラウンド再開で勝手に消えます。
 /// 専用のイベント購読も後始末も要りません。
 /// </remarks>
 public static class DebugMode
 {
     private static readonly HashSet<uint> Enabled = [];
+
+    /// <summary>後始末を仕掛け済みの netId です。同じ人へ二重に仕掛けないために持ちます。</summary>
+    private static readonly HashSet<uint> Hooked = [];
 
     /// <summary>
     /// このプレイヤーがデバッグ表示を出しているか。
@@ -39,21 +46,39 @@ public static class DebugMode
 
         if (netId == 0) return false;
 
-        if (!enabled)
+        bool was = Enabled.Contains(netId);
+
+        if (enabled)
+        {
+            Enabled.Add(netId);
+
+            // 後始末は 1 人につき 1 回だけ仕掛ける。ON/OFF のたびに積むと閉じ手が溜まる。
+            if (Hooked.Add(netId))
+                PlayerScope.Of(player).OnDispose(_ =>
+                {
+                    Enabled.Remove(netId);
+                    Hooked.Remove(netId);
+                });
+        }
+        else
         {
             Enabled.Remove(netId);
-
-            return false;
         }
 
-        if (Enabled.Add(netId))
-            PlayerScope.Of(player).OnDispose(_ => Enabled.Remove(netId));
+        // 設定画面の表示もこちらへ合わせる。コマンドで切り替えたときに
+        // 画面が ON のままだと、同じ値を押しても設定は飛ばず切り替えられなくなる。
+        if (was != enabled)
+            ServerSpecificUserSettings.TrySetTwoButtonIsB(player, ServerSpecifics.DebugModeSettingId, !enabled);
 
-        return true;
+        return enabled;
     }
 
     /// <summary>
     /// 全員ぶん消します。
     /// </summary>
-    public static void ClearAll() => Enabled.Clear();
+    public static void ClearAll()
+    {
+        Enabled.Clear();
+        Hooked.Clear();
+    }
 }

@@ -4,6 +4,8 @@ using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.ForceSystem.Forces;
 
+using ExiledSpawnedEventArgs = Exiled.Events.EventArgs.Player.SpawnedEventArgs;
+using PlayerHandlers = Exiled.Events.Handlers.Player;
 using ServerHandlers = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.ForceSystem;
@@ -28,6 +30,7 @@ public sealed class ForceManager : EventHandlerBase
         CustomInfoDisplay.ExtraInfoProvider = ForceNameplate.Text;
 
         SpawnSystem.Spawned += OnSpawned;
+        PlayerHandlers.Spawned += OnRoleSpawned;
         ServerHandlers.RestartingRound += OnRestartingRound;
         ServerHandlers.WaitingForPlayers += OnRestartingRound;
         ServerHandlers.RoundStarted += OnRoundStarted;
@@ -40,6 +43,7 @@ public sealed class ForceManager : EventHandlerBase
             CustomInfoDisplay.ExtraInfoProvider = null;
 
         SpawnSystem.Spawned -= OnSpawned;
+        PlayerHandlers.Spawned -= OnRoleSpawned;
         ServerHandlers.RestartingRound -= OnRestartingRound;
         ServerHandlers.WaitingForPlayers -= OnRestartingRound;
         ServerHandlers.RoundStarted -= OnRoundStarted;
@@ -57,6 +61,22 @@ public sealed class ForceManager : EventHandlerBase
     private static void OnRoundStarted() => ForceEvaluator.Start();
 
     private static void OnRestartingRound() => ForceRegistry.Reset();
+
+    /// <summary>
+    /// 役職が変わった人の所属を見直します。
+    /// </summary>
+    /// <remarks>
+    /// <c>Player.Spawned</c> は役職が入れ替わった<b>後</b>に配られるので、
+    /// ここで見る <c>Role</c> は新しいほうです。SCP にされた元隊員のように
+    /// 「生きているのに部隊システムの対象外」を捨てられるのはこの時点だけで、
+    /// 死亡だけを見る <c>PruneDead</c> では外れません。
+    /// </remarks>
+    private static void OnRoleSpawned(ExiledSpawnedEventArgs ev)
+    {
+        if (ev?.Player is not { } player) return;
+
+        ForceRegistry.Refresh(player);
+    }
 
     /// <summary>
     /// 波が出たら、その波ぶんの隊を 1 つ作ります。

@@ -1,3 +1,4 @@
+using System;
 using Exiled.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
@@ -19,6 +20,7 @@ public sealed class ForceMember
     {
         Player = player;
         NetId = player.GetNetId();
+        Kind = ForceKinds.For(player);
         JoinedAt = Time.time;
         AloneSince = Time.time;
     }
@@ -32,6 +34,15 @@ public sealed class ForceMember
     /// 本人を指す安定したキーです。
     /// </summary>
     public uint NetId { get; }
+
+    /// <summary>
+    /// この隊員状態を作ったときの、陣営から決まる隊の種類です。
+    /// </summary>
+    /// <remarks>
+    /// 役職が変わったかどうかを、隊に属していないあいだも判定できるようにするために持ちます。
+    /// これが今の役職と食い違ったら、階級も貢献度も前の役職のものなので丸ごと捨てます。
+    /// </remarks>
+    internal Type Kind { get; }
 
     /// <summary>
     /// 現在所属している隊です。どこにも属していなければ null。

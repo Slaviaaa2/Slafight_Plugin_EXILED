@@ -1,5 +1,6 @@
 using Exiled.API.Features;
 using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.ForceSystem;
 
 namespace Slafight_Plugin_EXILED.API.Core.Structs;
 
@@ -21,6 +22,8 @@ public readonly struct EscapeContext
         Player = player;
         Role = CustomRole.Of(player);
         Team = CustomTeam.Of(player);
+        ForceMember = player.GetForceMember();
+        Force = ForceMember?.Force;
 
         // 手錠を掛けられていなければ Cuffer は null になる。
         Escort = player?.Cuffer;
@@ -42,6 +45,20 @@ public readonly struct EscapeContext
     /// そのプレイヤーの陣営です。属していなければ null。
     /// </summary>
     public CustomTeam Team { get; }
+
+    /// <summary>
+    /// そのプレイヤーの隊員状態です。部隊システムの対象外なら null。
+    /// </summary>
+    /// <remarks>
+    /// 脱出は役職変更なので、脱出後には隊から外れて隊員状態も捨てられています
+    /// (<c>ForceRegistry.Refresh</c>)。脱出を評価する側はここの写しを見てください。
+    /// </remarks>
+    public ForceMember ForceMember { get; }
+
+    /// <summary>
+    /// 脱出する前に属していた隊です。無所属なら null。
+    /// </summary>
+    public ForceBase Force { get; }
 
     /// <summary>
     /// 手錠を掛けて連れてきた相手です。単独で出てきたなら null。

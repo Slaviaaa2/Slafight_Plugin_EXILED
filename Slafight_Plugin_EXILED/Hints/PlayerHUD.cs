@@ -53,6 +53,15 @@ public class PlayerHUD : EventHandlerBase
     /// <summary>部隊表示の 1 行目の縦位置です。0 が画面上端。</summary>
     private const int ForceHudTopY = 60;
 
+    /// <summary>デバッグ表示の横位置です。通常 HUD の左列に揃えます。</summary>
+    private const int DebugHudX = -350;
+
+    /// <summary>デバッグ表示の縦位置です。</summary>
+    private const int DebugHudY = 345;
+
+    /// <summary>デバッグ表示の文字の大きさです。</summary>
+    private const int DebugHudFontSize = 24;
+
     /// <summary>部隊表示の行送りです。</summary>
     /// <remarks>
     /// 各行は独立した Hint なので、HSM は行送りを自動計算しません。
@@ -213,7 +222,7 @@ public class PlayerHUD : EventHandlerBase
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Specific, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate + 350, 880);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Ability, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 22, XCordinate + 350, 800);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_EffectedInfo, string.Empty, HintAlignment.Center, HintSyncSpeed.Fastest, 22, 0, 930);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 24, XCordinate, 345);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, DebugHudFontSize, DebugHudX, DebugHudY);
     }
 
     private static string BuildServerInfoText()
@@ -489,7 +498,7 @@ public class PlayerHUD : EventHandlerBase
         if (debugHint == null)
         {
             // DebugModeはロビー中でも見たいので、PlayerHUDSetup(通常HUD群)は経由せず単独で作る
-            EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 24, -350, 345);
+            EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, DebugHudFontSize, DebugHudX, DebugHudY);
             debugHint = display.GetHint(HudConstId.PlayerHUD_Debug);
             if (debugHint == null) return false;
         }
@@ -506,6 +515,31 @@ public class PlayerHUD : EventHandlerBase
 
             return false;
         }
+    }
+
+    /// <summary>
+    /// デバッグ表示を消します。
+    /// </summary>
+    /// <remarks>
+    /// <b>OFF にしたら必ずここを通します。</b>デバッグループは ON の人しか触らないので、
+    /// 消さないと最後に描いた内容が画面に残り続けます。
+    /// ヒント自体は作り直さず、中身だけ空にします。
+    /// </remarks>
+    /// <returns>消すべきものがあって消したなら true。</returns>
+    public bool ClearDebugHud(Player player)
+    {
+        if (!IsPlayerValid(player)) return false;
+
+        var display = TryGetDisplay(player);
+
+        // まだヒントが無いなら消すものも無い。ここで作らない。
+        if (display?.GetHint(HudConstId.PlayerHUD_Debug) is not { } debugHint) return false;
+
+        if (string.IsNullOrEmpty(debugHint.Text)) return false;
+
+        debugHint.Text = string.Empty;
+
+        return true;
     }
 
     // =========================================================
@@ -979,9 +1013,13 @@ public class PlayerHUD : EventHandlerBase
     }
     
     /// <summary>
-    /// デバッグモード ON のプレイヤーに対して 0.1 秒ごとに
-    /// PHUD_Debug ヒントを更新するループ。
+    /// 0.1 秒ごとに PHUD_Debug ヒントを <see cref="DebugMode"/> の状態へ合わせるループ。
     /// </summary>
+    /// <remarks>
+    /// <b>ON 側だけでなく OFF 側も毎回書きます。</b>切り替え口はコマンドと
+    /// Server Specifics の 2 つあるので、切り替えた側から描画を叩く作りにすると
+    /// どちらかを足したときに消し忘れます。ここが状態を見て描き分ける唯一の場所です。
+    /// </remarks>
     private IEnumerator<float> DebugHudLoop()
     {
         yield return Timing.WaitForSeconds(0.5f);
@@ -991,9 +1029,11 @@ public class PlayerHUD : EventHandlerBase
             foreach (var player in Player.List)
             {
                 if (!IsPlayerValid(player)) continue;
-                if (!DebugMode.IsEnabled(player)) continue;
 
-                ForceDebugHudSync(player);
+                if (DebugMode.IsEnabled(player))
+                    ForceDebugHudSync(player);
+                else
+                    ClearDebugHud(player);
             }
  
             yield return Timing.WaitForSeconds(0.1f);

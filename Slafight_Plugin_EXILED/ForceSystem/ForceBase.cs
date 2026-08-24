@@ -311,6 +311,19 @@ public abstract class ForceBase
     // ───────────────────────────────
 
     /// <summary>
+    /// この人が、いまの役職のままこの隊に居られるかどうか。
+    /// </summary>
+    /// <remarks>
+    /// 既定は「いまの陣営から決まる隊の種類 (<see cref="ForceKinds"/>) がこの隊と同じであること」です。
+    /// 隊員が SCP や研究員に変えられても、死んでいなければ隊からは外れません。
+    /// これが false になった隊員は <see cref="ForceRegistry"/> が隊から外し、階級と貢献度ごと捨てます。
+    ///
+    /// 陣営の表に載らない独自の役職を抱える隊は、ここを override してください。
+    /// </remarks>
+    public virtual bool Accepts(Player player) =>
+        player is not null && ForceKinds.For(player) == GetType();
+
+    /// <summary>
     /// 隊員を加えます。既に別の隊に属していれば、そちらから外します。
     /// </summary>
     internal void Add(ForceMember member)

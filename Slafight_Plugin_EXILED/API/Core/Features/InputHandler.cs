@@ -2,11 +2,15 @@ using System;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using Exiled.Permissions.Extensions;
+using Slafight_Plugin_EXILED.API.Core.Commands;
 using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.ProximityChat;
 using UserSettings.ServerSpecific;
+
+using ServerHandlers = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.API.Core.Features;
 
@@ -27,12 +31,37 @@ public sealed class InputHandler : EventHandlerBase
     public override void RegisterEvents()
     {
         ServerSpecificSettingsSync.ServerOnSettingValueReceived += OnSettingValueReceived;
+        ServerHandlers.WaitingForPlayers += RestoreDebugMode;
     }
 
     /// <inheritdoc />
     public override void UnregisterEvents()
     {
         ServerSpecificSettingsSync.ServerOnSettingValueReceived -= OnSettingValueReceived;
+        ServerHandlers.WaitingForPlayers -= RestoreDebugMode;
+    }
+
+    /// <summary>
+    /// ラウンドを跨いだあと、設定画面の値からデバッグ表示を入れ直します。
+    /// </summary>
+    /// <remarks>
+    /// <see cref="DebugMode"/> の寿命は <see cref="PlayerScope"/> なので、ラウンド再開で
+    /// 全員ぶん消えます。設定画面の値はサーバー側に残っているので、ここで入れ直さないと
+    /// 「設定は ON なのに出ない」ままになります。設定は値が変わったときにしか飛んでこないため、
+    /// その状態では ON を押し直しても戻せません。
+    /// </remarks>
+    private static void RestoreDebugMode()
+    {
+        foreach (Player player in Player.List)
+        {
+            if (!player.IsSafePlayer()) continue;
+
+            if (!ServerSpecificUserSettings.IsDebugModeSelected(player)) continue;
+
+            if (!player.CheckPermission(DebugCommand.PermissionNode)) continue;
+
+            DebugMode.Set(player, true);
+        }
     }
 
     private static void OnSettingValueReceived(ReferenceHub hub, ServerSpecificSettingBase setting)
@@ -43,6 +72,14 @@ public sealed class InputHandler : EventHandlerBase
         if (setting is SSPlaintextSetting { SyncInputText: not null } text)
         {
             HandleText(player, text.SettingId, text.SyncInputText);
+
+            return;
+        }
+
+        // 2 択のトグルも押下ではなく値の変化で届く。
+        if (setting is SSTwoButtonsSetting twoButtons)
+        {
+            HandleTwoButtons(player, twoButtons);
 
             return;
         }
@@ -130,6 +167,34 @@ public sealed class InputHandler : EventHandlerBase
         player.ShowHint(
             $"<size=22>{ability.DisplayName}: <color=#8fdcff>{ability.SelectedOption?.Name}</color></size>",
             2f);
+    }
+
+    /// <summary>
+    /// 2 択設定の切り替えを受け取ります。
+    /// </summary>
+    /// <remarks>
+    /// デバッグ表示は管理者向けなので、設定画面から押されても
+    /// <see cref="DebugCommand.PermissionNode"/> を持っていなければ有効になりません。
+    /// クライアント側の見た目は ON のままになりますが、サーバーが持つ値は OFF に戻すので
+    /// <see cref="ServerSpecificUserSettings.IsDebugModeSelected"/> は実際の状態と食い違いません。
+    /// </remarks>
+    private static void HandleTwoButtons(Player player, SSTwoButtonsSetting setting)
+    {
+        if (setting.SettingId != ServerSpecifics.DebugModeSettingId) return;
+
+        // A が ON。定義 (ServerSpecifics の SSTwoButtonsSetting) の並びと合わせている。
+        bool enabled = !setting.SyncIsB;
+
+        if (enabled && !player.CheckPermission(DebugCommand.PermissionNode))
+        {
+            setting.SyncIsB = true;
+            DebugMode.Set(player, false);
+            player.ShowHint("<size=22>デバッグモードは管理者専用です。</size>", 3f);
+
+            return;
+        }
+
+        DebugMode.Set(player, enabled);
     }
 
     /// <summary>
