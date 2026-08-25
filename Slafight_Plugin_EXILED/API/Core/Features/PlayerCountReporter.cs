@@ -90,6 +90,10 @@ public sealed class PlayerCountReporter : EventHandlerBase
             string json = JsonSerializer.Serialize(new
             {
                 server = Plugin.ServerName,
+
+                // Bot 側 (bot.py) は同一ホストで動く複数サーバーをポート番号で識別するため、
+                // 人数の表示先チャンネルの振り分けに必要。
+                port = Server.Port,
                 count,
                 timestamp = DateTime.UtcNow,
             });

@@ -37,12 +37,22 @@
     </PropertyGroup>
 
     <!--
-        SL_References は通常環境変数で与えられるが、未設定の環境でも
-        兄弟リポジトリとしてチェックアウトされた SL_References を参照できるようにする。
+        SL_References は通常環境変数で与えられるが、未設定の環境でも解決できるようにする。
+        Linux は環境変数の大文字小文字を区別するため SL_REFERENCES も見る
+        （Windows はどちらの綴りでも同じ変数として解決される）。
+        それでも見つからなければ、上位ディレクトリを辿って SL_References を探す。
+        Rider(snap) などの IDE はシェルの ~/.bashrc を経由せず起動するので環境変数が渡らない。
     -->
     <PropertyGroup Condition=" '$(SL_References)' == '' ">
-        <SL_References Condition="Exists('$(MSBuildProjectDirectory)\..\..\SL_References\mscorlib.dll')">$(MSBuildProjectDirectory)\..\..\SL_References</SL_References>
+        <SL_References Condition="'$(SL_REFERENCES)' != ''">$(SL_REFERENCES)</SL_References>
+        <SLRefsRoot Condition="'$(SL_References)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', 'SL_References/mscorlib.dll'))</SLRefsRoot>
+        <SL_References Condition="'$(SL_References)' == '' And '$(SLRefsRoot)' != ''">$(SLRefsRoot)/SL_References</SL_References>
     </PropertyGroup>
+
+    <!-- 参照が解決できないまま中身の欠けた DLL が出来るより、はっきり落とす -->
+    <Target Name="ValidateSLRefs" BeforeTargets="ResolveAssemblyReferences" Condition="'$(SL_References)' == ''">
+        <Error Text="SL_References が見つかりません。環境変数 SL_REFERENCES を設定するか、プロジェクトの上位ディレクトリに SL_References を置いてください。" />
+    </Target>
 
     <ItemGroup>
         <PackageReference Include="ExMod.Exiled" Version="9.14.2" />
