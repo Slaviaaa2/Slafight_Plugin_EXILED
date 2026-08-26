@@ -111,8 +111,9 @@ public static class PlayerSpeakerManager
 
         if (dict.TryGetValue(purpose, out var speaker) && speaker.IsValid)
         {
+            // ここは音声パケットごとに通る経路。Log.Debug は Debug が無効でも
+            // 補間文字列の構築と Assembly.GetCallingAssembly() のスタックウォークを払うので置かない。
             speaker.SetListeners(listeners);
-            Log.Debug($"[PlayerSpeakerManager] GetOrCreateSpeaker[{purpose}]: existing for {player.Nickname} (ID: {playerId}, ControllerId: {speaker.ControllerId})");
             return speaker;
         }
 

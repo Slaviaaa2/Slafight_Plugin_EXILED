@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Exiled.API.Features;
@@ -80,6 +81,10 @@ public class PlayerHUD : EventHandlerBase
 
     private CoroutineHandle _specificAbilityLoop;
     private CoroutineHandle _forceHudLoop;
+    private CoroutineHandle _bulkSetupHandle;
+
+    /// <summary>全員分の HUD 構築を1フレームに何ミリ秒まで詰め込むか。</summary>
+    private const double HudSetupFrameBudgetMs = 4d;
     private CoroutineHandle _abilityHudLoop;
     private CoroutineHandle _taskSyncLoop;
     private CoroutineHandle _debugHudLoop;
@@ -93,9 +98,10 @@ public class PlayerHUD : EventHandlerBase
         Instance = this;
 
         Exiled.Events.Handlers.Player.Verified += ServerInfoHint;
+        // PlayerHUDMain が HUD 構築とロール情報の反映を両方やるため、
+        // 同じ RoundStarted で AllSyncHUD_ を重ねて呼ぶ必要はない（全員分の二度手間だった）。
         Exiled.Events.Handlers.Server.RoundStarted += PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole += AllSyncHUD;
-        Exiled.Events.Handlers.Server.RoundStarted += AllSyncHUD_;
         Exiled.Events.Handlers.Server.RestartingRound += DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer += Spectate;
         Exiled.Events.Handlers.Player.Left += OnLeft;
@@ -117,7 +123,6 @@ public class PlayerHUD : EventHandlerBase
         Exiled.Events.Handlers.Player.Verified -= ServerInfoHint;
         Exiled.Events.Handlers.Server.RoundStarted -= PlayerHUDMain;
         Exiled.Events.Handlers.Player.ChangingRole -= AllSyncHUD;
-        Exiled.Events.Handlers.Server.RoundStarted -= AllSyncHUD_;
         Exiled.Events.Handlers.Server.RestartingRound -= DestroyHints;
         Exiled.Events.Handlers.Player.ChangingSpectatedPlayer -= Spectate;
         Exiled.Events.Handlers.Player.Left -= OnLeft;
@@ -136,6 +141,9 @@ public class PlayerHUD : EventHandlerBase
 
         if (_forceHudLoop.IsRunning)
             Timing.KillCoroutines(_forceHudLoop);
+
+        if (_bulkSetupHandle.IsRunning)
+            Timing.KillCoroutines(_bulkSetupHandle);
 
         _spectateTargets.Clear();
     }
@@ -168,6 +176,24 @@ public class PlayerHUD : EventHandlerBase
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// 内容が変わったときだけ Text を書き、変化があったかを返す。
+    /// HintServiceMeow の <c>AbstractHint.Text</c> setter は同じ文字列を代入しても必ず更新イベントを出し、
+    /// SyncSpeed が Fastest ならその場でディスプレイ全体の再パースが走る。
+    /// 毎秒回る HUD ループから無条件に書くとこれが常時発火するため、必ずこの経路を使うこと。
+    /// </summary>
+    private static bool SetTextIfChanged(AbstractHint? hint, string? text)
+    {
+        if (hint == null)
+            return false;
+
+        if (string.Equals(hint.Text, text, StringComparison.Ordinal))
+            return false;
+
+        hint.Text = text;
+        return true;
     }
 
     /// <summary>PlayerDisplay を安全に取得する。失敗時は null を返す</summary>
@@ -215,13 +241,16 @@ public class PlayerHUD : EventHandlerBase
         int XCordinate = -350;
 
         EnsureServerInfoHint(display);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Role, "Role: " + player.CustomInfo, HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate, 860);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Objective, "Objective: Undefined", HintAlignment.Left, HintSyncSpeed.Fastest, 25, XCordinate, 915);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Team, "Team: Undefined", HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate, 885);
+        // SyncSpeed は「ヒント1つの更新でディスプレイ全体を何秒以内に再パースするか」。
+        // Fastest は待ち時間 0 = 即時フルパースなので、押した瞬間の反応が要るものだけに絞る。
+        // ロール/陣営/目標はロール変更時にしか変わらないため Normal (0.3s) で十分。
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Role, "Role: " + player.CustomInfo, HintAlignment.Left, HintSyncSpeed.Normal, 23, XCordinate, 860);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Objective, "Objective: Undefined", HintAlignment.Left, HintSyncSpeed.Normal, 25, XCordinate, 915);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Team, "Team: Undefined", HintAlignment.Left, HintSyncSpeed.Normal, 23, XCordinate, 885);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Event, "[Event]\n<size=28>Undefined</size>", HintAlignment.Left, HintSyncSpeed.Fast, 26, XCordinate, 120);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Specific, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 23, XCordinate + 350, 880);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Ability, string.Empty, HintAlignment.Left, HintSyncSpeed.Fastest, 22, XCordinate + 350, 800);
-        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_EffectedInfo, string.Empty, HintAlignment.Center, HintSyncSpeed.Fastest, 22, 0, 930);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Specific, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 23, XCordinate + 350, 880);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Ability, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, 22, XCordinate + 350, 800);
+        EnsurePlayerHudHint(display, HudConstId.PlayerHUD_EffectedInfo, string.Empty, HintAlignment.Center, HintSyncSpeed.Fast, 22, 0, 930);
         EnsurePlayerHudHint(display, HudConstId.PlayerHUD_Debug, string.Empty, HintAlignment.Left, HintSyncSpeed.Fast, DebugHudFontSize, DebugHudX, DebugHudY);
     }
 
@@ -238,7 +267,7 @@ public class PlayerHUD : EventHandlerBase
         var existing = display.GetHint(HudConstId.PlayerHUD_ServerInfo);
         if (existing != null)
         {
-            existing.Text = BuildServerInfoText();
+            SetTextIfChanged(existing, BuildServerInfoText());
             return existing;
         }
 
@@ -286,22 +315,77 @@ public class PlayerHUD : EventHandlerBase
         if (string.IsNullOrEmpty(hint.Text))
             hint.Text = defaultText;
 
-        hint.Alignment = alignment;
-        hint.SyncSpeed = syncSpeed;
-        hint.FontSize = fontSize;
-        hint.XCoordinate = x;
-        hint.YCoordinate = y;
-        hint.ResolutionBasedAlign = true;
+        // レイアウト系の setter も Text と同じく無条件で更新イベントを出す。
+        // ForceHud ループ（毎秒 人数 x 18行）やラウンド開始でまとめて走るため、変わった項目だけ書く。
+        if (hint.Alignment != alignment)
+            hint.Alignment = alignment;
+
+        if (hint.SyncSpeed != syncSpeed)
+            hint.SyncSpeed = syncSpeed;
+
+        if (hint.FontSize != fontSize)
+            hint.FontSize = fontSize;
+
+        if (hint.XCoordinate != x)
+            hint.XCoordinate = x;
+
+        if (hint.YCoordinate != y)
+            hint.YCoordinate = y;
+
+        if (!hint.ResolutionBasedAlign)
+            hint.ResolutionBasedAlign = true;
     }
 
     public void PlayerHUDMain()
     {
-        // 旧仕様寄り：RoundStarted 時点で全員分 HUD 作成
-        foreach (Player player in Player.List) // Player.List は既にスナップショットなので再コピー不要
+        // 旧仕様寄り：RoundStarted 時点で全員分 HUD 作成。
+        // ただし1フレームに集中させない（BulkSetupCoroutine を参照）。
+        StartBulkSetup();
+    }
+
+    /// <summary>
+    /// 全員分の HUD 構築をフレーム予算で分割して走らせる。
+    ///
+    /// HSM はヒントを1つ追加・変更するたびにディスプレイ全体の再パースを予約するため、
+    /// 「人数 x ヒント生成 + ロール情報の構築」をラウンド開始の同じフレームで一気にやると
+    /// そこで目に見える詰まりになる。ラウンド終了時の HUD 作り直しも同じ形。
+    /// </summary>
+    private void StartBulkSetup()
+    {
+        if (_bulkSetupHandle.IsRunning)
+            Timing.KillCoroutines(_bulkSetupHandle);
+
+        _bulkSetupHandle = Timing.RunCoroutine(BulkSetupCoroutine());
+    }
+
+    private IEnumerator<float> BulkSetupCoroutine()
+    {
+        // フレームをまたぐのでスナップショットを取る。
+        var players = Player.List.ToList();
+        var stopwatch = Stopwatch.StartNew();
+
+        foreach (Player player in players)
         {
             if (!IsPlayerValid(player)) continue;
-            PlayerHUDSetup(player);
-            ApplyRoleInfo(player, player);
+
+            var display = TryGetDisplay(player);
+            if (display == null) continue;
+
+            EnsureServerInfoHint(display);
+
+            if (!Round.IsLobby)
+            {
+                // 旧 PlayerHUDMain と同じく観戦者も含めて反映する。
+                // 観戦中の表示は ChangingSpectatedPlayer 側で対象の情報に差し替わる。
+                PlayerHUDSetup(player);
+                ApplyRoleInfo(player, player);
+            }
+
+            if (stopwatch.Elapsed.TotalMilliseconds < HudSetupFrameBudgetMs)
+                continue;
+
+            yield return Timing.WaitForOneFrame;
+            stopwatch.Restart();
         }
     }
 
@@ -321,40 +405,39 @@ public class PlayerHUD : EventHandlerBase
             switch (syncType)
             {
                 case SyncType.ServerInfo:
-                    var si = EnsureServerInfoHint(display);
-                    si.Text = hintText;
+                    SetTextIfChanged(EnsureServerInfoHint(display), hintText);
                     break;
                 case SyncType.PHUD_Role:
                     var role = display.GetHint(HudConstId.PlayerHUD_Role);
-                    if (role != null) role.Text = "Role: " + hintText;
+                    SetTextIfChanged(role, "Role: " + hintText);
                     break;
                 case SyncType.PHUD_Objective:
                     var obj = display.GetHint(HudConstId.PlayerHUD_Objective);
-                    if (obj != null) obj.Text = "Objective: " + hintText;
+                    SetTextIfChanged(obj, "Objective: " + hintText);
                     break;
                 case SyncType.PHUD_Team:
                     var team = display.GetHint(HudConstId.PlayerHUD_Team);
-                    if (team != null) team.Text = "Team: " + hintText;
+                    SetTextIfChanged(team, "Team: " + hintText);
                     break;
                 case SyncType.PHUD_Event:
                     var ev = display.GetHint(HudConstId.PlayerHUD_Event);
-                    if (ev != null) ev.Text = "[Event]\n<size=28>" + hintText + "</size>";
+                    SetTextIfChanged(ev, "[Event]\n<size=28>" + hintText + "</size>");
                     break;
                 case SyncType.PHUD_Specific:
                     var specific = display.GetHint(HudConstId.PlayerHUD_Specific);
-                    if (specific != null) specific.Text = hintText;
+                    SetTextIfChanged(specific, hintText);
                     break;
                 case SyncType.PHUD_Ability:
                     var ab = display.GetHint(HudConstId.PlayerHUD_Ability);
-                    if (ab != null) ab.Text = hintText;
+                    SetTextIfChanged(ab, hintText);
                     break;
                 case SyncType.PHUD_EffectedInfo:
                     var effected = display.GetHint(HudConstId.PlayerHUD_EffectedInfo);
-                    if (effected != null) effected.Text = hintText;
+                    SetTextIfChanged(effected, hintText);
                     break;
                 case SyncType.PHUD_Debug:
                     var db = display.GetHint(HudConstId.PlayerHUD_Debug);
-                    if (db != null) db.Text = hintText;
+                    SetTextIfChanged(db, hintText);
                     break;
             }
         }
@@ -585,7 +668,7 @@ public class PlayerHUD : EventHandlerBase
         {
             try
             {
-                specificHint.Text = RoleSpecificTextProvider.GetFor(target);
+                SetTextIfChanged(specificHint, RoleSpecificTextProvider.GetFor(target));
             }
             catch (Exception e)
             {
@@ -647,25 +730,8 @@ public class PlayerHUD : EventHandlerBase
 
         _spectateTargets.Clear();
 
-        Timing.CallDelayed(RoleSpawnTimings.HudRecreateAfterClear, () =>
-        {
-            foreach (Player player in Player.List)
-            {
-                if (!IsPlayerValid(player)) continue;
-
-                var display = TryGetDisplay(player);
-                if (display == null) continue;
-
-                EnsureServerInfoHint(display);
-
-                if (!Round.IsLobby)
-                {
-                    PlayerHUDSetup(player);
-                    if (player.Role?.Team != Team.Dead)
-                        ApplyRoleInfo(player, player);
-                }
-            }
-        });
+        // 作り直しも1フレームに詰め込まない。
+        Timing.CallDelayed(RoleSpawnTimings.HudRecreateAfterClear, StartBulkSetup);
 
         // ★ コルーチンは止めない（旧仕様の安定性維持）
     }
@@ -679,7 +745,14 @@ public class PlayerHUD : EventHandlerBase
         Player target)
     {
         var content = BuildAbilityHud(target);
-        abilityHint.Text = content.Text;
+
+        // Parameters は毎回新しい配列・新しい SSKeybindHintParameter になる。
+        // HSM の送信重複判定 (PlayerDisplay.SameParameterReferences) は要素の参照比較なので、
+        // 無条件に代入すると内容が同じでも判定が必ず外れ、0.5 秒ごとに HUD 全文が実送信される。
+        // 本文が同じなら、パラメータの並びも同じ（本文が {0} {1} の位置を持っているため）なので参照ごと据え置く。
+        if (!SetTextIfChanged(abilityHint, content.Text))
+            return;
+
         abilityHint.Parameters = content.Parameters;
     }
 
@@ -953,7 +1026,7 @@ public class PlayerHUD : EventHandlerBase
                 ForceHudTopY + (index * ForceHudLineHeight));
 
             if (display.GetHint(id) is { } hint)
-                hint.Text = rows[index];
+                SetTextIfChanged(hint, rows[index]);
         }
     }
 
@@ -998,9 +1071,9 @@ public class PlayerHUD : EventHandlerBase
                 {
                     string roleSpecific = RoleSpecificTextProvider.GetFor(hudTarget);
 
-                    specificHint.Text = string.IsNullOrEmpty(roleSpecific)
-                        ? string.Empty
-                        : roleSpecific;
+                    SetTextIfChanged(
+                        specificHint,
+                        string.IsNullOrEmpty(roleSpecific) ? string.Empty : roleSpecific);
                 }
                 catch (Exception e)
                 {

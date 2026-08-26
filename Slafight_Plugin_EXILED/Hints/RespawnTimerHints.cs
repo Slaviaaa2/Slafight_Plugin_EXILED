@@ -171,7 +171,8 @@ public sealed class RespawnTimerHints : EventHandlerBase
             Id = id,
             Text = string.Empty,
             Alignment = HintAlignment.Center,
-            SyncSpeed = HintSyncSpeed.Fastest,
+            // 表示は定期更新。Fastest(即時フルパース)にする必要はない。
+            SyncSpeed = HintSyncSpeed.Fast,
             FontSize = 24,
             XCoordinate = 0,
             YCoordinate = y,

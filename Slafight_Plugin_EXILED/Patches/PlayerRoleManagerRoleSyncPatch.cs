@@ -250,7 +250,10 @@ public static class PlayerRolesNetUtilsHandleSpawnedPlayerPatch
         if (!NetworkServer.active)
             return true;
 
-        if (hub != null && hub.netId != 0)
+        // NPC / Dummy は ReadyClient にならないので、リトライしても必ずタイムアウトする。
+        // 以前はスポーンのたびに 0.2 秒刻みのリトライを打ち切りまで回し、最後に警告を出していた。
+        // 到達結果（NPC には初期ロールパックを送らない）は同じまま、その空回りだけを省く。
+        if (hub != null && hub.netId != 0 && !WillNeverBecomeReadyClient(hub))
         {
             TrySendInitialRolePack(
                 hub.netId,
@@ -261,6 +264,24 @@ public static class PlayerRolesNetUtilsHandleSpawnedPlayerPatch
         }
 
         return false;
+    }
+
+    private static bool WillNeverBecomeReadyClient(ReferenceHub hub)
+    {
+        try
+        {
+            if (hub.isLocalPlayer || hub.IsHost)
+                return true;
+
+            if (InternalNpcRegistry.IsManaged(hub.PlayerId))
+                return true;
+
+            return Player.Get(hub) is { IsNPC: true };
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static void TrySendInitialRolePack(

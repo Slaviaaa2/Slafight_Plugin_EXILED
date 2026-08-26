@@ -74,7 +74,12 @@ public static class Handler
     }
 
     private static void OnPlayerLeft(LeftEventArgs ev)
-        => RemovePlayer(ev.Player);
+    {
+        RemovePlayer(ev.Player);
+
+        // 音声パケット経路から掃除を追い出した分、切断時にまとめて名簿を整理する。
+        PrunePlayerLists();
+    }
 
     private static void OnPlayerChangingRole(ChangingRoleEventArgs ev)
     {
@@ -181,19 +186,24 @@ public static class Handler
 
     private static VoiceRouteDecision? EvaluateProximityRoute(VoiceRouteContext context)
     {
+        // ここは「音声パケット x 受信者数」の頻度で呼ばれる。
+        // 安く大半を弾ける順に並べ、名簿の掃除は Left 側へ移した。
+
+        // 誰も近接チャットを使っていないなら即座に降りる。
+        if (ActivatedPlayers.Count == 0)
+            return null;
+
         if (!IsValid(context.Sender) || !IsValid(context.Receiver))
             return null;
 
-        PrunePlayerLists();
+        if (!ContainsPlayer(ActivatedPlayers, context.Sender))
+            return null;
 
         // どのチャンネルを流すかは役職が名乗る。ここでチャンネルを決め打ちしない。
         if (context.SourceChannel != ResolveSourceChannel(context.Sender))
             return null;
 
         if (!CanPlayerUseProximityChat(context.Sender))
-            return null;
-
-        if (!ContainsPlayer(ActivatedPlayers, context.Sender))
             return null;
 
         if (!CanReceiveProximity(context.Sender, context.Receiver, AudioMaxDistance))

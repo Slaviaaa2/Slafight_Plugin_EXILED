@@ -18,7 +18,38 @@ namespace Slafight_Plugin_EXILED.API.Features;
 /// </summary>
 public sealed class VoiceRouteContext
 {
+    internal VoiceRouteContext()
+    {
+    }
+
     internal VoiceRouteContext(
+        Player sender,
+        Player receiver,
+        VoiceMessage message,
+        VoiceChatChannel sourceChannel,
+        VoiceChatChannel nativeChannel)
+    {
+        Set(sender, receiver, message, sourceChannel, nativeChannel);
+    }
+
+    public Player Sender { get; private set; }
+    public Player Receiver { get; private set; }
+    public VoiceMessage Message { get; private set; }
+
+    /// <summary>The channel accepted from the sender before per-receiver validation.</summary>
+    public VoiceChatChannel SourceChannel { get; private set; }
+
+    /// <summary>The channel vanilla selected for this receiver. None means vanilla would not deliver it.</summary>
+    public VoiceChatChannel NativeChannel { get; private set; }
+
+    /// <summary>
+    /// 送り手・受け手の組を差し替えます。
+    /// Context は「音声パケット x 受信者数」の頻度で作られる、このプラグインで最も確保回数の多い
+    /// オブジェクトだったため、ルータは 1 個を使い回します。
+    /// したがって Context が有効なのは、それを受け取った評価関数の呼び出し中だけです。
+    /// 経路の評価関数は必要な値を読んで即座に返すこと。インスタンスを保持してはいけません。
+    /// </summary>
+    internal void Set(
         Player sender,
         Player receiver,
         VoiceMessage message,
@@ -31,16 +62,6 @@ public sealed class VoiceRouteContext
         SourceChannel = sourceChannel;
         NativeChannel = nativeChannel;
     }
-
-    public Player Sender { get; }
-    public Player Receiver { get; }
-    public VoiceMessage Message { get; }
-
-    /// <summary>The channel accepted from the sender before per-receiver validation.</summary>
-    public VoiceChatChannel SourceChannel { get; }
-
-    /// <summary>The channel vanilla selected for this receiver. None means vanilla would not deliver it.</summary>
-    public VoiceChatChannel NativeChannel { get; }
 }
 
 /// <summary>
@@ -230,6 +251,15 @@ public static class VoiceRoutingApi
     private static readonly Dictionary<string, RegisteredRule> Rules =
         new(StringComparer.OrdinalIgnoreCase);
 
+    // 音声パケット1つにつき「受信者数 x 2」回 Resolve が走るため、
+    // 並び替え結果・バッチ用の器・Context は毎回作らずここで使い回す。
+    private static readonly RegisteredRule[] EmptyRules = [];
+    private static readonly Dictionary<string, DeliveryBatch> BatchScratch =
+        new(StringComparer.OrdinalIgnoreCase);
+    private static readonly List<DeliveryBatch> BatchPool = [];
+    private static readonly VoiceRouteContext ContextScratch = new();
+
+    private static RegisteredRule[] _orderedRules;
     private static long _registrationSequence;
     private static bool _registered;
 
@@ -264,15 +294,23 @@ public static class VoiceRoutingApi
             throw new ArgumentNullException(nameof(rule));
 
         Rules[rule.Id] = new RegisteredRule(rule, ++_registrationSequence);
+        _orderedRules = null;
     }
 
     public static bool Unregister(string id)
-        => !string.IsNullOrWhiteSpace(id) && Rules.Remove(id.Trim());
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Rules.Remove(id.Trim()))
+            return false;
+
+        _orderedRules = null;
+        return true;
+    }
 
     public static void ClearRules()
     {
         Rules.Clear();
         _registrationSequence = 0;
+        _orderedRules = null;
     }
 
     private static void OnVoiceChatting(VoiceChattingEventArgs args)
@@ -281,7 +319,16 @@ public static class VoiceRoutingApi
             args.VoiceMessage.Data == null || args.VoiceMessage.DataLength <= 0)
             return;
 
-        var batches = new Dictionary<string, DeliveryBatch>(StringComparer.OrdinalIgnoreCase);
+        // 送り手に効く経路が1つも無いなら、全 hub 走査ごと省く。
+        // これを通らない限り毎パケット「受信者数」回の評価が走る。
+        if (!HasAnyRoute(args.Player))
+            return;
+
+        // 使い回しの器なので、前回が例外で中断していた場合に備えて必ず空から始める。
+        var batches = BatchScratch;
+        if (batches.Count > 0)
+            ReturnBatches(batches);
+
         var sourceChannel = args.VoiceModule.CurrentChannel;
 
         foreach (var hub in ReferenceHub.AllHubs)
@@ -298,13 +345,13 @@ public static class VoiceRoutingApi
                 ? VoiceChatChannel.None
                 : receiverVoiceRole.VoiceModule.ValidateReceive(args.Player.ReferenceHub, sourceChannel);
 
-            var context = new VoiceRouteContext(
+            ContextScratch.Set(
                 args.Player,
                 receiver,
                 args.VoiceMessage,
                 sourceChannel,
                 nativeChannel);
-            var decision = Resolve(context);
+            var decision = Resolve(ContextScratch);
             if (decision == null || !decision.Value.HasDelivery)
                 continue;
 
@@ -321,32 +368,39 @@ public static class VoiceRoutingApi
 
             if (!batches.TryGetValue(route.DeliveryKey, out var batch))
             {
-                batch = new DeliveryBatch(route);
+                batch = RentBatch(route);
                 batches.Add(route.DeliveryKey, batch);
             }
 
             batch.Targets.Add(hub);
         }
 
-        foreach (var batch in batches.Values)
+        try
         {
-            var decision = batch.Decision;
-            var speaker = PlayerSpeakerManager.GetOrCreateSpeaker(
-                args.Player,
-                decision.DeliveryKey,
-                decision.IsSpatial,
-                decision.MaxDistance,
-                decision.MinDistance,
-                decision.Volume,
-                speakerName: decision.DeliveryKey);
-
-            if (!speaker.IsValid)
+            foreach (var batch in batches.Values)
             {
-                Log.Warn($"[VoiceRouting] Could not create delivery '{decision.DeliveryKey}' for {args.Player.Nickname}.");
-                continue;
-            }
+                var decision = batch.Decision;
+                var speaker = PlayerSpeakerManager.GetOrCreateSpeaker(
+                    args.Player,
+                    decision.DeliveryKey,
+                    decision.IsSpatial,
+                    decision.MaxDistance,
+                    decision.MinDistance,
+                    decision.Volume,
+                    speakerName: decision.DeliveryKey);
 
-            speaker.SendFrame(args.VoiceMessage.Data, args.VoiceMessage.DataLength, batch.Targets);
+                if (!speaker.IsValid)
+                {
+                    Log.Warn($"[VoiceRouting] Could not create delivery '{decision.DeliveryKey}' for {args.Player.Nickname}.");
+                    continue;
+                }
+
+                speaker.SendFrame(args.VoiceMessage.Data, args.VoiceMessage.DataLength, batch.Targets);
+            }
+        }
+        finally
+        {
+            ReturnBatches(batches);
         }
     }
 
@@ -355,15 +409,58 @@ public static class VoiceRoutingApi
         if (!args.IsAllowed || !IsUsable(args.Sender) || !IsUsable(args.Player))
             return;
 
-        var context = new VoiceRouteContext(
+        if (!HasAnyRoute(args.Sender))
+            return;
+
+        ContextScratch.Set(
             args.Sender,
             args.Player,
             args.VoiceMessage,
             args.VoiceModule.CurrentChannel,
             args.VoiceMessage.Channel);
-        var decision = Resolve(context);
+        var decision = Resolve(ContextScratch);
         if (decision?.SuppressNative == true)
             args.IsAllowed = false;
+    }
+
+    /// <summary>
+    /// 何も経路が無い送り手のパケットで hub 一覧に触れないための、安い門番です。
+    /// </summary>
+    private static bool HasAnyRoute(Player sender)
+    {
+        if (Rules.Count > 0)
+            return true;
+
+        return CustomRole.Of(sender) is { Voice.Routes.Count: > 0 };
+    }
+
+    private static DeliveryBatch RentBatch(VoiceRouteDecision decision)
+    {
+        DeliveryBatch batch;
+        if (BatchPool.Count > 0)
+        {
+            int last = BatchPool.Count - 1;
+            batch = BatchPool[last];
+            BatchPool.RemoveAt(last);
+        }
+        else
+        {
+            batch = new DeliveryBatch();
+        }
+
+        batch.Reset(decision);
+        return batch;
+    }
+
+    private static void ReturnBatches(Dictionary<string, DeliveryBatch> batches)
+    {
+        foreach (var batch in batches.Values)
+        {
+            batch.Targets.Clear();
+            BatchPool.Add(batch);
+        }
+
+        batches.Clear();
     }
 
     /// <summary>
@@ -407,10 +504,25 @@ public static class VoiceRoutingApi
         return null;
     }
 
-    private static IEnumerable<RegisteredRule> OrderedRules()
-        => Rules.Values
+    /// <summary>
+    /// 評価順に並べたルール。並び替えの結果は使い回します。
+    /// Resolve は「音声パケット x 受信者数」の頻度で呼ばれるため、
+    /// ここで毎回 LINQ の並び替えを走らせると単価がそのまま効いてしまいます。
+    /// Register / Unregister / ClearRules がキャッシュを捨てます。
+    /// </summary>
+    private static RegisteredRule[] OrderedRules()
+    {
+        if (_orderedRules != null)
+            return _orderedRules;
+
+        if (Rules.Count == 0)
+            return _orderedRules = EmptyRules;
+
+        return _orderedRules = Rules.Values
             .OrderByDescending(entry => entry.Rule.Priority)
-            .ThenByDescending(entry => entry.Sequence);
+            .ThenByDescending(entry => entry.Sequence)
+            .ToArray();
+    }
 
     private static bool IsUsable(Player player)
     {
@@ -438,13 +550,14 @@ public static class VoiceRoutingApi
 
     private sealed class DeliveryBatch
     {
-        public DeliveryBatch(VoiceRouteDecision decision)
+        public VoiceRouteDecision Decision { get; private set; }
+        public List<ReferenceHub> Targets { get; } = [];
+
+        public void Reset(VoiceRouteDecision decision)
         {
             Decision = decision;
+            Targets.Clear();
         }
-
-        public VoiceRouteDecision Decision { get; }
-        public List<ReferenceHub> Targets { get; } = [];
     }
 }
 
