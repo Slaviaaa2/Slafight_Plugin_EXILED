@@ -73,7 +73,12 @@ public static class Handler
     }
 
     private static void OnPlayerLeft(LeftEventArgs ev)
-        => RemovePlayer(ev.Player);
+    {
+        RemovePlayer(ev.Player);
+
+        // 音声パケット経路から掃除を追い出した分、切断時にまとめて名簿を整理する。
+        PrunePlayerLists();
+    }
 
     private static void OnPlayerChangingRole(ChangingRoleEventArgs ev)
     {
@@ -184,13 +189,13 @@ public static class Handler
 
     private static VoiceRouteDecision? EvaluateProximityRoute(VoiceRouteContext context)
     {
-        if (!IsValid(context.Sender) || !IsValid(context.Receiver))
+        // このメソッドは「音声パケット x 受信者数」の頻度で呼ばれる。
+        // 一番安く大半を弾けるチャンネル判定を先頭に置く。
+        // 名簿の掃除は Left / ChangingRole / RestartingRound 側に移したので、ここではやらない。
+        if (context.SourceChannel != VoiceChatChannel.ScpChat)
             return null;
 
-        PrunePlayerLists();
-
-        // SCP チャットだけを Proximity にミラー
-        if (context.SourceChannel != VoiceChatChannel.ScpChat)
+        if (!IsValid(context.Sender) || !IsValid(context.Receiver))
             return null;
 
         if (!CanPlayerUseProximityChat(context.Sender))

@@ -147,7 +147,7 @@ public class Scp096Anger : CRole
         _shyGuyPositions[player] = player.Position;
 
         _maintenanceCoroutines[player] =
-            Timing.RunCoroutine(MaintainAnger(player, session));
+            RoundScopedCoroutines.Run(MaintainAnger(player, session));
 
         Log.Debug("[Scp096Anger] SCP-096: Anger was spawned.");
 

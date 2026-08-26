@@ -123,7 +123,7 @@ public class Sinkhole : IBootstrapHandler, IDisposable
                             JoiningPlayers.Add(player);
                             player.IsGodModeEnabled = true;
 
-                            Timing.RunCoroutine(PocketJoinAnim(player, sinkhole));
+                            RoundScopedCoroutines.Run(PocketJoinAnim(player, sinkhole));
 
                             Timing.CallDelayed(3.1f, () =>
                             {

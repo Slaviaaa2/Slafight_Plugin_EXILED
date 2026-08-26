@@ -17,7 +17,7 @@ public class DropBiggerShitAbility : AbilityBase
     {
         try
         {
-            Timing.RunCoroutine(Coroutine(player));
+            RoundScopedCoroutines.Run(Coroutine(player));
         }
         catch (Exception ex)
         {

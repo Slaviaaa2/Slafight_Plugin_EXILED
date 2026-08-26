@@ -137,6 +137,13 @@ public static class NetworkVisibilityManager
     private static readonly Dictionary<uint, NetworkIdentity>    _identityCache  = new();
     private static bool _registered;
 
+    // Verified / Spawned は「1人につき管理オブジェクト全走査」だった。
+    // ラウンド開始は全員が同じフレームでスポーンするため、人数分の全走査が積み上がる。
+    // 1フレーム分をまとめて 1 回の走査で流す。
+    private static readonly HashSet<int>  _pendingRefreshIds = [];
+    private static readonly List<Player>  _refreshBuffer     = [];
+    private static bool _refreshScheduled;
+
     // =========================================================
     // Show 拒否フック
     // =========================================================
@@ -191,6 +198,8 @@ public static class NetworkVisibilityManager
         ShowVeto = null;
         _states.Clear();
         _identityCache.Clear();
+        _pendingRefreshIds.Clear();
+        _refreshBuffer.Clear();
     }
 
     // =========================================================
@@ -201,18 +210,14 @@ public static class NetworkVisibilityManager
     {
         _states.Clear();
         _identityCache.Clear();
+        _pendingRefreshIds.Clear();
+        _refreshBuffer.Clear();
     }
 
     private static void OnVerified(VerifiedEventArgs? ev)
     {
         if (ev?.Player == null) return;
-
-        foreach (var (netId, identity) in _identityCache)
-        {
-            if (identity == null) continue;
-            if (!_states.TryGetValue(netId, out var state)) continue;
-            SendVisibility(identity, ev.Player, state.ShouldShow(ev.Player, Player.List));
-        }
+        QueueRefresh(ev.Player);
     }
 
     /// <summary>
@@ -223,19 +228,65 @@ public static class NetworkVisibilityManager
     private static void OnSpawned(SpawnedEventArgs? ev)
     {
         if (ev?.Player == null) return;
+        QueueRefresh(ev.Player);
+    }
 
-        // スポーン直後は Mirror の再送信が走るため、1フレーム後に補正する
-        Timing.CallDelayed(0f, () =>
+    /// <summary>
+    /// 対象プレイヤーの再評価を次フレームにまとめる。
+    /// スポーン直後は Mirror の再送信が走るため、補正は必ず1フレーム後に行う。
+    /// </summary>
+    private static void QueueRefresh(Player player)
+    {
+        if (player == null || !player.IsConnected)
+            return;
+
+        // 管理オブジェクトが1つも無ければ送るものが無い（ラウンド開始直後がこれ）。
+        if (_identityCache.Count == 0)
+            return;
+
+        _pendingRefreshIds.Add(player.Id);
+
+        if (_refreshScheduled)
+            return;
+
+        _refreshScheduled = true;
+        Timing.CallDelayed(0f, FlushPendingRefresh);
+    }
+
+    private static void FlushPendingRefresh()
+    {
+        _refreshScheduled = false;
+
+        if (_pendingRefreshIds.Count == 0 || _identityCache.Count == 0)
         {
-            if (ev.Player == null || !ev.Player.IsConnected) return;
+            _pendingRefreshIds.Clear();
+            return;
+        }
 
-            foreach (var (netId, identity) in _identityCache)
-            {
-                if (identity == null) continue;
-                if (!_states.TryGetValue(netId, out var state)) continue;
-                SendVisibility(identity, ev.Player, state.ShouldShow(ev.Player, Player.List));
-            }
-        });
+        _refreshBuffer.Clear();
+        foreach (var playerId in _pendingRefreshIds)
+        {
+            var player = Player.Get(playerId);
+            if (player != null && player.IsConnected)
+                _refreshBuffer.Add(player);
+        }
+
+        _pendingRefreshIds.Clear();
+
+        if (_refreshBuffer.Count == 0)
+            return;
+
+        // 走査は1回。state の引き直しも identity ごとに1回で済む。
+        foreach (var (netId, identity) in _identityCache)
+        {
+            if (identity == null) continue;
+            if (!_states.TryGetValue(netId, out var state)) continue;
+
+            foreach (var player in _refreshBuffer)
+                SendVisibility(identity, player, state.ShouldShow(player, Player.List));
+        }
+
+        _refreshBuffer.Clear();
     }
 
     private static void OnChangingSpectatedPlayer(ChangingSpectatedPlayerEventArgs? ev)

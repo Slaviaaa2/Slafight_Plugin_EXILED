@@ -52,7 +52,7 @@ public class Scp173Role : CRole
 
         player.AddAbility<TeleportRandomAbility>();
         player.AddAbility<PlaceTantrumAbility>();
-        Timing.RunCoroutine(WaitAndTeleport(player));
+        RoundScopedCoroutines.Run(WaitAndTeleport(player));
     }
 
     private IEnumerator<float> WaitAndTeleport(Player player)

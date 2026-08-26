@@ -44,7 +44,7 @@ public class DummyRoad : CItemKeycard
         try
         {
             var schem = ObjectSpawner.SpawnSchematic("SCP3005", ev.Player.Position, ev.Player.CameraTransform.forward);
-            Timing.RunCoroutine(MissileCoroutine(schem, ev.Player));
+            RoundScopedCoroutines.Run(MissileCoroutine(schem, ev.Player));
         }
         catch (Exception ex)
         {

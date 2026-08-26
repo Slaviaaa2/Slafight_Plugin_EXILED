@@ -39,10 +39,19 @@ public class Scp966Role : CRole
     private const float BlackoutRadius = 15f;
     private const float BlackoutCheckInterval = 0.5f;
 
-    private readonly Dictionary<Player, List<Player>> _invisibleEffectivePlayers = [];
-    private readonly Dictionary<Player, byte> _speedLevels = [];
-    private readonly Dictionary<Player, CoroutineHandle> _visibilityCoroutineHandles = [];
-    private readonly Dictionary<Player, CoroutineHandle> _speedCoroutineHandles = [];
+    // 可視性の再評価周期。以前は 0.1 秒ごとに全プレイヤーへ部屋ライトの
+    // 対象限定 RPC を差分なしで投げていた。
+    private const float VisibilityCheckInterval = 0.25f;
+
+    // 破棄され得る Player を遅延辞書のキーにしないため、すべて Player.Id で持つ。
+    private readonly Dictionary<int, HashSet<int>> _invisibleEffectivePlayers = [];
+    private readonly Dictionary<int, byte> _speedLevels = [];
+    private readonly Dictionary<int, CoroutineHandle> _visibilityCoroutineHandles = [];
+    private readonly Dictionary<int, CoroutineHandle> _speedCoroutineHandles = [];
+
+    // 観測者 ID -> 直近に送ったライト状態 (true = 消灯を送った)。
+    // 変化したときだけ RPC を出すためのキャッシュ。
+    private readonly Dictionary<int, bool> _lightStateByViewer = [];
     private readonly HashSet<Room> _blackoutRooms = [];
     private bool _blackoutCoroutineRunning;
     
@@ -66,27 +75,30 @@ public class Scp966Role : CRole
         player.MaxHumeShield = 500f;
         player.HumeShield = player.MaxHumeShield;
         
-        _invisibleEffectivePlayers[player] = [];
-        _speedLevels[player] = 1;
-        _visibilityCoroutineHandles[player] = new CoroutineHandle();
-        _speedCoroutineHandles[player] = new CoroutineHandle();
-        _visibilityCoroutineHandles[player] = Timing.RunCoroutine(VisibilityCoroutine(player));
-        _speedCoroutineHandles[player] = Timing.RunCoroutine(SpeedCoroutine(player));
+        // このラウンド最初の 966。前ラウンドのライト状態キャッシュが残っていると
+        // 「変化なし」と誤判定して必要な RPC を落とすので、ここで捨てる。
+        if (_visibilityCoroutineHandles.Count == 0)
+            _lightStateByViewer.Clear();
+
+        _invisibleEffectivePlayers[player.Id] = [];
+        _speedLevels[player.Id] = 1;
+        _visibilityCoroutineHandles[player.Id] = Timing.RunCoroutine(VisibilityCoroutine(player));
+        _speedCoroutineHandles[player.Id] = Timing.RunCoroutine(SpeedCoroutine(player));
 
         if (!_blackoutCoroutineRunning)
         {
             _blackoutCoroutineRunning = true;
-            Timing.RunCoroutine(BlackoutCoroutine());
+            RoundScopedCoroutines.Run(BlackoutCoroutine());
         }
         
-        RoleSpecificTextProvider.Set(player, $"Speed Level: {_speedLevels[player]} / 5");
+        RoleSpecificTextProvider.Set(player, $"Speed Level: {_speedLevels[player.Id]} / 5");
         base.OnRoleSpawned(player, roleSpawnFlags);
     }
 
     protected override void OnRoleHurtingOthers(HurtingEventArgs ev)
     {
         if (ev.Player is null || ev.Attacker is null) return;
-        ev.Amount = 20f + (_speedLevels.TryGetValue(ev.Attacker, out var speedLevel) ? speedLevel : 1);
+        ev.Amount = 20f + (_speedLevels.TryGetValue(ev.Attacker.Id, out var speedLevel) ? speedLevel : 1);
         ev.Player.EnableEffect<Slowness>(20, 10f);
         ev.Player.EnableEffect<Blindness>(40, 10f);
         if (HasViewCondition(ev.Player))
@@ -118,14 +130,14 @@ public class Scp966Role : CRole
         if (!Check(ev.Player)) return;
         ev.IsAllowed = false;
         ev.Ragdoll?.Destroy();
-        var speedLevel = _speedLevels.TryGetValue(ev.Player, out var level) ? level : (byte)1;
+        var speedLevel = _speedLevels.TryGetValue(ev.Player.Id, out var level) ? level : (byte)1;
         if (speedLevel >= 5)
         {
             ev.Player.Heal(10f);
         }
         else
         {
-            _speedLevels[ev.Player] = (byte)(speedLevel + 1);
+            _speedLevels[ev.Player.Id] = (byte)(speedLevel + 1);
         }
     }
 
@@ -136,23 +148,35 @@ public class Scp966Role : CRole
             if (!Check(player)) yield break;
             if (Round.IsLobby || player.ReferenceHub == null || player.IsDead)
                 yield break;
-            var result = new List<Player>();
+            // 可視プレイヤーは ID の HashSet で持つ。
+            // 以前は構築中の List に対する Contains（線形探索）で判定していたため、
+            // 人数の二乗に比例し、しかも判定順に依存していた。
+            var visibleIds = new HashSet<int>();
             foreach (var target in Player.List)
             {
                 if (target is null) continue;
                 if (HasViewCondition(target))
-                {
-                    result.Add(target);
-                }
-
-                // 966 が見えるプレイヤーは暗く、見えないプレイヤーは明るく
-                bool isVisible = result.Contains(target);
-                if (target.GetTeam() is CTeam.SCPs) continue;
-                target.CurrentRoom?.SetRoomLightsForTargetOnly(target, !isVisible);
+                    visibleIds.Add(target.Id);
             }
-            _invisibleEffectivePlayers[player] = result;
-            PlayerVisibilitySyncProvider.SetHiddenRule(player, p => !result.Contains(p));
-            yield return Timing.WaitForSeconds(0.1f);
+
+            foreach (var target in Player.List)
+            {
+                if (target is null) continue;
+                if (target.GetTeam() is CTeam.SCPs) continue;
+
+                // 966 が見えるプレイヤーは暗く、見えないプレイヤーは明るく。
+                // ライト同期は対象限定 RPC なので、状態が変わったときだけ送る。
+                bool lightsOff = !visibleIds.Contains(target.Id);
+                if (_lightStateByViewer.TryGetValue(target.Id, out var previous) && previous == lightsOff)
+                    continue;
+
+                _lightStateByViewer[target.Id] = lightsOff;
+                target.CurrentRoom?.SetRoomLightsForTargetOnly(target, lightsOff);
+            }
+
+            _invisibleEffectivePlayers[player.Id] = visibleIds;
+            PlayerVisibilitySyncProvider.SetHiddenRule(player, p => p != null && !visibleIds.Contains(p.Id));
+            yield return Timing.WaitForSeconds(VisibilityCheckInterval);
         }
     }
 
@@ -208,6 +232,21 @@ public class Scp966Role : CRole
         _blackoutCoroutineRunning = false;
     }
 
+    /// <summary>可視性ループが消灯を送ったままのプレイヤーを明るく戻す。</summary>
+    private void RestoreViewerLights()
+    {
+        foreach (var pair in _lightStateByViewer)
+        {
+            if (!pair.Value)
+                continue;
+
+            var viewer = Player.Get(pair.Key);
+            viewer?.CurrentRoom?.SetRoomLightsForTargetOnly(viewer, false);
+        }
+
+        _lightStateByViewer.Clear();
+    }
+
     private void RestoreBlackoutRooms()
     {
         foreach (var room in _blackoutRooms)
@@ -226,7 +265,7 @@ public class Scp966Role : CRole
             if (!Check(player)) yield break;
             if (Round.IsLobby || player.ReferenceHub == null || player.IsDead)
                 yield break;
-            if (!_speedLevels.TryGetValue(player, out var speedLevel))
+            if (!_speedLevels.TryGetValue(player.Id, out var speedLevel))
                 yield break;
 
             switch (speedLevel)
@@ -281,17 +320,21 @@ public class Scp966Role : CRole
         if (player == null)
             return;
 
-        if (_visibilityCoroutineHandles.TryGetValue(player, out var visibilityHandle))
+        if (_visibilityCoroutineHandles.TryGetValue(player.Id, out var visibilityHandle))
             Timing.KillCoroutines(visibilityHandle);
 
-        if (_speedCoroutineHandles.TryGetValue(player, out var speedHandle))
+        if (_speedCoroutineHandles.TryGetValue(player.Id, out var speedHandle))
             Timing.KillCoroutines(speedHandle);
 
-        _visibilityCoroutineHandles.Remove(player);
-        _speedCoroutineHandles.Remove(player);
-        _invisibleEffectivePlayers.Remove(player);
-        _speedLevels.Remove(player);
+        _visibilityCoroutineHandles.Remove(player.Id);
+        _speedCoroutineHandles.Remove(player.Id);
+        _invisibleEffectivePlayers.Remove(player.Id);
+        _speedLevels.Remove(player.Id);
         RoleSpecificTextProvider.Clear(player);
         PlayerVisibilitySyncProvider.ShowToAll(player);
+
+        // 最後の 966 が居なくなったら、暗くしたままのプレイヤーを明るく戻す。
+        if (_visibilityCoroutineHandles.Count == 0)
+            RestoreViewerLights();
     }
 }

@@ -346,7 +346,7 @@ public class DanteEvent : SpecialEvent
 
             if (_hp <= 0f)
             {
-                yield return Timing.WaitUntilDone(Timing.RunCoroutine(Finale()));
+                yield return Timing.WaitUntilDone(RoundScopedCoroutines.Run(Finale()));
                 yield break;
             }
 
@@ -707,7 +707,7 @@ public class DanteEvent : SpecialEvent
         if (!_leaping && !_invulnerable && Random.value < leapChance)
         {
             Player leapTarget = targets[Random.Range(0, targets.Count)];
-            Timing.RunCoroutine(LeapAttack(leapTarget.Position));
+            RoundScopedCoroutines.Run(LeapAttack(leapTarget.Position));
             return;
         }
 
@@ -919,7 +919,7 @@ public class DanteEvent : SpecialEvent
             Player t = targets[Random.Range(0, targets.Count)];
             Vector2 jitter = Random.insideUnitCircle * 4f;
             Vector3 impact = t.Position + new Vector3(jitter.x, 0f, jitter.y);
-            Timing.RunCoroutine(SkyTentacleStrike(impact));
+            RoundScopedCoroutines.Run(SkyTentacleStrike(impact));
         }
     }
 

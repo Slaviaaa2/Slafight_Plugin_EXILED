@@ -270,7 +270,7 @@ internal sealed class FemurBreakerController
         HasCapturedVictim = true;
 
         if (_door != null)
-            Timing.RunCoroutine(SchematicMover.Move(_door, _door.Position, new Vector3(0f, -2.5f, 0f), 0.65f));
+            RoundScopedCoroutines.Run(SchematicMover.Move(_door, _door.Position, new Vector3(0f, -2.5f, 0f), 0.65f));
     }
 
     private void KillScheduledCallbacks()

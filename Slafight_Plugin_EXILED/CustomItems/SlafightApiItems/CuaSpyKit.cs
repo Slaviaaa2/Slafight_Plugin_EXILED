@@ -93,7 +93,7 @@ public class CuaSpyKit : CItemKeycard
         {
             var player = Player.List.FirstOrDefault(p => p?.ReferenceHub != null && p.Id == playerId);
             if (player != null)
-                Timing.RunCoroutine(Coroutine(player));
+                RoundScopedCoroutines.Run(Coroutine(player));
         });
         base.OnChangingItem(ev);
     }

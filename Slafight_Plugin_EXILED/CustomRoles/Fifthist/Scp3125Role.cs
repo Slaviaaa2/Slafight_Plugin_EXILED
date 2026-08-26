@@ -46,8 +46,8 @@ public class Scp3125Role : CRole
             if (!Check(current) || !IsSafeRolePlayer(current))
                 return;
 
-            Timing.RunCoroutine(Scp3125HintSyncCoroutine(current));
-            Timing.RunCoroutine(Scp3125Coroutine(current));
+            RoundScopedCoroutines.Run(Scp3125HintSyncCoroutine(current));
+            RoundScopedCoroutines.Run(Scp3125Coroutine(current));
         });
     }
     

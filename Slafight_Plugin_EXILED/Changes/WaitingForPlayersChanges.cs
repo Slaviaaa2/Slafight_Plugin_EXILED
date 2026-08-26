@@ -40,6 +40,12 @@ public class WaitingForPlayersChanges : IBootstrapHandler
 
     private const float RoundStartTriggerRemainingTime = 1f;
     private const int MinimumPlayersToStart = 2;
+
+    // ロビーの監視周期。RoundStartTriggerRemainingTime(1秒)の窓は 0.1 秒周期でも取りこぼさない。
+    private const float LobbyTickInterval = 0.1f;
+
+    // これ以上ずれていたら待機位置へ戻す (0.35m)。
+    private const float WaitingRoomSnapDistanceSqr = 0.1225f;
     private static readonly Vector3 RoundStartMovePosition = new(247.15f, 199.30f, -63.33f);
     private static readonly Vector3 RoundStartFadeEndPosition = new(247.15f, 199.30f, -63.64f);
     private static readonly Quaternion RoundStartRotation = Quaternion.Euler(0f, 180f, 0f);
@@ -92,6 +98,16 @@ public class WaitingForPlayersChanges : IBootstrapHandler
     private static bool _roundStartTransitionTriggered;
     private static bool _minimumPlayersLobbyLockActive;
 
+    // ロビーのテキスト更新は毎 tick 呼ばれる。前回送った文字列を覚えて差分だけ書く。
+    private static string? _lastPlayerCountFormat;
+    private static string? _lastNextEventFormat;
+    private static string? _lastRemainingTimeFormat;
+
+    // 待機部屋スキマティックが未ロードのとき、FindObjectsByType による全シーン走査を
+    // 毎 tick 走らせないためのバックオフ。
+    private const float WaitingRoomScanInterval = 1f;
+    private static float _nextWaitingRoomScanTime;
+
     private static void OnWaitingForPlayers()
     {
         GameObject.Find("StartRound")?.transform.localScale = Vector3.zero;
@@ -112,6 +128,10 @@ public class WaitingForPlayersChanges : IBootstrapHandler
         _playerCountText = null;
         _nextEventText = null;
         _remainingTimeText = null;
+        _lastPlayerCountFormat = null;
+        _lastNextEventFormat = null;
+        _lastRemainingTimeFormat = null;
+        _nextWaitingRoomScanTime = 0f;
     }
 
     private static void OnVerified(VerifiedEventArgs ev)
@@ -423,20 +443,35 @@ public class WaitingForPlayersChanges : IBootstrapHandler
                 TriggerRoundStartTransition();
             }
 
-            if (!_roundStartTransitionTriggered)
+            // Player.List の走査は 1 周につき 1 回。
+            // 以前は 0.05 秒ごとに 2 回舐めたうえ、位置が合っている人にも
+            // 毎回テレポート(位置同期の送信)を投げていた。
+            int safeCount = 0;
+            bool repositionNeeded = !_roundStartTransitionTriggered;
+
+            foreach (var p in Player.List)
             {
-                var list = Player.List.Where(p => !p.IsNPC && p.IsSafePlayer()).ToList();
-                list.ForEach(p =>
-                {
+                if (!p.IsSafePlayer())
+                    continue;
+
+                safeCount++;
+
+                if (!repositionNeeded || p.IsNPC)
+                    continue;
+
+                if ((p.Position - WaitingRoomPosition).sqrMagnitude > WaitingRoomSnapDistanceSqr)
                     p.Position = WaitingRoomPosition;
+
+                if (!p.IsNoclipEnabled)
                     p.IsNoclipEnabled = true;
+
+                if (!p.IsGodModeEnabled)
                     p.IsGodModeEnabled = true;
-                });
             }
 
-            UpdateWaitingRoomTexts(Player.List.Count(p => p.IsSafePlayer()));
+            UpdateWaitingRoomTexts(safeCount);
 
-            yield return Timing.WaitForSeconds(0.05f);
+            yield return Timing.WaitForSeconds(LobbyTickInterval);
         }
     }
 
@@ -445,20 +480,43 @@ public class WaitingForPlayersChanges : IBootstrapHandler
         if (!EnsureWaitingRoomTextRefs())
             return;
 
-        _playerCountText?.TextFormat = $"<b><u>{playerCount} / {Exiled.API.Features.Server.MaxPlayerCount}</u></b>";
+        // TextToy.TextFormat への代入は SyncVar 送信を伴う。
+        // 表示が変わっていない間は書かない。
+        string playerCountFormat = $"<b><u>{playerCount} / {Exiled.API.Features.Server.MaxPlayerCount}</u></b>";
+        if (!string.Equals(_lastPlayerCountFormat, playerCountFormat, StringComparison.Ordinal))
+        {
+            _lastPlayerCountFormat = playerCountFormat;
+            _playerCountText?.TextFormat = playerCountFormat;
+        }
 
-        string nextEventName = SpecialEventsHandler.Instance.LocalizedEventName;
-        _nextEventText?.TextFormat = $"<b><u>Next Event: {nextEventName}</u></b>";
+        string nextEventFormat = $"<b><u>Next Event: {SpecialEventsHandler.Instance.LocalizedEventName}</u></b>";
+        if (!string.Equals(_lastNextEventFormat, nextEventFormat, StringComparison.Ordinal))
+        {
+            _lastNextEventFormat = nextEventFormat;
+            _nextEventText?.TextFormat = nextEventFormat;
+        }
 
         // 演出中(LobbyWaitingTime を RoundStartStallTime まで足止めしている間)は 0 固定表示にする
         float time = _roundStartTransitionTriggered ? 0f : Round.LobbyWaitingTime;
-        _remainingTimeText?.TextFormat = $"<b><u>Remaining Time to Start: {(int)time}</u></b>";
+        string remainingTimeFormat = $"<b><u>Remaining Time to Start: {(int)time}</u></b>";
+        if (!string.Equals(_lastRemainingTimeFormat, remainingTimeFormat, StringComparison.Ordinal))
+        {
+            _lastRemainingTimeFormat = remainingTimeFormat;
+            _remainingTimeText?.TextFormat = remainingTimeFormat;
+        }
     }
 
     private static bool EnsureWaitingRoomTextRefs()
     {
         if (_playerCountText != null && _nextEventText != null && _remainingTimeText != null)
             return true;
+
+        // FindObjectsByType はシーン全体の走査。待機部屋がまだ湧いていない間に
+        // 毎 tick これを走らせるとロビーが丸ごと重くなるので、1秒に1回だけ試す。
+        if (Time.realtimeSinceStartup < _nextWaitingRoomScanTime)
+            return false;
+
+        _nextWaitingRoomScanTime = Time.realtimeSinceStartup + WaitingRoomScanInterval;
 
         SchematicObject schematic = Object
             .FindObjectsByType<SchematicObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)

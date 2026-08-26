@@ -560,14 +560,32 @@ public class ScpStatusHints : IBootstrapHandler
             display.AddHint(hint);
         }
 
-        hint.Alignment = group.Key.Alignment;
-        hint.YCoordinateAlign = group.Key.VerticalAlign;
-        hint.ResolutionBasedAlign = group.Key.ResolutionBasedAlign;
-        hint.SyncSpeed = group.Key.SyncSpeed;
-        hint.XCoordinate = group.Key.X;
-        hint.YCoordinate = group.Key.Y;
-        hint.FontSize = group.FontSize;
-        hint.LineHeight = group.Key.LineHeight;
+        // Text は差分で書いていたが、レイアウト系の setter も同じ更新イベントを出す。
+        // 無条件に書いていたため、0.5 秒ごとに viewer x スロット分の
+        // ディスプレイ全体再パースが必ず走っていた（Text の差分判定が無意味になっていた）。
+        if (hint.Alignment != group.Key.Alignment)
+            hint.Alignment = group.Key.Alignment;
+
+        if (hint.YCoordinateAlign != group.Key.VerticalAlign)
+            hint.YCoordinateAlign = group.Key.VerticalAlign;
+
+        if (hint.ResolutionBasedAlign != group.Key.ResolutionBasedAlign)
+            hint.ResolutionBasedAlign = group.Key.ResolutionBasedAlign;
+
+        if (hint.SyncSpeed != group.Key.SyncSpeed)
+            hint.SyncSpeed = group.Key.SyncSpeed;
+
+        if (hint.XCoordinate != group.Key.X)
+            hint.XCoordinate = group.Key.X;
+
+        if (hint.YCoordinate != group.Key.Y)
+            hint.YCoordinate = group.Key.Y;
+
+        if (hint.FontSize != group.FontSize)
+            hint.FontSize = group.FontSize;
+
+        if (hint.LineHeight != group.Key.LineHeight)
+            hint.LineHeight = group.Key.LineHeight;
 
         if (hint.Text != text)
             hint.Text = text;

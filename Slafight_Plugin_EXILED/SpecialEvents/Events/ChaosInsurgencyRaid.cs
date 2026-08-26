@@ -41,7 +41,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
         if (CancelIfOutdated()) return;
 
-        Timing.RunCoroutine(RaidCoroutine());
+        RoundScopedCoroutines.Run(RaidCoroutine());
     }
 
     public override void RegisterEvents()
@@ -122,7 +122,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
         bool ciAlive = Exiled.API.Features.Player.List.Any(p => p != null && p.GetTeam() == CTeam.ChaosInsurgency);
 
         if (ciAlive)
-            Timing.RunCoroutine(CiSuccessCoroutine());
+            RoundScopedCoroutines.Run(CiSuccessCoroutine());
         else
             HandleCiFailure();
     }
@@ -166,7 +166,7 @@ public class ChaosInsurgencyRaidEvent : SpecialEvent
 
         schematicObject.Position = new Vector3(-90f, 500f, -45f);
         schematicObject.Rotation = Quaternion.Euler(new Vector3(0, 0, 55));
-        Timing.RunCoroutine(NukeDownCoroutine(schematicObject));
+        RoundScopedCoroutines.Run(NukeDownCoroutine(schematicObject));
 
         foreach (var room in Room.List)
         {

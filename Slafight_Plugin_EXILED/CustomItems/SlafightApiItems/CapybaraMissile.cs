@@ -39,7 +39,7 @@ public class CapybaraMissile : CItemWeapon
             var cameraForward = ev.Player.CameraTransform.forward.normalized;
             var capybara = Capybara.Create(startPos + cameraForward * 1.5f, Quaternion.Euler(ev.Player.CameraTransform.forward));
             capybara.Collidable = false;
-            Timing.RunCoroutine(MissileCoroutine(capybara, ev.Player));
+            RoundScopedCoroutines.Run(MissileCoroutine(capybara, ev.Player));
         }
         catch (Exception)
         {

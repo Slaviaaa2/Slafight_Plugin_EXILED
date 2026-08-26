@@ -78,7 +78,7 @@ public class Scp610Role : CRole
             ev.Player.TryAddFlag(SpecificFlagType.Infecting610);
             ev.Player.EnableEffect<Concussed>(255);
             ev.Player.EnableEffect<DamageReduction>(60);
-            Timing.RunCoroutine(InfectionCoroutine(ev.Player));
+            RoundScopedCoroutines.Run(InfectionCoroutine(ev.Player));
         }
         else if (ev.Player.HasFlag(SpecificFlagType.Infecting610))
         {

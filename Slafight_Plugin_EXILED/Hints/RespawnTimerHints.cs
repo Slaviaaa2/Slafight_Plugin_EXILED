@@ -187,7 +187,8 @@ public sealed class RespawnTimerHints : IBootstrapHandler, IDisposable
             Id = id,
             Text = string.Empty,
             Alignment = HintAlignment.Center,
-            SyncSpeed = HintSyncSpeed.Fastest,
+            // 表示は 0.5 秒周期。Fastest(即時フルパース)にする必要はない。
+            SyncSpeed = HintSyncSpeed.Fast,
             FontSize = 24,
             XCoordinate = 0,
             YCoordinate = y,

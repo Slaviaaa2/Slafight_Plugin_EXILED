@@ -39,7 +39,7 @@ public class MarionWheeler : CRole
     {
         Timing.CallDelayed(RoleSpawnTimings.FastSpawnFinalize, () =>
         {
-            Timing.RunCoroutine(Coroutine(player));
+            RoundScopedCoroutines.Run(Coroutine(player));
         });
     }
 

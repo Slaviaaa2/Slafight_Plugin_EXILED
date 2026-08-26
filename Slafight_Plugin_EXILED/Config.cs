@@ -10,8 +10,8 @@ public class Config : IConfig
     [Description("プラグインの有効/無効を設定します")]
     public bool IsEnabled { get; set; } = true;
 
-    [Description("デバッグログを出力するかどうか")]
-    public bool Debug { get; set; } = true;
+    [Description("デバッグログを出力するかどうか。本番では false のままにしてください（出力先のI/Oに加え、EXILED の Log.Debug は呼び出しごとにスタックウォークします）")]
+    public bool Debug { get; set; } = false;
 
     [Description("サーバーが満員になった時に待機時間を飛ばしてラウンドを自動開始する処理を無効化します")]
     public bool DisableFullServerRoundStart { get; set; } = true;

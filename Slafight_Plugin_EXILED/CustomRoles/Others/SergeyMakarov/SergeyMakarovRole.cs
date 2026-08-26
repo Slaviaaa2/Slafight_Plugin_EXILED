@@ -79,7 +79,7 @@ public class SergeyMakarovRole : CRole
 
             RPNameSetter.SetForcedCustomName(current, $"セルゲイ・マカロフ ({current.Nickname})");
         });
-        Timing.RunCoroutine(SergeySharedContents.SergeySharedCoroutine(player));
+        RoundScopedCoroutines.Run(SergeySharedContents.SergeySharedCoroutine(player));
     }
 
     protected override void OnRoleDying(DyingEventArgs ev)
@@ -110,7 +110,7 @@ public class SergeyMakarovRole : CRole
         );
         SpawnContextRegistry.Register(chaosOnlyContext);
         SpawnContextRegistry.SetActive("SM_ChaosOnly");
-        Timing.RunCoroutine(SergeyMakarovExtensionAndUtils.AwakenScene(ev.Player));
+        RoundScopedCoroutines.Run(SergeyMakarovExtensionAndUtils.AwakenScene(ev.Player));
         base.OnRoleDying(ev);
     }
 }

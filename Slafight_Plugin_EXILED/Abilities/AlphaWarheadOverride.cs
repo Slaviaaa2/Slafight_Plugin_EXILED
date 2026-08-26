@@ -42,7 +42,7 @@ public class AlphaWarheadOverride : AbilityBase
         Timing.CallDelayed(5f, () =>
         {
             SpeakerApi.Play("./AlphaWarhead/warhead079.ogg", "AlphaWarhead", Vector3.zero, true, null, false, 999999999, 0);
-            Timing.RunCoroutine(Coroutine());
+            RoundScopedCoroutines.Run(Coroutine());
             player.RemoveAbility<AlphaWarheadOverride>();
         });
     }

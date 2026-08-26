@@ -40,7 +40,7 @@ public class SpeedUpEvent : SpecialEvent
         Exiled.API.Features.Cassie.MessageTranslated("$pitch_.2 .g4 .g4 $pitch_1 Attention All Personnel . By Division . Extremely Advanced Adrenaline Injection Detected . Please Stay Safe And Continue Work .",
             "お菓子の戦士達の妨害工作により、全職員に超絶加速アドレナリンが注射されていることが確認されました。安全に気を付けて業務を続けてください。");
 
-        Timing.RunCoroutine(SpeedUpCoroutine());
+        RoundScopedCoroutines.Run(SpeedUpCoroutine());
     }
 
     private IEnumerator<float> SpeedUpCoroutine()

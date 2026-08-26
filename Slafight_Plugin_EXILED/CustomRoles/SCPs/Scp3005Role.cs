@@ -61,8 +61,8 @@ public class Scp3005Role : CRole
         player.AddAbility<MindblasterAbility>();
         player.AddAbility<SoundOfFifthAbility>();
 
-        Timing.RunCoroutine(WaitAndTeleport(player));
-        Timing.RunCoroutine(Scp3005Coroutine(player));
+        RoundScopedCoroutines.Run(WaitAndTeleport(player));
+        RoundScopedCoroutines.Run(Scp3005Coroutine(player));
     }
     
     protected override void OnRoleDying(DyingEventArgs ev)

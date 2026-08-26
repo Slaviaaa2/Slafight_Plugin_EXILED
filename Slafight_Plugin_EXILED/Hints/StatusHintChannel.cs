@@ -19,7 +19,11 @@ public sealed class StatusHintLayout
     /// </summary>
     public HintVerticalAlign VerticalAlign { get; set; } = HintVerticalAlign.Top;
 
-    public HintSyncSpeed SyncSpeed { get; set; } = HintSyncSpeed.Fastest;
+    /// <summary>
+    /// Fastest は待ち時間 0 = 即時フルパース。ステータス表示は 0.5 秒周期の更新なので
+    /// Fast (0.1 秒以内) で十分で、HSM 側が同フレームの更新をまとめられる。
+    /// </summary>
+    public HintSyncSpeed SyncSpeed { get; set; } = HintSyncSpeed.Fast;
     public bool ResolutionBasedAlign { get; set; } = true;
     public float XCoordinate { get; set; } = 0f;
 

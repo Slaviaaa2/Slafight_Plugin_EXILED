@@ -40,7 +40,7 @@ public class SnowWarriorsAttackEvent : SpecialEvent
 
         if (CancelIfOutdated()) return;
 
-        Timing.RunCoroutine(RaidCoroutine());
+        RoundScopedCoroutines.Run(RaidCoroutine());
     }
 
     public override void RegisterEvents()
@@ -89,7 +89,7 @@ public class SnowWarriorsAttackEvent : SpecialEvent
             "$pitch_.8 First Order . Light up all facility . Accepted .",
             "<b><color=#ffffff>雪の帝王</color></b>の最初の指令：全施設のライトアップ ...承認");
 
-        Timing.RunCoroutine(LightUpCoroutine());
+        RoundScopedCoroutines.Run(LightUpCoroutine());
 
         yield return Timing.WaitForSeconds(8f);
         if (CancelIfOutdated()) yield break;
@@ -121,7 +121,7 @@ public class SnowWarriorsAttackEvent : SpecialEvent
         }
 
         if (snowAlive)
-            Timing.RunCoroutine(SnowSuccessCoroutine());
+            RoundScopedCoroutines.Run(SnowSuccessCoroutine());
         else
             HandleSnowWarriorFailure();
     }
@@ -165,7 +165,7 @@ public class SnowWarriorsAttackEvent : SpecialEvent
 
         schematicObject.Position = new Vector3(-90f, 500f, -45f);
         schematicObject.Rotation = Quaternion.Euler(new Vector3(0, 0, 55));
-        Timing.RunCoroutine(NukeDownCoroutine(schematicObject));
+        RoundScopedCoroutines.Run(NukeDownCoroutine(schematicObject));
 
         foreach (var room in Room.List)
         {

@@ -49,7 +49,7 @@ public class SenseOfGreatDoctor : AbilityBase
             maxDistance: 1f,
             minDistance: 0.1f,
             listeners: listener => listener.Id == player.Id);
-        Timing.RunCoroutine(Coroutine(player, purpose));
+        RoundScopedCoroutines.Run(Coroutine(player, purpose));
     }
 
     private static IEnumerator<float> Coroutine(Player player, string purpose)

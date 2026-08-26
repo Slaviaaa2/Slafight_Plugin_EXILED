@@ -102,7 +102,7 @@ public class Scp035Role : CRole
         schematicObject.Scale *= 1.185f;
         LabApi.Features.Wrappers.Player.Get(player.NetId)!.DestroySchematic(schematicObject);
 
-        Timing.RunCoroutine(Coroutine(player));
+        RoundScopedCoroutines.Run(Coroutine(player));
     }
 
     protected override void OnRoleDying(DyingEventArgs ev)
@@ -294,7 +294,7 @@ public class Scp035Role : CRole
             if (state.NowState == Scp035StateType.FullyAwaken)
             {
                 // 完全覚醒用コルーチンへ移行
-                Timing.RunCoroutine(FullyAwakenCoroutine(player));
+                RoundScopedCoroutines.Run(FullyAwakenCoroutine(player));
                 yield break;
             }
 

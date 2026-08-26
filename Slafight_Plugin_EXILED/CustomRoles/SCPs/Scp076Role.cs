@@ -119,7 +119,7 @@ public class Scp076Role : CRole
 
         CleanupPlayerState(player);
         MovementIntensities[player.Id] = BaseMovementIntensity;
-        Timing.RunCoroutine(MovementBoostLoop(player));
+        RoundScopedCoroutines.Run(MovementBoostLoop(player));
         ScheduleOmegaSevenLossCheck("SCP-076 spawned");
     }
 
@@ -251,7 +251,7 @@ public class Scp076Role : CRole
 
             if (!MovementIntensities.ContainsKey(current.Id)) return;
             MovementIntensities[current.Id] = BoostedMovementIntensity;
-            Timing.RunCoroutine(ResetMovementAfter(current.Id, 30f));
+            RoundScopedCoroutines.Run(ResetMovementAfter(current.Id, 30f));
         });
     }
 
@@ -324,7 +324,7 @@ public class Scp076Role : CRole
         player.SetCustomInfo($"<color={ServerColors.Red}>SCP-076</color>");
         RefreshTeamNpc(player);
         ShowResistanceWarning(player, triggerMessage);
-        Timing.RunCoroutine(ResistanceCountdownLoop(player));
+        RoundScopedCoroutines.Run(ResistanceCountdownLoop(player));
 
         Log.Debug($"[SCP-076] Resistance state started for {player.Nickname}({player.Id}).");
     }

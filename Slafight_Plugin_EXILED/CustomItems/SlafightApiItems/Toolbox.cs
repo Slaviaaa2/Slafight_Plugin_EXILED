@@ -113,7 +113,7 @@ public class Toolbox : CItem
             if (ev.Door is not BreakableDoor breakableDoor) return;
             if (!breakableDoor.CanBreak()) return;
             breakableDoor.Break();
-            Timing.RunCoroutine(CooldownCoroutine(ev.Player));
+            RoundScopedCoroutines.Run(CooldownCoroutine(ev.Player));
         }
         else
         {
@@ -123,7 +123,7 @@ public class Toolbox : CItem
             {
                 ev.Door.Lock(30f, DoorLockType.Lockdown079);
             });
-            Timing.RunCoroutine(CooldownCoroutine(ev.Player));
+            RoundScopedCoroutines.Run(CooldownCoroutine(ev.Player));
         }
     }
 
@@ -141,7 +141,7 @@ public class Toolbox : CItem
                 if (door is not BreakableDoor breakableDoor) return;
                 if (!breakableDoor.IsDestroyed) return;
                 breakableDoor.Repair();
-                Timing.RunCoroutine(CooldownCoroutine(ev.Player));
+                RoundScopedCoroutines.Run(CooldownCoroutine(ev.Player));
             }
         }
     }
@@ -158,7 +158,7 @@ public class Toolbox : CItem
         ev.Generator.State = GeneratorState.Unlocked;
         ev.Generator.IsUnlocked = true;
 
-        Timing.RunCoroutine(CooldownCoroutine(ev.Player));
+        RoundScopedCoroutines.Run(CooldownCoroutine(ev.Player));
     }
 
     private IEnumerator<float> HintLoopCoroutine(Player player)

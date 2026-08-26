@@ -26,7 +26,7 @@ public class MindblasterAbility : AbilityBase
         try
         {
             var schem = ObjectSpawner.SpawnSchematic("SCP3005", startPos, player.CameraTransform.forward);
-            Timing.RunCoroutine(MissileCoroutine(schem, player));
+            RoundScopedCoroutines.Run(MissileCoroutine(schem, player));
         }
         catch (Exception ex)
         {

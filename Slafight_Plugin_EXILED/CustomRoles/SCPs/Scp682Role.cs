@@ -53,8 +53,8 @@ public class Scp682Role : CRole
         SpeedLevels[player] = 1f;
         player.SetScale(new Vector3(0.7f, 0.75f, 1.2f));
         
-        Timing.RunCoroutine(WaitAndTeleport(player));
-        Timing.RunCoroutine(Coroutine(player));
+        RoundScopedCoroutines.Run(WaitAndTeleport(player));
+        RoundScopedCoroutines.Run(Coroutine(player));
     }
 
     private IEnumerator<float> WaitAndTeleport(Player player)

@@ -59,7 +59,7 @@ public class PandraBreaker : CItem
             return;
         }
 
-        Timing.RunCoroutine(CooldownCoroutine(serial));
+        RoundScopedCoroutines.Run(CooldownCoroutine(serial));
         base.OnDropping(ev);
     }
 

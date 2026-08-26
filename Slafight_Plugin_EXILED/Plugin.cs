@@ -33,7 +33,7 @@ namespace Slafight_Plugin_EXILED;
 public class Plugin : Plugin<Config>
 {
     public static Plugin Singleton { get; set; } = null!;
-    public const string ServerName = "シャープ鯖";
+    public const string ServerName = "[RP]シャープ鯖";
 
     private CancellationTokenSource _playerCountCts;
     private static readonly HttpClient HttpClient = new()
@@ -51,6 +51,10 @@ public class Plugin : Plugin<Config>
     public override void OnEnabled()
     {
         Singleton = this;
+
+        // 他の RestartingRound ハンドラより先に停止させたいので最初に登録する。
+        RoundScopedCoroutines.Register();
+
         InitializeMediaTools();
         PlayerSpeakerManager.RegisterEvents();
         VoiceRoutingApi.RegisterEvents();
@@ -201,6 +205,8 @@ public class Plugin : Plugin<Config>
         DebugModeHandler.ClearAll();
         RPNameSetter.ClearAll();
             
+        RoundScopedCoroutines.Unregister();
+
         HarmonyInstance?.UnpatchAll(HarmonyInstance.Id);
         HarmonyInstance = null;
             
@@ -241,6 +247,10 @@ public class Plugin : Plugin<Config>
             var data = new
             {
                 server = ServerName,
+
+                // Bot 側 (bot.py) は同一ホストで動く複数サーバーをポート番号で識別するため、
+                // 人数の表示先チャンネルの振り分けに必要。
+                port = Server.Port,
                 count,
                 timestamp = DateTime.UtcNow
             };

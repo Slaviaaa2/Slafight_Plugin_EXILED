@@ -49,7 +49,7 @@ public class BattleAxe : CItem
             ev.IsAllowed = false;
             return;
         }
-        Timing.RunCoroutine(CooldownCoroutine(ev.Player.Id, 5f));
+        RoundScopedCoroutines.Run(CooldownCoroutine(ev.Player.Id, 5f));
     }
 
     protected override void OnHurtingOthers(HurtingEventArgs ev)

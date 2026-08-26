@@ -36,6 +36,9 @@ public static class ModerationBridge
             {
                 type,
                 server = Plugin.ServerName,
+
+                // Bot 側 (bot.py) がポート別の通知チャンネルへ振り分けるのに使う。
+                port = Server.Port,
                 timestamp = DateTime.UtcNow,
                 data,
             };

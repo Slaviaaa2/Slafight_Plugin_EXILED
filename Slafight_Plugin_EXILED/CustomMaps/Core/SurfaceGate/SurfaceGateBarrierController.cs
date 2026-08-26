@@ -6,6 +6,7 @@ using PlayerRoles;
 using ProjectMER.Features.Objects;
 using Slafight_Plugin_EXILED.CustomMaps.Core.Utilities;
 using UnityEngine;
+using Slafight_Plugin_EXILED.API.Features;
 
 namespace Slafight_Plugin_EXILED.CustomMaps.Core.SurfaceGate;
 
@@ -55,7 +56,7 @@ internal sealed class SurfaceGateBarrierController
         if (_barrier is null)
             return;
 
-        Timing.RunCoroutine(AnimateBarrier(waitTime));
+        RoundScopedCoroutines.Run(AnimateBarrier(waitTime));
     }
 
     private IEnumerator<float> AnimateBarrier(float waitTime)

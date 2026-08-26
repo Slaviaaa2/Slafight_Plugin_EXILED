@@ -53,7 +53,7 @@ public class ThrowKnife : CItem
         try
         {
             var schem = ObjectSpawner.SpawnSchematic("ThrowKnife", startPos, ev.Player.CameraTransform.forward);
-            Timing.RunCoroutine(AnimCoroutine(schem, ev.Player));
+            RoundScopedCoroutines.Run(AnimCoroutine(schem, ev.Player));
         }
         catch (Exception)
         {
