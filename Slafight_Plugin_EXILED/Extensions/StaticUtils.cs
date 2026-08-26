@@ -399,13 +399,13 @@ public static class StaticUtils
     /// <param name="colorA">開始色</param>
     /// <param name="colorB">終了色</param>
     /// <param name="progress">進行度合い (0.0: ColorA, 1.0: ColorB)</param>
-    /// <returns">グラデーション色</returns>
+    /// <returns>グラデーション色</returns>
     public static Color GetGradientColor(Color colorA, Color colorB, float progress)
     {
         // 進行度合いを 0.0〜1.0 の範囲に制限
         progress = Mathf.Clamp(progress, 0f, 1f);
         
-        // 각 채널を線形インターポレーション
+        // 各チャンネルを線形補間
         return new Color(
             Mathf.Lerp(colorA.r, colorB.r, progress),
             Mathf.Lerp(colorA.g, colorB.g, progress),
