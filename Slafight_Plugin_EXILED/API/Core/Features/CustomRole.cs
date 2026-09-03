@@ -165,6 +165,19 @@ public abstract class CustomRole : IPlayerOwn
     public virtual RoleVoiceSettings Voice => RoleVoiceSettings.None;
 
     /// <summary>
+    /// この役職だけに適用する定型文通信の上書きです。
+    /// 既定では所属する <see cref="Team"/> とバニラ陣営の設定を引き継ぎます。
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// // 所属陣営では禁止でも、この役職だけ専用 Prefix 付きで許可する。
+    /// public override CommunicationPolicy Communication =>
+    ///     CommunicationPolicy.Enabled("司令部");
+    /// </code>
+    /// </example>
+    public virtual CommunicationPolicy Communication => CommunicationPolicy.Inherit();
+
+    /// <summary>
     /// ネームプレートに出す追加情報です。null なら変更しません。
     /// </summary>
     /// <remarks>

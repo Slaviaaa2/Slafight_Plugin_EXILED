@@ -94,6 +94,13 @@ public sealed class InputHandler : EventHandlerBase
             return;
         }
 
+        if (keybind.SettingId == ServerSpecifics.CannedChatKeybindSettingId)
+        {
+            CannedChatMenuApi.Toggle(player);
+
+            return;
+        }
+
         if (!player.IsAlive) return;
 
         if (keybind.SettingId == ServerSpecifics.AbilityUseKeybindSettingId)

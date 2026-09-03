@@ -12,6 +12,10 @@ public static class HudConstId
     public const string PlayerHUD_EffectedInfo = "PlayerHUD_EffectedInfo";
     public const string PlayerHUD_Forces = "PlayerHUD_Forces";
     public const string PlayerHUD_Debug = "PlayerHUD_Debug";
+    public const string PlayerHUD_CommunicationHeader = "PlayerHUD_CommunicationHeader";
+    public const string PlayerHUD_CommunicationRows = "PlayerHUD_CommunicationRows";
+    public const string CannedChatMenuHeader = "CannedChatMenuHeader";
+    public const string CannedChatMenuOptions = "CannedChatMenuOptions";
     public const string LobbyInfo = "LobbyInfo";
     public const string TemporaryHintService = "DoorLockedInfo";
     public const string SpawnTimerHUD_FoundationStaff = "SpawnTimerHUD_FoundationStaff";

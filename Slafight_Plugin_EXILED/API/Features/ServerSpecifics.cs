@@ -14,6 +14,7 @@ public abstract class ServerSpecifics
         Banner,
         CommunicationGroup,
         ProximityChatKeybind,
+        CannedChatKeybind,
         RpName,
         AbilityGroup,
         AbilityUseKeybind,
@@ -83,6 +84,17 @@ public abstract class ServerSpecifics
                 true,
                 false,
                 hint: "一部の利用可能ロールで、近接チャットを使用するのに必要です。Vを推奨します。")),
+
+
+        new SettingDefinition(
+            SettingKey.CannedChatKeybind,
+            id => new SSKeybindSetting(
+                id,
+                "定型文通信メニュー",
+                KeyCode.Y,
+                true,
+                false,
+                hint: "定型文通信のSCP-330メニューを開閉します。Yを推奨します。")),
 
 
         new SettingDefinition(
@@ -241,6 +253,7 @@ public abstract class ServerSpecifics
 
     public static readonly int HeaderSettingId = GetSettingId(SettingKey.Header);
     public static readonly int ProximityChatKeybindSettingId = GetSettingId(SettingKey.ProximityChatKeybind);
+    public static readonly int CannedChatKeybindSettingId = GetSettingId(SettingKey.CannedChatKeybind);
     public static readonly int RpNameSettingId = GetSettingId(SettingKey.RpName);
     public static readonly int AbilityUseKeybindSettingId = GetSettingId(SettingKey.AbilityUseKeybind);
     public static readonly int AbilitySwitchKeybindSettingId = GetSettingId(SettingKey.AbilitySwitchKeybind);

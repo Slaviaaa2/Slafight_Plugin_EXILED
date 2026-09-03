@@ -75,6 +75,18 @@ public abstract class CustomTeam
     public virtual bool IsGroupOfInterest => true;
 
     /// <summary>
+    /// この陣営の定型文通信設定です。可否はバニラ陣営の既定を引き継ぎ、
+    /// Prefix は既定でこのチームの <see cref="Name"/> になります。
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// public override CommunicationPolicy Communication =>
+    ///     CommunicationPolicy.Enabled("第五教会");
+    /// </code>
+    /// </example>
+    public virtual CommunicationPolicy Communication => CommunicationPolicy.Inherit(Name);
+
+    /// <summary>
     /// バニラのラウンド終了処理に任せるか。
     /// false のときは <see cref="VictoryText"/> を全員に出して手動で終わらせます。
     /// </summary>

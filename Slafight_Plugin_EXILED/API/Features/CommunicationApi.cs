@@ -1,0 +1,505 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
+using HintServiceMeow.Core.Enum;
+using HintServiceMeow.Core.Models.Hints;
+using HintServiceMeow.Core.Utilities;
+using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.API.Core.Structs;
+using Slafight_Plugin_EXILED.API.Enums;
+using Slafight_Plugin_EXILED.Extensions;
+using UnityEngine;
+using Hint = HintServiceMeow.Core.Models.Hints.Hint;
+using PlayerTeam = PlayerRoles.Team;
+using PlayerHandlers = Exiled.Events.Handlers.Player;
+using ServerHandlers = Exiled.Events.Handlers.Server;
+
+namespace Slafight_Plugin_EXILED.API.Features;
+
+/// <summary>
+/// PlayerHUD 上部の「通信」欄へ短いメッセージを流す公開 API です。
+/// 定型文メニュー以外の機能も、インベントリやメニュー実装を知らずに利用できます。
+/// </summary>
+public static class CommunicationApi
+{
+    /// <summary>プレイヤー発信の通信が届く既定距離です。</summary>
+    public const float DefaultRange = 8f;
+
+    private const int MaxVisibleRows = 10;
+    private const int MaxTextLength = 44;
+    private const int MaxSenderLength = 18;
+    private const int MaxCategoryLength = 10;
+    private const int MaxPrefixLength = 12;
+    private const int HeaderX = -350;
+    private const int HeaderY = 505;
+    private const int FirstRowY = 535;
+    private const int RowHeight = 27;
+    private const string HeaderColor = "#62c7ff";
+    private const string SenderColor = "#a9ddff";
+
+    private static readonly Dictionary<uint, List<CommunicationEntry>> EntriesByViewer = new();
+
+    private static readonly Dictionary<PlayerTeam, ResolvedCommunicationPolicy> DefaultTeamPolicies =
+        new Dictionary<PlayerTeam, ResolvedCommunicationPolicy>
+        {
+            [PlayerTeam.FoundationForces] = new(true, "財団"),
+            [PlayerTeam.ChaosInsurgency] = new(true, "カオス"),
+            [PlayerTeam.Scientists] = new(true, "研究員"),
+            [PlayerTeam.ClassD] = new(true, "Dクラス"),
+            [PlayerTeam.SCPs] = new(false, "SCP"),
+            [PlayerTeam.Dead] = new(false, "死亡者"),
+            [PlayerTeam.OtherAlive] = new(false, "その他"),
+            [PlayerTeam.Flamingos] = new(false, "フラミンゴ"),
+        };
+
+    private static readonly Dictionary<PlayerTeam, ResolvedCommunicationPolicy> TeamPolicies =
+        new(DefaultTeamPolicies);
+
+    /// <summary>通信が正常に少なくとも1人へ配信された後に発火します。</summary>
+    public static event Action<CommunicationEntry>? Sent;
+
+    /// <summary>
+    /// 発言者名と陣営 Prefix 付きで、送信者から8m以内の受信者へ通信を送ります。
+    /// recipients を指定した場合も、その中から距離内の生存者だけへ送ります。
+    /// </summary>
+    public static int Send(
+        Player sender,
+        string text,
+        IEnumerable<Player>? recipients = null,
+        string category = "通信")
+        => SendNearby(sender, text, DefaultRange, recipients, category);
+
+    /// <summary>
+    /// 指定距離内へプレイヤー発信の通信を送ります。
+    /// バニラ陣営、CustomTeam、CustomRole の順に利用可否と Prefix を解決します。
+    /// </summary>
+    public static int SendNearby(
+        Player sender,
+        string text,
+        float range = DefaultRange,
+        IEnumerable<Player>? recipients = null,
+        string category = "通信")
+    {
+        if (sender is null || !sender.IsSafePlayer())
+            return 0;
+
+        ResolvedCommunicationPolicy policy = ResolvePolicy(sender);
+        if (!policy.IsAvailable)
+            return 0;
+
+        float clampedRange = Mathf.Max(0f, range);
+        float squaredRange = clampedRange * clampedRange;
+        IEnumerable<Player> candidates = recipients ?? Player.List;
+        Player[] nearby = candidates
+            .Where(viewer => CanReceiveNearby(sender, viewer, squaredRange))
+            .Distinct()
+            .ToArray();
+
+        return SendCore(
+            Safe(sender.Nickname),
+            text,
+            nearby,
+            category,
+            policy.Prefix);
+    }
+
+    /// <summary>
+    /// 任意の送信元名で距離制限のない通信を送ります。
+    /// サーバー全体通知向けです。位置を持つ装置・ギミックには <see cref="SendAt"/> を使います。
+    /// </summary>
+    public static int Send(
+        string senderName,
+        string text,
+        IEnumerable<Player>? recipients = null,
+        string category = "通信")
+        => SendCore(senderName, text, recipients ?? Player.List, category, string.Empty);
+
+    /// <summary>
+    /// マップ装置などの任意座標を発信源として、指定距離内の生存者へ通信を送ります。
+    /// プレイヤーの陣営利用可否は適用されません。
+    /// </summary>
+    public static int SendAt(
+        string senderName,
+        string text,
+        Vector3 origin,
+        float range = DefaultRange,
+        IEnumerable<Player>? recipients = null,
+        string category = "通信",
+        string? prefix = null)
+    {
+        float clampedRange = Mathf.Max(0f, range);
+        float squaredRange = clampedRange * clampedRange;
+        IEnumerable<Player> candidates = recipients ?? Player.List;
+        Player[] nearby = candidates
+            .Where(viewer => CanReceiveAt(origin, viewer, squaredRange))
+            .Distinct()
+            .ToArray();
+
+        return SendCore(senderName, text, nearby, category, prefix);
+    }
+
+    /// <summary>プレイヤーが現在の陣営・役職で定型文通信を利用できるか返します。</summary>
+    public static bool CanUse(Player player) => ResolvePolicy(player).IsAvailable;
+
+    /// <summary>
+    /// バニラ陣営 → CustomTeam → CustomRole の順に上書きを適用した設定を返します。
+    /// </summary>
+    public static ResolvedCommunicationPolicy ResolvePolicy(Player player)
+    {
+        if (player is null || !player.IsSafePlayer())
+            return new ResolvedCommunicationPolicy(false, string.Empty);
+
+        if (!TeamPolicies.TryGetValue(player.Role.Team, out ResolvedCommunicationPolicy resolved))
+            resolved = new ResolvedCommunicationPolicy(false, string.Empty);
+
+        CustomRole? role = CustomRole.Of(player);
+        CustomTeam? team = role?.Team ?? CustomTeam.Of(player);
+
+        if (team is not null)
+            resolved = resolved.Apply(team.Communication);
+
+        if (role is not null)
+            resolved = resolved.Apply(role.Communication);
+
+        return resolved;
+    }
+
+    /// <summary>指定したバニラ陣営の既定可否と Prefix を変更します。</summary>
+    public static void SetTeamPolicy(PlayerTeam team, bool isAvailable, string? prefix = null)
+    {
+        string currentPrefix = TeamPolicies.TryGetValue(team, out ResolvedCommunicationPolicy current)
+            ? current.Prefix
+            : string.Empty;
+
+        TeamPolicies[team] = new ResolvedCommunicationPolicy(isAvailable, prefix ?? currentPrefix);
+    }
+
+    /// <summary>指定したバニラ陣営の現在の既定設定を返します。</summary>
+    public static ResolvedCommunicationPolicy GetTeamPolicy(PlayerTeam team)
+        => TeamPolicies.TryGetValue(team, out ResolvedCommunicationPolicy policy)
+            ? policy
+            : new ResolvedCommunicationPolicy(false, string.Empty);
+
+    /// <summary>バニラ陣営の可否と Prefix を組み込み既定値へ戻します。</summary>
+    public static void ResetTeamPolicies()
+    {
+        TeamPolicies.Clear();
+        foreach (KeyValuePair<PlayerTeam, ResolvedCommunicationPolicy> pair in DefaultTeamPolicies)
+            TeamPolicies.Add(pair.Key, pair.Value);
+    }
+
+    private static int SendCore(
+        string senderName,
+        string text,
+        IEnumerable<Player> recipients,
+        string category,
+        string? prefix)
+    {
+        if (!Round.IsStarted)
+            return 0;
+
+        string normalized = Normalize(text);
+        if (normalized.Length == 0)
+            return 0;
+
+        var entry = new CommunicationEntry(
+            NormalizeLabel(senderName, "SYSTEM", MaxSenderLength),
+            normalized,
+            NormalizeLabel(category, "通信", MaxCategoryLength),
+            NormalizeOptionalLabel(prefix, MaxPrefixLength),
+            DateTime.UtcNow);
+
+        int delivered = 0;
+
+        foreach (Player viewer in recipients.Where(x => x is not null).Distinct())
+        {
+            if (!viewer.IsSafePlayer())
+                continue;
+
+            uint netId = viewer.NetId;
+            if (!EntriesByViewer.TryGetValue(netId, out List<CommunicationEntry> entries))
+            {
+                entries = new List<CommunicationEntry>(MaxVisibleRows);
+                EntriesByViewer.Add(netId, entries);
+            }
+
+            while (entries.Count >= MaxVisibleRows)
+                entries.RemoveAt(0);
+
+            entries.Add(entry);
+            Render(viewer, entries);
+            delivered++;
+        }
+
+        if (delivered > 0)
+        {
+            try
+            {
+                Sent?.Invoke(entry);
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"[CommunicationApi] Sent subscriber failed: {exception}");
+            }
+        }
+
+        return delivered;
+    }
+
+    /// <summary>指定プレイヤーの通信履歴と表示行を消します。見出しは残します。</summary>
+    public static void Clear(Player player)
+    {
+        if (player is null)
+            return;
+
+        EntriesByViewer.Remove(player.NetId);
+        if (Round.IsStarted)
+            Render(player, Array.Empty<CommunicationEntry>());
+        else
+            RemoveHints(player);
+    }
+
+    internal static void Ensure(Player player)
+    {
+        if (!player.IsSafePlayer())
+            return;
+
+        if (!Round.IsStarted)
+        {
+            RemoveHints(player);
+            return;
+        }
+
+        EntriesByViewer.TryGetValue(player.NetId, out List<CommunicationEntry>? entries);
+        Render(player, entries ?? Enumerable.Empty<CommunicationEntry>());
+    }
+
+    internal static void Remove(Player player)
+    {
+        if (player is null)
+            return;
+
+        EntriesByViewer.Remove(player.NetId);
+    }
+
+    internal static void Reset(bool removeHints = false)
+    {
+        if (removeHints)
+        {
+            foreach (Player player in Player.List)
+                RemoveHints(player);
+        }
+
+        EntriesByViewer.Clear();
+    }
+
+    internal static void Shutdown()
+    {
+        foreach (Player player in Player.List)
+            RemoveHints(player);
+
+        EntriesByViewer.Clear();
+        Sent = null;
+        ResetTeamPolicies();
+    }
+
+    private static void Render(Player viewer, IEnumerable<CommunicationEntry> source)
+    {
+        if (!Round.IsStarted)
+        {
+            RemoveHints(viewer);
+            return;
+        }
+
+        if (!NetGuards.IsReadyClient(viewer))
+            return;
+
+        PlayerDisplay display;
+        try
+        {
+            display = PlayerDisplay.Get(viewer.ReferenceHub);
+        }
+        catch
+        {
+            return;
+        }
+
+        EnsureHint(
+            display,
+            HudConstId.PlayerHUD_CommunicationHeader,
+            $"<size=20><color={HeaderColor}>━━ 通信 ━━</color></size>",
+            20,
+            HeaderX,
+            HeaderY);
+
+        CommunicationEntry[] entries = source.Take(MaxVisibleRows).ToArray();
+        for (int index = 0; index < MaxVisibleRows; index++)
+        {
+            string id = $"{HudConstId.PlayerHUD_CommunicationRows}_{index}";
+            string row = index < entries.Length ? Format(entries[index]) : string.Empty;
+            EnsureHint(display, id, row, 17, HeaderX, FirstRowY + (index * RowHeight));
+        }
+    }
+
+    private static void EnsureHint(PlayerDisplay display, string id, string text, int fontSize, int x, int y)
+    {
+        if (display.GetHint(id) is not Hint hint)
+        {
+            hint = new Hint
+            {
+                Id = id,
+                Alignment = HintAlignment.Left,
+                YCoordinateAlign = HintVerticalAlign.Top,
+                SyncSpeed = HintSyncSpeed.Fast,
+                ResolutionBasedAlign = true,
+                FontSize = fontSize,
+                XCoordinate = x,
+                YCoordinate = y,
+            };
+            display.AddHint(hint);
+        }
+
+        if (!string.Equals(hint.Text, text, StringComparison.Ordinal))
+            hint.Text = text;
+    }
+
+    private static void RemoveHints(Player player)
+    {
+        if (!NetGuards.IsReadyClient(player))
+            return;
+
+        try
+        {
+            PlayerDisplay display = PlayerDisplay.Get(player.ReferenceHub);
+            display.RemoveHint(HudConstId.PlayerHUD_CommunicationHeader);
+            for (int index = 0; index < MaxVisibleRows; index++)
+                display.RemoveHint($"{HudConstId.PlayerHUD_CommunicationRows}_{index}");
+        }
+        catch
+        {
+            // 切断・プラグイン停止中はクライアント側表示も失われるため続行する。
+        }
+    }
+
+    private static string Format(CommunicationEntry entry)
+    {
+        string prefix = entry.Prefix.Length == 0 ? string.Empty : $"[{entry.Prefix}] ";
+        return $"<size=17><color={SenderColor}>[{entry.Category}] {prefix}{entry.Sender}</color>: {entry.Text}</size>";
+    }
+
+    private static bool CanReceiveNearby(Player sender, Player? viewer, float squaredRange)
+    {
+        if (viewer is null || !viewer.IsSafePlayer() || !viewer.IsAlive)
+            return false;
+
+        if (ReferenceEquals(sender.ReferenceHub, viewer.ReferenceHub))
+            return true;
+
+        return CanReceiveAt(sender.Position, viewer, squaredRange);
+    }
+
+    private static bool CanReceiveAt(Vector3 origin, Player? viewer, float squaredRange)
+        => viewer is not null && viewer.IsSafePlayer() && viewer.IsAlive &&
+           (origin - viewer.Position).sqrMagnitude <= squaredRange;
+
+    private static string Normalize(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return string.Empty;
+
+        string normalized = string.Join(" ", text!
+            .Replace('\r', ' ')
+            .Replace('\n', ' ')
+            .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+
+        if (normalized.Length > MaxTextLength)
+            normalized = normalized.Substring(0, MaxTextLength - 1) + "…";
+
+        return Safe(normalized);
+    }
+
+    private static string Safe(string? text)
+        => string.IsNullOrEmpty(text)
+            ? string.Empty
+            : text!.Replace("<", "＜").Replace(">", "＞");
+
+    private static string NormalizeLabel(string? text, string fallback, int maxLength)
+    {
+        string normalized = Safe(string.IsNullOrWhiteSpace(text) ? fallback : text!.Trim());
+        return normalized.Length <= maxLength
+            ? normalized
+            : normalized.Substring(0, maxLength - 1) + "…";
+    }
+
+    private static string NormalizeOptionalLabel(string? text, int maxLength)
+    {
+        string normalized = Safe(text?.Trim());
+        return normalized.Length <= maxLength
+            ? normalized
+            : normalized.Substring(0, maxLength - 1) + "…";
+    }
+}
+
+/// <summary>通信欄に保存される、描画に依存しない1件のメッセージです。</summary>
+public sealed class CommunicationEntry
+{
+    public CommunicationEntry(string sender, string text, string category, DateTime sentAtUtc)
+        : this(sender, text, category, string.Empty, sentAtUtc)
+    {
+    }
+
+    public CommunicationEntry(string sender, string text, string category, string prefix, DateTime sentAtUtc)
+    {
+        Sender = sender;
+        Text = text;
+        Category = category;
+        Prefix = prefix ?? string.Empty;
+        SentAtUtc = sentAtUtc;
+    }
+
+    public string Sender { get; }
+    public string Text { get; }
+    public string Category { get; }
+    public string Prefix { get; }
+    public DateTime SentAtUtc { get; }
+}
+
+/// <summary>通信HUDの生成とラウンド／退出時の後始末を担当します。</summary>
+public sealed class CommunicationHudHandler : EventHandlerBase
+{
+    public override void RegisterEvents()
+    {
+        PlayerHandlers.Verified += OnVerified;
+        PlayerHandlers.Left += OnLeft;
+        ServerHandlers.RoundStarted += OnRoundStarted;
+        ServerHandlers.WaitingForPlayers += OnRoundReset;
+        ServerHandlers.RestartingRound += OnRestartingRound;
+    }
+
+    public override void UnregisterEvents()
+    {
+        PlayerHandlers.Verified -= OnVerified;
+        PlayerHandlers.Left -= OnLeft;
+        ServerHandlers.RoundStarted -= OnRoundStarted;
+        ServerHandlers.WaitingForPlayers -= OnRoundReset;
+        ServerHandlers.RestartingRound -= OnRestartingRound;
+        CommunicationApi.Shutdown();
+    }
+
+    private static void OnVerified(VerifiedEventArgs ev) => CommunicationApi.Ensure(ev.Player);
+
+    private static void OnLeft(LeftEventArgs ev) => CommunicationApi.Remove(ev.Player);
+
+    private static void OnRoundStarted()
+    {
+        foreach (Player player in Player.List)
+            CommunicationApi.Ensure(player);
+    }
+
+    private static void OnRoundReset() => CommunicationApi.Reset(removeHints: true);
+
+    private static void OnRestartingRound() => CommunicationApi.Reset(removeHints: true);
+}
