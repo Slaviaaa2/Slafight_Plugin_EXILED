@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using HintServiceMeow.Core.Enum;
@@ -13,6 +14,7 @@ using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using Mirror;
 using Slafight_Plugin_EXILED.API.Core.Features;
+using Slafight_Plugin_EXILED.API.Core.Structs;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
 using Slafight_Plugin_EXILED.Extensions;
@@ -31,6 +33,7 @@ public static class CannedChatMenuApi
 {
     private const int MaxOptions = 6;
     private const float EquipDelay = 0.08f;
+    private const int TextMenuY = 720;
 
     private static readonly CandyKindID[] SlotCandies =
     [
@@ -54,6 +57,7 @@ public static class CannedChatMenuApi
     ];
 
     private static readonly Dictionary<uint, MenuSession> Sessions = new();
+    private static readonly Dictionary<uint, TextMenuSession> TextSessions = new();
     private static IReadOnlyList<CannedChatNode> rootOptions = BuildDefaultMenu();
     private static int nextSessionToken;
 
@@ -75,12 +79,12 @@ public static class CannedChatMenuApi
 
     /// <summary>対象プレイヤーが定型文メニューを開いているか返します。</summary>
     public static bool IsOpen(Player? player)
-        => TryFindSession(player, out _);
+        => TryFindSession(player, out _) || TryFindTextSession(player, out _);
 
     /// <summary>定型文メニューを開きます。</summary>
     public static bool Open(Player player)
     {
-        if (!player.IsSafePlayer() || !NetGuards.IsReadyClient(player) || !player.IsAlive)
+        if (!Round.IsStarted || !player.IsSafePlayer() || !NetGuards.IsReadyClient(player) || !player.IsAlive)
         {
             player?.ShowHint("<size=20>定型文通信は生存中のみ使用できます。</size>", 2f);
             return false;
@@ -95,11 +99,15 @@ public static class CannedChatMenuApi
             return false;
         }
 
-        if (!CommunicationApi.CanUse(player))
+        ResolvedCommunicationPolicy policy = CommunicationApi.ResolvePolicy(player);
+        if (!policy.IsAvailable)
         {
             player.ShowHint("<size=20>現在の陣営・役職では定型文通信を利用できません。</size>", 2f);
             return false;
         }
+
+        if (policy.MenuMode == CommunicationMenuMode.Text)
+            return OpenTextMenu(player);
 
         ReferenceHub hub = player.ReferenceHub;
         Inventory inventory = hub.inventory;
@@ -140,10 +148,81 @@ public static class CannedChatMenuApi
     /// <summary>対象プレイヤーのメニューを閉じ、開く前の装備へ戻します。</summary>
     public static bool Close(Player player)
     {
+        if (TryFindTextSession(player, out TextMenuSession? textSession))
+        {
+            CloseTextSession(textSession);
+            return true;
+        }
+
         if (!TryFindSession(player, out MenuSession? session))
             return false;
 
         CloseSession(session, restoreHeldItem: true);
+        return true;
+    }
+
+    /// <summary>
+    /// 文字メニュー表示中だけ、能力操作用Server Specific Settingsキーを選択操作として消費します。
+    /// </summary>
+    internal static bool TryHandleTextInput(Player player, int settingId)
+    {
+        if (!TryFindTextSession(player, out TextMenuSession? session))
+            return false;
+
+        bool isPrevious = settingId == ServerSpecifics.AbilityOptionPreviousKeybindSettingId;
+        bool isNext = settingId == ServerSpecifics.AbilityOptionNextKeybindSettingId;
+        bool isSelect = settingId == ServerSpecifics.AbilityUseKeybindSettingId;
+        bool isBack = settingId == ServerSpecifics.AbilitySwitchKeybindSettingId;
+        if (!isPrevious && !isNext && !isSelect && !isBack)
+            return false;
+
+        if (!CommunicationApi.CanUse(player))
+        {
+            CloseTextSession(session);
+            player.ShowHint("<size=20>現在の陣営・役職では定型文通信を利用できません。</size>", 2f);
+            return true;
+        }
+
+        IReadOnlyList<CannedChatNode> options = CurrentOptions(session);
+        if (options.Count == 0)
+        {
+            CloseTextSession(session);
+            return true;
+        }
+
+        if (isPrevious || isNext)
+        {
+            int delta = isPrevious ? -1 : 1;
+            session.SelectedIndex = (session.SelectedIndex + delta + options.Count) % options.Count;
+            RenderTextMenu(player, session);
+            return true;
+        }
+
+        if (isBack)
+        {
+            if (session.Path.Count == 0)
+                CloseTextSession(session);
+            else
+            {
+                session.Path.RemoveAt(session.Path.Count - 1);
+                session.SelectedIndex = 0;
+                RenderTextMenu(player, session);
+            }
+
+            return true;
+        }
+
+        CannedChatNode selected = options[session.SelectedIndex];
+        if (selected.Children.Count > 0)
+        {
+            session.Path.Add(selected);
+            session.SelectedIndex = 0;
+            RenderTextMenu(player, session);
+            return true;
+        }
+
+        CloseTextSession(session);
+        ExecuteNode(player, selected);
         return true;
     }
 
@@ -199,7 +278,34 @@ public static class CannedChatMenuApi
         }
 
         CloseSession(session, restoreHeldItem: true);
+        ExecuteNode(player, selected);
 
+        return true;
+    }
+
+    internal static void Shutdown()
+    {
+        foreach (MenuSession session in Sessions.Values.ToArray())
+            CloseSession(session, restoreHeldItem: true);
+
+        foreach (TextMenuSession session in TextSessions.Values.ToArray())
+            CloseTextSession(session);
+
+        Sessions.Clear();
+        TextSessions.Clear();
+    }
+
+    private static bool OpenTextMenu(Player player)
+    {
+        ReferenceHub hub = player.ReferenceHub;
+        var session = new TextMenuSession(++nextSessionToken, hub);
+        TextSessions.Add(hub.netId, session);
+        RenderTextMenu(player, session);
+        return true;
+    }
+
+    private static void ExecuteNode(Player player, CannedChatNode selected)
+    {
         try
         {
             if (selected.Action is not null)
@@ -211,16 +317,6 @@ public static class CannedChatMenuApi
         {
             Log.Error($"[CannedChatMenu] '{selected.Label}' action failed for {player.Nickname}: {exception}");
         }
-
-        return true;
-    }
-
-    internal static void Shutdown()
-    {
-        foreach (MenuSession session in Sessions.Values.ToArray())
-            CloseSession(session, restoreHeldItem: true);
-
-        Sessions.Clear();
     }
 
     private static void EquipMenu(uint netId, ushort bagSerial, int token)
@@ -285,6 +381,9 @@ public static class CannedChatMenuApi
     private static IReadOnlyList<CannedChatNode> CurrentOptions(MenuSession session)
         => session.Path.Count == 0 ? rootOptions : session.Path[session.Path.Count - 1].Children;
 
+    private static IReadOnlyList<CannedChatNode> CurrentOptions(TextMenuSession session)
+        => session.Path.Count == 0 ? rootOptions : session.Path[session.Path.Count - 1].Children;
+
     private static List<CandyKindID> BuildCandySlots(int count)
         => SlotCandies.Take(Math.Min(count, MaxOptions)).ToList();
 
@@ -340,6 +439,80 @@ public static class CannedChatMenuApi
         }
     }
 
+    private static void RenderTextMenu(Player player, TextMenuSession session)
+    {
+        if (!NetGuards.IsReadyClient(player))
+            return;
+
+        PlayerDisplay display;
+        try
+        {
+            display = PlayerDisplay.Get(player.ReferenceHub);
+        }
+        catch
+        {
+            return;
+        }
+
+        IReadOnlyList<CannedChatNode> options = CurrentOptions(session);
+        if (options.Count == 0)
+            return;
+
+        session.SelectedIndex = Math.Min(session.SelectedIndex, options.Count - 1);
+        string path = session.Path.Count == 0
+            ? "メイン"
+            : string.Join(" › ", session.Path.Select(x => Safe(x.Label)));
+
+        var choices = new StringBuilder();
+        for (int index = 0; index < options.Count; index++)
+        {
+            if (index == 3)
+                choices.AppendLine();
+            else if (index > 0)
+                choices.Append("　");
+
+            string label = Safe(options[index].Label);
+            choices.Append(index == session.SelectedIndex
+                ? $"<color=#7fd6ff><b>▶ {label} ◀</b></color>"
+                : $"<color=#d8d8d8>{label}</color>");
+        }
+
+        string text =
+            $"<size=20><mark=#11151ddd><color=#7fd6ff><b> 定型文通信 </b></color> {path} </mark></size>\n" +
+            $"<size=18><mark=#11151ddd> {choices} </mark></size>\n" +
+            "<size=14><mark=#11151ddd> " +
+            "<color=#aaffaa>{0}</color>/<color=#aaffaa>{1}</color>:選択　" +
+            "<color=#aaffaa>{2}</color>:決定　" +
+            "<color=#aaffaa>{3}</color>:戻る　" +
+            "<color=#aaffaa>{4}</color>:閉じる </mark></size>";
+
+        if (display.GetHint(HudConstId.CannedChatTextMenu) is not Hint hint)
+        {
+            hint = new Hint
+            {
+                Id = HudConstId.CannedChatTextMenu,
+                Alignment = HintAlignment.Center,
+                YCoordinateAlign = HintVerticalAlign.Top,
+                SyncSpeed = HintSyncSpeed.Fastest,
+                ResolutionBasedAlign = true,
+                XCoordinate = 0,
+                YCoordinate = TextMenuY,
+                FontSize = 20,
+            };
+            display.AddHint(hint);
+        }
+
+        hint.Text = text;
+        hint.Parameters =
+        [
+            new global::Hints.SSKeybindHintParameter(ServerSpecifics.AbilityOptionPreviousKeybindSettingId),
+            new global::Hints.SSKeybindHintParameter(ServerSpecifics.AbilityOptionNextKeybindSettingId),
+            new global::Hints.SSKeybindHintParameter(ServerSpecifics.AbilityUseKeybindSettingId),
+            new global::Hints.SSKeybindHintParameter(ServerSpecifics.AbilitySwitchKeybindSettingId),
+            new global::Hints.SSKeybindHintParameter(ServerSpecifics.CannedChatKeybindSettingId),
+        ];
+    }
+
     private static void EnsureMenuHint(PlayerDisplay display, string id, string text, int x, int y, int fontSize)
     {
         if (display.GetHint(id) is not Hint hint)
@@ -373,6 +546,31 @@ public static class CannedChatMenuApi
             display.RemoveHint(HudConstId.CannedChatMenuHeader);
             for (int index = 0; index < MaxOptions; index++)
                 display.RemoveHint($"{HudConstId.CannedChatMenuOptions}_{index}");
+        }
+        catch
+        {
+            // 切断・ラウンド破棄中は表示自体も失われるため、後処理を続行する。
+        }
+    }
+
+    private static void CloseTextSession(TextMenuSession session)
+    {
+        if (!TextSessions.TryGetValue(session.NetId, out TextMenuSession? current) ||
+            !ReferenceEquals(current, session))
+            return;
+
+        TextSessions.Remove(session.NetId);
+        RemoveTextMenuHint(session.Hub);
+    }
+
+    private static void RemoveTextMenuHint(ReferenceHub hub)
+    {
+        if (!NetGuards.IsReadyClient(hub))
+            return;
+
+        try
+        {
+            PlayerDisplay.Get(hub).RemoveHint(HudConstId.CannedChatTextMenu);
         }
         catch
         {
@@ -472,6 +670,22 @@ public static class CannedChatMenuApi
         public bool Transitioning { get; set; } = true;
     }
 
+    private sealed class TextMenuSession
+    {
+        public TextMenuSession(int token, ReferenceHub hub)
+        {
+            Token = token;
+            NetId = hub.netId;
+            Hub = hub;
+        }
+
+        public int Token { get; }
+        public uint NetId { get; }
+        public ReferenceHub Hub { get; }
+        public List<CannedChatNode> Path { get; } = new();
+        public int SelectedIndex { get; set; }
+    }
+
     internal static bool TryGetSession(Player player, out ushort bagSerial, out bool transitioning)
     {
         if (TryFindSession(player, out MenuSession? session))
@@ -488,8 +702,28 @@ public static class CannedChatMenuApi
 
     internal static void CloseWithoutRestore(Player player)
     {
+        if (TryFindTextSession(player, out TextMenuSession? textSession))
+            CloseTextSession(textSession);
+
         if (TryFindSession(player, out MenuSession? session))
             CloseSession(session, restoreHeldItem: false);
+    }
+
+    private static bool TryFindTextSession(Player? player, out TextMenuSession session)
+    {
+        session = null!;
+        if (player?.ReferenceHub is not { } hub)
+            return false;
+
+        if (TextSessions.TryGetValue(player.NetId, out TextMenuSession? direct) &&
+            ReferenceEquals(direct.Hub, hub))
+        {
+            session = direct;
+            return true;
+        }
+
+        session = TextSessions.Values.FirstOrDefault(candidate => ReferenceEquals(candidate.Hub, hub))!;
+        return session is not null;
     }
 
     private static bool TryFindSession(Player? player, out MenuSession session)
@@ -552,6 +786,7 @@ public sealed class CannedChatMenuHandler : EventHandlerBase
         PlayerHandlers.ChangedItem += OnChangedItem;
         PlayerHandlers.ChangingRole += OnChangingRole;
         PlayerHandlers.Left += OnLeft;
+        ServerHandlers.WaitingForPlayers += OnWaitingForPlayers;
         ServerHandlers.RestartingRound += OnRestartingRound;
     }
 
@@ -560,6 +795,7 @@ public sealed class CannedChatMenuHandler : EventHandlerBase
         PlayerHandlers.ChangedItem -= OnChangedItem;
         PlayerHandlers.ChangingRole -= OnChangingRole;
         PlayerHandlers.Left -= OnLeft;
+        ServerHandlers.WaitingForPlayers -= OnWaitingForPlayers;
         ServerHandlers.RestartingRound -= OnRestartingRound;
         CannedChatMenuApi.Shutdown();
     }
@@ -578,6 +814,8 @@ public sealed class CannedChatMenuHandler : EventHandlerBase
 
     private static void OnLeft(LeftEventArgs ev)
         => CannedChatMenuApi.CloseWithoutRestore(ev.Player);
+
+    private static void OnWaitingForPlayers() => CannedChatMenuApi.Shutdown();
 
     private static void OnRestartingRound() => CannedChatMenuApi.Shutdown();
 }

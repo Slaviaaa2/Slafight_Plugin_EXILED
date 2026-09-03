@@ -16,6 +16,7 @@ public static class HudConstId
     public const string PlayerHUD_CommunicationRows = "PlayerHUD_CommunicationRows";
     public const string CannedChatMenuHeader = "CannedChatMenuHeader";
     public const string CannedChatMenuOptions = "CannedChatMenuOptions";
+    public const string CannedChatTextMenu = "CannedChatTextMenu";
     public const string LobbyInfo = "LobbyInfo";
     public const string TemporaryHintService = "DoorLockedInfo";
     public const string SpawnTimerHUD_FoundationStaff = "SpawnTimerHUD_FoundationStaff";

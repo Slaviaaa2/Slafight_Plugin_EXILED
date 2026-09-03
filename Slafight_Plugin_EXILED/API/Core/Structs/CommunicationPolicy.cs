@@ -15,7 +15,8 @@ public readonly struct CommunicationPolicy
         string? proximityLabel = null,
         string? radioLabel = null,
         float? proximityRange = null,
-        bool? isRadioAvailable = null)
+        bool? isRadioAvailable = null,
+        CommunicationMenuMode? menuMode = null)
     {
         IsAvailable = isAvailable;
         Prefix = prefix;
@@ -25,6 +26,7 @@ public readonly struct CommunicationPolicy
         RadioLabel = radioLabel;
         ProximityRange = proximityRange;
         IsRadioAvailable = isRadioAvailable;
+        MenuMode = menuMode;
     }
 
     /// <summary>通信機能を利用できるか。null なら下位設定を引き継ぎます。</summary>
@@ -53,6 +55,9 @@ public readonly struct CommunicationPolicy
     /// <summary>使用可能なRadioを所持しているとき無線経路も使うか。null なら引き継ぎます。</summary>
     public bool? IsRadioAvailable { get; }
 
+    /// <summary>定型文の選択UI。null なら引き継ぎます。</summary>
+    public CommunicationMenuMode? MenuMode { get; }
+
     /// <summary>可否を引き継ぎます。prefix を指定すれば表記だけ上書きします。</summary>
     public static CommunicationPolicy Inherit(
         string? prefix = null,
@@ -61,7 +66,8 @@ public readonly struct CommunicationPolicy
         string? proximityLabel = null,
         string? radioLabel = null,
         float? proximityRange = null,
-        bool? isRadioAvailable = null)
+        bool? isRadioAvailable = null,
+        CommunicationMenuMode? menuMode = null)
         => new(
             null,
             prefix,
@@ -70,7 +76,8 @@ public readonly struct CommunicationPolicy
             proximityLabel,
             radioLabel,
             proximityRange,
-            isRadioAvailable);
+            isRadioAvailable,
+            menuMode);
 
     /// <summary>この層で通信を許可します。</summary>
     public static CommunicationPolicy Enabled(
@@ -80,7 +87,8 @@ public readonly struct CommunicationPolicy
         string? proximityLabel = null,
         string? radioLabel = null,
         float? proximityRange = null,
-        bool? isRadioAvailable = null)
+        bool? isRadioAvailable = null,
+        CommunicationMenuMode? menuMode = null)
         => new(
             true,
             prefix,
@@ -89,7 +97,8 @@ public readonly struct CommunicationPolicy
             proximityLabel,
             radioLabel,
             proximityRange,
-            isRadioAvailable);
+            isRadioAvailable,
+            menuMode);
 
     /// <summary>この層で通信を禁止します。</summary>
     public static CommunicationPolicy Disabled(string? prefix = null) => new(false, prefix);
@@ -106,7 +115,8 @@ public readonly struct ResolvedCommunicationPolicy
         string? proximityLabel = "近接",
         string? radioLabel = "通信",
         float proximityRange = 8f,
-        bool isRadioAvailable = true)
+        bool isRadioAvailable = true,
+        CommunicationMenuMode menuMode = CommunicationMenuMode.Scp330)
     {
         IsAvailable = isAvailable;
         Prefix = prefix ?? string.Empty;
@@ -116,6 +126,7 @@ public readonly struct ResolvedCommunicationPolicy
         RadioLabel = radioLabel ?? "通信";
         ProximityRange = proximityRange;
         IsRadioAvailable = isRadioAvailable;
+        MenuMode = menuMode;
     }
 
     public bool IsAvailable { get; }
@@ -134,6 +145,8 @@ public readonly struct ResolvedCommunicationPolicy
 
     public bool IsRadioAvailable { get; }
 
+    public CommunicationMenuMode MenuMode { get; }
+
     internal ResolvedCommunicationPolicy Apply(CommunicationPolicy policy)
         => new(
             policy.IsAvailable ?? IsAvailable,
@@ -143,5 +156,16 @@ public readonly struct ResolvedCommunicationPolicy
             policy.ProximityLabel ?? ProximityLabel,
             policy.RadioLabel ?? RadioLabel,
             policy.ProximityRange ?? ProximityRange,
-            policy.IsRadioAvailable ?? IsRadioAvailable);
+            policy.IsRadioAvailable ?? IsRadioAvailable,
+            policy.MenuMode ?? MenuMode);
+}
+
+/// <summary>定型文を選ぶために使うクライアントUIです。</summary>
+public enum CommunicationMenuMode
+{
+    /// <summary>SCP-330の6分割メニューを一時的に使用します。</summary>
+    Scp330,
+
+    /// <summary>画面下部の文字メニューをServer Specific Settingsキーで操作します。</summary>
+    Text,
 }

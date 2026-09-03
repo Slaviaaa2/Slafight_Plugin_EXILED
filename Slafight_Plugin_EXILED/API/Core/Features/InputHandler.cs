@@ -101,6 +101,11 @@ public sealed class InputHandler : EventHandlerBase
             return;
         }
 
+        // インベントリを持たない役職向け文字メニューを開いている間だけ、
+        // 既存の能力操作キーを選択操作として消費する。閉じれば通常処理へ戻る。
+        if (CannedChatMenuApi.TryHandleTextInput(player, keybind.SettingId))
+            return;
+
         if (!player.IsAlive) return;
 
         if (keybind.SettingId == ServerSpecifics.AbilityUseKeybindSettingId)

@@ -22,5 +22,6 @@ public sealed class Scp079 : CustomRole
     public override CommunicationPolicy Communication =>
         CommunicationPolicy.Enabled(
             proximityPrefix: "???",
-            isRadioAvailable: false);
+            isRadioAvailable: false,
+            menuMode: CommunicationMenuMode.Text);
 }
