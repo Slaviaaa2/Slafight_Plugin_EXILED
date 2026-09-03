@@ -7,6 +7,9 @@ using Exiled.Events.EventArgs.Player;
 using HintServiceMeow.Core.Enum;
 using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.Core.Utilities;
+using InventorySystem;
+using InventorySystem.Items;
+using InventorySystem.Items.Radio;
 using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Core.Structs;
 using Slafight_Plugin_EXILED.API.Enums;
@@ -58,7 +61,7 @@ public static class CommunicationApi
     private static readonly Dictionary<PlayerTeam, ResolvedCommunicationPolicy> TeamPolicies =
         new(DefaultTeamPolicies);
 
-    /// <summary>通信が正常に少なくとも1人へ配信された後に発火します。</summary>
+    /// <summary>通信が正常に少なくとも1人へ配信された経路ごとに発火します。</summary>
     public static event Action<CommunicationEntry>? Sent;
 
     /// <summary>
@@ -70,7 +73,62 @@ public static class CommunicationApi
         string text,
         IEnumerable<Player>? recipients = null,
         string category = "通信")
-        => SendNearby(sender, text, DefaultRange, recipients, category);
+        => SendRouted(sender, text, recipients, category);
+
+    /// <summary>
+    /// 近接経路とRadio経路へ1回の発言を配信します。
+    /// 近接範囲内の受信者には近接表示を優先し、同じ発言を二重には表示しません。
+    /// </summary>
+    public static int SendRouted(
+        Player sender,
+        string text,
+        IEnumerable<Player>? recipients = null,
+        string category = "通信")
+    {
+        if (sender is null || !sender.IsSafePlayer())
+            return 0;
+
+        ResolvedCommunicationPolicy policy = ResolvePolicy(sender);
+        if (!policy.IsAvailable)
+            return 0;
+
+        Player[] candidates = (recipients ?? Player.List)
+            .Where(viewer => viewer is not null && viewer.IsSafePlayer() && viewer.IsAlive)
+            .Distinct()
+            .ToArray();
+
+        float proximityRange = Mathf.Max(0f, policy.ProximityRange);
+        float squaredProximityRange = proximityRange * proximityRange;
+        Player[] nearby = candidates
+            .Where(viewer => CanReceiveNearby(sender, viewer, squaredProximityRange))
+            .ToArray();
+        var nearbyNetIds = new HashSet<uint>(nearby.Select(viewer => viewer.NetId));
+
+        int delivered = SendCore(
+            Safe(sender.Nickname),
+            text,
+            nearby,
+            ResolveRouteLabel(category, policy.ProximityLabel),
+            policy.ProximityPrefix,
+            CommunicationRoute.Proximity);
+
+        if (!policy.IsRadioAvailable || !TryGetUsableRadio(sender, out RadioItem senderRadio))
+            return delivered;
+
+        Player[] radioOnly = candidates
+            .Where(viewer => !nearbyNetIds.Contains(viewer.NetId) && CanReceiveRadio(sender, senderRadio, viewer))
+            .ToArray();
+
+        delivered += SendCore(
+            Safe(sender.Nickname),
+            text,
+            radioOnly,
+            ResolveRouteLabel(category, policy.RadioLabel),
+            policy.RadioPrefix,
+            CommunicationRoute.Radio);
+
+        return delivered;
+    }
 
     /// <summary>
     /// 指定距離内へプレイヤー発信の通信を送ります。
@@ -102,8 +160,9 @@ public static class CommunicationApi
             Safe(sender.Nickname),
             text,
             nearby,
-            category,
-            policy.Prefix);
+            ResolveRouteLabel(category, policy.ProximityLabel),
+            policy.ProximityPrefix,
+            CommunicationRoute.Proximity);
     }
 
     /// <summary>
@@ -115,7 +174,13 @@ public static class CommunicationApi
         string text,
         IEnumerable<Player>? recipients = null,
         string category = "通信")
-        => SendCore(senderName, text, recipients ?? Player.List, category, string.Empty);
+        => SendCore(
+            senderName,
+            text,
+            recipients ?? Player.List,
+            category,
+            string.Empty,
+            CommunicationRoute.Direct);
 
     /// <summary>
     /// マップ装置などの任意座標を発信源として、指定距離内の生存者へ通信を送ります。
@@ -138,7 +203,7 @@ public static class CommunicationApi
             .Distinct()
             .ToArray();
 
-        return SendCore(senderName, text, nearby, category, prefix);
+        return SendCore(senderName, text, nearby, category, prefix, CommunicationRoute.Proximity);
     }
 
     /// <summary>プレイヤーが現在の陣営・役職で定型文通信を利用できるか返します。</summary>
@@ -170,11 +235,15 @@ public static class CommunicationApi
     /// <summary>指定したバニラ陣営の既定可否と Prefix を変更します。</summary>
     public static void SetTeamPolicy(PlayerTeam team, bool isAvailable, string? prefix = null)
     {
-        string currentPrefix = TeamPolicies.TryGetValue(team, out ResolvedCommunicationPolicy current)
-            ? current.Prefix
-            : string.Empty;
+        ResolvedCommunicationPolicy current = GetTeamPolicy(team);
+        TeamPolicies[team] = current.Apply(new CommunicationPolicy(isAvailable, prefix));
+    }
 
-        TeamPolicies[team] = new ResolvedCommunicationPolicy(isAvailable, prefix ?? currentPrefix);
+    /// <summary>指定したバニラ陣営へ詳細な通信設定を重ねます。</summary>
+    public static void SetTeamPolicy(PlayerTeam team, CommunicationPolicy policy)
+    {
+        ResolvedCommunicationPolicy current = GetTeamPolicy(team);
+        TeamPolicies[team] = current.Apply(policy);
     }
 
     /// <summary>指定したバニラ陣営の現在の既定設定を返します。</summary>
@@ -196,7 +265,8 @@ public static class CommunicationApi
         string text,
         IEnumerable<Player> recipients,
         string category,
-        string? prefix)
+        string? prefix,
+        CommunicationRoute route)
     {
         if (!Round.IsStarted)
             return 0;
@@ -210,6 +280,7 @@ public static class CommunicationApi
             normalized,
             NormalizeLabel(category, "通信", MaxCategoryLength),
             NormalizeOptionalLabel(prefix, MaxPrefixLength),
+            route,
             DateTime.UtcNow);
 
         int delivered = 0;
@@ -405,6 +476,39 @@ public static class CommunicationApi
         => viewer is not null && viewer.IsSafePlayer() && viewer.IsAlive &&
            (origin - viewer.Position).sqrMagnitude <= squaredRange;
 
+    /// <summary>プレイヤーが電源ONかつ電池残量ありのRadioを所持しているか返します。</summary>
+    public static bool TryGetUsableRadio(Player? player, out RadioItem radio)
+    {
+        radio = null!;
+        if (player is null || !player.IsSafePlayer() ||
+            !RadioMessages.GetRadio(player.ReferenceHub, out RadioItem found) || !found.IsUsable)
+            return false;
+
+        radio = found;
+        return true;
+    }
+
+    private static bool CanReceiveRadio(Player sender, RadioItem senderRadio, Player viewer)
+    {
+        if (!TryGetUsableRadio(viewer, out RadioItem receiverRadio))
+            return false;
+
+        int rangeId = Mathf.Max(senderRadio._rangeId, receiverRadio._rangeId);
+        RadioItem rangeSource = senderRadio;
+        if (InventoryItemLoader.TryGetItem(ItemType.Radio, out RadioItem template))
+            rangeSource = template;
+
+        if (rangeSource.Ranges is null || rangeId < 0 || rangeId >= rangeSource.Ranges.Length)
+            return false;
+
+        return rangeSource.Ranges[rangeId].CheckRange(sender.Position, viewer.Position, out _);
+    }
+
+    private static string ResolveRouteLabel(string requestedCategory, string routeLabel)
+        => string.Equals(requestedCategory, "通信", StringComparison.Ordinal)
+            ? routeLabel
+            : requestedCategory;
+
     private static string Normalize(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -447,16 +551,28 @@ public static class CommunicationApi
 public sealed class CommunicationEntry
 {
     public CommunicationEntry(string sender, string text, string category, DateTime sentAtUtc)
-        : this(sender, text, category, string.Empty, sentAtUtc)
+        : this(sender, text, category, string.Empty, CommunicationRoute.Direct, sentAtUtc)
     {
     }
 
     public CommunicationEntry(string sender, string text, string category, string prefix, DateTime sentAtUtc)
+        : this(sender, text, category, prefix, CommunicationRoute.Direct, sentAtUtc)
+    {
+    }
+
+    public CommunicationEntry(
+        string sender,
+        string text,
+        string category,
+        string prefix,
+        CommunicationRoute route,
+        DateTime sentAtUtc)
     {
         Sender = sender;
         Text = text;
         Category = category;
         Prefix = prefix ?? string.Empty;
+        Route = route;
         SentAtUtc = sentAtUtc;
     }
 
@@ -464,7 +580,16 @@ public sealed class CommunicationEntry
     public string Text { get; }
     public string Category { get; }
     public string Prefix { get; }
+    public CommunicationRoute Route { get; }
     public DateTime SentAtUtc { get; }
+}
+
+/// <summary>通信行がどの経路で受信されたか。</summary>
+public enum CommunicationRoute
+{
+    Direct,
+    Proximity,
+    Radio,
 }
 
 /// <summary>通信HUDの生成とラウンド／退出時の後始末を担当します。</summary>

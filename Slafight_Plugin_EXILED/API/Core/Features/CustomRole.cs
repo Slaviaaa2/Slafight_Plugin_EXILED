@@ -172,7 +172,10 @@ public abstract class CustomRole : IPlayerOwn
     /// <code>
     /// // 所属陣営では禁止でも、この役職だけ専用 Prefix 付きで許可する。
     /// public override CommunicationPolicy Communication =>
-    ///     CommunicationPolicy.Enabled("司令部");
+    ///     CommunicationPolicy.Enabled(
+    ///         proximityPrefix: "司令部",
+    ///         radioPrefix: "秘匿回線",
+    ///         proximityRange: 12f);
     /// </code>
     /// </example>
     public virtual CommunicationPolicy Communication => CommunicationPolicy.Inherit();
