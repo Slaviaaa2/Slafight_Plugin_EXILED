@@ -5,7 +5,6 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using Respawning;
 using Respawning.Waves;
-using Slafight_Plugin_EXILED.API.Interface;
 using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.API.Features;

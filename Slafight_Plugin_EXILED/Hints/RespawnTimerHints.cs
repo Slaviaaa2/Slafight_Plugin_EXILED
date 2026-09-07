@@ -11,9 +11,7 @@ using PlayerRoles;
 using Respawning;
 using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Core.Features;
-using Slafight_Plugin_EXILED.API.Interface;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
-using Server = Exiled.Events.Handlers.Server;
 
 namespace Slafight_Plugin_EXILED.Hints;
 

@@ -9,7 +9,6 @@ using Exiled.API.Features.Pickups;
 using Mirror;
 using ProjectMER.Features;
 using Slafight_Plugin_EXILED.API.Core.Features;
-using Slafight_Plugin_EXILED.API.Features;
 using UnityEngine;
 using PrefabType = Exiled.API.Enums.PrefabType;
 using BaseLocker = MapGeneration.Distributors.Locker;

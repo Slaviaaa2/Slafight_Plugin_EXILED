@@ -148,10 +148,10 @@
     <ItemGroup>
       <Folder Include="CustomItems\Accesibilities\InventoryChat\" />
       <Folder Include="CustomItems\Keycards\" />
+      <Folder Include="CustomRoles\Bases\" />
       <Folder Include="CustomRoles\ChaosInsurgents\" />
       <Folder Include="CustomRoles\Fifthists\" />
       <Folder Include="CustomRoles\FoundationForces\Guards\SecurityTeams\" />
-      <Folder Include="CustomRoles\FoundationForces\MTFs\Epsilon11\" />
       <Folder Include="CustomRoles\FoundationForces\MTFs\Eta10\" />
       <Folder Include="CustomRoles\FoundationForces\MTFs\Nu7\" />
       <Folder Include="CustomRoles\Neutrals\ClassD\" />

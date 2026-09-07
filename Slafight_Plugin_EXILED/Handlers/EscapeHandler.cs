@@ -5,7 +5,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs.Player;
-using Mirror;
 using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Core.Structs;

@@ -5,7 +5,6 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles.Voice;
-using Slafight_Plugin_EXILED.API.Interface;
 using ExiledIntercom = Exiled.API.Features.Intercom;
 using GameIntercom = PlayerRoles.Voice.Intercom;
 using PlayerHandler = Exiled.Events.Handlers.Player;

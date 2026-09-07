@@ -8,7 +8,6 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using InventorySystem.Items.Keycards;
 using MEC;
-using UnityEngine;
 using VoiceChat;
 
 namespace Slafight_Plugin_EXILED.API.Features;

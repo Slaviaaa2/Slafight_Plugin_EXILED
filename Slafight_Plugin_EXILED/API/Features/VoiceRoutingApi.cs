@@ -5,7 +5,6 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using PlayerRoles.Voice;
 using Slafight_Plugin_EXILED.API.Core.Features;
-using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using VoiceChat;

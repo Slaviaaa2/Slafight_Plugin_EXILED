@@ -3,7 +3,6 @@ using System.Linq;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using LabApi.Events.Arguments.PlayerEvents;
-using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Extensions;
 using PlayerHandlers = Exiled.Events.Handlers.Player;
 using ServerHandlers = Exiled.Events.Handlers.Server;

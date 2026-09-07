@@ -15,12 +15,10 @@ using PlayerRoles;
 using Slafight_Plugin_EXILED.API.Core.Features;
 using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Extensions;
 using UnityEngine;
 using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 using HintParameter = Hints.HintParameter;
-using Server = Exiled.Events.Handlers.Server;
 using SSKeybindHintParameter = Hints.SSKeybindHintParameter;
 
 namespace Slafight_Plugin_EXILED.Hints;

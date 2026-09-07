@@ -1,14 +1,10 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.Events.EventArgs.Scp079;
-using Exiled.Events.Handlers;
 using MEC;
 using Slafight_Plugin_EXILED.API.Core.Features;
-using Slafight_Plugin_EXILED.API.Enums;
-using Slafight_Plugin_EXILED.API.Interface;
 using Slafight_Plugin_EXILED.Extensions;
 using Player = Exiled.API.Features.Player;
 

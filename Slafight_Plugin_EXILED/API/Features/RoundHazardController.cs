@@ -3,13 +3,13 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Warhead;
 using LightContainmentZoneDecontamination;
-using Slafight_Plugin_EXILED.API.Interface;
+using Slafight_Plugin_EXILED.API.Core.Features;
 using MapHandler = Exiled.Events.Handlers.Map;
 using WarheadHandler = Exiled.Events.Handlers.Warhead;
 
 namespace Slafight_Plugin_EXILED.API.Features;
 
-public sealed class RoundHazardController : Slafight_Plugin_EXILED.API.Core.Features.EventHandlerBase
+public sealed class RoundHazardController : EventHandlerBase
 {
     private const string DefaultDecontaminationCancelMessage = "除染は取り消されました";
 

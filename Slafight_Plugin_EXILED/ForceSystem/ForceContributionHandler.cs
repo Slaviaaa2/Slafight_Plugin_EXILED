@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using Respawning;
-using Respawning.Waves;
 using Slafight_Plugin_EXILED.API.Core.Extensions;
 using Slafight_Plugin_EXILED.API.Core.Enums;
 using Slafight_Plugin_EXILED.API.Core.Features;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CustomPlayerEffects;
 using Exiled.API.Features;
-using PlayerRoles;
 using Slafight_Plugin_EXILED.CustomEffects;
 using Slafight_Plugin_EXILED.Extensions;
 using Slafight_Plugin_EXILED.API.Core.Features;

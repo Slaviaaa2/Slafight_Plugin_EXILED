@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
-using Exiled.CustomItems.API.Features;
 using MEC;
-using PlayerRoles;
-using Slafight_Plugin_EXILED.API.Enums;
 using Slafight_Plugin_EXILED.API.Features;
-using Slafight_Plugin_EXILED.API.Structs;
 using UnityEngine;
 using Random = System.Random;
 using CoreCustomItem = Slafight_Plugin_EXILED.API.Core.Features.CustomItem;
