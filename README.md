@@ -1,6 +1,6 @@
 # Slafight Plugin EXILED
 
-**Version:** `v1.9.0.0` | **Target:** SCP: Secret Laboratory / EXILED `9.14.2` / .NET Framework 4.8
+**Version:** `v2.0.0.0` | **Target:** SCP: Secret Laboratory / EXILED `9.15.0` / .NET Framework 4.8
 
 シャープ鯖向けに開発されている大型EXILEDプラグインです。カスタムロール、
 カスタムアイテム、特殊イベント、HUD、音声、ProjectMER製マップ・ギミックを
@@ -42,7 +42,7 @@ Slafightの現行構成は、以下のSharp Server管理リポジトリで構成
 
 ### 直接参照
 
-- EXILED `9.14.2`
+- EXILED `9.15.0`
 - `ProjectMER.dll`
 - `HintServiceMeow-Exiled.dll`
 - `SNAPI-HSM.dll`
@@ -50,11 +50,8 @@ Slafightの現行構成は、以下のSharp Server管理リポジトリで構成
 
 ### 音声・運用ランタイム
 
-- `AudioPlayerApi.dll`
-- `SCPSLAudioApi.dll`
-- `NVorbis.dll`
-- `ffmpeg.exe`
-- `yt-dlp.exe`
+- ffmpeg
+- yt-dlp
 - `MEROptimizerLabAPI.dll`（現行サーバー構成で併用）
 
 正確なコンパイル参照は
@@ -74,8 +71,6 @@ Slafightの現行構成は、以下のSharp Server管理リポジトリで構成
 
 %APPDATA%\EXILED\Plugins\dependencies\
   0Harmony.dll
-  AudioPlayerApi.dll
-  SCPSLAudioApi.dll
   ...音声・管理ライブラリ
 
 %APPDATA%\SCP Secret Laboratory\LabAPI\plugins\7777\
